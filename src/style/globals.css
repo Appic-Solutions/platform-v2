@@ -1,0 +1,13 @@
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import colors properties */
+@import "./colors.css";
+
+/* Import radius properties */
+@import "./radius.css";
+
+/* Import fonts */
+@import "./fonts.css";

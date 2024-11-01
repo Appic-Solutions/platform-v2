@@ -1,0 +1,12 @@
+:root {
+  --radius-sharp: 0px;
+  --radius-xxs: 2px;
+  --radius-xs: 2px;
+  --radius-s: 4px;
+  --radius-sm: 6px;
+  --radius-m: 10px;
+  --radius-ml: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 36px;
+  --radius-round: 999px;
+}

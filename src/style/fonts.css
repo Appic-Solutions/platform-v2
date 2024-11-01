@@ -1,0 +1,32 @@
+/* Lora font */
+@font-face {
+  font-family: "Lora";
+  src:
+    url("../../public/fonts/Lora/Lora-Regular.woff2") format("woff2"),
+    url("../../public/fonts/Lora/Lora-Regular.woff") format("woff"),
+    url("../../public/fonts/Lora/Lora-Regular.ttf") format("truetype"),
+    url("../../public/fonts/Lora/Lora-Regular.eot");
+  src: url("../../public/fonts/Lora/Lora-Regular.eot?#iefix")
+    format("embedded-opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* RethinkSans font */
+@font-face {
+  font-family: "RethinkSans";
+  src:
+    url("../../public/fonts/RethinkSans/RethinkSans-Regular.woff2")
+      format("woff2"),
+    url("../../public/fonts/RethinkSans/RethinkSans-Regular.woff")
+      format("woff"),
+    url("../../public/fonts/RethinkSans/RethinkSans-Regular.ttf")
+      format("truetype"),
+    url("../../public/fonts/RethinkSans/RethinkSans-Regular.eot");
+  src: url("../../public/fonts/RethinkSans/RethinkSans-Regular.eot?#iefix")
+    format("embedded-opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
