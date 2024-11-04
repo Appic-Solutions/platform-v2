@@ -1,9 +1,11 @@
+import FeatureBox from "@/components/layout/FeatureBox";
+
 const Home = () => {
   return (
-    <div>
-      home
+    <div className="flex justify-center h-screen items-center">
+      <FeatureBox />
     </div>
   );
-}
+};
 
 export default Home;
