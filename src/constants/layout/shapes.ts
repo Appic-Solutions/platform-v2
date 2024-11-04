@@ -1,45 +1,39 @@
 export interface ShapeSize {
-  width: number
-  height: number
-  positionX: number
-  positionY: number
+  width: string
+  height: string
+  positionTop?: string
+  positionBottom?: string
+  positionRight?: string
+  positionLeft?: string
 }
 
 export const shapesSizes: ShapeSize[] = [
   {
-    height: 101,
-    width: 101,
-    positionX: 0,
-    positionY: 0,
+    width: "101px",
+    height: "101px",
+    positionTop: "50px",
+    positionLeft: "80px",
   },
   {
-    height: 131,
-    width: 131,
-    positionX: 0,
-    positionY: 0,
+    width: "131px",
+    height: "131px",
+    positionLeft: "180px",
+    positionBottom: "201px",
   },
   {
-    height: 68,
-    width: 68,
-    positionX: 0,
-    positionY: 0,
+    width: "68px",
+    height: "68px",
   },
   {
-    height: 101,
-    width: 101,
-    positionX: 0,
-    positionY: 0,
+    width: "101px",
+    height: "101px",
   },
   {
-    height: 101,
-    width: 101,
-    positionX: 0,
-    positionY: 0,
+    width: "101px",
+    height: "101px",
   },
   {
-    height: 239,
-    width: 239,
-    positionX: 0,
-    positionY: 0,
+    width: "239px",
+    height: "239px",
   },
 ]

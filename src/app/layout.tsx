@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "../style/globals.css";
-import ShapesPage from "@/components/layout/shapes";
+import HeaderPage from "@/components/layout/header";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,9 +13,9 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en" className="dark bg-background-main bg-no-repeat h-screen">
-      <body className="max-w-[1920] m-auto">
-        <ShapesPage />
+    <html lang="en" className="dark bg-background-main bg-no-repeat">
+      <body className="relative w-full max-w-[1920px] mx-auto flex flex-col">
+        <HeaderPage />
         {children}
       </body>
     </html>
