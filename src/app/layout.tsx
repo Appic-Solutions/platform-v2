@@ -14,7 +14,6 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en">
-      {/* TEMP: Temporary code for testing purposes (h-screen) */}
       <body className="relative w-full max-w-[1920px] bg-background-dark">
         <HeaderPage />
         {children}
