@@ -13,13 +13,14 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en" className="dark bg-background-main bg-no-repeat">
-      <body className="relative w-full max-w-[1920px] mx-auto flex flex-col">
+    <html lang="en">
+      {/* TEMP: Temporary code for testing purposes (h-screen) */}
+      <body className="relative w-full max-w-[1920px] bg-background-dark">
         <HeaderPage />
         {children}
       </body>
     </html>
   );
-}
+};
 
 export default RootLayout;

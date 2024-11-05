@@ -1,0 +1,4 @@
+/* container */
+.modified-container {
+  @apply px-6 xl:px-12;
+}

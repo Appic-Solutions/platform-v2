@@ -1,9 +1,15 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-const FeatureBox = () => {
+type FeatureBoxProps = {
+  children: ReactNode;
+};
+
+const FeatureBox: React.FC<FeatureBoxProps> = ({ children }) => {
   return (
-    <div className="p-2 max-w-[80%] min-w-[50%] h-[80%] bg-white bg-opacity-25 rounded-[28px]">
-      <div className="rounded-lg p-4 bg-input-fields h-full">FeatureBox</div>;
+    <div className="p-2 w-full lg:w-min lg:max-w-[80%] min-w-[40%] lg:bg-white lg:bg-opacity-25 rounded-xl backdrop-blur-sm">
+      <div className="rounded-lg lg:px-16 py-8 lg:bg-input-fields lg:dark:bg-background-dark h-full flex flex-col gap-4">
+        {children}
+      </div>
     </div>
   );
 };

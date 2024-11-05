@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
@@ -7,7 +7,19 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "class",
+  corePlugins: {
+    container: false,
+  },
   theme: {
+    /* Container */
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1.5rem",
+        xl: "3rem",
+      },
+    },
+
     /* Radius */
     borderRadius: {
       sharp: "0px",
@@ -19,6 +31,7 @@ const config: Config = {
       ml: "16px",
       lg: "24px",
       xl: "36px",
+      "2xl": "46px",
       round: "999px",
     },
 
@@ -99,6 +112,7 @@ const config: Config = {
         "primary-buttons": "var(--primary-buttons)",
         "highlighed-components": "var(--highlighed-components)",
         "background-main": "var(--background-main)",
+        "background-dark": "var(--background-dark)",
       },
 
       /* Box Shadow */
@@ -108,5 +122,5 @@ const config: Config = {
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;
