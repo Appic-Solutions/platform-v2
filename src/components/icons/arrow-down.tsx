@@ -1,10 +1,17 @@
-const ArrowDownIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+const ArrowDownIcon = ({
+  className,
+  width,
+  height,
+  ...props
+}: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      width="18"
-      height="18"
+      width={width || "18"}
+      height={height || "18"}
       viewBox="0 0 14 18"
       fill="none"
+      stroke="currentColor"
+      className={className || "fill-[#333333]"}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

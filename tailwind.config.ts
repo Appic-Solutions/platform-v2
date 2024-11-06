@@ -104,6 +104,7 @@ const config: Config = {
         active: "rgb(var(--active))",
         success: "rgb(var(--success))",
         fail: "rgb(var(--fail))",
+        muted: "rgb(var(--muted))",
       },
 
       /* Background */

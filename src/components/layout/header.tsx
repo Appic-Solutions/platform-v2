@@ -9,10 +9,21 @@ const HeaderPage = () => {
   const path = usePathname();
 
   return (
-    <header className={cn("order-last lg:order-first", "flex items-center justify-between", "pt-5 pb-3.5 modified-container")}>
+    <header
+      className={cn(
+        "order-last lg:order-first",
+        "flex items-center justify-between",
+        "pt-5 pb-3.5 modified-container"
+      )}
+    >
       {/* Logo */}
       <Link href="/" className="min-w-[52px] min-h-11 hidden lg:flex">
-        <Image src={"/images/logo/white-logo.png"} alt="logo" width={52} height={44} />
+        <Image
+          src={"/images/logo/white-logo.png"}
+          alt="logo"
+          width={52}
+          height={44}
+        />
       </Link>
 
       {/* Navbar Menu */}
@@ -30,11 +41,19 @@ const HeaderPage = () => {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
-                  path === item.href && "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]"
+                  path === item.href &&
+                    "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]"
                 )}
               >
                 <item.Icon className="min-w-5 min-h-5" />
-                <span className={cn("hidden md:flex", "text-mobile-highlight-bold lg:text-highlight-bold")}>{item.label}</span>
+                <span
+                  className={cn(
+                    "hidden md:flex",
+                    "text-mobile-highlight-bold lg:text-highlight-bold"
+                  )}
+                >
+                  {item.label}
+                </span>
               </Link>
             </li>
           ))}
@@ -42,7 +61,13 @@ const HeaderPage = () => {
       </nav>
 
       {/* User Wallet */}
-      <div className={cn("bg-[#FAF7FD80]/50 rounded-round border border-[#ECE6F5] py-2 px-4 hidden lg:flex")}>User Wallet</div>
+      <div
+        className={cn(
+          "bg-[#FAF7FD80]/50 rounded-round border border-[#ECE6F5] py-2 px-4 hidden lg:flex"
+        )}
+      >
+        User Wallet
+      </div>
     </header>
   );
 };
