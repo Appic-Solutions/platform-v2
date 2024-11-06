@@ -14,7 +14,7 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en">
-      <body className=" relative w-full max-w-[1920px] bg-background-dark">
+      <body className="dark relative w-full max-w-[1920px] bg-background-dark">
         <HeaderPage />
         {children}
       </body>
