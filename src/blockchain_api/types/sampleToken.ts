@@ -143,3 +143,7 @@ const tokens: Token[] = [
     chainTypes: "ICP",
   },
 ];
+
+function filterTokensByChainId(chainId: number): Token[] {
+  return tokens.filter((token) => token.chainId === chainId);
+}
