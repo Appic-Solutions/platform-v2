@@ -1,20 +1,22 @@
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { AllHTMLAttributes, FC } from "react";
 
 type CardProps = {
   children: React.ReactNode;
   className?: string;
-};
+} & AllHTMLAttributes<HTMLDivElement>;
 
-const Card: React.FC<CardProps> = ({ children, className }) => {
+const Card: FC<CardProps> = ({ children, className, ...other }) => {
   return (
     <div
       className={cn(
-        "text-white lg:text-primary text-hero-bold font-bold",
-        "px-4 md:px-12 py-8 w-full bg-background-dark md:bg-background-main max-w-lg md:max-w-full",
-        "rounded-2xl border-2 border-white relative",
-        { className }
+        "relative w-full max-w-lg px-4 py-8",
+        "text-white text-hero-bold font-bold",
+        "bg-background-dark rounded-2xl border-2 border-white",
+        "md:px-12 md:max-w-full md:bg-background-main lg:text-primary",
+        className
       )}
+      {...other}
     >
       {children}
     </div>

@@ -14,7 +14,7 @@ export interface NavbarItem {
 export const NAVBAR_ITEMS: NavbarItem[] = [
   {
     label: "Swap",
-    href: "/",
+    href: "/bridge",
     tooltip: "Swap",
     Icon: ParkOutlineBridgeIcon,
   },

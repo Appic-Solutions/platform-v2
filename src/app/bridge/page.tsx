@@ -8,7 +8,7 @@ import Card from "@/components/ui/Card";
 
 const BridgeHome = () => {
   return (
-    <div className="relative w-full h-full mt-14 modified-container flex justify-center">
+    <div className="relative w-full h-full flex justify-center px-6 xl:px-12">
       <ShapesPage />
       <div className="flex justify-center items-center h-full w-full z-10">
         <FeatureBox>
@@ -33,7 +33,6 @@ const BridgeHome = () => {
                   <div className="flex items-center gap-4">
                     <TokenPlaceHolderIcon className="fill-primary stroke-white dark:stroke-black" />
                     <span className="text-primary text-mobile-heading-2">
-                      {" "}
                       Select Token
                     </span>
                     <span
@@ -50,7 +49,6 @@ const BridgeHome = () => {
                   <div className="flex relative items-center gap-4">
                     <TokenPlaceHolderIcon className="fill-muted stroke-white dark:stroke-black" />
                     <span className="text-muted text-mobile-heading-2">
-                      {" "}
                       Select Token
                     </span>
                   </div>
