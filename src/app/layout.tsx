@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../style/globals.css";
 import HeaderPage from "@/components/layout/header";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,13 +14,16 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en">
-      <body className="dark relative w-full max-w-[1920px] bg-background-dark">
+    <html lang="en" className="dark bg-background-main bg-no-repeat h-screen">
+      <body className={cn(
+        "relative max-w-[1920px] mx-auto w-full h-full",
+        "flex flex-col items-center justify-center"
+      )}>
         <HeaderPage />
         {children}
       </body>
     </html>
   );
-};
+}
 
 export default RootLayout;
