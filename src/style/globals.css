@@ -11,3 +11,19 @@
 
 /* Import fonts */
 @import "./fonts.css";
+
+/* Font family styles */
+@layer base {
+  html {
+    font-family: "RethinkSans", sans-serif;
+  }
+
+  .text-display-1,
+  .text-display-2,
+  .text-display-3,
+  .text-mobile-display-1,
+  .text-mobile-display-2,
+  .text-mobile-display-3 {
+    font-family: "Lora", serif;
+  }
+}
