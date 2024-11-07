@@ -13,27 +13,27 @@ export interface NavbarItem {
 
 export const NAVBAR_ITEMS: NavbarItem[] = [
   {
-    label: "Swap",
-    href: "/bridge",
-    tooltip: "Swap",
+    label: "Bridge",
+    href: "/",
+    tooltip: "Bridge",
     Icon: ParkOutlineBridgeIcon,
   },
   {
-    label: "Cross chain",
-    href: "/cross-chain",
+    label: "Swap",
+    href: "/swap",
     tooltip: "Swap",
     Icon: BlockChainIcon,
   },
   {
-    label: "Auto invest",
+    label: "Auto Invest",
     href: "/auto-invest",
-    tooltip: "Auto invest",
+    tooltip: "Auto Invest",
     Icon: TransformDataIcon,
   },
   {
     label: "Advanced",
     href: "/advanced",
-    tooltip: "Swap",
+    tooltip: "Advanced",
     Icon: LockIcon,
   },
 ]
