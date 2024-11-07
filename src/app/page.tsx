@@ -1,3 +1,5 @@
+"use client";
+
 import FeatureBox from "@/components/layout/FeatureBox";
 import ShapesPage from "@/components/layout/shapes";
 import TransformDataHorizontalIcon from "@/components/icons/transform-data-horizontal";
@@ -5,60 +7,88 @@ import TokenPlaceHolderIcon from "@/components/icons/token-placeholder";
 import ArrowDownIcon from "@/components/icons/arrow-down";
 import { cn } from "@/lib/utils";
 import Card from "@/components/ui/Card";
+import { useState } from "react";
+import Button from "@/components/ui/button/button";
 
 const BridgeHome = () => {
+  const [isFirstTokenSelected] = useState(false);
+  const [isSecondTokenSelected] = useState(false);
+
   return (
-    <div className="relative w-full h-full flex justify-center px-6 xl:px-12">
+    <div
+      className={cn(
+        "relative w-full flex justify-center px-6 h-full",
+        "xl:px-12"
+      )}
+    >
       <ShapesPage />
-      <div className="flex justify-center items-center h-full w-full z-10">
+      <div
+        className={cn(
+          "flex justify-center items-center w-full z-10 pt-12",
+          "md:w-min md:pb-12"
+        )}
+      >
         <FeatureBox>
-          <div className="flex flex-col gap-12 items-center w-full max-w-lg lg:max-w-full ">
-            {/* header */}
+          <div
+            className={cn(
+              "flex flex-col gap-8 items-center w-full",
+              "max-w-lg lg:max-w-full justify-between h-full"
+            )}
+          >
             <div className="flex justify-between items-center w-full">
               <h3 className="text-mobile-heading-2 md:text-heading-3 font-bold text-primary">
                 Bridge
               </h3>
-              <div className="flex items-center gap-2">
-                <TransformDataHorizontalIcon className="stroke-primary" />
-                <span className="text-caption-bold font-medium text-primary">
+              <button className="flex items-center gap-2 text-primary opacity-90">
+                <TransformDataHorizontalIcon className="text-primary" />
+                <span className="text-caption-bold font-medium">
                   Change to swap
                 </span>
-              </div>
+              </button>
             </div>
-            {/* body */}
             <div className="flex flex-col gap-12 items-center w-full">
-              {/* inputs */}
               <div className="w-full flex flex-col gap-4 items-center">
                 <Card>
-                  <div className="flex items-center gap-4">
-                    <TokenPlaceHolderIcon className="fill-primary stroke-white dark:stroke-black" />
-                    <span className="text-primary text-mobile-heading-2">
+                  <p className="text-caption-bold font-medium text-primary opacity-50 mb-3">
+                    From
+                  </p>
+                  <div className="flex items-center gap-4 text-primary">
+                    <TokenPlaceHolderIcon className="stroke-white dark:stroke-black" />
+                    <span className="text-mobile-heading-2 text-primary">
                       Select Token
                     </span>
                     <span
                       className={cn(
-                        "p-5 rounded-round flex items-center gap-4 bg-muted border-2 border-white",
-                        "absolute left-1/2 -translate-x-1/2 -bottom-10 z-10"
+                        "p-4 rounded-round flex items-center gap-4 bg-muted",
+                        "dark:bg-background-dark border-2 border-white border-opacity-25",
+                        "absolute left-1/2 -translate-x-1/2 -bottom-9 z-10"
                       )}
                     >
-                      <ArrowDownIcon className="fill-primary" />
+                      <ArrowDownIcon className="text-primary" />
                     </span>
                   </div>
                 </Card>
                 <Card>
-                  <div className="flex relative items-center gap-4">
-                    <TokenPlaceHolderIcon className="fill-muted stroke-white dark:stroke-black" />
-                    <span className="text-muted text-mobile-heading-2">
+                  <p className="text-caption-bold font-medium text-primary opacity-50 mb-3">
+                    To
+                  </p>
+                  <div className="flex items-center gap-4 text-primary">
+                    <TokenPlaceHolderIcon className="stroke-white dark:stroke-black " />
+                    <span className=" text-mobile-heading-2 text-primary">
                       Select Token
                     </span>
                   </div>
                 </Card>
               </div>
             </div>
-            {/* footer */}
-            <div className="w-11/12 bg-primary-buttons py-4 rounded-ml text-center text-content-bold font-medium text-white">
-              Connect Wallet
-            </div>
+            <Button
+              isDisable={isFirstTokenSelected || isSecondTokenSelected}
+              variant="contained"
+              color="primary"
+              className="w-full"
+            >
+              Confirm
+            </Button>
           </div>
         </FeatureBox>
       </div>

@@ -1,10 +1,10 @@
 export interface ShapeSize {
-  width: string
-  height: string
-  positionTop?: string
-  positionBottom?: string
-  positionRight?: string
-  positionLeft?: string
+  width: string;
+  height: string;
+  positionTop?: string;
+  positionBottom?: string;
+  positionRight?: string;
+  positionLeft?: string;
 }
 
 export const shapesSizes: ShapeSize[] = [
@@ -52,9 +52,9 @@ export const shapesSizes: ShapeSize[] = [
   },
   // right_bottom
   {
-    positionRight: "29%",
-    positionBottom: "22%",
+    positionRight: "25%",
+    positionBottom: "0%",
     width: "101px",
     height: "101px",
   },
-]
+];

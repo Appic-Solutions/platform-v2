@@ -10,10 +10,10 @@ const Card: FC<CardProps> = ({ children, className, ...other }) => {
   return (
     <div
       className={cn(
-        "relative w-full max-w-lg px-4 py-8",
+        "relative w-full max-w-lg px-12 py-8",
         "text-white text-hero-bold font-bold",
-        "bg-background-dark rounded-2xl border-2 border-white",
-        "md:px-12 md:max-w-full md:bg-background-main lg:text-primary",
+        "bg-background-dark rounded-2xl border-2 border-white border-opacity-25",
+        "md:bg-input-fields md:max-w-full md:text-primary",
         className
       )}
       {...other}

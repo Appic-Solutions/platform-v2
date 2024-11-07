@@ -114,6 +114,7 @@ const config: Config = {
         "highlighed-components": "var(--highlighed-components)",
         "background-main": "var(--background-main)",
         "background-dark": "var(--background-dark)",
+        "shapes-background": "var(--shapes-background)",
       },
 
       /* Box Shadow */

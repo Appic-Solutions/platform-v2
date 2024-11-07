@@ -15,15 +15,17 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en" className="dark bg-background-main bg-no-repeat h-screen">
-      <body className={cn(
-        "relative max-w-[1920px] mx-auto w-full h-full",
-        "flex flex-col items-center justify-center"
-      )}>
+      <body
+        className={cn(
+          "relative max-w-[1920px] mx-auto w-full h-full",
+          "flex flex-col items-center justify-between"
+        )}
+      >
         <HeaderPage />
         {children}
       </body>
     </html>
   );
-}
+};
 
 export default RootLayout;
