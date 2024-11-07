@@ -10,7 +10,7 @@ interface EvmToken {
   usdHoldingAmount?: number; // Optional: Value in USD of the user's holdings
 }
 
-interface IpcToken {
+interface IcpToken {
   name: string; // Name of the token (e.g., "Ethereum")
   symbol: string; // Token symbol (e.g., "ETH")
   logo: string; // URL for the token's logo image

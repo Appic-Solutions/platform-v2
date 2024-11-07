@@ -1,4 +1,4 @@
-const tokens: EvmToken[] = [
+const sample_tokens: EvmToken[] = [
   {
     name: "Ethereum",
     symbol: "ETH",
