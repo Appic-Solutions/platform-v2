@@ -1,7 +1,9 @@
-import BlockChainIcon from "@/components/icons/blockchain"
-import LockIcon from "@/components/icons/lock"
-import ParkOutlineBridgeIcon from "@/components/icons/park-outline-bridge"
-import TransformDataIcon from "@/components/icons/transform-data"
+import {
+  blockchainIcon,
+  LockIcon,
+  ParkOutlineBridgeIcon,
+  TransformDataIcon,
+} from "@/components/icons"
 import { ElementType } from "react"
 
 export interface NavbarItem {
@@ -22,7 +24,7 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: "Swap",
     href: "/swap",
     tooltip: "Swap",
-    Icon: BlockChainIcon,
+    Icon: blockchainIcon,
   },
   {
     label: "Auto Invest",

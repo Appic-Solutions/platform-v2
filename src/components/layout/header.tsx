@@ -13,7 +13,7 @@ const HeaderPage = () => {
       className={cn(
         "order-last lg:order-first w-full",
         "flex items-center justify-between",
-        "pt-5 pb-3.5 px-6 xl:px-12"
+        "pt-5 pb-3.5 px-6 xl:px-12 z-10"
       )}>
 
       {/* Logo */}
