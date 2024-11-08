@@ -40,9 +40,18 @@
     rgba(21, 21, 21, 1) 0%,
     rgba(8, 8, 8, 1) 100%
   );
+  --active: 1, 255, 18;
   --success: 13, 152, 87;
   --fail: 255, 0, 0;
   --muted: 136, 136, 136;
+
+  --box-background: radial-gradient(
+    100% 249.45% at 0% 2.78%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.35) 100%
+  );
+
+  --box-border: #ffffff3d;
 }
 
 /* Dark mode colors properties */
@@ -75,4 +84,12 @@
     rgba(8, 8, 8, 1) 100%
   );
   --muted: 141, 141, 141;
+
+  --box-background: radial-gradient(
+    100% 249.45% at 0% 2.78%,
+    #151515 0%,
+    #080808 100%
+  );
+
+  --box-border: #6363633d;
 }
