@@ -16,7 +16,7 @@ const Box: FC<BoxProps> = ({ children, className }) => {
         "*:z-10",
         // Box Background
         "max-md:before:hidden before:content-[''] before:absolute before:inset-0",
-        "before:bg-box-background before:bg-center before:bg-no-repeat before:backdrop-blur-[25px]",
+        "before:bg-box-background before:bg-center before:bg-no-repeat",
         className
       )}>
       {children}

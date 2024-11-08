@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../style/globals.css";
 import HeaderPage from "@/components/layout/header";
 import { cn } from "@/lib/utils";
+import ShapesPage from "@/components/layout/shapes";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,6 +24,7 @@ const RootLayout = ({
           "flex flex-col items-center justify-between"
         )}>
         <HeaderPage />
+        <ShapesPage />
         {children}
       </body>
     </html>

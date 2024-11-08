@@ -12,15 +12,15 @@ export const shapesSizes: ShapeSize[] = [
   {
     width: "101px",
     height: "101px",
-    positionTop: "15%",
-    positionLeft: "1%",
+    positionTop: "25%",
+    positionLeft: "5%",
   },
   // left_bottom
   {
     width: "131px",
     height: "131px",
-    positionLeft: "5%",
-    positionBottom: "10%",
+    positionLeft: "8%",
+    positionBottom: "20%",
   },
   // left_center
   {
@@ -31,15 +31,15 @@ export const shapesSizes: ShapeSize[] = [
   },
   // right_top
   {
-    positionRight: "25%",
-    positionTop: "10%",
+    positionRight: "29%",
+    positionTop: "22%",
     width: "101px",
     height: "101px",
   },
   // right_center-first
   {
-    positionRight: "1%",
-    positionBottom: "10%",
+    positionRight: "0%",
+    positionBottom: "25%",
     width: "239px",
     height: "239px",
   },
@@ -52,8 +52,8 @@ export const shapesSizes: ShapeSize[] = [
   },
   // right_bottom
   {
-    positionRight: "25%",
-    positionBottom: "0%",
+    positionRight: "30%",
+    positionBottom: "15%",
     width: "101px",
     height: "101px",
   },

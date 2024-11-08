@@ -44,7 +44,7 @@ const BridgeHome = () => {
 
         {/* Select Token Section */}
         <div className="relative flex flex-col gap-y-4 w-full">
-          <Card className="max-h-[155px]">
+          <Card className="max-h-[133px] md:max-h-[155px]">
             <div
               className={cn(
                 "relative flex flex-col gap-y-2",
@@ -68,7 +68,7 @@ const BridgeHome = () => {
           )}>
             <ArrowDownIcon />
           </div>
-          <Card className="max-h-[155px]">
+          <Card className="max-h-[133px] md:max-h-[155px]">
             <div
               className={cn(
                 "relative flex flex-col gap-y-2",
