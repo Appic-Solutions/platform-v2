@@ -1,4 +1,6 @@
-const chains: Chain[] = [
+import { Chain } from "../types/chains"
+
+export const chains: Chain[] = [
   {
     chainId: 0,
     name: "Internet Computer",
@@ -99,4 +101,4 @@ const chains: Chain[] = [
     disabled: true,
     logo: "https://cryptologos.cc/logos/fantom-ftm-logo.png",
   },
-];
+]

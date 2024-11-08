@@ -1,4 +1,6 @@
-const tokens: Token[] = [
+import { EvmToken, IcpToken } from "../types/tokens"
+
+export const tokens: (EvmToken | IcpToken)[] = [
   {
     name: "Ethereum",
     symbol: "ETH",
@@ -142,8 +144,8 @@ const tokens: Token[] = [
     usdHoldingAmount: undefined,
     chainTypes: "ICP",
   },
-];
+]
 
-function filterTokensByChainId(chainId: number): Token[] {
-  return tokens.filter((token) => token.chainId === chainId);
+export function filterTokensByChainId(chainId: number): (EvmToken | IcpToken)[] {
+  return tokens.filter((token) => token.chainId === chainId)
 }
