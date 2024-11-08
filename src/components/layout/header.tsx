@@ -50,7 +50,7 @@ const HeaderPage = () => {
                 <span
                   className={cn(
                     "hidden md:flex",
-                    "text-mobile-highlight-bold lg:text-highlight-bold"
+                    "text-lg font-bold"
                   )}
                 >
                   {item.label}

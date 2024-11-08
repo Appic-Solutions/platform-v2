@@ -67,7 +67,7 @@ const Button: FC<ButtonProps> = ({
   const colorStyle = variantStyles[variant]?.[color];
   const commonProps = {
     className: cn(
-      "flex items-center justify-center gap-2 rounded-m w-full py-6",
+      "flex items-center justify-center gap-1 rounded-m w-full",
       "font-medium transition-all duration-200",
       colorStyle,
       sizeStyles[size],

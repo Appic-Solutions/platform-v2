@@ -1,98 +1,111 @@
 "use client";
-
-import FeatureBox from "@/components/layout/FeatureBox";
-import ShapesPage from "@/components/layout/shapes";
-import TransformDataHorizontalIcon from "@/components/icons/transform-data-horizontal";
-import TokenPlaceHolderIcon from "@/components/icons/token-placeholder";
 import ArrowDownIcon from "@/components/icons/arrow-down";
+import TransformDataHorizontalIcon from "@/components/icons/transform-data-horizontal";
+import Box from "@/components/ui/box";
+import Card from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import Card from "@/components/ui/Card";
-import { useState } from "react";
-import Button from "@/components/ui/button/button";
+import Image from "next/image";
 
 const BridgeHome = () => {
-  const [isFirstTokenSelected] = useState(false);
-  const [isSecondTokenSelected] = useState(false);
-
   return (
-    <div
-      className={cn(
-        "relative w-full flex justify-center px-6 h-full",
-        "xl:px-12"
-      )}
-    >
-      <ShapesPage />
-      <div
+    <Box className="md:max-w-[617px] md:max-h-[607px] md:pb-10">
+      <div className="flex flex-col items-center justify-center gap-y-7 w-full max-w-[482px]">
+        {/* Header Section */}
+        <div className="flex items-center justify-between w-full px-4 md:px-0">
+          <h1 className={cn(
+            "text-black dark:text-white",
+            "text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold"
+          )}>
+            Bridge
+          </h1>
+          <button
+            className={cn(
+              "flex items-center justify-center gap-x-2",
+              "text-black/90 dark:text-white/90",
+              "text-sm font-medium max-md:hidden",
+            )}>
+            <TransformDataHorizontalIcon />
+            Change to swap
+          </button>
+
+          {/* Mobile Avatar */}
+          <button className={cn(
+            "flex items-center justify-center md:hidden",
+            "*:rounded-round",
+          )}>
+            <Image
+              src="/images/logo5/white-logo.png"
+              alt="avatar"
+              width={38}
+              height={38}
+            />
+          </button>
+        </div>
+
+        {/* Select Token Section */}
+        <div className="relative flex flex-col gap-y-4 w-full">
+          <Card className="max-h-[155px]">
+            <div
+              className={cn(
+                "relative flex flex-col gap-y-2",
+                "*:rounded-round",
+              )}>
+              <p className="text-sm font-semibold">From</p>
+              <div
+                className="w-11 h-11 bg-white"
+              />
+              <div
+                className="w-5 h-5 bg-black absolute right-0 bottom-0 border-[2.5px] border-black dark:border-white"
+              />
+            </div>
+            <p>Select Token</p>
+          </Card>
+          <div className={cn(
+            "absolute rounded-round inset-0 w-14 h-14 m-auto z-20",
+            "flex items-center justify-center",
+            "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
+            "border-2 border-white dark:border-white/30"
+          )}>
+            <ArrowDownIcon />
+          </div>
+          <Card className="max-h-[155px]">
+            <div
+              className={cn(
+                "relative flex flex-col gap-y-2",
+                "*:rounded-round",
+              )}>
+              <p className="text-sm font-semibold">To</p>
+              <div
+                className="w-11 h-11 bg-white"
+              />
+              <div
+                className="w-5 h-5 bg-black absolute right-0 bottom-0 border-[2.5px] border-black dark:border-white"
+              />
+            </div>
+            <p>Select Token</p>
+          </Card>
+        </div>
+        <button
+          className={cn(
+            "flex items-center self-start gap-x-2 ml-4 md:ml-0",
+            "text-black/90 dark:text-white/90",
+            "text-caption-regular font-medium md:hidden",
+          )}>
+          <TransformDataHorizontalIcon />
+          Change to swap
+        </button>
+      </div>
+
+      {/* Submit Button */}
+      <button
         className={cn(
-          "flex justify-center items-center w-full z-10 pt-12",
-          "md:w-min md:pb-12"
+          "bg-primary-buttons w-full h-14 rounded-ml max-w-[482px]",
+          "text-highlight-standard font-normal text-white",
         )}
       >
-        <FeatureBox>
-          <div
-            className={cn(
-              "flex flex-col gap-8 items-center w-full",
-              "max-w-lg lg:max-w-full justify-between h-full"
-            )}
-          >
-            <div className="flex justify-between items-center w-full">
-              <h3 className="text-mobile-heading-2 md:text-heading-3 font-bold text-primary">
-                Bridge
-              </h3>
-              <button className="flex items-center gap-2 text-primary opacity-90">
-                <TransformDataHorizontalIcon className="text-primary" />
-                <span className="text-caption-bold font-medium">
-                  Change to swap
-                </span>
-              </button>
-            </div>
-            <div className="flex flex-col gap-12 items-center w-full">
-              <div className="w-full flex flex-col gap-4 items-center">
-                <Card>
-                  <p className="text-caption-bold font-medium text-primary opacity-50 mb-3">
-                    From
-                  </p>
-                  <div className="flex items-center gap-4 text-primary">
-                    <TokenPlaceHolderIcon className="stroke-white dark:stroke-black" />
-                    <span className="text-mobile-heading-2 text-primary">
-                      Select Token
-                    </span>
-                    <span
-                      className={cn(
-                        "p-4 rounded-round flex items-center gap-4 bg-muted",
-                        "dark:bg-background-dark border-2 border-white border-opacity-25",
-                        "absolute left-1/2 -translate-x-1/2 -bottom-9 z-10"
-                      )}
-                    >
-                      <ArrowDownIcon className="text-primary" />
-                    </span>
-                  </div>
-                </Card>
-                <Card>
-                  <p className="text-caption-bold font-medium text-primary opacity-50 mb-3">
-                    To
-                  </p>
-                  <div className="flex items-center gap-4 text-primary">
-                    <TokenPlaceHolderIcon className="stroke-white dark:stroke-black " />
-                    <span className=" text-mobile-heading-2 text-primary">
-                      Select Token
-                    </span>
-                  </div>
-                </Card>
-              </div>
-            </div>
-            <Button
-              isDisable={isFirstTokenSelected || isSecondTokenSelected}
-              variant="contained"
-              color="primary"
-              className="w-full"
-            >
-              Confirm
-            </Button>
-          </div>
-        </FeatureBox>
-      </div>
-    </div>
+        Confirm
+      </button>
+    </Box>
   );
 };
 
