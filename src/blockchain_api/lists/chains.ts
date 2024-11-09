@@ -1,4 +1,4 @@
-import { Chain } from "../types/chains"
+import { Chain } from "../types/chains";
 
 export const chains: Chain[] = [
   {
@@ -9,7 +9,8 @@ export const chains: Chain[] = [
     depositHelperAddress: null,
     type: "ICP",
     disabled: false,
-    logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+    logo: "/images/chains-logos/icp.svg",
+    minter_address: undefined,
   },
   {
     chainId: 1,
@@ -19,7 +20,8 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample1",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+    logo: "/images/chains-logos/ethereum.svg",
+    minter_address: "",
   },
   {
     chainId: 42161,
@@ -29,27 +31,30 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample3",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/arbitrum-arb-logo.png",
+    logo: "/images/chains-logos/arbitrum.svg",
+    minter_address: "",
   },
   {
     chainId: 56,
-    name: "Binance Smart Chain (BSC)",
+    name: "Binance Smart Chain",
     nativeTokenSymbol: "BNB",
     scannerAddress: "https://bscscan.com",
     depositHelperAddress: "0xDepositHelperAddressExample4",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png",
+    logo: "/images/chains-logos/bsc.svg",
+    minter_address: "",
   },
   {
     chainId: 97,
-    name: "Binance Smart Chain Testnet (BSC Testnet)",
+    name: "Binance Smart Chain(Testnet)",
     nativeTokenSymbol: "BNB",
     scannerAddress: "https://testnet.bscscan.com",
     depositHelperAddress: "0xDepositHelperAddressExample5",
     type: "EVM",
     disabled: false,
-    logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png",
+    logo: "/images/chains-logos/bsc.svg",
+    minter_address: "",
   },
   {
     chainId: 137,
@@ -59,7 +64,8 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample6",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
+    logo: "/images/chains-logos/polygon.svg",
+    minter_address: "",
   },
   {
     chainId: 10,
@@ -69,7 +75,8 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample7",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/optimism-op-logo.png",
+    logo: "/images/chains-logos/optimism.svg",
+    minter_address: "",
   },
   {
     chainId: 8453,
@@ -79,7 +86,8 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample8",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/base-logo.png",
+    logo: "/images/chains-logos/base.svg",
+    minter_address: "",
   },
   {
     chainId: 43114,
@@ -89,7 +97,8 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample9",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/avalanche-avax-logo.png",
+    logo: "/images/chains-logos/avalanche.svg",
+    minter_address: "",
   },
   {
     chainId: 250,
@@ -99,6 +108,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample10",
     type: "EVM",
     disabled: true,
-    logo: "https://cryptologos.cc/logos/fantom-ftm-logo.png",
+    logo: "/images/chains-logos/fantom.svg",
+    minter_address: "",
   },
-]
+];
