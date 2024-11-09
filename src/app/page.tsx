@@ -27,6 +27,7 @@ const BridgeHome = () => {
   };
 
   const swapTokensHandler = () => {
+    if (!fromToken || !toToken) return;
     const temp = fromToken;
     setFromToken(toToken);
     setToToken(temp);

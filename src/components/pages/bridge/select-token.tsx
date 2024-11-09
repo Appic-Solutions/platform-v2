@@ -33,9 +33,10 @@ const SelectTokenPage = ({
           <button className={cn(
             "flex items-center justify-center gap-x-2",
             "text-black/90 dark:text-white/90",
-            "text-sm font-medium max-md:hidden"
+            "text-sm font-medium max-md:hidden disabled:opacity-50 disabled:cursor-not-allowed"
           )}
             onClick={swapTokensHandler}
+            disabled={!fromToken || !toToken}
           >
             <ArrowsRightLeftIcon width={18} height={18} />
             Change to swap
@@ -124,9 +125,10 @@ const SelectTokenPage = ({
         </div>
         <button className={cn(
           "flex items-center self-start gap-x-2 ml-4 md:ml-0",
-          "text-black/90 dark:text-white/90 font-medium md:hidden",
+          "text-black/90 dark:text-white/90 font-medium md:hidden disabled:opacity-50 disabled:cursor-not-allowed"
         )}
           onClick={swapTokensHandler}
+          disabled={!fromToken || !toToken}
         >
           <ArrowsRightLeftIcon width={18} height={18} />
           Change to swap

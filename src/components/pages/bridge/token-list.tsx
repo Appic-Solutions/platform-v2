@@ -19,16 +19,27 @@ interface TokenListPageProps {
   toToken: EvmToken | IcpToken | null
 }
 
-const ChainSelector = ({ selectedChainId, onChainSelect }: { selectedChainId: Chain["chainId"], onChainSelect: (chainId: Chain["chainId"]) => void }) => (
+const ChainSelector = ({
+  selectedChainId,
+  onChainSelect
+}: {
+  selectedChainId: Chain["chainId"],
+  onChainSelect: (chainId: Chain["chainId"]) => void
+}) => (
   <div className="grid grid-cols-5 gap-5 place-items-center w-full select-none md:px-4 mb-7">
     {chains.map((chain, idx) => (
       <div
         key={idx}
         className={cn(
           "flex items-center justify-center rounded-round cursor-pointer w-12 h-12 md:w-14 md:h-14",
-          selectedChainId === chain.chainId && "ring-4 ring-primary-buttons"
+          selectedChainId === chain.chainId && "ring-4 ring-primary-buttons",
+          chain.disabled && "opacity-50 cursor-not-allowed select-none"
         )}
-        onClick={() => onChainSelect(chain.chainId)}
+        onClick={() => {
+          if (!chain.disabled) {
+            onChainSelect(chain.chainId)
+          }
+        }}
       >
         <Image
           src={chain.logo}
@@ -44,25 +55,19 @@ const ChainSelector = ({ selectedChainId, onChainSelect }: { selectedChainId: Ch
 const TokenCard = ({
   token,
   onClick,
-  disabled,
   isSelected
 }: {
   token: EvmToken | IcpToken,
   onClick: () => void,
-  disabled: boolean,
   isSelected: boolean
 }) => (
   <div
     className={cn(
       "flex items-center gap-x-5 cursor-pointer group duration-200 rounded-sm p-2",
-      disabled ? "opacity-50 cursor-not-allowed select-none" : "hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]",
+      "hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]",
       isSelected && "bg-[#F5F5F5] dark:bg-[#2A2A2A]"
     )}
-    onClick={() => {
-      if (!disabled) {
-        onClick()
-      }
-    }}
+    onClick={onClick}
   >
     <Image
       src={token.logo}
@@ -173,7 +178,6 @@ const TokenListPage = ({ prevStepHandler, setTokenHandler, selectedType, fromTok
               setTokenHandler(token)
               prevStepHandler()
             }}
-            disabled={token.disabled || false}
             isSelected={isTokenSelected(token)}
           />
         ))}
