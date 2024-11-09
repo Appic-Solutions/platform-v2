@@ -10,12 +10,15 @@ interface Token {
   holdingAmount?: number // Optional: Amount the user holds of this token
   usdHoldingAmount?: number // Optional: Value in USD of the user's holdings
   chainTypes: ChainType
+  disabled?: boolean // Optional: Whether the token is disabled
 }
 
-export interface EvmToken extends Token {
+export type EvmToken = Token & {
   contractAddress: string // Address of the token's contract if the token is an EVm token
+  canisterId?: never // Address of the token's cansiter id if the token is an ICP token
 }
 
-export interface IcpToken extends Token {
+export type IcpToken = Token & {
   canisterId: string // Address of the token's cansiter id if the token is an ICP token
+  contractAddress?: never // Address of the token's contract if the token is an EVm token
 }

@@ -1,4 +1,4 @@
-import { Chain } from "../types/chains";
+import { Chain } from "../types/chains"
 
 export const chains: Chain[] = [
   {
@@ -9,7 +9,7 @@ export const chains: Chain[] = [
     depositHelperAddress: null,
     type: "ICP",
     disabled: false,
-    logo: "/images/chains-logos/icp.svg",
+    logo: "/images/logo/chains-logos/icp.svg",
     minter_address: undefined,
   },
   {
@@ -20,7 +20,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample1",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/ethereum.svg",
+    logo: "/images/logo/chains-logos/ethereum.svg",
     minter_address: "",
   },
   {
@@ -31,7 +31,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample3",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/arbitrum.svg",
+    logo: "/images/logo/chains-logos/arbitrum.svg",
     minter_address: "",
   },
   {
@@ -42,7 +42,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample4",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/bsc.svg",
+    logo: "/images/logo/chains-logos/bsc.svg",
     minter_address: "",
   },
   {
@@ -53,7 +53,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample5",
     type: "EVM",
     disabled: false,
-    logo: "/images/chains-logos/bsc.svg",
+    logo: "/images/logo/chains-logos/bsc.svg",
     minter_address: "",
   },
   {
@@ -64,7 +64,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample6",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/polygon.svg",
+    logo: "/images/logo/chains-logos/polygon.svg",
     minter_address: "",
   },
   {
@@ -75,7 +75,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample7",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/optimism.svg",
+    logo: "/images/logo/chains-logos/optimism.svg",
     minter_address: "",
   },
   {
@@ -86,7 +86,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample8",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/base.svg",
+    logo: "/images/logo/chains-logos/base.svg",
     minter_address: "",
   },
   {
@@ -97,7 +97,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample9",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/avalanche.svg",
+    logo: "/images/logo/chains-logos/avalanche.svg",
     minter_address: "",
   },
   {
@@ -108,7 +108,7 @@ export const chains: Chain[] = [
     depositHelperAddress: "0xDepositHelperAddressExample10",
     type: "EVM",
     disabled: true,
-    logo: "/images/chains-logos/fantom.svg",
+    logo: "/images/logo/chains-logos/fantom.svg",
     minter_address: "",
   },
-];
+]

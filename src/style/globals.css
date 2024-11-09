@@ -12,7 +12,6 @@
 /* Import fonts */
 @import "./fonts.css";
 
-/* Font family styles */
 @layer base {
   html {
     font-family: "RethinkSans", sans-serif;

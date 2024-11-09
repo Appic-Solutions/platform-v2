@@ -18,11 +18,10 @@ const RootLayout = ({
     <html
       lang="en"
       className="dark bg-[#060607] bg-no-repeat h-screen">
-      <body
-        className={cn(
-          "relative max-w-[1920px] mx-auto w-full h-full",
-          "flex flex-col items-center justify-between"
-        )}>
+      <body className={cn(
+        "relative max-w-[1920px] mx-auto w-full h-full",
+        "flex flex-col items-center justify-between"
+      )}>
         <HeaderPage />
         <ShapesPage />
         {children}

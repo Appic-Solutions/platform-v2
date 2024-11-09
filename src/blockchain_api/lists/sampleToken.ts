@@ -1,4 +1,4 @@
-import { EvmToken, IcpToken } from "../types/tokens";
+import { EvmToken, IcpToken } from "../types/tokens"
 
 export const tokens: (EvmToken | IcpToken)[] = [
   {
@@ -143,9 +143,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     holdingAmount: undefined,
     usdHoldingAmount: undefined,
     chainTypes: "ICP",
+    disabled: true,
   },
-];
+]
 
-export function filterTokensByChainId(chainId: number): (EvmToken | IcpToken)[] {
-  return tokens.filter((token) => token.chainId === chainId);
+export function filterTokensByChainId(
+  chainId: number
+): (EvmToken | IcpToken)[] {
+  return tokens.filter((token) => token.chainId === chainId)
 }

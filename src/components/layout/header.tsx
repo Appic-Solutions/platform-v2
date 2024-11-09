@@ -35,18 +35,18 @@ const HeaderPage = () => {
           "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]",
           "w-full lg:w-auto md:py-1.5"
         )}>
-        <ul className="flex items-center justify-between gap-x-1.5 max-h-[60px]">
+        <ul className="flex items-center justify-center gap-x-1.5 max-h-[60px]">
           {NAVBAR_ITEMS.map((item, idx) => (
             <li key={idx}>
               <Link
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
+                  "flex items-center justify-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
                   path === item.href &&
                   "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]"
                 )}
               >
-                <item.Icon className="min-w-5 min-h-5" />
+                <item.Icon width={24} height={24} className="min-w-5 min-h-5" />
                 <span
                   className={cn(
                     "hidden md:flex",

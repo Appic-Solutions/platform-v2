@@ -1,46 +1,71 @@
 "use client";
-import { Chain } from "@/blockchain_api/types/chains";
+import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import SelectOptionPage from "@/components/pages/bridge/select-return";
 import SelectTokenPage from "@/components/pages/bridge/select-token";
 import TokenListPage from "@/components/pages/bridge/token-list";
 import { useState } from "react";
 
+type TokenType = EvmToken | IcpToken | null;
+type SelectionType = "from" | "to";
+
 const BridgeHome = () => {
-  // States
-  const [activeStep, setActiveStep] = useState(3);
-  const [selectedChain, setSelectedChain] = useState<Chain["chainId"] | null>(
-    null
-  );
+  const [activeStep, setActiveStep] = useState(1);
+  const [selectedType, setSelectedType] = useState<SelectionType>("from");
+  const [fromToken, setFromToken] = useState<TokenType>(null);
+  const [toToken, setToToken] = useState<TokenType>(null);
 
-  // Step Handlers
-  const nextStepHandler = () => {
-    setActiveStep((prev) => prev + 1);
-  };
-  const prevStepHandler = () => {
-    setActiveStep((prev) => prev - 1);
+  const handleStepChange = (direction: "next" | "prev" | number) => {
+    setActiveStep(prev => {
+      const newStep = typeof direction === "number" ? direction : prev + (direction === "next" ? 1 : -1);
+      return Math.min(Math.max(newStep, 1), 4);
+    });
   };
 
-  // Select Chain
-  const selectChainHandler = (chainId: Chain["chainId"]) => {
-    setSelectedChain(chainId);
+  const handleTokenSelection = (token: EvmToken | IcpToken) => {
+    const setToken = selectedType === "from" ? setFromToken : setToToken;
+    setToken(token);
   };
 
-  switch (activeStep) {
-    case 1:
-      return <SelectTokenPage nextStepHandler={nextStepHandler} />;
-    case 2:
-      return (
-        <TokenListPage
-          prevStepHandler={prevStepHandler}
-          selectedChain={selectedChain}
-          selectChainHandler={selectChainHandler}
-        />
-      );
-    case 3:
-      return <SelectOptionPage nextStepHandler={nextStepHandler} />;
-    default:
-      return <></>;
+  const swapTokensHandler = () => {
+    const temp = fromToken;
+    setFromToken(toToken);
+    setToToken(temp);
   }
+
+  const renderStep = () => {
+    switch (activeStep) {
+      case 1:
+        return (
+          <SelectTokenPage
+            stepHandler={handleStepChange}
+            setSelectedType={setSelectedType}
+            fromToken={fromToken}
+            toToken={toToken}
+            swapTokensHandler={swapTokensHandler}
+          />
+        );
+      case 2:
+        return (
+          <TokenListPage
+            prevStepHandler={() => handleStepChange("prev")}
+            setTokenHandler={handleTokenSelection}
+            selectedType={selectedType}
+            fromToken={fromToken}
+            toToken={toToken}
+          />
+        );
+      case 3:
+        return (
+          <SelectOptionPage
+            nextStepHandler={() => handleStepChange("next")}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return renderStep();
 };
 
 export default BridgeHome;
