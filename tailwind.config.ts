@@ -1,4 +1,5 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
+import scrollbar from "tailwind-scrollbar";
 
 const config: Config = {
   content: [
@@ -10,6 +11,7 @@ const config: Config = {
   corePlugins: {
     container: false,
   },
+  plugins: [scrollbar({ nocompatible: true })],
   theme: {
     fontFamily: {
       lora: ["Lora"],
@@ -59,6 +61,5 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
-}
-export default config
+};
+export default config;

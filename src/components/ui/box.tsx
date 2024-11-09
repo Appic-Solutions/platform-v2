@@ -1,9 +1,9 @@
-import { cn } from "@/lib/utils"
-import { FC, ReactNode } from "react"
+import { cn } from "@/lib/utils";
+import { FC, ReactNode } from "react";
 
 interface BoxProps {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 const Box: FC<BoxProps> = ({ children, className }) => {
@@ -18,10 +18,11 @@ const Box: FC<BoxProps> = ({ children, className }) => {
         "max-md:before:hidden before:content-[''] before:absolute before:inset-0",
         "before:bg-box-background before:bg-center before:bg-no-repeat",
         className
-      )}>
+      )}
+    >
       {children}
     </div>
-  )
-}
+  );
+};
 
-export default Box
+export default Box;
