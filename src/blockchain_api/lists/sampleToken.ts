@@ -1,4 +1,4 @@
-import { EvmToken, IcpToken } from "../types/tokens"
+import { EvmToken, IcpToken } from "../types/tokens";
 
 export const tokens: (EvmToken | IcpToken)[] = [
   {
@@ -41,7 +41,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     chainTypes: "EVM",
   },
   {
-    name: "Binance Smart Chain (BSC)",
+    name: "Binance Smart Chain",
     symbol: "BNB",
     logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
@@ -54,7 +54,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     chainTypes: "EVM",
   },
   {
-    name: "Binance Smart Chain Testnet (BSC Testnet)",
+    name: "Binance Smart Chain(Testnet)",
     symbol: "BNB",
     logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
@@ -132,7 +132,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     chainTypes: "EVM",
   },
   {
-    name: "Internet Computer (ICP)",
+    name: "Internet Computer",
     symbol: "ICP",
     logo: "https://cryptologos.cc/logos/internet-computer-icp-logo.png",
     contractAddress: undefined,
@@ -144,8 +144,8 @@ export const tokens: (EvmToken | IcpToken)[] = [
     usdHoldingAmount: undefined,
     chainTypes: "ICP",
   },
-]
+];
 
 export function filterTokensByChainId(chainId: number): (EvmToken | IcpToken)[] {
-  return tokens.filter((token) => token.chainId === chainId)
+  return tokens.filter((token) => token.chainId === chainId);
 }
