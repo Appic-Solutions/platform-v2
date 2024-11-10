@@ -4,12 +4,14 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ConnectWallet, ConnectWalletDropdownMenu, ConnectWalletDropdownMenuDisconnectItem, useIdentityKit } from "@nfid/identitykit/react";
-import { sign } from "crypto";
+import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
+import { useAppKit } from "@reown/appkit/react";
 
 const HeaderPage = () => {
   const path = usePathname();
   const { isInitializing, user, isUserConnecting, icpBalance, signer, identity, delegationType, accounts, connect, disconnect, fetchIcpBalance } = useIdentityKit();
+  const { open, close } = useAppKit();
+
   // console.log(sig);
   return (
     <header className={cn("order-last lg:order-first w-full", "flex items-center justify-between", "pt-5 pb-3.5 px-6 xl:px-12 z-10")}>
@@ -55,10 +57,11 @@ const HeaderPage = () => {
       <div
         className="bg-[#FAF7FD80]/50 rounded-round border border-[#ECE6F5] py-2 px-4 hidden lg:flex"
         onClick={() => {
-          connect();
+          open();
         }}
       >
         User Wallet
+        <ConnectWallet></ConnectWallet>
       </div>
       {/* <ConnectWalletDropdownMenuAddressItem value={""}></ConnectWalletDropdownMenuAddressItem> */}
     </header>
