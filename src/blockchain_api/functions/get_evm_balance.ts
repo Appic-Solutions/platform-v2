@@ -81,71 +81,68 @@ export async function get_evm_wallet_tokens_balance(wallet_address: string): Pro
 //   .then((data) => console.log(data))
 //   .catch((error) => console.error(error));
 
-// Example response
-// {
-//     "jsonrpc": "2.0",
-//     "id": 1,
-//     "result": {
+// Example function return
+//
+//      {
 //         "totalBalanceUsd": "4915134435857.581297310767673907",
-//         "assets": [
+//         "tokens": [
 //             {
 //                 "chainId": "1",
-//                 "tokenName": "Amber Token",
-//                 "tokenSymbol": "AMB",
-//                 "tokenDecimals": 18,
-//                 "tokenType": "ERC20",
+//                 "name": "Amber Token",
+//                 "symbol": "AMB",
+//                 "decimals": 18,
+//                 "chainTypes": "EVM",
 //                 "contractAddress": "0x4dc3643dbc642b72c158e7f3d2ff232df61cb6ce",
-//                 "holderAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7",
 //                 "balance": "0.0009",
 //                 "balanceRawInteger": "900000000000000",
-//                 "balanceUsd": "4915133942196.190757578196621746",
-//                 "tokenPrice": "5461259935773545.286197996246384112",
-//                 "thumbnail": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4DC3643DbC642b72C158E7F3d2ff232df61cb6CE/logo.png"
+//                 "usdBalance": "4915133942196.190757578196621746",
+//                 "usdPrice": "5461259935773545.286197996246384112",
+//                 "logo": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4DC3643DbC642b72C158E7F3d2ff232df61cb6CE/logo.png",
+//                  "disabled": "true",
 //             },
 //             {
 //                 "chainId": "1",
-//                 "tokenName": "Tether USD",
-//                 "tokenSymbol": "USDT",
-//                 "tokenDecimals": 6,
-//                 "tokenType": "ERC20",
+//                 "name": "Tether USD",
+//                 "symbol": "USDT",
+//                 "decimals": 6,
+//                 "chainTypes": "EVM",
 //                 "contractAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-//                 "holderAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7",
 //                 "balance": "181812.058733",
 //                 "balanceRawInteger": "181812058733",
-//                 "balanceUsd": "181812.058733",
-//                 "tokenPrice": "1",
-//                 "thumbnail": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"
+//                 "usdBalance": "181812.058733",
+//                 "usdPrice": "1",
+//                 "logo": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"
+//                  "disabled": "true",
 //             },
 //             {
 //                 "chainId": "56",
-//                 "tokenName": "Tether USD",
-//                 "tokenSymbol": "USDT",
-//                 "tokenDecimals": 18,
-//                 "tokenType": "ERC20",
+//                 "name": "Tether USD",
+//                 "symbol": "USDT",
+//                 "decimals": 18,
+//                 "chainTypes": "EVM",
 //                 "contractAddress": "0x55d398326f99059ff775485246999027b3197955",
-//                 "holderAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7",
 //                 "balance": "169752.555225093619558572",
 //                 "balanceRawInteger": "169752555225093619558572",
-//                 "balanceUsd": "169752.555225093619558572",
-//                 "tokenPrice": "1",
-//                 "thumbnail": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/0x55d398326f99059fF775485246999027B3197955/logo.png"
+//                 "usdBalance": "169752.555225093619558572",
+//                 "usdPrice": "1",
+//                 "logo": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/0x55d398326f99059fF775485246999027B3197955/logo.png"
+//                  "disabled": "true",
 //             },
 //             {
 //                 "chainId": "56",
-//                 "tokenName": "Space Protocol",
-//                 "tokenSymbol": "SPL",
-//                 "tokenDecimals": 18,
-//                 "tokenType": "ERC20",
+//                 "name": "Space Protocol",
+//                 "symbol": "SPL",
+//                 "decimals": 18,
+//                 "chainTypes": "EVM",
 //                 "contractAddress": "0xfec6832ab7bea7d3db02472b64cb59cfc6f2c107",
-//                 "holderAddress": "0xdac17f958d2ee523a2206206994597c13d831ec7",
 //                 "balance": "500",
 //                 "balanceRawInteger": "500000000000000000000",
-//                 "balanceUsd": "0",
-//                 "tokenPrice": "0",
-//                 "thumbnail": ""
+//                 "usdBalance": "0",
+//                 "usdPrice": "0",
+//                 "logo": ""
+//                  "disabled": "true",
 //             }
 //         ]
-//     }
 // }
 
 // utils
