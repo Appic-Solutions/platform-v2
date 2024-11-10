@@ -15,8 +15,11 @@ const BridgeHome = () => {
   const [toToken, setToToken] = useState<TokenType>(null);
 
   const handleStepChange = (direction: "next" | "prev" | number) => {
-    setActiveStep(prev => {
-      const newStep = typeof direction === "number" ? direction : prev + (direction === "next" ? 1 : -1);
+    setActiveStep((prev) => {
+      const newStep =
+        typeof direction === "number"
+          ? direction
+          : prev + (direction === "next" ? 1 : -1);
       return Math.min(Math.max(newStep, 1), 4);
     });
   };
@@ -31,7 +34,7 @@ const BridgeHome = () => {
     const temp = fromToken;
     setFromToken(toToken);
     setToToken(temp);
-  }
+  };
 
   const renderStep = () => {
     switch (activeStep) {
@@ -56,11 +59,13 @@ const BridgeHome = () => {
           />
         );
       case 3:
-        return (
+        return fromToken && toToken ? (
           <SelectOptionPage
+            fromToken={fromToken}
+            toToken={toToken}
             nextStepHandler={() => handleStepChange("next")}
           />
-        );
+        ) : null;
       default:
         return null;
     }

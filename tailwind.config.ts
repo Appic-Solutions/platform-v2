@@ -52,8 +52,9 @@ const config: Config = {
         "highlighed-components": "var(--highlighed-components)",
         "background-dark": "var(--background-dark)",
         "shapes-background": "var(--shapes-background)",
-
+        "card-background": "var(--card-background)",
         "box-background": "var(--box-background)",
+        "highlighted-card": "var(--highlighted-card)",
       },
       /* Box Shadow */
       boxShadow: {

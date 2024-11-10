@@ -26,9 +26,9 @@
       rgba(255, 255, 255, 0.3) 157.6%
     );
   --shapes-background: linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 1.21) 121.6%,
-    rgba(17, 61, 146, 0.21) 9.35%
+    322.44deg,
+    rgba(17, 61, 146, 0.21) 14.48%,
+    rgba(255, 255, 255, 0.21) 94.54%
   );
   --background-main: radial-gradient(
     100% 249.45% at 0% 2.78%,
@@ -51,6 +51,12 @@
     rgba(255, 255, 255, 0.35) 100%
   );
 
+  --highlighted-card: linear-gradient(
+    160deg,
+    rgb(163, 195, 253) 5%,
+    rgb(255, 255, 255) 157.6%
+  );
+
   --box-border: #ffffff3d;
 }
 
@@ -64,9 +70,9 @@
     rgba(33, 33, 33, 0.24) 100%
   );
   --shapes-background: linear-gradient(
-    -45deg,
-    rgba(17, 61, 146, 0.21) 0%,
-    rgba(255, 255, 255, 0.21) 100%
+    322.44deg,
+    rgba(17, 61, 146, 0.21) 14.48%,
+    rgba(255, 255, 255, 0.21) 94.54%
   );
   --highlighed-components: linear-gradient(
     159.24deg,
@@ -89,6 +95,12 @@
     100% 249.45% at 0% 2.78%,
     #151515 0%,
     #080808 100%
+  );
+
+  --highlighted-card: linear-gradient(
+    154.24deg,
+    rgba(0, 33, 94, 0.672) 9.35%,
+    rgb(0, 0, 0) 157.6%
   );
 
   --box-border: #6363633d;
