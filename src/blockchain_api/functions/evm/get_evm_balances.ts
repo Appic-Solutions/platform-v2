@@ -1,7 +1,7 @@
 import axios from "axios";
-import { chains } from "../lists/chains";
-import { Chain } from "../types/chains";
-import { EvmToken } from "../types/tokens";
+import { chains } from "../../lists/chains";
+import { Chain } from "../../types/chains";
+import { EvmToken } from "../../types/tokens";
 import { error } from "console";
 
 interface AnkrGetBalanceRequestParams {

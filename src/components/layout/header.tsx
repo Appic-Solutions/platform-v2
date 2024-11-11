@@ -4,15 +4,17 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
+import { ConnectWallet, useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { useAppKit } from "@reown/appkit/react";
+import { HttpAgent } from "@dfinity/agent";
+import { useEffect, useState } from "react";
 
 const HeaderPage = () => {
   const path = usePathname();
   const { isInitializing, user, isUserConnecting, icpBalance, signer, identity, delegationType, accounts, connect, disconnect, fetchIcpBalance } = useIdentityKit();
   const { open, close } = useAppKit();
 
-  // console.log(sig);
+  console.log();
   return (
     <header className={cn("order-last lg:order-first w-full", "flex items-center justify-between", "pt-5 pb-3.5 px-6 xl:px-12 z-10")}>
       {/* Logo */}
