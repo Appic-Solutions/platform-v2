@@ -5,13 +5,15 @@ import { BridgeOptionType } from "./BridgeOptionsList";
 import FireIcon from "@/components/icons/fire";
 import ClockIcon from "@/components/icons/clock";
 import ChevronDownIcon from "@/components/icons/chevron-down";
+import { motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 interface BridgeOptionProps {
   option: BridgeOptionType;
   isSelected: boolean;
   isExpanded: boolean;
-  onSelect: (id: number) => void;
-  onExpand: (id: number) => void;
+  onSelect: (option: BridgeOptionType) => void;
+  onExpand: (option: BridgeOptionType) => void;
   className?: string;
 }
 
@@ -25,7 +27,7 @@ const BridgeOption = ({
 }: BridgeOptionProps) => {
   return (
     <Card
-      onClick={() => onSelect(option.id)}
+      onClick={() => onSelect(option)}
       className={cn(
         "py-4 px-4 flex-col gap-3 items-start justify-center",
         "min-w-[300px]",
@@ -35,7 +37,6 @@ const BridgeOption = ({
         option.isBest && "bg-highlighted-card",
         isSelected && "border-2 border-blue-600",
         "min-h-[165px]",
-        isExpanded && "min-h-[360px]",
         "transition-all duration-300 ease-in-out",
         "md:rounded-xl",
         className
@@ -58,7 +59,7 @@ const BridgeOption = ({
           )}
         </div>
         <button
-          onClick={() => onExpand(option.id)}
+          onClick={() => onExpand(option)}
           className={cn(
             "bg-gray-400 bg-opacity-20 rounded-m p-2 flex items-center ml-auto",
             "transition-transform duration-300",
@@ -134,31 +135,54 @@ const BridgeOption = ({
       </div>
 
       {/* Expanded content */}
-      {isExpanded && (
-        <div className="mt-4 w-full border-t border-gray-200 dark:border-gray-700 pt-4">
-          <div className="space-y-4">
-            <p className="text-sm font-medium">Additional Details:</p>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Network Fee:</span>
-                <span>0.001 ETH</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Estimated Time:</span>
-                <span>{option.time} mins</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Route:</span>
-                <span>Direct Bridge</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Security:</span>
-                <span>High</span>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{
+              height: "auto",
+              opacity: 1,
+              transition: {
+                height: { duration: 0.3 },
+                opacity: { duration: 0.2, delay: 0.1 },
+              },
+            }}
+            exit={{
+              height: 0,
+              opacity: 0,
+              transition: {
+                height: { duration: 0.3 },
+                opacity: { duration: 0.2 },
+              },
+            }}
+            className="w-full overflow-hidden"
+          >
+            <div className="mt-4 w-full border-t border-gray-200 dark:border-gray-700 pt-4">
+              <div className="space-y-4">
+                <p className="text-sm font-medium">Additional Details:</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted">Network Fee:</span>
+                    <span>0.001 ETH</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted">Estimated Time:</span>
+                    <span>{option.time} mins</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted">Route:</span>
+                    <span>Direct Bridge</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted">Security:</span>
+                    <span>High</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 };

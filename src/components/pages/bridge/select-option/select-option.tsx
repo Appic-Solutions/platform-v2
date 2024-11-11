@@ -8,7 +8,9 @@ import Box from "@/components/ui/box";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import PageHeader from "@/components/ui/PageHeader";
 import TokenCard from "./components/TokenCard";
-import BridgeOptionsList from "./components/BridgeOptionsList";
+import BridgeOptionsList, {
+  BridgeOptionType,
+} from "./components/BridgeOptionsList";
 import ActionButton from "./components/ActionButton";
 
 const SelectOptionPage = ({
@@ -24,11 +26,17 @@ const SelectOptionPage = ({
   const [amount, setAmount] = useState("");
   const [usdPrice, setUsdPrice] = useState("0");
   const [toAmount, setToAmount] = useState("0");
-  const [expandedOption, setExpandedOption] = useState<number | null>(null);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-
-  const handleOptionSelect = (optionId: number) => {
-    setSelectedOption(optionId);
+  const [expandedOption, setExpandedOption] = useState<BridgeOptionType | null>(
+    null
+  );
+  const [selectedOption, setSelectedOption] = useState<BridgeOptionType | null>(
+    null
+  );
+  const [showAllOptions, setShowAllOptions] = useState(false);
+  const handleOptionSelect = (option: BridgeOptionType) => {
+    if (option.isActive) {
+      setSelectedOption(option);
+    }
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,11 +47,11 @@ const SelectOptionPage = ({
     setToAmount((usdPrice * (toToken?.usdPrice ?? 0)).toFixed(2));
   };
 
-  const handleExpand = (optionId: number) => {
-    if (expandedOption === optionId) {
+  const handleExpand = (option: BridgeOptionType) => {
+    if (expandedOption === option) {
       setExpandedOption(null);
     } else {
-      setExpandedOption(optionId);
+      setExpandedOption(option);
     }
   };
 
@@ -107,20 +115,15 @@ const SelectOptionPage = ({
         </div>
         {/* BRIDGE OPTIONS */}
         <BridgeOptionsList
+          amount={amount}
           selectedOption={selectedOption}
           expandedOption={expandedOption}
           handleOptionSelect={handleOptionSelect}
           handleExpand={handleExpand}
+          showAllOptions={showAllOptions}
+          setShowAllOptions={setShowAllOptions}
         />
       </div>
-      {/* SELECT OPTION BUTTON: MOBILE */}
-      <ActionButton
-        isDisabled={!selectedOption || !Number(amount)}
-        onClick={(e) => e.preventDefault()}
-        isMobile={true}
-      >
-        Select Return
-      </ActionButton>
     </Box>
   );
 };
