@@ -159,13 +159,15 @@ const SelectTokenPage = ({
         disabled={
           !fromToken ||
           !toToken ||
-          !fromToken.contractAddress === !toToken.contractAddress
+          (!fromToken.contractAddress === !toToken.contractAddress &&
+            fromToken?.chainId === toToken?.chainId)
         }
         onClick={() => stepHandler(3)}
       >
         {fromToken &&
         toToken &&
-        fromToken?.contractAddress === toToken?.contractAddress
+        fromToken?.contractAddress === toToken?.contractAddress &&
+        fromToken?.chainId === toToken?.chainId
           ? "Please select different tokens"
           : "Confirm"}
       </button>
