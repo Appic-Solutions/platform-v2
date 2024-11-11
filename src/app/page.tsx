@@ -1,6 +1,6 @@
 "use client";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import SelectOptionPage from "@/components/pages/bridge/select-return";
+import SelectOptionPage from "@/components/pages/bridge/select-option/select-option";
 import SelectTokenPage from "@/components/pages/bridge/select-token";
 import TokenListPage from "@/components/pages/bridge/token-list";
 import { useState } from "react";
@@ -63,7 +63,9 @@ const BridgeHome = () => {
           <SelectOptionPage
             fromToken={fromToken}
             toToken={toToken}
+            prevStepHandler={() => handleStepChange(1)}
             nextStepHandler={() => handleStepChange("next")}
+            swapTokensHandler={swapTokensHandler}
           />
         ) : null;
       default:
