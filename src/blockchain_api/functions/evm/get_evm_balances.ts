@@ -41,12 +41,12 @@ interface AnkrResponse {
   };
 }
 
-interface TokensBalance {
+interface EvmTokensBalances {
   tokens: EvmToken[];
   totalBalanceUsd: string;
 }
 
-export async function get_evm_wallet_tokens_balance(wallet_address: string): Promise<TokensBalance> {
+export async function get_evm_wallet_tokens_balance(wallet_address: string): Promise<EvmTokensBalances> {
   let chains_ankr_array: string[] = chains.filter((chain): chain is Chain & { ankr_handle: string } => chain.ankr_handle !== undefined).map((chain) => chain.ankr_handle);
   let requestParams: AnkrGetBalanceRequestParams = {
     id: 1,

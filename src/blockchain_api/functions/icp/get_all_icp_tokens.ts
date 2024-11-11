@@ -44,7 +44,7 @@ export const transformToIcpTokens = (tokensWithPrices: TokenWithPrice[]): IcpTok
       chainTypes: "ICP",
       canisterId: token.id,
       fee: token.fee.toString(),
-      token_type: token.tokenType,
+      tokenType: token.tokenType,
     })
   );
 };
@@ -130,7 +130,7 @@ export const calculatePrice = (allTokens: TokenInfoWithType[], allPairs: PairInf
       .dividedBy(new BigNumber(tokenReserve.value.toString()).dividedBy(new BigNumber(10).pow(tokenReserve.decimals)))
       .toString();
 
-    allTokensWithPrices.push({ ...token, price });
+    if (new BigNumber(price).isGreaterThan(0)) allTokensWithPrices.push({ ...token, price });
   });
 
   return allTokensWithPrices;
