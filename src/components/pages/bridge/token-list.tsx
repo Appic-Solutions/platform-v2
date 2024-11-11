@@ -1,30 +1,30 @@
-"use client"
-import { chains } from "@/blockchain_api/lists/chains"
-import { tokens } from "@/blockchain_api/lists/sampleToken"
-import { Chain } from "@/blockchain_api/types/chains"
-import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens"
-import { LinkIcon } from "@/components/icons"
-import ExpandLeftIcon from "@/components/icons/expand-left"
-import Box from "@/components/ui/box"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-import Link from "next/link"
-import { useMemo, useState, useEffect } from "react"
+"use client";
+import { chains } from "@/blockchain_api/lists/chains";
+import { tokens } from "@/blockchain_api/lists/sampleToken";
+import { Chain } from "@/blockchain_api/types/chains";
+import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
+import { LinkIcon } from "@/components/icons";
+import Box from "@/components/ui/box";
+import PageHeader from "@/components/ui/PageHeader";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useState, useEffect } from "react";
 
 interface TokenListPageProps {
-  prevStepHandler: () => void
-  setTokenHandler: (token: EvmToken | IcpToken) => void
-  selectedType: "from" | "to"
-  fromToken: EvmToken | IcpToken | null
-  toToken: EvmToken | IcpToken | null
+  prevStepHandler: () => void;
+  setTokenHandler: (token: EvmToken | IcpToken) => void;
+  selectedType: "from" | "to";
+  fromToken: EvmToken | IcpToken | null;
+  toToken: EvmToken | IcpToken | null;
 }
 
 const ChainSelector = ({
   selectedChainId,
-  onChainSelect
+  onChainSelect,
 }: {
-  selectedChainId: Chain["chainId"],
-  onChainSelect: (chainId: Chain["chainId"]) => void
+  selectedChainId: Chain["chainId"];
+  onChainSelect: (chainId: Chain["chainId"]) => void;
 }) => (
   <div className="grid grid-cols-5 gap-5 place-items-center w-full select-none md:px-4 mb-7">
     {chains.map((chain, idx) => (
@@ -37,29 +37,24 @@ const ChainSelector = ({
         )}
         onClick={() => {
           if (!chain.disabled) {
-            onChainSelect(chain.chainId)
+            onChainSelect(chain.chainId);
           }
         }}
       >
-        <Image
-          src={chain.logo}
-          alt={chain.name}
-          width={54}
-          height={54}
-        />
+        <Image src={chain.logo} alt={chain.name} width={54} height={54} />
       </div>
     ))}
   </div>
-)
+);
 
 const TokenCard = ({
   token,
   onClick,
-  isSelected
+  isSelected,
 }: {
-  token: EvmToken | IcpToken,
-  onClick: () => void,
-  isSelected: boolean
+  token: EvmToken | IcpToken;
+  onClick: () => void;
+  isSelected: boolean;
 }) => (
   <div
     className={cn(
@@ -77,18 +72,23 @@ const TokenCard = ({
       className="rounded-round"
     />
     <div className="flex flex-col flex-1 min-w-0">
-      <p className="text-xl font-bold text-black dark:text-white truncate">{token.name}</p>
+      <p className="text-xl font-bold text-black dark:text-white truncate">
+        {token.name}
+      </p>
       <div className="overflow-hidden h-5">
         <div className="flex flex-col transition-transform duration-300 group-hover:-translate-y-5">
           <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate">
             {token.symbol}
           </p>
           <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate flex items-center gap-x-2">
-            {token?.contractAddress?.slice(0, 14) || token?.canisterId?.slice(0, 14)}
+            {token?.contractAddress?.slice(0, 14) ||
+              token?.canisterId?.slice(0, 14)}
             <Link
-              href={token.chainTypes === "EVM"
-                ? `https://etherscan.io/token/${token.contractAddress}`
-                : `https://dashboard.internetcomputer.org/canister/${token.canisterId}`}
+              href={
+                token.chainTypes === "EVM"
+                  ? `https://etherscan.io/token/${token.contractAddress}`
+                  : `https://dashboard.internetcomputer.org/canister/${token.canisterId}`
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-sm p-0.5 hover:bg-white/10"
@@ -101,55 +101,62 @@ const TokenCard = ({
       </div>
     </div>
   </div>
-)
+);
 
-const TokenListPage = ({ prevStepHandler, setTokenHandler, selectedType, fromToken, toToken }: TokenListPageProps) => {
-  const [query, setQuery] = useState("")
-  const [selectedChainId, setSelectedChainId] = useState<Chain["chainId"]>(0)
+const TokenListPage = ({
+  prevStepHandler,
+  setTokenHandler,
+  selectedType,
+  fromToken,
+  toToken,
+}: TokenListPageProps) => {
+  const [query, setQuery] = useState("");
+  const [selectedChainId, setSelectedChainId] = useState<Chain["chainId"]>(0);
 
   useEffect(() => {
     // Set initial chain based on selected token
-    const tokenToCheck = selectedType === "from" ? fromToken : toToken
+    const tokenToCheck = selectedType === "from" ? fromToken : toToken;
     if (tokenToCheck) {
-      setSelectedChainId(tokenToCheck.chainId)
+      setSelectedChainId(tokenToCheck.chainId);
     } else {
-      setSelectedChainId(chains[0].chainId) // Default to first chain if no token selected
+      setSelectedChainId(chains[0].chainId); // Default to first chain if no token selected
     }
-  }, [selectedType, fromToken, toToken])
+  }, [selectedType, fromToken, toToken]);
 
   const filteredTokens = useMemo(() => {
-    const searchQuery = query.toLowerCase()
+    const searchQuery = query.toLowerCase();
     return tokens
-      .filter(token => token.chainId === selectedChainId)
-      .filter(token =>
-        token.name.toLowerCase().includes(searchQuery) ||
-        token.symbol.toLowerCase().includes(searchQuery) ||
-        token.contractAddress?.toLowerCase().includes(searchQuery) ||
-        token.canisterId?.toLowerCase().includes(searchQuery)
-      )
-  }, [query, selectedChainId])
+      .filter((token) => token.chainId === selectedChainId)
+      .filter(
+        (token) =>
+          token.name.toLowerCase().includes(searchQuery) ||
+          token.symbol.toLowerCase().includes(searchQuery) ||
+          token.contractAddress?.toLowerCase().includes(searchQuery) ||
+          token.canisterId?.toLowerCase().includes(searchQuery)
+      );
+  }, [query, selectedChainId]);
 
   const isTokenSelected = (token: EvmToken | IcpToken) => {
     if (selectedType === "from") {
-      return fromToken?.contractAddress === token.contractAddress && fromToken?.chainId === token.chainId
+      return (
+        fromToken?.contractAddress === token.contractAddress &&
+        fromToken?.chainId === token.chainId
+      );
     }
-    return toToken?.contractAddress === token.contractAddress && toToken?.chainId === token.chainId
-  }
+    return (
+      toToken?.contractAddress === token.contractAddress &&
+      toToken?.chainId === token.chainId
+    );
+  };
 
   return (
     <Box className="justify-normal md:max-w-[611px] md:max-h-[716px] md:pt-6">
-      <div className={cn("flex items-center justify-center mb-8", "text-black dark:text-white")}>
-        <button
-          className={cn("flex items-center justify-center gap-x-1", "absolute left-4 font-semibold md:left-8")}
-          onClick={prevStepHandler}
-        >
-          <ExpandLeftIcon width={18} height={18} />
-          Back
-        </button>
-        <p className="text-[26px] md:text-3xl font-bold">Bridge from</p>
-      </div>
+      <PageHeader title="Select Bridge Option" onBack={prevStepHandler} />
 
-      <ChainSelector selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
+      <ChainSelector
+        selectedChainId={selectedChainId}
+        onChainSelect={setSelectedChainId}
+      />
 
       <hr className="bg-white dark:bg-[#636363]/25 w-[calc(100%-52px)] max-md:hidden" />
 
@@ -175,15 +182,15 @@ const TokenListPage = ({ prevStepHandler, setTokenHandler, selectedType, fromTok
             key={idx}
             token={token}
             onClick={() => {
-              setTokenHandler(token)
-              prevStepHandler()
+              setTokenHandler(token);
+              prevStepHandler();
             }}
             isSelected={isTokenSelected(token)}
           />
         ))}
       </div>
     </Box>
-  )
-}
+  );
+};
 
-export default TokenListPage
+export default TokenListPage;
