@@ -11,7 +11,7 @@ interface IcpTokensBalances {
   totalBalanceUsd: string;
 }
 
-export async function get_evm_wallet_tokens_balance(principal_id: string, all_tokens: IcpToken[], authenticated_agent: HttpAgent): Promise<IcpTokensBalances> {
+export async function get_icp_wallet_tokens_balance(principal_id: string, all_tokens: IcpToken[], authenticated_agent: HttpAgent): Promise<IcpTokensBalances> {
   let totalBalanceUsd = new BigNumber(0);
 
   try {
