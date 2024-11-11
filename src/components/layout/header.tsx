@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
+import { ConnectWallet, useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { useAppKit } from "@reown/appkit/react";
 import Tooltip from "../ui/Tooltip";
 
@@ -30,69 +30,30 @@ const HeaderPage = () => {
 
   // console.log(sig);
   return (
-    <header
-      className={cn(
-        "order-last lg:order-first w-full",
-        "flex items-center justify-between",
-        "pt-5 pb-3.5 px-6 xl:px-12 z-10"
-      )}
-    >
+    <header className={cn("order-last lg:order-first w-full", "flex items-center justify-between", "pt-5 pb-3.5 px-6 xl:px-12 z-10")}>
       {/* Logo */}
-      <Link
-        href="/"
-        className="min-w-[114px] min-h-11 hidden lg:flex items-center justify-center"
-      >
-        <Image
-          src={"/images/logo/white-logo.png"}
-          alt="logo"
-          width={52}
-          height={44}
-        />
+      <Link href="/" className="min-w-[114px] min-h-11 hidden lg:flex items-center justify-center">
+        <Image src={"/images/logo/white-logo.png"} alt="logo" width={52} height={44} />
       </Link>
 
       {/* Navbar Menu */}
-      <nav
-        className={cn(
-          "border-2 border-white/30 py-0.5 px-4 rounded-round text-white",
-          "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]",
-          "w-full lg:w-auto md:py-1.5"
-        )}
-      >
+      <nav className={cn("border-2 border-white/30 py-0.5 px-4 rounded-round text-white", "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]", "w-full lg:w-auto md:py-1.5")}>
         <ul className="flex items-center justify-center gap-x-1.5 max-h-[60px] sm:justify-between">
           {NAVBAR_ITEMS.map((item, idx) =>
             item.active ? (
               <li key={idx}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "flex items-center justify-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
-                    path === item.href &&
-                      "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]"
-                  )}
-                >
-                  <item.Icon
-                    width={24}
-                    height={24}
-                    className="min-w-5 min-h-5"
-                  />
-                  <span className={cn("hidden md:flex", "text-lg font-bold")}>
-                    {item.label}
-                  </span>
+                <Link href={item.href} className={cn("flex items-center justify-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4", path === item.href && "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]")}>
+                  <item.Icon width={24} height={24} className="min-w-5 min-h-5" />
+                  <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
                 </Link>
               </li>
             ) : (
               <div
                 key={idx}
-                className={cn(
-                  "relative flex items-center justify-center gap-x-1 select-none",
-                  "rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
-                  "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
-                )}
+                className={cn("relative flex items-center justify-center gap-x-1 select-none", "rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group", "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]")}
               >
                 <item.Icon width={24} height={24} className="min-w-5 min-h-5" />
-                <span className={cn("hidden md:flex", "text-lg font-bold")}>
-                  {item.label}
-                </span>
+                <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
 
                 <Tooltip>Coming Soon</Tooltip>
               </div>
