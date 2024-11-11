@@ -8,6 +8,11 @@
     rgba(255, 255, 255, 0.8) 0%,
     rgba(255, 255, 255, 0.24) 100%
   );
+  --input-fields-hover: linear-gradient(
+    160deg,
+    rgb(255, 255, 255) 0%,
+    rgba(255, 255, 255, 0.24) 100%
+  );
   --primary-buttons: linear-gradient(
       90deg,
       #1c68f8 0%,
@@ -67,6 +72,11 @@
   --input-fields: linear-gradient(
     180deg,
     rgba(36, 36, 36, 0.8) 0%,
+    rgba(33, 33, 33, 0.24) 100%
+  );
+  --input-fields-hover: linear-gradient(
+    180deg,
+    rgba(66, 66, 66, 0.8) 0%,
     rgba(33, 33, 33, 0.24) 100%
   );
   --shapes-background: linear-gradient(

@@ -10,7 +10,7 @@ const Card: FC<CardProps> = ({ children, className, ...other }) => {
   return (
     <div
       className={cn(
-        "relative w-full flex items-center gap-x-7 overflow-hidden",
+        "relative w-full flex items-center gap-x-7 overflow-hidden group",
         "px-9 py-11 rounded-xl border-2 border-box-border",
         "text-2xl leading-7 font-bold",
         "text-black dark:text-white",
@@ -21,6 +21,7 @@ const Card: FC<CardProps> = ({ children, className, ...other }) => {
       )}
       {...other}
     >
+      <div className="absolute rounded-xl inset-0 bg-input-fields-hover z-10 opacity-0 group-hover:opacity-30 transition-opacity duration-300 ease-in-out" />
       {children}
     </div>
   );

@@ -55,6 +55,7 @@ const config: Config = {
         "card-background": "var(--card-background)",
         "box-background": "var(--box-background)",
         "highlighted-card": "var(--highlighted-card)",
+        "input-fields-hover": "var(--input-fields-hover)",
       },
       /* Box Shadow */
       boxShadow: {
