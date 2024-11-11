@@ -12,14 +12,17 @@ import BridgeOptionsList, {
   BridgeOptionType,
 } from "./components/BridgeOptionsList";
 import ActionButton from "./components/ActionButton";
+import Tooltip from "@/components/ui/Tooltip";
 
 const SelectOptionPage = ({
   fromToken,
   toToken,
   prevStepHandler,
+  swapTokensHandler,
 }: {
   nextStepHandler: () => void;
   prevStepHandler: () => void;
+  swapTokensHandler: () => void;
   fromToken: EvmToken | IcpToken;
   toToken: EvmToken | IcpToken;
 }) => {
@@ -41,10 +44,10 @@ const SelectOptionPage = ({
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const usdPrice = Number(value) * (fromToken?.usdPrice ?? 0);
-    setAmount(e.target.value);
+    const usdPrice = Number(value) * Number(fromToken?.usdPrice ?? 0);
     setUsdPrice(usdPrice.toFixed(2));
-    setToAmount((usdPrice * (toToken?.usdPrice ?? 0)).toFixed(2));
+    setAmount(e.target.value);
+    setToAmount((usdPrice / Number(toToken?.usdPrice ?? 0)).toFixed(2));
   };
 
   const handleExpand = (option: BridgeOptionType) => {
@@ -89,13 +92,15 @@ const SelectOptionPage = ({
             />
             <div
               className={cn(
-                "absolute rounded-round inset-0 top-3 w-14 h-14 m-auto z-20",
+                "absolute rounded-round inset-0 w-14 h-14 m-auto z-20 cursor-pointer group",
                 "flex items-center justify-center",
                 "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
                 "border-2 border-white dark:border-white/30"
               )}
+              onClick={swapTokensHandler}
             >
               <ArrowDownIcon width={24} height={24} />
+              <Tooltip>swap</Tooltip>
             </div>
             <TokenCard
               type="to"

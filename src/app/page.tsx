@@ -65,6 +65,7 @@ const BridgeHome = () => {
             toToken={toToken}
             prevStepHandler={() => handleStepChange(1)}
             nextStepHandler={() => handleStepChange("next")}
+            swapTokensHandler={swapTokensHandler}
           />
         ) : null;
       default:

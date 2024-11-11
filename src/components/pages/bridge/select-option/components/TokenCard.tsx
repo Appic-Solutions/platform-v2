@@ -35,15 +35,22 @@ const TokenCard = ({
       <div className="flex items-center justify-between w-full">
         {/* left section */}
         <div className="flex items-center gap-x-3 max-w-[40%]">
-          <div className=" border-2 border-primary rounded-round p-3">
-            <div className="relative w-8 h-8 md:w-11 md:h-11">
-              <Image
-                src={token.logo}
-                alt={token.name}
-                className="object-contain"
-                fill
-              />
-            </div>
+          <div
+            className={cn("relative flex flex-col gap-y-2", "*:rounded-round")}
+          >
+            <Image
+              src={token.logo ?? "images/logo/placeholder.png"}
+              alt={token.name}
+              width={44}
+              height={44}
+            />
+            <Image
+              src={token.logo ?? "images/logo/placeholder.png"}
+              alt="token-logo"
+              width={20}
+              height={20}
+              className="w-5 h-5 absolute -right-1 -bottom-2 border-[2.5px] border-black dark:border-white"
+            />
           </div>
           <div>
             <p className="text-xl md:text-3xl">{token.symbol}</p>
@@ -91,9 +98,10 @@ const TokenCard = ({
             )}
           >
             {type === "to" && (
-              <span className="text-primary text-xl md:text-2xl">
-                {amount} {token.symbol}
-              </span>
+              <div className="text-primary text-xl md:text-2xl flex items-center gap-x-2">
+                <span>{amount}</span>
+                <span>{token.symbol}</span>
+              </div>
             )}
             {type === "from" && (
               <>

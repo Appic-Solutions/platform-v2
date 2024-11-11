@@ -21,7 +21,7 @@ const Card: FC<CardProps> = ({ children, className, ...other }) => {
       )}
       {...other}
     >
-      <div className="absolute rounded-xl inset-0 bg-input-fields-hover z-10 opacity-0 group-hover:opacity-30 transition-opacity duration-300 ease-in-out" />
+      {/* <div className="absolute rounded-xl inset-0 bg-input-fields-hover z-10 opacity-0 group-hover:opacity-30 transition-opacity duration-300 ease-in-out" /> */}
       {children}
     </div>
   );
