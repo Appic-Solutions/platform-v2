@@ -10,19 +10,22 @@ import { useAppKit } from "@reown/appkit/react";
 const HeaderPage = () => {
   const path = usePathname();
   const {
-    isInitializing,
-    user,
-    isUserConnecting,
-    icpBalance,
-    signer,
-    identity,
-    delegationType,
-    accounts,
-    connect,
-    disconnect,
-    fetchIcpBalance,
+    // isInitializing,
+    // user,
+    // isUserConnecting,
+    // icpBalance,
+    // signer,
+    // identity,
+    // delegationType,
+    // accounts,
+    // connect,
+    // disconnect,
+    // fetchIcpBalance,
   } = useIdentityKit();
-  const { open, close } = useAppKit();
+  const {
+    open,
+    // close
+  } = useAppKit();
 
   // console.log(sig);
   return (
