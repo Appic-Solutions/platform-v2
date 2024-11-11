@@ -6,6 +6,7 @@ import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { LinkIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
 import PageHeader from "@/components/ui/PageHeader";
+import Tooltip from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,20 +29,22 @@ const ChainSelector = ({
 }) => (
   <div className="grid grid-cols-5 gap-5 place-items-center w-full select-none md:px-4 mb-7">
     {chains.map((chain, idx) => (
-      <div
-        key={idx}
-        className={cn(
-          "flex items-center justify-center rounded-round cursor-pointer w-12 h-12 md:w-14 md:h-14",
-          selectedChainId === chain.chainId && "ring-4 ring-primary-buttons",
-          chain.disabled && "opacity-50 cursor-not-allowed select-none"
-        )}
-        onClick={() => {
-          if (!chain.disabled) {
-            onChainSelect(chain.chainId);
-          }
-        }}
-      >
-        <Image src={chain.logo} alt={chain.name} width={54} height={54} />
+      <div className="relative group" key={idx}>
+        <div
+          className={cn(
+            "flex items-center justify-center rounded-round cursor-pointer w-12 h-12 md:w-14 md:h-14",
+            selectedChainId === chain.chainId && "ring-4 ring-primary-buttons",
+            chain.disabled && "opacity-50 cursor-not-allowed select-none"
+          )}
+          onClick={() => {
+            if (!chain.disabled) {
+              onChainSelect(chain.chainId);
+            }
+          }}
+        >
+          <Image src={chain.logo} alt={chain.name} width={54} height={54} />
+        </div>
+        <Tooltip>{chain.name}</Tooltip>
       </div>
     ))}
   </div>
@@ -151,7 +154,7 @@ const TokenListPage = ({
 
   return (
     <Box className="justify-normal md:max-w-[611px] md:max-h-[716px] md:pt-6">
-      <PageHeader title="Select Bridge Option" onBack={prevStepHandler} />
+      <PageHeader title="Bridge From" onBack={prevStepHandler} />
 
       <ChainSelector
         selectedChainId={selectedChainId}

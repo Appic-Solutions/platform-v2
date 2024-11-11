@@ -1,8 +1,9 @@
 "use client";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import { ArrowDownIcon, ArrowsRightLeftIcon } from "@/components/icons";
+import { ArrowDownIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
 import Card from "@/components/ui/Card";
+import Tooltip from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -32,7 +33,7 @@ const SelectTokenPage = ({
           >
             Bridge
           </h1>
-          <button
+          {/* <button
             className={cn(
               "flex items-center justify-center gap-x-2",
               "text-black/90 dark:text-white/90",
@@ -43,7 +44,7 @@ const SelectTokenPage = ({
           >
             <ArrowsRightLeftIcon width={18} height={18} />
             Change to swap
-          </button>
+          </button> */}
 
           {/* Mobile Avatar */}
           <button
@@ -95,13 +96,15 @@ const SelectTokenPage = ({
           </Card>
           <div
             className={cn(
-              "absolute rounded-round inset-0 w-14 h-14 m-auto z-20",
+              "absolute rounded-round inset-0 w-14 h-14 m-auto z-20 cursor-pointer group",
               "flex items-center justify-center",
               "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
               "border-2 border-white dark:border-white/30"
             )}
+            onClick={swapTokensHandler}
           >
             <ArrowDownIcon width={24} height={24} />
+            <Tooltip>swap</Tooltip>
           </div>
           <Card
             className="max-h-[133px] md:max-h-[155px] cursor-pointer"
@@ -134,7 +137,7 @@ const SelectTokenPage = ({
             <p>{toToken ? toToken.name : "Select Token"}</p>
           </Card>
         </div>
-        <button
+        {/* <button
           className={cn(
             "flex items-center self-start gap-x-2 ml-4 md:ml-0",
             "text-black/90 dark:text-white/90 font-medium md:hidden disabled:opacity-50 disabled:cursor-not-allowed"
@@ -144,7 +147,7 @@ const SelectTokenPage = ({
         >
           <ArrowsRightLeftIcon width={18} height={18} />
           Change to swap
-        </button>
+        </button> */}
       </div>
 
       {/* Submit Button */}

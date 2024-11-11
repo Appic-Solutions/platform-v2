@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectWallet, useIdentityKit } from "@nfid/identitykit/react";
 import { useAppKit } from "@reown/appkit/react";
+import Tooltip from "../ui/Tooltip";
 
 const HeaderPage = () => {
   const path = usePathname();
@@ -84,7 +85,8 @@ const HeaderPage = () => {
                 key={idx}
                 className={cn(
                   "relative flex items-center justify-center gap-x-1 select-none",
-                  "rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group"
+                  "rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
+                  "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
                 )}
               >
                 <item.Icon width={24} height={24} className="min-w-5 min-h-5" />
@@ -92,17 +94,7 @@ const HeaderPage = () => {
                   {item.label}
                 </span>
 
-                <div
-                  className={cn(
-                    "absolute bottom-full w-24 h-fit text-xs lg:top-full md:text-sm md:w-28",
-                    "px-2 py-1 rounded-round bg-primary-buttons",
-                    "group-hover:opacity-100 opacity-0 duration-100",
-                    "after:content-[''] after:absolute after:-bottom-1 after:inset-x-0 after:mx-auto",
-                    "after:w-4 after:h-4 after:bg-primary-buttons after:rotate-45 after:-z-10 after:rounded-s lg:after:-top-1"
-                  )}
-                >
-                  Coming Soon
-                </div>
+                <Tooltip>Coming Soon</Tooltip>
               </div>
             )
           )}
