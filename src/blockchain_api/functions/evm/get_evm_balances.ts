@@ -47,8 +47,8 @@ interface EvmTokensBalances {
 }
 
 export async function get_evm_wallet_tokens_balances(wallet_address: string): Promise<EvmTokensBalances> {
-  let chains_ankr_array: string[] = chains.filter((chain): chain is Chain & { ankr_handle: string } => chain.ankr_handle !== undefined).map((chain) => chain.ankr_handle);
-  let requestParams: AnkrGetBalanceRequestParams = {
+  const chains_ankr_array: string[] = chains.filter((chain): chain is Chain & { ankr_handle: string } => chain.ankr_handle !== undefined).map((chain) => chain.ankr_handle);
+  const requestParams: AnkrGetBalanceRequestParams = {
     id: 1,
     jsonrpc: "2.0",
     method: "ankr_getAccountBalance",

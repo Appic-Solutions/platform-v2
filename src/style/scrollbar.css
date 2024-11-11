@@ -1,0 +1,46 @@
+/* Scrollbar styles */
+/* Scrollbar styles */
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px; /* Add height for horizontal scroll bars */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0; /* Remove any margin */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(136, 136, 136, 0.74);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(136, 136, 136, 0.48);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Corner */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Hide scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: block;
+  }
+}

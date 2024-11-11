@@ -2,7 +2,7 @@
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import SelectOptionPage from "@/components/pages/bridge/select-option/select-option";
 import SelectTokenPage from "@/components/pages/bridge/select-token";
-import TokenListPage from "@/components/pages/bridge/token-list";
+import TokenListPage from "@/components/pages/bridge/chain-token-list/token-list";
 import { useState } from "react";
 
 type TokenType = EvmToken | IcpToken | null;

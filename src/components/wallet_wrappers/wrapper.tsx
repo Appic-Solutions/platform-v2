@@ -1,13 +1,12 @@
 "use client";
-
-import { IdentityKitAuthType, IdentityKitDelegationType, IdentityKitSignerClient } from "@nfid/identitykit";
-import { ConnectWallet, IdentityKitProvider, IdentityKitTheme } from "@nfid/identitykit/react";
+import { IdentityKitAuthType } from "@nfid/identitykit";
+import { IdentityKitProvider } from "@nfid/identitykit/react";
 import { wagmiAdapter, projectId } from "@/config/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
 import { mainnet, arbitrum, avalanche, base, optimism, polygon } from "@reown/appkit/networks";
-import React, { type ReactNode } from "react";
-import { cookieToInitialState, WagmiProvider, type Config } from "wagmi";
+import React from "react";
+import { WagmiProvider, type Config } from "wagmi";
 
 // Set up queryClient
 const queryClient = new QueryClient();

@@ -1,6 +1,5 @@
-"use client";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import { ArrowDownIcon } from "@/components/icons";
+import { ArrowsUpDownIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
 import Card from "@/components/ui/Card";
 import Tooltip from "@/components/ui/Tooltip";
@@ -33,19 +32,6 @@ const SelectTokenPage = ({
           >
             Bridge
           </h1>
-          {/* <button
-            className={cn(
-              "flex items-center justify-center gap-x-2",
-              "text-black/90 dark:text-white/90",
-              "text-sm font-medium max-md:hidden disabled:opacity-50 disabled:cursor-not-allowed"
-            )}
-            onClick={swapTokensHandler}
-            disabled={!fromToken || !toToken}
-          >
-            <ArrowsRightLeftIcon width={18} height={18} />
-            Change to swap
-          </button> */}
-
           {/* Mobile Avatar */}
           <button
             className={cn(
@@ -103,7 +89,7 @@ const SelectTokenPage = ({
             )}
             onClick={swapTokensHandler}
           >
-            <ArrowDownIcon width={24} height={24} />
+            <ArrowsUpDownIcon width={24} height={24} />
             <Tooltip>swap</Tooltip>
           </div>
           <Card
@@ -137,17 +123,6 @@ const SelectTokenPage = ({
             <p>{toToken ? toToken.name : "Select Token"}</p>
           </Card>
         </div>
-        {/* <button
-          className={cn(
-            "flex items-center self-start gap-x-2 ml-4 md:ml-0",
-            "text-black/90 dark:text-white/90 font-medium md:hidden disabled:opacity-50 disabled:cursor-not-allowed"
-          )}
-          onClick={swapTokensHandler}
-          disabled={!fromToken || !toToken}
-        >
-          <ArrowsRightLeftIcon width={18} height={18} />
-          Change to swap
-        </button> */}
       </div>
 
       {/* Submit Button */}
@@ -165,9 +140,9 @@ const SelectTokenPage = ({
         onClick={() => stepHandler(3)}
       >
         {fromToken &&
-        toToken &&
-        fromToken?.contractAddress === toToken?.contractAddress &&
-        fromToken?.chainId === toToken?.chainId
+          toToken &&
+          fromToken?.contractAddress === toToken?.contractAddress &&
+          fromToken?.chainId === toToken?.chainId
           ? "Please select different tokens"
           : "Confirm"}
       </button>
