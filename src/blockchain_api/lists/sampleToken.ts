@@ -1,4 +1,4 @@
-import { EvmToken, IcpToken } from "../types/tokens"
+import { EvmToken, IcpToken } from "../types/tokens";
 
 export const tokens: (EvmToken | IcpToken)[] = [
   {
@@ -7,11 +7,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 2000, // Placeholder value
+    usdPrice: "2000", // Placeholder value
     decimals: 18,
     chainId: 1,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -20,11 +21,13 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 2000, // Placeholder value
+    usdPrice: "2000", // Placeholder value
     decimals: 18,
     chainId: 11155111,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -33,11 +36,13 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/arbitrum-arb-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 2000, // Placeholder value
+    usdPrice: "2000", // Placeholder value
     decimals: 18,
     chainId: 42161,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -46,11 +51,13 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 250, // Placeholder value
+    usdPrice: "250", // Placeholder value
     decimals: 18,
     chainId: 56,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -59,11 +66,13 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 250, // Placeholder value
+    usdPrice: "250", // Placeholder value
     decimals: 18,
     chainId: 97,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    usdBalance: undefined,
+    balanceRawInteger: "345354235234523",
+
     chainTypes: "EVM",
   },
   {
@@ -72,11 +81,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 1.5, // Placeholder value
+    usdPrice: "1.5", // Placeholder value
     decimals: 18,
     chainId: 137,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    usdBalance: undefined,
+    balanceRawInteger: "345354235234523",
     chainTypes: "EVM",
   },
   {
@@ -85,11 +95,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/optimism-op-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 2000, // Placeholder value
+    usdPrice: "2000", // Placeholder value
     decimals: 18,
     chainId: 10,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    usdBalance: undefined,
+    balanceRawInteger: "345354235234523",
     chainTypes: "EVM",
   },
   {
@@ -98,11 +109,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/base-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 2000, // Placeholder value
+    usdPrice: "2000", // Placeholder value
     decimals: 18,
     chainId: 8453,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -111,11 +123,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/avalanche-avax-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 15, // Placeholder value
+    usdPrice: "15", // Placeholder value
     decimals: 18,
     chainId: 43114,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -124,11 +137,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/fantom-ftm-logo.png",
     contractAddress: "0x0000000000000000000000000000000000000000",
     canisterId: undefined,
-    usdPrice: 0.5, // Placeholder value
+    usdPrice: "0.5", // Placeholder value
     decimals: 18,
     chainId: 250,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balance: undefined,
+    balanceRawInteger: "345354235234523",
+    usdBalance: undefined,
     chainTypes: "EVM",
   },
   {
@@ -137,18 +151,17 @@ export const tokens: (EvmToken | IcpToken)[] = [
     logo: "https://cryptologos.cc/logos/internet-computer-icp-logo.png",
     contractAddress: undefined,
     canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-    usdPrice: 5, // Placeholder value
+    usdPrice: "533", // Placeholder value
     decimals: 8,
     chainId: 0,
-    holdingAmount: undefined,
-    usdHoldingAmount: undefined,
+    balanceRawInteger: "345354235234523",
+    balance: undefined,
+    usdBalance: undefined,
     chainTypes: "ICP",
     disabled: true,
   },
-]
+];
 
-export function filterTokensByChainId(
-  chainId: number
-): (EvmToken | IcpToken)[] {
-  return tokens.filter((token) => token.chainId === chainId)
+export function filterTokensByChainId(chainId: number): (EvmToken | IcpToken)[] {
+  return tokens.filter((token) => token.chainId === chainId);
 }

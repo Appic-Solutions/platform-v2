@@ -64,6 +64,7 @@ const HeaderPage = () => {
         <ConnectWallet></ConnectWallet>
       </div>
       {/* <ConnectWalletDropdownMenuAddressItem value={""}></ConnectWalletDropdownMenuAddressItem> */}
+      <div className="bg-[#FAF7FD80]/50 rounded-round border border-[#ECE6F5] py-2 px-4 hidden lg:flex">User Wallet</div>
     </header>
   );
 };

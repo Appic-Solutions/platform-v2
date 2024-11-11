@@ -1,5 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useState } from "react";
 
 import { ArrowDownIcon } from "@/components/icons";
 import Image from "next/image";
@@ -7,6 +9,8 @@ import Box from "@/components/ui/box";
 import Card from "@/components/ui/Card";
 import ClockIcon from "@/components/icons/clock";
 import FireIcon from "@/components/icons/fire";
+import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
+import ChevronDownIcon from "@/components/icons/chevron-down";
 
 // TODO: This is a temporary code for testing purposes only
 const returns = [
@@ -15,7 +19,7 @@ const returns = [
     amount: 1.154844,
     via: "ICP",
     time: 10,
-    price: 1.24,
+    usdPrice: 1.24,
     isBest: true,
     isActive: true,
   },
@@ -24,7 +28,7 @@ const returns = [
     amount: 1.154844,
     via: "ICP",
     time: 10,
-    price: 1.24,
+    usdPrice: 1.24,
     isBest: false,
     isActive: true,
   },
@@ -33,7 +37,7 @@ const returns = [
     amount: 1.154844,
     via: "ICP",
     time: 10,
-    price: 1.24,
+    usdPrice: 1.24,
     isBest: false,
     isActive: false,
   },
@@ -42,17 +46,36 @@ const returns = [
     amount: 1.154844,
     via: "ICP",
     time: 10,
-    price: 1.24,
+    usdPrice: 1.24,
     isBest: false,
-    isActive: false,
+    isActive: true,
   },
 ];
 
 const SelectOptionPage = ({
-  nextStepHandler,
+  fromToken,
+  toToken,
 }: {
   nextStepHandler: () => void;
+  fromToken: EvmToken | IcpToken;
+  toToken: EvmToken | IcpToken;
 }) => {
+  const [amount, setAmount] = useState("");
+  const [usdPrice, setUsdPrice] = useState("0");
+  const [expandedReturn, setExpandedReturn] = useState<number | null>(null);
+  const [selectedReturn, setSelectedReturn] = useState<number | null>(null);
+
+  const handleReturnSelect = (returnId: number) => {
+    setSelectedReturn(returnId);
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const usdPrice = Number(value) * (fromToken?.usdPrice ?? 0);
+    setAmount(e.target.value);
+    setUsdPrice(usdPrice.toFixed(2));
+  };
+
   return (
     <Box
       className={cn(
@@ -120,32 +143,51 @@ const SelectOptionPage = ({
               </p>
               <div className="flex items-center justify-between w-full">
                 {/* left section */}
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 max-w-[40%]">
                   <div className=" border-2 border-primary rounded-round p-3">
                     <div className="relative w-8 h-8 md:w-11 md:h-11">
                       <Image
-                        src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
-                        alt="btc"
+                        src={fromToken?.logo ?? ""}
+                        alt={fromToken?.name ?? ""}
                         className="object-contain"
                         fill
                       />
                     </div>
                   </div>
                   <div>
-                    <p className="text-xl md:text-3xl">ETH</p>
-                    <p className="text-base md:text-xl font-semibold text-muted">
-                      Solana
+                    <p className="text-xl md:text-3xl">{fromToken?.symbol}</p>
+                    <p className="text-sm md:text-base font-semibold text-muted">
+                      {fromToken?.name}
                     </p>
                   </div>
                 </div>
                 {/* right section */}
-                <div className="flex flex-col gap-y-3 items-end">
+                <div className="flex flex-col gap-y-2 items-end">
                   <p className="text-muted text-xs md:text-sm font-semibold">
                     Available: 0.334 ETH
                   </p>
-                  <p className="text-xl md:text-2xl font-semibold">0.3245764</p>
-                  <div className="px-4 py-1 text-xs md:text-sm text-black bg-gradient-to-r from-white to-white/35 rounded-ml">
-                    max
+                  <input
+                    type="text"
+                    placeholder="0"
+                    value={amount}
+                    onChange={(e) => handleAmountChange(e)}
+                    className={cn(
+                      "border-[#1C68F8] dark:border-[#000000] rounded-m py-1 px-3 outline-none",
+                      "bg-white/50 dark:bg-white/30 text-black dark:text-white",
+                      "placeholder:text-black/50 dark:placeholder:text-white/50",
+                      amount.length > 8
+                        ? "text-sm md:text-sm w-3/4"
+                        : "text-sm md:text-xl w-1/2",
+                      "font-semibold"
+                    )}
+                  />
+                  <div className="flex flex-col md:flex-row items-center gap-2">
+                    <span className="text-muted text-xs md:text-sm">
+                      {usdPrice} $
+                    </span>
+                    <span className="px-4 cursor-pointer py-1 text-xs md:text-sm text-black bg-gradient-to-r from-white to-white/35 rounded-ml">
+                      max
+                    </span>
                   </div>
                 </div>
               </div>
@@ -180,28 +222,27 @@ const SelectOptionPage = ({
                   <div className=" border-2 border-primary rounded-round p-3">
                     <div className="relative w-8 h-8 md:w-11 md:h-11">
                       <Image
-                        src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
-                        alt="btc"
+                        src={toToken?.logo ?? ""}
+                        alt={toToken?.name ?? ""}
                         className="object-contain"
                         fill
                       />
                     </div>
                   </div>
                   <div>
-                    <p className="text-xl md:text-3xl">ETH</p>
-                    <p className="text-base md:text-xl font-semibold text-muted">
-                      Solana
+                    <p className="text-xl md:text-3xl">{toToken?.symbol}</p>
+                    <p className="text-sm md:text-base font-semibold text-muted">
+                      {toToken?.name}
                     </p>
                   </div>
                 </div>
                 {/* right section */}
                 <div className="flex flex-col gap-y-3 items-end">
-                  <p className="text-muted text-xs md:text-sm font-semibold">
-                    Available: 0.334 ETH
-                  </p>
                   <p className="text-xl md:text-2xl font-semibold">0.3245764</p>
-                  <div className="px-4 py-1 text-xs md:text-sm text-black bg-gradient-to-r from-white to-white/35 rounded-ml">
-                    max
+                  <div className="flex flex-col gap-y-3 items-end">
+                    <span className="text-muted text-xs md:text-sm">
+                      {usdPrice} $
+                    </span>
                   </div>
                 </div>
               </div>
@@ -211,10 +252,14 @@ const SelectOptionPage = ({
           <button
             className={cn(
               "bg-primary-buttons justify-self-end w-full h-14 rounded-ml max-w-[482px]",
-              "text-highlight-standard font-normal text-white",
-              "max-lg:hidden"
+              "text-highlight-standard font-normal text-white outline-none",
+              "max-lg:hidden",
+              // Add disabled styles
+              (!selectedReturn || !Number(amount)) &&
+                "opacity-50 cursor-not-allowed"
             )}
-            onClick={nextStepHandler}
+            onClick={(e) => e.preventDefault}
+            disabled={!selectedReturn}
           >
             Select Return
           </button>
@@ -232,34 +277,60 @@ const SelectOptionPage = ({
               "text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold"
             )}
           >
-            To
+            Receive
           </h1>
           <div className="w-full flex lg:flex-col gap-4 h-full overflow-x-scroll lg:overflow-y-scroll pr-4 hide-scrollbar">
             {returns.map((item) => (
               <Card
+                onClick={() => item.isActive && handleReturnSelect(item.id)}
                 className={cn(
-                  "py-4 px-4 flex-col gap-4 items-start justify-center overflow-visible",
-                  "min-h-[165px] min-w-[300px]",
+                  "py-4 px-4 flex-col gap-3 items-start justify-center",
+                  "min-w-[300px]",
                   "sm:px-6",
                   "md:px-6",
                   item.isActive && "cursor-pointer",
-                  item.isBest && "bg-highlighed-components"
+                  item.isBest && "bg-highlighted-card",
+                  selectedReturn === item.id && "border-2 border-blue-600",
+                  "min-h-[165px]",
+                  expandedReturn === item.id && "min-h-[360px]",
+                  "transition-all duration-300 ease-in-out",
+                  "md:rounded-xl"
                 )}
                 key={item.id}
               >
-                {/* top line */}
-                {item.isBest && (
-                  <p
+                {/* top section */}
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex-1">
+                    {item.isBest && (
+                      <p
+                        className={cn(
+                          "text-muted text-xs lg:text-sm font-thin",
+                          "bg-primary-buttons text-white rounded-ml px-2 w-fit",
+                          !item.isActive && "opacity-50"
+                        )}
+                      >
+                        Best Return
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() =>
+                      item.isActive &&
+                      setExpandedReturn(
+                        expandedReturn === item.id ? null : item.id
+                      )
+                    }
                     className={cn(
-                      "text-muted text-xs lg:text-sm font-thin",
-                      "bg-primary-buttons text-white rounded-ml px-2",
-                      !item.isActive && "opacity-50"
+                      "bg-gray-400 bg-opacity-20 rounded-m p-2 flex items-center ml-auto",
+                      "transition-transform duration-300",
+                      expandedReturn === item.id && "rotate-180",
+                      !item.isActive && "opacity-30"
                     )}
                   >
-                    Best Return
-                  </p>
-                )}
-                {/* middle line */}
+                    <ChevronDownIcon width={10} height={10} />
+                  </button>
+                </div>
+                {/* middle section */}
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-x-3">
                     <div className="border-2 border-primary rounded-round p-3">
@@ -277,7 +348,7 @@ const SelectOptionPage = ({
                     <p
                       className={cn(
                         "text-base lg:text-xl",
-                        !item.isActive && "opacity-50"
+                        !item.isActive && "opacity-30"
                       )}
                     >
                       {item.amount}
@@ -287,16 +358,14 @@ const SelectOptionPage = ({
                     <div
                       className={cn(
                         "px-4 py-1 rounded-ml flex items-center gap-x-1",
-                        item.isBest
-                          ? "bg-highlighed-components"
-                          : "bg-input-fields",
-                        !item.isActive && "opacity-50"
+                        "bg-white",
+                        !item.isActive && "opacity-30"
                       )}
                     >
                       <span
                         className={cn(
                           "text-xs lg:text-sm",
-                          item.isBest ? "text-blue-600" : "text-primary"
+                          item.isBest ? "text-blue-600" : "text-black"
                         )}
                       >
                         via {item.via}
@@ -310,19 +379,21 @@ const SelectOptionPage = ({
                     </div>
                   </div>
                 </div>
-                {/* bottom line */}
+                {/* bottom section */}
                 <div
                   className={cn(
                     "flex items-end w-full justify-end gap-x-4",
-                    !item.isActive && "opacity-50"
+                    !item.isActive && "opacity-30"
                   )}
                 >
                   <span className="flex items-center gap-x-1 w-max">
-                    <p className="text-muted text-xs font-thin">1.24</p>
+                    <p className="text-muted text-xs font-thin text-primary">
+                      1.24
+                    </p>
                     <FireIcon width={15} height={15} className="text-primary" />
                   </span>
                   <span className="flex items-center gap-x-1 w-max">
-                    <p className="text-muted text-xs font-thin">10 Mins</p>
+                    <p className="text-primary text-xs font-thin">10 Mins</p>
                     <ClockIcon
                       width={15}
                       height={15}
@@ -330,6 +401,33 @@ const SelectOptionPage = ({
                     />
                   </span>
                 </div>
+
+                {/* Expanded content */}
+                {expandedReturn === item.id && (
+                  <div className="mt-4 w-full border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <div className="space-y-4">
+                      <p className="text-sm font-medium">Additional Details:</p>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted">Network Fee:</span>
+                          <span>0.001 ETH</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted">Estimated Time:</span>
+                          <span>{item.time} mins</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted">Route:</span>
+                          <span>Direct Bridge</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted">Security:</span>
+                          <span>High</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </Card>
             ))}
           </div>
@@ -339,10 +437,13 @@ const SelectOptionPage = ({
       <button
         className={cn(
           "bg-primary-buttons w-full h-14 rounded-ml max-w-[482px] mt-7 py-4",
-          "text-highlight-standard font-normal text-white",
-          "lg:hidden"
+          "text-highlight-standard outline-none font-normal text-white",
+          "lg:hidden",
+          (!selectedReturn || !Number(amount)) &&
+            "opacity-50 cursor-not-allowed"
         )}
-        onClick={nextStepHandler}
+        onClick={(e) => e.preventDefault()}
+        disabled={!selectedReturn || !Number(amount)}
       >
         Select Return
       </button>
