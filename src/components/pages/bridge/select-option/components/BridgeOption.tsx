@@ -2,11 +2,9 @@ import Card from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { BridgeOptionType } from "./BridgeOptionsList";
-import FireIcon from "@/components/icons/fire";
-import ClockIcon from "@/components/icons/clock";
-import ChevronDownIcon from "@/components/icons/chevron-down";
 import { motion } from "framer-motion";
 import { AnimatePresence } from "framer-motion";
+import { ChevronDownIcon, ClockIcon, FireIcon } from "@/components/icons";
 
 interface BridgeOptionProps {
   option: BridgeOptionType;
