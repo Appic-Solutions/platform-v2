@@ -2,7 +2,6 @@ import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { ArrowsUpDownIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
 import Card from "@/components/ui/Card";
-import Tooltip from "@/components/ui/Tooltip";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -75,7 +74,7 @@ const SelectTokenPage = ({
                 alt="token-logo"
                 width={20}
                 height={20}
-                className="w-5 h-5 absolute -right-1 -bottom-2 border-[2.5px] border-black dark:border-white"
+                className="w-5 h-5 absolute -right-1 -bottom-1 border border-black dark:border-white"
               />
             </div>
             <p>{fromToken ? fromToken.name : "Select Token"}</p>
@@ -85,26 +84,21 @@ const SelectTokenPage = ({
               "absolute rounded-round inset-0 w-14 h-14 m-auto z-20 cursor-pointer group",
               "flex items-center justify-center",
               "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
-              "border-2 border-white dark:border-white/30"
+              "border-2 border-white dark:border-white/30",
+              "transition-transform duration-300 hover:rotate-180 hover:scale-110"
             )}
             onClick={swapTokensHandler}
           >
             <ArrowsUpDownIcon width={24} height={24} />
-            <Tooltip>swap</Tooltip>
+            {/* <Tooltip>swap</Tooltip> */}
           </div>
           <Card
             className="max-h-[133px] md:max-h-[155px] cursor-pointer"
             onClick={() => {
               setSelectedType("to");
               stepHandler("next");
-            }}
-          >
-            <div
-              className={cn(
-                "relative flex flex-col gap-y-2",
-                "*:rounded-round"
-              )}
-            >
+            }}>
+            <div className="relative flex flex-col gap-y-2 *:rounded-round">
               <p className="text-sm font-semibold">To</p>
               <Image
                 src={toToken ? toToken.logo : "images/logo/placeholder.png"}
@@ -117,7 +111,7 @@ const SelectTokenPage = ({
                 alt="token-logo"
                 width={20}
                 height={20}
-                className="w-5 h-5 absolute -right-1 -bottom-2 border-[2.5px] border-black dark:border-white"
+                className="w-5 h-5 absolute -right-1 -bottom-1 border border-black dark:border-white"
               />
             </div>
             <p>{toToken ? toToken.name : "Select Token"}</p>
