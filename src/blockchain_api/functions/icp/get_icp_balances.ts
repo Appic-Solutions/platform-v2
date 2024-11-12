@@ -43,9 +43,10 @@ export const get_tokens_balances = async (all_token: IcpToken[], userPrincipal: 
         const tokenBalance = await get_single_token_balance(canisterId, tokenType, userPrincipal, agent);
         if (tokenBalance) {
           // Calculate USD balance
-          const usdBalance = new BigNumber(tokenBalance.toString()).dividedBy(10).pow(decimals).multipliedBy(usdPrice).toString();
+          const balance = new BigNumber(tokenBalance.toString()).dividedBy(new BigNumber(10).pow(decimals));
+          const usdBalance = balance.multipliedBy(usdPrice).toString();
 
-          return { ...token, balance: tokenBalance.toString(), usdBalance, balanceRawInteger: tokenBalance.toString() };
+          return { ...token, balance: balance.toString(), usdBalance, balanceRawInteger: tokenBalance.toString() };
         }
         return { ...token, balance: "0", usdBalance: "0" };
       } catch (error) {

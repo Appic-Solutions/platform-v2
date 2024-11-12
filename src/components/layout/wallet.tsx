@@ -11,6 +11,7 @@ import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_t
 import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
 import { useAuthenticatedAgent } from "@/hooks/useAuthenticatedAgent";
 import { get_icp_wallet_tokens_balances } from "@/blockchain_api/functions/icp/get_icp_balances";
+import { get_evm_wallet_tokens_balances } from "@/blockchain_api/functions/evm/get_evm_balances";
 
 const WalletPage = () => {
   // States Management
@@ -42,16 +43,25 @@ const WalletPage = () => {
     }
   }, [unauthenticatedAgent, authenticatedAgent, icpIdentity]);
 
-  useEffect(() => {}, []);
-
   // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
   const { disconnect: disconnectEvm } = useDisconnect();
 
+  // Fetch All ICP Tokens
+  const fetchEvmBalance = async () => {
+    if (evmAddress) {
+      // Get user balance
+      const user_balance = await get_evm_wallet_tokens_balances(evmAddress);
+      console.log("res => ", user_balance);
+    }
+  };
+
   useEffect(() => {
-    console.log("evmAddress > ", evmAddress);
+    if (evmAddress) {
+      fetchEvmBalance();
+    }
   }, [evmAddress]);
 
   const getChainLogo = (chainId: string | number | undefined): string => {
