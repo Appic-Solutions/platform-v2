@@ -9,6 +9,39 @@ import { CloseIcon } from "../icons";
 // import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
 // import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
 
+
+const WalletCard = ({
+  connectWallet,
+  walletLogo,
+  walletTitle,
+  walletSubTitle
+}: {
+  connectWallet: () => void,
+  walletLogo: string,
+  walletTitle: string,
+  walletSubTitle: string
+}) => {
+  return (
+    <div
+      onClick={() => connectWallet()}
+      className={cn(
+        "flex items-center gap-2 cursor-pointer p-2 rounded-sm duration-200",
+        "hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]"
+      )}>
+      <Image
+        src={walletLogo}
+        alt="ICP Wallet"
+        width={51}
+        height={51}
+      />
+      <div className="flex flex-col">
+        <span className="text-lg font-bold text-black dark:text-white">{walletTitle}</span>
+        <span className="text-sm font-semibold text-[#B5B3B3]">{walletSubTitle}</span>
+      </div>
+    </div>
+  )
+}
+
 const WalletPage = () => {
   // States Management
   const [showPopover, setShowPopover] = useState(false);
@@ -56,6 +89,7 @@ const WalletPage = () => {
       (icpIdentity || isEvmConnected) && "px-3",
       "*:rounded-round"
     )}>
+
       {(!icpIdentity || !isEvmConnected) && (
         <Popover open={showPopover} onOpenChange={setShowPopover}>
           <PopoverTrigger className="w-full text-black font-medium text-sm dark:text-white py-2 px-3">
@@ -68,36 +102,28 @@ const WalletPage = () => {
               </PopoverClose>
               Select Wallet
             </div>
-            <div className={cn(
-              "flex flex-col  gap-4 text-black font-medium text-sm dark:text-white",
-              "*:flex *:items-center *:gap-2 *:cursor-pointer *:p-2 *:rounded-sm *:duration-200"
-            )}>
+            <div className="flex flex-col gap-4">
               {!icpIdentity && (
-                <div onClick={() => connectIcp()} className="hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]">
-                  <Image
-                    src="/images/logo/icp-logo.png"
-                    alt="ICP Wallet"
-                    width={24}
-                    height={24}
-                  />
-                  Connect ICP Wallet
-                </div>
+                <WalletCard
+                  connectWallet={() => connectIcp()}
+                  walletLogo="/images/logo/icp-logo.png"
+                  walletTitle="Connect ICP Wallet"
+                  walletSubTitle="BNB Chain"
+                />
               )}
               {!isEvmConnected && (
-                <div onClick={() => openEvmModal()} className="hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]">
-                  <Image
-                    src="/images/logo/icp-logo.png"
-                    alt="EVM Wallet"
-                    width={24}
-                    height={24}
-                  />
-                  Connect EVM Wallet
-                </div>
+                <WalletCard
+                  connectWallet={() => openEvmModal()}
+                  walletLogo="/images/logo/icp-logo.png"
+                  walletTitle="Connect EVM Wallet"
+                  walletSubTitle="Ethereum"
+                />
               )}
             </div>
           </PopoverContent>
         </Popover>
       )}
+
       {icpIdentity && (
         <Popover open={showIcpPopover} onOpenChange={setShowIcpPopover}>
           <PopoverTrigger>
@@ -123,6 +149,7 @@ const WalletPage = () => {
           </PopoverContent>
         </Popover>
       )}
+
       {isEvmConnected && (
         <Popover open={showEvmPopover} onOpenChange={setShowEvmPopover}>
           <PopoverTrigger>
@@ -151,8 +178,9 @@ const WalletPage = () => {
           </PopoverContent>
         </Popover>
       )}
+
     </div >
-  );
+  )
 };
 
 export default WalletPage;
