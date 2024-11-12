@@ -81,7 +81,7 @@ const TokenListPage = ({
           "w-full"
         )} />
 
-      <div style={{ scrollbarColor: "#FFFFFF80 transparent" }} className="w-full flex flex-col gap-y-5 overflow-y-auto">
+      <div className="w-full flex flex-col gap-y-5 overflow-y-auto">
         {filteredTokens.map((token, idx) => (
           <TokenCard
             key={idx}
