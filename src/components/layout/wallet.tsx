@@ -1,11 +1,12 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { useIdentityKit } from "@nfid/identitykit/react";
-import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useDisconnect, useAppKitNetwork } from "@reown/appkit/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "../ui/popover";
 import { CloseIcon } from "../icons";
+import { chains } from "@/blockchain_api/lists/chains";
 // import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
 // import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
 
@@ -40,11 +41,16 @@ const WalletPage = () => {
   // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
+  const { chainId } = useAppKitNetwork();
   const { disconnect: disconnectEvm } = useDisconnect();
 
   useEffect(() => {
     console.log("evmAddress > ", evmAddress);
   }, [evmAddress]);
+
+  const getChainLogo = (chainId: string | number | undefined): string => {
+    return chains.find((chain) => chain.chainId == Number(chainId))?.logo || "/images/logo/chains/ethereum.svg";
+  };
 
   return (
     <div className={cn("hidden lg:flex items-center justify-evenly gap-2 relative min-w-fit w-[165px] h-[42px]", "rounded-round bg-[#faf7fd]/50 border border-[#ECE6F5]", (icpIdentity || isEvmConnected) && "px-3", "*:rounded-round")}>
@@ -61,13 +67,13 @@ const WalletPage = () => {
             <div className={cn("flex flex-col  gap-4 text-black font-medium text-sm dark:text-white", "*:flex *:items-center *:gap-2 *:cursor-pointer *:p-2 *:rounded-sm *:duration-200")}>
               {!icpIdentity && (
                 <div onClick={() => connectIcp()} className="hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]">
-                  <Image src="/images/logo/icp-logo.png" alt="ICP Wallet" width={24} height={24} />
+                  <Image src="/images/logo/wallet_logos/icp.svg" alt="ICP Wallet" width={24} height={24} />
                   Connect ICP Wallet
                 </div>
               )}
               {!isEvmConnected && (
                 <div onClick={() => openEvmModal()} className="hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]">
-                  <Image src="/images/logo/icp-logo.png" alt="EVM Wallet" width={24} height={24} />
+                  <Image src={getChainLogo(chainId)} alt="EVM Wallet" width={24} height={24} />
                   Connect EVM Wallet
                 </div>
               )}
@@ -78,7 +84,7 @@ const WalletPage = () => {
       {icpIdentity && (
         <Popover open={showIcpPopover} onOpenChange={setShowIcpPopover}>
           <PopoverTrigger>
-            <Image src="/images/logo/icp-logo.png" alt="ICP Wallet" width={24} height={24} />
+            <Image src="/images/logo/wallet_logos/icp.svg" alt="ICP Wallet" width={24} height={24} />
           </PopoverTrigger>
           <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
@@ -96,7 +102,7 @@ const WalletPage = () => {
       {isEvmConnected && (
         <Popover open={showEvmPopover} onOpenChange={setShowEvmPopover}>
           <PopoverTrigger>
-            <Image src="/images/logo/icp-logo.png" alt="ICP Wallet" width={24} height={24} />
+            <Image src={getChainLogo(chainId)} alt="ICP Wallet" width={24} height={24} />
           </PopoverTrigger>
           <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
