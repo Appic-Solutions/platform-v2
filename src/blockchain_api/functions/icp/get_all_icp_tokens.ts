@@ -9,19 +9,19 @@ import { IcpToken } from "@/blockchain_api/types/tokens";
 
 // The main function to be called
 export const get_all_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
-  let all_sonic_tokens: TokenInfoWithType[] = await get_all_sonic_tokens(agent);
+  const all_sonic_tokens: TokenInfoWithType[] = await get_all_sonic_tokens(agent);
 
   if (all_sonic_tokens.length == 0) return [];
 
-  let all_sonic_pairs: PairInfoExt[] = await get_all_sonic_pairs(agent);
+  const all_sonic_pairs: PairInfoExt[] = await get_all_sonic_pairs(agent);
 
   if (all_sonic_pairs.length == 0) return [];
 
-  let icp_price: number | null = await get_icp_price();
+  const icp_price: number | null = await get_icp_price();
 
   if (icp_price == null) return [];
 
-  let all_tokens_with_prices: TokenWithPrice[] = calculatePrice(all_sonic_tokens, all_sonic_pairs, icp_price);
+  const all_tokens_with_prices: TokenWithPrice[] = calculatePrice(all_sonic_tokens, all_sonic_pairs, icp_price);
 
   if (all_tokens_with_prices.length == 0) return [];
 
