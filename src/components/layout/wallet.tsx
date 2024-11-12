@@ -1,13 +1,17 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { useIdentityKit } from "@nfid/identitykit/react";
-import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useDisconnect, useAppKitNetwork } from "@reown/appkit/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "../ui/popover";
 import { CloseIcon } from "../icons";
-// import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
-// import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { chains } from "@/blockchain_api/lists/chains";
+import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
+import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { useAuthenticatedAgent } from "@/hooks/useAuthenticatedAgent";
+import { get_icp_wallet_tokens_balances } from "@/blockchain_api/functions/icp/get_icp_balances";
+import { get_evm_wallet_tokens_balances } from "@/blockchain_api/functions/evm/get_evm_balances";
 
 
 const WalletCard = ({
@@ -49,38 +53,53 @@ const WalletPage = () => {
   const [showIcpPopover, setShowIcpPopover] = useState(false);
 
   // Get Unauthenticated Agent
-  // const unauthenticatedAgent = useUnAuthenticatedAgent();
-
+  const unauthenticatedAgent = useUnAuthenticatedAgent();
+  const authenticatedAgent = useAuthenticatedAgent();
   // ICP Wallet Hooks
-  const {
-    identity: icpIdentity,
-    connect: connectIcp,
-    disconnect: disconnectIcp,
-  } = useIdentityKit();
+  const { identity: icpIdentity, connect: connectIcp, disconnect: disconnectIcp } = useIdentityKit();
 
   // Fetch All ICP Tokens
-  // const fetchIcpBalance = async () => {
-  //   if (unauthenticatedAgent) {
-  //     const res = await get_all_icp_tokens(unauthenticatedAgent);
-  //     console.log("res => ", res);
-  //   }
-  // }
+  const fetchIcpBalance = async () => {
+    if (unauthenticatedAgent && authenticatedAgent && icpIdentity) {
+      // Get all tokens
+      const all_tokens = await get_all_icp_tokens(unauthenticatedAgent);
 
-  // useEffect(() => {
-  //   if (unauthenticatedAgent) {
-  //     fetchIcpBalance();
-  //   }
-  // }, [unauthenticatedAgent]);
+      // Get user balance
+      const user_balance = await get_icp_wallet_tokens_balances(icpIdentity.getPrincipal().toString(), all_tokens, unauthenticatedAgent);
+      console.log("res => ", user_balance);
+    }
+  };
 
+  useEffect(() => {
+    if (unauthenticatedAgent) {
+      fetchIcpBalance();
+    }
+  }, [unauthenticatedAgent, authenticatedAgent, icpIdentity]);
 
   // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
-  const { disconnect: disconnectEvm } = useDisconnect()
+  const { chainId } = useAppKitNetwork();
+  const { disconnect: disconnectEvm } = useDisconnect();
+
+  // Fetch All ICP Tokens
+  const fetchEvmBalance = async () => {
+    if (evmAddress) {
+      // Get user balance
+      const user_balance = await get_evm_wallet_tokens_balances(evmAddress);
+      console.log("res => ", user_balance);
+    }
+  };
 
   useEffect(() => {
-    console.log("evmAddress > ", evmAddress);
-  }, [evmAddress])
+    if (evmAddress) {
+      fetchEvmBalance();
+    }
+  }, [evmAddress]);
+
+  const getChainLogo = (chainId: string | number | undefined): string => {
+    return chains.find((chain) => chain.chainId == Number(chainId))?.logo || "/images/logo/chains/ethereum.svg";
+  };
 
   return (
     <div className={cn(
@@ -92,9 +111,7 @@ const WalletPage = () => {
 
       {(!icpIdentity || !isEvmConnected) && (
         <Popover open={showPopover} onOpenChange={setShowPopover}>
-          <PopoverTrigger className="w-full text-black font-medium text-sm dark:text-white py-2 px-3">
-            + Add Wallet
-          </PopoverTrigger>
+          <PopoverTrigger className="w-full text-black font-medium text-sm dark:text-white py-2 px-3">+ Add Wallet</PopoverTrigger>
           <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
               <PopoverClose className="absolute top-4 right-4">
@@ -127,12 +144,7 @@ const WalletPage = () => {
       {icpIdentity && (
         <Popover open={showIcpPopover} onOpenChange={setShowIcpPopover}>
           <PopoverTrigger>
-            <Image
-              src="/images/logo/icp-logo.png"
-              alt="ICP Wallet"
-              width={24}
-              height={24}
-            />
+            <Image src="/images/logo/wallet_logos/icp.svg" alt="ICP Wallet" width={24} height={24} />
           </PopoverTrigger>
           <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
@@ -141,9 +153,7 @@ const WalletPage = () => {
               </PopoverClose>
               Your ICP Wallet
             </div>
-            <button
-              onClick={() => disconnectIcp()}
-              className="text-sm font-semibold text-fail px-4 py-2 rounded-m duration-200 hover:bg-fail hover:text-white">
+            <button onClick={() => disconnectIcp()} className="text-sm font-semibold text-fail px-4 py-2 rounded-m duration-200 hover:bg-fail hover:text-white">
               Disconnect
             </button>
           </PopoverContent>
@@ -153,12 +163,7 @@ const WalletPage = () => {
       {isEvmConnected && (
         <Popover open={showEvmPopover} onOpenChange={setShowEvmPopover}>
           <PopoverTrigger>
-            <Image
-              src="/images/logo/icp-logo.png"
-              alt="ICP Wallet"
-              width={24}
-              height={24}
-            />
+            <Image src={getChainLogo(chainId)} alt="ICP Wallet" width={24} height={24} />
           </PopoverTrigger>
           <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
@@ -167,12 +172,8 @@ const WalletPage = () => {
               </PopoverClose>
               Your EVM Wallet
             </div>
-            <div className="flex flex-col gap-4 text-black font-medium text-sm dark:text-white">
-              EVM DATA
-            </div>
-            <button
-              onClick={() => disconnectEvm()}
-              className="text-sm font-semibold text-fail px-4 py-2 rounded-m duration-200 hover:bg-fail hover:text-white">
+            <div className="flex flex-col gap-4 text-black font-medium text-sm dark:text-white">EVM DATA</div>
+            <button onClick={() => disconnectEvm()} className="text-sm font-semibold text-fail px-4 py-2 rounded-m duration-200 hover:bg-fail hover:text-white">
               Disconnect
             </button>
           </PopoverContent>

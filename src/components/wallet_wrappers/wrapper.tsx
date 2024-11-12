@@ -18,17 +18,19 @@ if (!projectId) {
 // Set up metadata
 const metadata = {
   name: "Appicdao",
-  description: "AppKit Example",
-  url: "https://reown.com/appkit", // origin must match your domain & subdomain
+  description: "Appic crosschain swap on icp",
+  url: "http://app.appicdao.com", // origin must match your domain & subdomain
   icons: ["https://assets.reown.com/reown-profile-pic.png"],
+  debug: true,
 };
 
 // Create the modal
-const modal = createAppKit({
+createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   networks: [mainnet, arbitrum, avalanche, base, optimism, polygon],
   defaultNetwork: mainnet,
+
   metadata: metadata,
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
@@ -40,8 +42,6 @@ export const WalletWrapper = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  // const initialState = cookieToInitialState(wagmiAdapter.wagmiConfig as Config, cookies);
-
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
       <IdentityKitProvider authType={IdentityKitAuthType.DELEGATION} signerClientOptions={{ targets: ["2ztvj-yaaaa-aaaap-ahiza-cai"] }}>
