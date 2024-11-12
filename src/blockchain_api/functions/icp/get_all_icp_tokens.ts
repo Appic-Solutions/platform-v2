@@ -1,11 +1,12 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { idlFactory as sonicIdlFactory, TokenInfoWithType, PairInfoExt } from "@/did/sonic/sonic.did";
+import { idlFactory as sonicIdlFactory } from "@/did/sonic/sonic.did";
 
 import BigNumber from "bignumber.js";
 
 import { Principal } from "@dfinity/principal";
 import { get_icp_price } from "./get_icp_price";
 import { IcpToken } from "@/blockchain_api/types/tokens";
+import { TokenInfoWithType, PairInfoExt } from "@/did/sonic/sonic_types.did";
 
 // The main function to be called
 export const get_all_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {

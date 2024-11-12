@@ -7,8 +7,10 @@ import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "../ui/popover";
 import { CloseIcon } from "../icons";
 import { chains } from "@/blockchain_api/lists/chains";
-// import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
-// import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
+import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { useAuthenticatedAgent } from "@/hooks/useAuthenticatedAgent";
+import { get_icp_wallet_tokens_balances } from "@/blockchain_api/functions/icp/get_icp_balances";
 
 const WalletPage = () => {
   // States Management
@@ -17,24 +19,28 @@ const WalletPage = () => {
   const [showIcpPopover, setShowIcpPopover] = useState(false);
 
   // Get Unauthenticated Agent
-  // const unauthenticatedAgent = useUnAuthenticatedAgent();
-
+  const unauthenticatedAgent = useUnAuthenticatedAgent();
+  const authenticatedAgent = useAuthenticatedAgent();
   // ICP Wallet Hooks
   const { identity: icpIdentity, connect: connectIcp, disconnect: disconnectIcp } = useIdentityKit();
 
   // Fetch All ICP Tokens
-  // const fetchIcpBalance = async () => {
-  //   if (unauthenticatedAgent) {
-  //     const res = await get_all_icp_tokens(unauthenticatedAgent);
-  //     console.log("res => ", res);
-  //   }
-  // }
+  const fetchIcpBalance = async () => {
+    if (unauthenticatedAgent && authenticatedAgent && icpIdentity) {
+      // Get all tokens
+      const all_tokens = await get_all_icp_tokens(unauthenticatedAgent);
 
-  // useEffect(() => {
-  //   if (unauthenticatedAgent) {
-  //     fetchIcpBalance();
-  //   }
-  // }, [unauthenticatedAgent]);
+      // Get user balance
+      const user_balance = await get_icp_wallet_tokens_balances(icpIdentity.getPrincipal().toString(), all_tokens, unauthenticatedAgent);
+      console.log("res => ", user_balance);
+    }
+  };
+
+  useEffect(() => {
+    if (unauthenticatedAgent) {
+      fetchIcpBalance();
+    }
+  }, [unauthenticatedAgent, authenticatedAgent, icpIdentity]);
 
   useEffect(() => {}, []);
 
