@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Principal } from "@dfinity/principal";
-import { dip20IdleFactory, icrcIdlFactory } from "@/did";
+import { icrcIdlFactory } from "@/did/ledger/icrc1.did";
+import { dip20IdleFactory } from "@/did/ledger/dip20.did";
 import { IcpToken } from "@/blockchain_api/types/tokens";
 import { Actor, Agent, HttpAgent } from "@dfinity/agent";
 
@@ -11,11 +12,11 @@ interface IcpTokensBalances {
   totalBalanceUsd: string;
 }
 
-export async function get_icp_wallet_tokens_balances(principal_id: string, all_tokens: IcpToken[], authenticated_agent: HttpAgent): Promise<IcpTokensBalances> {
+export async function get_icp_wallet_tokens_balances(principal_id: string, all_tokens: IcpToken[], unauthenticated_agent: HttpAgent): Promise<IcpTokensBalances> {
   let totalBalanceUsd = new BigNumber(0);
 
   try {
-    const tokens_balances = await get_tokens_balances(all_tokens, principal_id, authenticated_agent);
+    const tokens_balances = await get_tokens_balances(all_tokens, principal_id, unauthenticated_agent);
     const non_zero_balances = tokens_balances.filter((token) => {
       if (token.balance != "0") {
         totalBalanceUsd = totalBalanceUsd.plus(token.usdBalance as unknown as number);
@@ -40,11 +41,14 @@ export const get_tokens_balances = async (all_token: IcpToken[], userPrincipal: 
       try {
         // Fetch token balance
         const tokenBalance = await get_single_token_balance(canisterId, tokenType, userPrincipal, agent);
+        if (tokenBalance) {
+          // Calculate USD balance
+          const balance = new BigNumber(tokenBalance.toString()).dividedBy(new BigNumber(10).pow(decimals));
+          const usdBalance = balance.multipliedBy(usdPrice).toString();
 
-        // Calculate USD balance
-        const usdBalance = new BigNumber(tokenBalance.toString()).dividedBy(10).pow(decimals).multipliedBy(usdPrice).toString();
-
-        return { ...token, balance: tokenBalance.toString(), usdBalance, balanceRawInteger: tokenBalance.toString() };
+          return { ...token, balance: balance.toString(), usdBalance, balanceRawInteger: tokenBalance.toString() };
+        }
+        return { ...token, balance: "0", usdBalance: "0" };
       } catch (error) {
         console.error(`Error fetching balance for token ${canisterId}:`, error);
         return { ...token, balance: "0", usdBalance: "0" }; // Default values in case of error
@@ -75,6 +79,5 @@ const get_single_token_balance = async (canisterId: string, tokenType: string, u
     console.error(`Error in get_single_token_balance for canisterId ${canisterId}:`, error);
     tokenBalance = BigInt(0);
   }
-
   return tokenBalance;
 };

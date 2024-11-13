@@ -2,7 +2,6 @@ import axios from "axios";
 import { chains } from "../../lists/chains";
 import { Chain } from "../../types/chains";
 import { EvmToken } from "../../types/tokens";
-import { error } from "console";
 
 interface AnkrGetBalanceRequestParams {
   id: number;
@@ -63,7 +62,6 @@ export async function get_evm_wallet_tokens_balances(wallet_address: string): Pr
     const response = await axios.post<AnkrResponse>(`https://rpc.ankr.com/multichain/${process.env.ANKR_API_KEY}`, requestParams);
     if (response.data.error) {
       console.error("Error fetching account balance:", response.data.error);
-      throw error;
     }
     return {
       totalBalanceUsd: response.data.result.totalBalanceUsd,

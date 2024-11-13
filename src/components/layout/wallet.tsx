@@ -7,8 +7,44 @@ import { useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "../ui/popover";
 import { CloseIcon } from "../icons";
 import { chains } from "@/blockchain_api/lists/chains";
-// import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
-// import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
+import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { useAuthenticatedAgent } from "@/hooks/useAuthenticatedAgent";
+import { get_icp_wallet_tokens_balances } from "@/blockchain_api/functions/icp/get_icp_balances";
+import { get_evm_wallet_tokens_balances } from "@/blockchain_api/functions/evm/get_evm_balances";
+
+
+const WalletCard = ({
+  connectWallet,
+  walletLogo,
+  walletTitle,
+  walletSubTitle
+}: {
+  connectWallet: () => void,
+  walletLogo: string,
+  walletTitle: string,
+  walletSubTitle: string
+}) => {
+  return (
+    <div
+      onClick={() => connectWallet()}
+      className={cn(
+        "flex items-center gap-2 cursor-pointer p-2 rounded-sm duration-200",
+        "hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]"
+      )}>
+      <Image
+        src={walletLogo}
+        alt="ICP Wallet"
+        width={51}
+        height={51}
+      />
+      <div className="flex flex-col">
+        <span className="text-lg font-bold text-black dark:text-white">{walletTitle}</span>
+        <span className="text-sm font-semibold text-[#B5B3B3]">{walletSubTitle}</span>
+      </div>
+    </div>
+  )
+}
 
 const WalletPage = () => {
   // States Management
@@ -17,26 +53,28 @@ const WalletPage = () => {
   const [showIcpPopover, setShowIcpPopover] = useState(false);
 
   // Get Unauthenticated Agent
-  // const unauthenticatedAgent = useUnAuthenticatedAgent();
-
+  const unauthenticatedAgent = useUnAuthenticatedAgent();
+  const authenticatedAgent = useAuthenticatedAgent();
   // ICP Wallet Hooks
   const { identity: icpIdentity, connect: connectIcp, disconnect: disconnectIcp } = useIdentityKit();
 
   // Fetch All ICP Tokens
-  // const fetchIcpBalance = async () => {
-  //   if (unauthenticatedAgent) {
-  //     const res = await get_all_icp_tokens(unauthenticatedAgent);
-  //     console.log("res => ", res);
-  //   }
-  // }
+  const fetchIcpBalance = async () => {
+    if (unauthenticatedAgent && authenticatedAgent && icpIdentity) {
+      // Get all tokens
+      const all_tokens = await get_all_icp_tokens(unauthenticatedAgent);
 
-  // useEffect(() => {
-  //   if (unauthenticatedAgent) {
-  //     fetchIcpBalance();
-  //   }
-  // }, [unauthenticatedAgent]);
+      // Get user balance
+      const user_balance = await get_icp_wallet_tokens_balances(icpIdentity.getPrincipal().toString(), all_tokens, unauthenticatedAgent);
+      console.log("res => ", user_balance);
+    }
+  };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (unauthenticatedAgent) {
+      fetchIcpBalance();
+    }
+  }, [unauthenticatedAgent, authenticatedAgent, icpIdentity]);
 
   // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
@@ -44,8 +82,19 @@ const WalletPage = () => {
   const { chainId } = useAppKitNetwork();
   const { disconnect: disconnectEvm } = useDisconnect();
 
+  // Fetch All ICP Tokens
+  const fetchEvmBalance = async () => {
+    if (evmAddress) {
+      // Get user balance
+      const user_balance = await get_evm_wallet_tokens_balances(evmAddress);
+      console.log("res => ", user_balance);
+    }
+  };
+
   useEffect(() => {
-    console.log("evmAddress > ", evmAddress);
+    if (evmAddress) {
+      fetchEvmBalance();
+    }
   }, [evmAddress]);
 
   const getChainLogo = (chainId: string | number | undefined): string => {
@@ -53,7 +102,13 @@ const WalletPage = () => {
   };
 
   return (
-    <div className={cn("hidden lg:flex items-center justify-evenly gap-2 relative min-w-fit w-[165px] h-[42px]", "rounded-round bg-[#faf7fd]/50 border border-[#ECE6F5]", (icpIdentity || isEvmConnected) && "px-3", "*:rounded-round")}>
+    <div className={cn(
+      "hidden lg:flex items-center justify-evenly gap-2 relative min-w-fit w-[165px] h-[42px]",
+      "rounded-round bg-[#faf7fd]/50 border border-[#ECE6F5]",
+      (icpIdentity || isEvmConnected) && "px-3",
+      "*:rounded-round"
+    )}>
+
       {(!icpIdentity || !isEvmConnected) && (
         <Popover open={showPopover} onOpenChange={setShowPopover}>
           <PopoverTrigger className="w-full text-black font-medium text-sm dark:text-white py-2 px-3">+ Add Wallet</PopoverTrigger>
@@ -64,23 +119,28 @@ const WalletPage = () => {
               </PopoverClose>
               Select Wallet
             </div>
-            <div className={cn("flex flex-col  gap-4 text-black font-medium text-sm dark:text-white", "*:flex *:items-center *:gap-2 *:cursor-pointer *:p-2 *:rounded-sm *:duration-200")}>
+            <div className="flex flex-col gap-4">
               {!icpIdentity && (
-                <div onClick={() => connectIcp()} className="hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]">
-                  <Image src="/images/logo/wallet_logos/icp.svg" alt="ICP Wallet" width={24} height={24} />
-                  Connect ICP Wallet
-                </div>
+                <WalletCard
+                  connectWallet={() => connectIcp()}
+                  walletLogo="/images/logo/icp-logo.png"
+                  walletTitle="Connect ICP Wallet"
+                  walletSubTitle="BNB Chain"
+                />
               )}
               {!isEvmConnected && (
-                <div onClick={() => openEvmModal()} className="hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]">
-                  <Image src={getChainLogo(chainId)} alt="EVM Wallet" width={24} height={24} />
-                  Connect EVM Wallet
-                </div>
+                <WalletCard
+                  connectWallet={() => openEvmModal()}
+                  walletLogo="/images/logo/icp-logo.png"
+                  walletTitle="Connect EVM Wallet"
+                  walletSubTitle="Ethereum"
+                />
               )}
             </div>
           </PopoverContent>
         </Popover>
       )}
+
       {icpIdentity && (
         <Popover open={showIcpPopover} onOpenChange={setShowIcpPopover}>
           <PopoverTrigger>
@@ -99,6 +159,7 @@ const WalletPage = () => {
           </PopoverContent>
         </Popover>
       )}
+
       {isEvmConnected && (
         <Popover open={showEvmPopover} onOpenChange={setShowEvmPopover}>
           <PopoverTrigger>
@@ -118,8 +179,9 @@ const WalletPage = () => {
           </PopoverContent>
         </Popover>
       )}
-    </div>
-  );
+
+    </div >
+  )
 };
 
 export default WalletPage;
