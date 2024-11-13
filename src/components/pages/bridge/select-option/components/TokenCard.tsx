@@ -24,9 +24,9 @@ const TokenCard = ({
   return (
     <Card
       className={cn(
-        "max-h-[133px] px-4",
-        "md:max-h-[174px] md:px-10 md:py-20",
-        "sm:px-6"
+        "max-h-[133px] px-4 rounded-lg",
+        "md:max-h-[174px] md:px-10 md:py-20 md:rounded-lg",
+        "sm:px-6 lg:rounded-lg"
       )}
     >
       <p className="absolute top-3 text-muted text-sm font-semibold">

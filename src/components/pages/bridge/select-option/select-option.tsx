@@ -35,7 +35,6 @@ const SelectOptionPage = ({
   const [selectedOption, setSelectedOption] = useState<BridgeOptionType | null>(
     null
   );
-  const [showAllOptions, setShowAllOptions] = useState(false);
   const handleOptionSelect = (option: BridgeOptionType) => {
     if (option.isActive) {
       setSelectedOption(option);
@@ -61,14 +60,13 @@ const SelectOptionPage = ({
   return (
     <Box
       className={cn(
-        "flex flex-col overflow-y-scroll ",
+        "flex flex-col overflow-y-scroll",
         "lg:px-14 md:overflow-auto md:max-h-[607px] md:max-w-[617px]",
         "lg:max-w-[1060px] lg:h-[607px] lg:pb-10"
       )}
     >
-      {/* BACK BUTTON AND TITLE */}
       <PageHeader title="Select Bridge Option" onBack={prevStepHandler} />
-      {/* BOX CONTENT */}
+
       <div
         className={cn(
           "flex flex-col gap-10 w-full flex-1",
@@ -109,7 +107,6 @@ const SelectOptionPage = ({
               usdPrice={usdPrice}
             />
           </div>
-          {/* SELECT OPTION BUTTON: DESKTOP */}
           <ActionButton
             isDisabled={!selectedOption || !Number(amount)}
             onClick={(e) => e.preventDefault()}
@@ -118,15 +115,13 @@ const SelectOptionPage = ({
             Select Option
           </ActionButton>
         </div>
+
         {/* BRIDGE OPTIONS */}
         <BridgeOptionsList
-          amount={amount}
           selectedOption={selectedOption}
           expandedOption={expandedOption}
           handleOptionSelect={handleOptionSelect}
           handleExpand={handleExpand}
-          showAllOptions={showAllOptions}
-          setShowAllOptions={setShowAllOptions}
         />
       </div>
     </Box>

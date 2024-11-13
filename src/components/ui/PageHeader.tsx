@@ -28,7 +28,7 @@ const PageHeader = ({ title, onBack, className }: PageHeaderProps) => {
           Back
         </button>
       )}
-      <p className="text-[26px] md:text-3xl font-bold">{title}</p>
+      <p className="text-[1rem] md:text-3xl font-bold">{title}</p>
     </div>
   );
 };

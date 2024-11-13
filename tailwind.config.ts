@@ -1,5 +1,5 @@
-import type { Config } from "tailwindcss"
-import scrollbar from "tailwind-scrollbar"
+import type { Config } from "tailwindcss";
+import scrollbar from "tailwind-scrollbar";
 
 const config: Config = {
   content: [
@@ -8,11 +8,16 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "class",
-  corePlugins: {
-    container: false,
-  },
   plugins: [scrollbar({ nocompatible: true })],
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+
     fontFamily: {
       lora: ["Lora"],
       rethinkSans: ["RethinkSans"],
@@ -63,5 +68,5 @@ const config: Config = {
       },
     },
   },
-}
-export default config
+};
+export default config;
