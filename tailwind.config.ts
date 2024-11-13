@@ -66,6 +66,21 @@ const config: Config = {
       boxShadow: {
         "appic-shadow": "4px 4px 0px 0px #00000040",
       },
+      keyframes: {
+        "slide-in": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+      },
+      animation: {
+        "slide-in": "slide-in 0.3s ease-out forwards",
+      },
     },
   },
 };

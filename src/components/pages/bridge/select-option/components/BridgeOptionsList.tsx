@@ -61,7 +61,8 @@ const BridgeOptionsList = ({
     <div
       className={cn(
         "flex flex-col items-start w-full",
-        "lg:max-w-[45%] md:pr-2"
+        "lg:max-w-[45%] md:pr-2",
+        "animate-slide-in opacity-0 delay-300"
       )}
     >
       <div className="w-full flex lg:flex-col gap-4 h-full overflow-x-scroll lg:overflow-y-scroll pr-4 hide-scrollbar">

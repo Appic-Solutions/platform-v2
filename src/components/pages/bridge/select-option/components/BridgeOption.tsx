@@ -36,7 +36,6 @@ const BridgeOption = ({
         isExpanded && "!h-[360px]",
         "overflow-hidden",
         "transition-[height] duration-300 ease-out",
-        "",
         className
       )}
       key={option.id}
