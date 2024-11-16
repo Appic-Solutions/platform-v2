@@ -2,7 +2,7 @@ import { IcpToken, EvmToken } from "@/blockchain_api/types/tokens";
 
 import { isValidEvmAddress } from "@/lib/validation";
 
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
