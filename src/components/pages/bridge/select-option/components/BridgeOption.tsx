@@ -2,8 +2,6 @@ import Card from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { BridgeOptionType } from "./BridgeOptionsList";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
 import { ChevronDownIcon, ClockIcon, FireIcon } from "@/components/icons";
 
 interface BridgeOptionProps {
@@ -25,18 +23,19 @@ const BridgeOption = ({
 }: BridgeOptionProps) => {
   return (
     <Card
-      onClick={() => onSelect(option)}
+      onClick={() => option.isActive && onSelect(option)}
       className={cn(
-        "py-4 px-4 flex-col gap-3 items-start justify-center",
+        "py-2 md:py-2 lg:py-2 flex-col gap-3 items-start justify-center rounded-lg",
         "min-w-[300px]",
-        "sm:px-6",
-        "md:px-6",
+        "px-6",
+        "md:px-6 md:rounded-lg",
         option.isActive && "cursor-pointer",
         option.isBest && "bg-highlighted-card",
         isSelected && "border-2 border-blue-600",
-        "min-h-[165px]",
-        "transition-all duration-300 ease-in-out",
-        "md:rounded-xl",
+        "h-[165px]",
+        isExpanded && "!h-[360px]",
+        "overflow-hidden",
+        "transition-[height] duration-300 ease-out",
         className
       )}
       key={option.id}
@@ -47,8 +46,8 @@ const BridgeOption = ({
           {option.isBest && (
             <p
               className={cn(
-                "text-muted text-xs font-thin",
-                "bg-primary-buttons text-white rounded-[10px] px-2 w-fit py-2",
+                "text-muted text-xs lg:text-sm font-thin",
+                "bg-primary-buttons text-white rounded-[10px] px-2 w-fit",
                 !option.isActive && "opacity-50"
               )}
             >
@@ -57,7 +56,7 @@ const BridgeOption = ({
           )}
         </div>
         <button
-          onClick={() => onExpand(option)}
+          onClick={() => option.isActive && onExpand(option)}
           className={cn(
             "bg-gray-400 bg-opacity-20 rounded-[10px] p-2 flex items-center ml-auto",
             "transition-transform duration-300",
@@ -123,7 +122,7 @@ const BridgeOption = ({
         )}
       >
         <span className="flex items-center gap-x-1 w-max">
-          <p className="text-xs font-thin text-primary">$ 1.24</p>
+          <p className="text-xs font-thin text-primary">1.24</p>
           <FireIcon width={15} height={15} className="text-primary" />
         </span>
         <span className="flex items-center gap-x-1 w-max">
@@ -133,54 +132,31 @@ const BridgeOption = ({
       </div>
 
       {/* Expanded content */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: "auto",
-              opacity: 1,
-              transition: {
-                height: { duration: 0.3 },
-                opacity: { duration: 0.2, delay: 0.1 },
-              },
-            }}
-            exit={{
-              height: 0,
-              opacity: 0,
-              transition: {
-                height: { duration: 0.3 },
-                opacity: { duration: 0.2 },
-              },
-            }}
-            className="w-full overflow-hidden"
-          >
-            <div className="mt-4 w-full border-t border-gray-200 dark:border-gray-700 pt-4">
-              <div className="space-y-4">
-                <p className="text-sm font-medium">Additional Details:</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Network Fee:</span>
-                    <span>0.001 ETH</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Estimated Time:</span>
-                    <span>{option.time} mins</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Route:</span>
-                    <span>Direct Bridge</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Security:</span>
-                    <span>High</span>
-                  </div>
-                </div>
+      {isExpanded && (
+        <div className="mt-4 w-full border-t border-gray-200 dark:border-gray-700 pt-4">
+          <div className="space-y-4">
+            <p className="text-sm font-medium">Additional Details:</p>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted">Network Fee:</span>
+                <span>0.001 ETH</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted">Estimated Time:</span>
+                <span>{option.time} mins</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted">Route:</span>
+                <span>Direct Bridge</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted">Security:</span>
+                <span>High</span>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

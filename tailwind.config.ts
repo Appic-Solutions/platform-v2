@@ -8,11 +8,16 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "class",
-  corePlugins: {
-    container: false,
-  },
   plugins: [scrollbar({ nocompatible: true })],
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+
     fontFamily: {
       lora: ["Lora"],
       rethinkSans: ["RethinkSans"],
@@ -56,12 +61,23 @@ const config: Config = {
           "0%": { transform: "translateX(-100%)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
         },
+        "slide-in": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
       },
 
       /* Animation */
       animation: {
         "slide-in-from-right": "slideInFromRight 0.5s ease-in-out",
         "slide-in-from-left": "slideInFromLeft 0.5s ease-in-out",
+        "slide-in": "slide-in 0.3s ease-out forwards",
       },
     },
   },
