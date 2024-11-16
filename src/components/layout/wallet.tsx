@@ -18,18 +18,16 @@ const WalletCard = ({
   connectWallet,
   walletLogo,
   walletTitle,
-  walletSubTitle
 }: {
   connectWallet: () => void,
   walletLogo: string,
   walletTitle: string,
-  walletSubTitle: string
 }) => {
   return (
     <div
       onClick={() => connectWallet()}
       className={cn(
-        "flex items-center gap-2 cursor-pointer p-2 rounded-sm duration-200",
+        "flex items-center gap-2 cursor-pointer p-2 rounded-md duration-200",
         "hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]"
       )}>
       <Image
@@ -38,10 +36,7 @@ const WalletCard = ({
         width={51}
         height={51}
       />
-      <div className="flex flex-col">
-        <span className="text-lg font-bold text-black dark:text-white">{walletTitle}</span>
-        <span className="text-sm font-semibold text-[#B5B3B3]">{walletSubTitle}</span>
-      </div>
+      <span className="text-lg font-bold text-black dark:text-white">{walletTitle}</span>
     </div>
   )
 }
@@ -104,9 +99,9 @@ const WalletPage = () => {
   return (
     <div className={cn(
       "hidden lg:flex items-center justify-evenly gap-2 relative min-w-fit w-[165px] h-[42px]",
-      "rounded-round bg-[#faf7fd]/50 border border-[#ECE6F5]",
+      "rounded-full bg-[#faf7fd]/50 border border-[#ECE6F5]",
       (icpIdentity || isEvmConnected) && "px-3",
-      "*:rounded-round"
+      "*:rounded-full"
     )}>
 
       {(!icpIdentity || !isEvmConnected) && (
@@ -123,17 +118,15 @@ const WalletPage = () => {
               {!icpIdentity && (
                 <WalletCard
                   connectWallet={() => connectIcp()}
-                  walletLogo="/images/logo/icp-logo.png"
+                  walletLogo="/images/logo/wallet_logos/icp.svg"
                   walletTitle="Connect ICP Wallet"
-                  walletSubTitle="BNB Chain"
                 />
               )}
               {!isEvmConnected && (
                 <WalletCard
                   connectWallet={() => openEvmModal()}
-                  walletLogo="/images/logo/icp-logo.png"
+                  walletLogo={getChainLogo(chainId)}
                   walletTitle="Connect EVM Wallet"
-                  walletSubTitle="Ethereum"
                 />
               )}
             </div>
@@ -153,7 +146,7 @@ const WalletPage = () => {
               </PopoverClose>
               Your ICP Wallet
             </div>
-            <button onClick={() => disconnectIcp()} className="text-sm font-semibold text-fail px-4 py-2 rounded-m duration-200 hover:bg-fail hover:text-white">
+            <button onClick={() => disconnectIcp()} className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white">
               Disconnect
             </button>
           </PopoverContent>
@@ -173,7 +166,7 @@ const WalletPage = () => {
               Your EVM Wallet
             </div>
             <div className="flex flex-col gap-4 text-black font-medium text-sm dark:text-white">EVM DATA</div>
-            <button onClick={() => disconnectEvm()} className="text-sm font-semibold text-fail px-4 py-2 rounded-m duration-200 hover:bg-fail hover:text-white">
+            <button onClick={() => disconnectEvm()} className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white">
               Disconnect
             </button>
           </PopoverContent>

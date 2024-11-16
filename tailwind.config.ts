@@ -17,22 +17,6 @@ const config: Config = {
       lora: ["Lora"],
       rethinkSans: ["RethinkSans"],
     },
-
-    /* Radius */
-    borderRadius: {
-      sharp: "0px",
-      xxs: "2px",
-      xs: "2px",
-      s: "4px",
-      sm: "6px",
-      m: "10px",
-      ml: "16px",
-      lg: "24px",
-      xl: "36px",
-      "2xl": "46px",
-      round: "999px",
-    },
-
     extend: {
       /* Colors */
       colors: {
@@ -60,6 +44,24 @@ const config: Config = {
       /* Box Shadow */
       boxShadow: {
         "appic-shadow": "4px 4px 0px 0px #00000040",
+      },
+
+      /* Keyframes */
+      keyframes: {
+        slideInFromRight: {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        slideInFromLeft: {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+      },
+
+      /* Animation */
+      animation: {
+        "slide-in-from-right": "slideInFromRight 0.5s ease-in-out",
+        "slide-in-from-left": "slideInFromLeft 0.5s ease-in-out",
       },
     },
   },

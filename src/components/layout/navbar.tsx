@@ -2,7 +2,6 @@
 import { NAVBAR_ITEMS } from "@/constants/layout/navbar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import Tooltip from "../ui/Tooltip";
 import { usePathname } from "next/navigation";
 
 const NavbarPage = () => {
@@ -10,7 +9,7 @@ const NavbarPage = () => {
 
   return (
     <nav className={cn(
-      "border-2 border-white/30 py-0.5 px-4 rounded-round text-white",
+      "border-2 border-white/30 py-0.5 px-4 rounded-full text-white",
       "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]",
       "w-full lg:w-auto md:py-1.5"
     )}>
@@ -21,7 +20,7 @@ const NavbarPage = () => {
               <Link
                 href={item.href}
                 className={cn(
-                  "flex items-center justify-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
+                  "flex items-center justify-center gap-x-1 rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
                   path === item.href && "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]"
                 )}>
                 {item.Icon}
@@ -33,13 +32,12 @@ const NavbarPage = () => {
               key={idx}
               className={cn(
                 "relative flex items-center justify-center gap-x-1 select-none",
-                "rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
+                "rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
                 "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
               )}
             >
               {item.Icon}
               <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
-              <Tooltip>Coming Soon</Tooltip>
             </div>
           )
         )}

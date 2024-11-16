@@ -12,7 +12,7 @@ const Box: FC<BoxProps> = ({ children, className }) => {
       className={cn(
         "relative overflow-hidden w-full h-full px-6 pt-10 m-auto",
         "flex flex-col items-center justify-between",
-        "md:border-[11px] md:border-box-border md:rounded-lg md:pb-6",
+        "md:border-[11px] md:border-box-border md:rounded-3xl md:pb-6",
         "*:z-10",
         // Box Background
         "backdrop-blur-md max-md:before:hidden before:content-[''] before:absolute before:inset-0",

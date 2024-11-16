@@ -11,7 +11,7 @@ const ActionButton = ({ isDisabled, onClick, isMobile }: ActionButtonProps) => {
   return (
     <button
       className={cn(
-        "bg-primary-buttons w-full h-14 rounded-ml text-primary",
+        "bg-primary-buttons w-full h-14 rounded-2xl text-primary",
         isMobile ? "lg:hidden" : "max-lg:hidden",
         isDisabled && "opacity-50 cursor-not-allowed"
       )}

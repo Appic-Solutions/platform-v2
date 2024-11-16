@@ -1,18 +1,15 @@
 "use client";
-
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
-
 import { ArrowDownIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import PageHeader from "@/components/ui/PageHeader";
 import TokenCard from "./components/TokenCard";
 import BridgeOptionsList, {
   BridgeOptionType,
 } from "./components/BridgeOptionsList";
 import ActionButton from "./components/ActionButton";
-import Tooltip from "@/components/ui/Tooltip";
+import BoxHeader from "@/components/ui/box-header";
 
 const SelectOptionPage = ({
   fromToken,
@@ -67,7 +64,7 @@ const SelectOptionPage = ({
       )}
     >
       {/* BACK BUTTON AND TITLE */}
-      <PageHeader title="Select Bridge Option" onBack={prevStepHandler} />
+      <BoxHeader title="Select Bridge Option" onBack={prevStepHandler} />
       {/* BOX CONTENT */}
       <div
         className={cn(
@@ -92,7 +89,7 @@ const SelectOptionPage = ({
             />
             <div
               className={cn(
-                "absolute rounded-round inset-0 w-14 h-14 m-auto z-20 cursor-pointer group",
+                "absolute rounded-full inset-0 w-14 h-14 m-auto z-20 cursor-pointer group",
                 "flex items-center justify-center",
                 "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
                 "border-2 border-white dark:border-white/30"
@@ -100,7 +97,6 @@ const SelectOptionPage = ({
               onClick={swapTokensHandler}
             >
               <ArrowDownIcon width={24} height={24} />
-              <Tooltip>swap</Tooltip>
             </div>
             <TokenCard
               type="to"
@@ -129,7 +125,7 @@ const SelectOptionPage = ({
           setShowAllOptions={setShowAllOptions}
         />
       </div>
-    </Box>
+    </Box >
   );
 };
 

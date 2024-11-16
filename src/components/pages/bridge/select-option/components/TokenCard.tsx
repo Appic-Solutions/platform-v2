@@ -2,7 +2,7 @@ import { IcpToken } from "@/blockchain_api/types/tokens";
 
 import { EvmToken } from "@/blockchain_api/types/tokens";
 
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -36,7 +36,7 @@ const TokenCard = ({
         {/* left section */}
         <div className="flex items-center gap-x-3 max-w-[40%]">
           <div
-            className={cn("relative flex flex-col gap-y-2", "*:rounded-round")}
+            className={cn("relative flex flex-col gap-y-2", "*:rounded-full")}
           >
             <Image
               src={token.logo ?? "images/logo/placeholder.png"}
@@ -78,7 +78,7 @@ const TokenCard = ({
                 }
               }}
               className={cn(
-                "border-[#1C68F8] dark:border-[#000000] rounded-m py-1 px-3 outline-none",
+                "border-[#1C68F8] dark:border-[#000000] rounded-[10px] py-1 px-3 outline-none",
                 "bg-white/50 dark:bg-white/30 text-black dark:text-white",
                 "placeholder:text-black/50 dark:placeholder:text-white/50",
                 amount && amount.length > 8
@@ -108,7 +108,7 @@ const TokenCard = ({
                 <span className="text-muted text-xs md:text-sm">
                   $ {usdPrice}
                 </span>
-                <span className="px-4 cursor-pointer py-1 text-xs md:text-sm text-black bg-gradient-to-r from-white to-white/35 rounded-ml">
+                <span className="px-4 cursor-pointer py-1 text-xs md:text-sm text-black bg-gradient-to-r from-white to-white/35 rounded-2xl">
                   max
                 </span>
               </>

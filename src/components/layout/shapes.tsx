@@ -17,7 +17,7 @@ const ShapesPage = () => {
         ) => (
           <div
             key={idx}
-            className="absolute rounded-round bg-shapes-background opacity-50"
+            className="absolute rounded-full bg-shapes-background opacity-50"
             style={{
               width,
               height,

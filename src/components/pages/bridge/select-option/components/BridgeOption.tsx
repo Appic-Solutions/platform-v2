@@ -1,4 +1,4 @@
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { BridgeOptionType } from "./BridgeOptionsList";
@@ -48,7 +48,7 @@ const BridgeOption = ({
             <p
               className={cn(
                 "text-muted text-xs font-thin",
-                "bg-primary-buttons text-white rounded-m px-2 w-fit py-2",
+                "bg-primary-buttons text-white rounded-[10px] px-2 w-fit py-2",
                 !option.isActive && "opacity-50"
               )}
             >
@@ -59,7 +59,7 @@ const BridgeOption = ({
         <button
           onClick={() => onExpand(option)}
           className={cn(
-            "bg-gray-400 bg-opacity-20 rounded-m p-2 flex items-center ml-auto",
+            "bg-gray-400 bg-opacity-20 rounded-[10px] p-2 flex items-center ml-auto",
             "transition-transform duration-300",
             isExpanded && "rotate-180",
             !option.isActive && "opacity-30"
@@ -71,7 +71,7 @@ const BridgeOption = ({
       {/* middle section */}
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-x-3">
-          <div className="border-2 border-primary rounded-round p-3">
+          <div className="border-2 border-primary rounded-full p-3">
             <div className={cn("relative w-6 h-6", "lg:w-10 lg:h-10")}>
               <Image
                 src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
@@ -93,7 +93,7 @@ const BridgeOption = ({
         <div className="flex flex-col gap-y-3 items-end">
           <div
             className={cn(
-              "px-4 py-1 rounded-ml flex items-center gap-x-1",
+              "px-4 py-1 rounded-2xl flex items-center gap-x-1",
               "bg-white",
               !option.isActive && "opacity-30"
             )}

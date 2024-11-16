@@ -15,7 +15,7 @@ const TokenCard = ({
 }) => (
   <div
     className={cn(
-      "flex items-center gap-x-5 cursor-pointer group duration-200 rounded-sm p-2",
+      "flex items-center gap-x-5 cursor-pointer group duration-200 rounded-md p-2",
       "hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]",
       isSelected && "bg-[#F5F5F5] dark:bg-[#2A2A2A]"
     )}
@@ -26,7 +26,7 @@ const TokenCard = ({
       alt={token.name}
       width={50}
       height={50}
-      className="rounded-round"
+      className="rounded-full"
     />
     <div className="flex flex-col flex-1 min-w-0">
       <p className="text-xl font-bold text-black dark:text-white truncate">
@@ -49,7 +49,7 @@ const TokenCard = ({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="rounded-sm p-0.5 hover:bg-white/10"
+              className="rounded-md p-0.5 hover:bg-white/10"
             >
               <LinkIcon width={18} height={18} />
             </Link>

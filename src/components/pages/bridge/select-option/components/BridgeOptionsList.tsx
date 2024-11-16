@@ -149,7 +149,7 @@ const MobileView = React.memo(
 
         <motion.button
           onClick={() => setShowAllOptions(!showAllOptions)}
-          className="w-full mt-4 py-2 px-4 bg-white bg-opacity-15 text-white rounded-ml mb-4"
+          className="w-full mt-4 py-2 px-4 bg-white bg-opacity-15 text-white rounded-2xl mb-4"
           whileTap={{ scale: 0.95 }}
         >
           {showAllOptions ? "Hide Options" : "View All Options"}
