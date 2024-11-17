@@ -70,8 +70,7 @@ const SelectOptionPage = ({
         "flex flex-col overflow-y-scroll",
         "lg:px-14 md:overflow-auto md:max-h-[607px] md:max-w-[617px]",
         "lg:max-w-[1060px] lg:h-[607px] lg:pb-10"
-      )}
-    >
+      )}>
       {/* BACK BUTTON AND TITLE */}
       <BoxHeader title="Select Bridge Option" onBack={prevStepHandler} />
       {/* BOX CONTENT */}
@@ -80,8 +79,7 @@ const SelectOptionPage = ({
           "flex flex-col gap-10 w-full flex-1",
           "lg:flex-row lg:overflow-hidden",
           "animate-slide-in opacity-0"
-        )}
-      >
+        )}>
         {/* SELECTED TOKENS */}
         <div
           className={cn(

@@ -1,7 +1,7 @@
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { LinkIcon } from "@/components/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 
 const TokenCard = ({
@@ -21,13 +21,11 @@ const TokenCard = ({
     )}
     onClick={onClick}
   >
-    <Image
-      src={token.logo}
-      alt={token.name}
-      width={50}
-      height={50}
-      className="rounded-full"
-    />
+    <Avatar className="w-[50px] h-[50px] rounded-full">
+      <AvatarImage src={token.logo} alt={token.name} />
+      <AvatarFallback>{token.name}</AvatarFallback>
+    </Avatar>
+
     <div className="flex flex-col flex-1 min-w-0">
       <p className="text-xl font-bold text-black dark:text-white truncate">
         {token.name}

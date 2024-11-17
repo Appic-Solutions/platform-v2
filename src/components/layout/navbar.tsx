@@ -3,6 +3,7 @@ import { NAVBAR_ITEMS } from "@/constants/layout/navbar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 const NavbarPage = () => {
   const path = usePathname();
@@ -28,21 +29,27 @@ const NavbarPage = () => {
               </Link>
             </li>
           ) : (
-            <div
-              key={idx}
-              className={cn(
-                "relative flex items-center justify-center gap-x-1 select-none",
-                "rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
-                "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
-              )}
-            >
-              {item.Icon}
-              <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
-            </div>
+            <TooltipProvider key={idx}>
+              <Tooltip>
+                <TooltipTrigger
+                  key={idx}
+                  className={cn(
+                    "relative flex items-center justify-center gap-x-1 select-none",
+                    "rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
+                    "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
+                  )}>
+                  {item.Icon}
+                  <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {item.tooltip}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )
         )}
       </ul>
-    </nav>
+    </nav >
   );
 };
 
