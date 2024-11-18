@@ -35,7 +35,7 @@ export const transformToIcpTokens = (tokensWithPrices: TokenWithPrice[]): IcpTok
     (token): IcpToken => ({
       name: token.name,
       symbol: token.symbol,
-      logo: `'https://cdn.sonic.ooo/icons/'${token.id}`,
+      logo: `https://cdn.sonic.ooo/icons/${token.id}`,
       usdPrice: token.price,
       decimals: token.decimals,
       chainId: 0, // Set to 0 for ICP tokens

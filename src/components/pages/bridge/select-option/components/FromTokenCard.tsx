@@ -1,7 +1,5 @@
 import { IcpToken } from "@/blockchain_api/types/tokens";
-
 import { EvmToken } from "@/blockchain_api/types/tokens";
-
 import Card from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

@@ -3,7 +3,7 @@ import { ArrowsUpDownIcon } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Box from "@/components/ui/box";
 import Card from "@/components/ui/card";
-import { cn, getChainLogo } from "@/lib/utils";
+import { cn, getChainLogo, getChainName } from "@/lib/utils";
 
 interface SelectTokenProps {
   stepHandler: (value: "next" | "prev" | number) => void;
@@ -22,25 +22,30 @@ interface TokenCardProps {
 function TokenCard({ token, customOnClick, label }: TokenCardProps) {
   return (
     <Card
-      className="max-h-[133px] md:max-h-[155px] cursor-pointer"
+      className="max-h-[133px] md:max-h-[155px] cursor-pointer flex-col items-start justify-center gap-2"
       onClick={() => {
         customOnClick?.()
       }}>
-      <div className="relative flex flex-col gap-y-2">
-        <p className="text-sm font-semibold">{label}</p>
-        <Avatar className="w-11 h-11 rounded-full">
-          <AvatarImage src={token?.logo || "images/logo/placeholder.png"} />
-          <AvatarFallback>{token?.symbol}</AvatarFallback>
-        </Avatar>
-        <Avatar className={cn(
-          "absolute -right-1 -bottom-1 w-5 h-5 rounded-full",
-          "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
-        )}>
-          <AvatarImage src={getChainLogo(token?.chainId)} />
-          <AvatarFallback>{token?.symbol}</AvatarFallback>
-        </Avatar>
+      <p className="text-sm font-semibold">{label}</p>
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          <Avatar className=" w-11 h-11 rounded-full">
+            <AvatarImage src={token?.logo || "images/logo/placeholder.png"} />
+            <AvatarFallback>{token?.symbol}</AvatarFallback>
+          </Avatar>
+          <Avatar className={cn(
+            "absolute -right-1 -bottom-1 w-5 h-5 rounded-full",
+            "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+          )}>
+            <AvatarImage src={getChainLogo(token?.chainId)} />
+            <AvatarFallback>{token?.symbol}</AvatarFallback>
+          </Avatar>
+        </div>
+        <div>
+          <p>{token?.symbol || "Select Token"}</p>
+          <p className="text-sm">{getChainName(token?.chainId)}</p>
+        </div>
       </div>
-      <p>{token?.name || "Select Token"}</p>
     </Card >
   )
 }

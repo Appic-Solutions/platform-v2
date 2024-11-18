@@ -28,12 +28,12 @@ const TokenCard = ({
 
     <div className="flex flex-col flex-1 min-w-0">
       <p className="text-xl font-bold text-black dark:text-white truncate">
-        {token.name}
+        {token.symbol}
       </p>
       <div className="overflow-hidden h-5">
         <div className="flex flex-col transition-transform duration-300 group-hover:-translate-y-5">
           <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate">
-            {token.symbol}
+            {token.name}
           </p>
           <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate flex items-center gap-x-2">
             {token?.contractAddress?.slice(0, 14) ||
