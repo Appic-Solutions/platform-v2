@@ -1,5 +1,4 @@
 import { IcpToken } from "@/blockchain_api/types/tokens";
-
 import { EvmToken } from "@/blockchain_api/types/tokens";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
