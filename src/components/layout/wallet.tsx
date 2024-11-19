@@ -143,6 +143,7 @@ const WalletPage = () => {
           balance={icpBalance}
           disconnect={handleDisconnectIcp}
           isLoading={icpLoading}
+          address={icpIdentity?.getPrincipal().toString() || ""}
         />
       )}
 
@@ -155,6 +156,7 @@ const WalletPage = () => {
           balance={evmBalance}
           disconnect={handleDisconnectEvm}
           isLoading={evmLoading}
+          address={evmAddress || ""}
         />
       )}
 

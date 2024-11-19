@@ -21,8 +21,25 @@ export const getChainName = (chainId: string | number | undefined): string => {
 };
 
 // Format number to show only counted items (e.g. 1.23456 -> 1.23)
-export const getCountedNumber = (price: number | undefined | null, decimals: number = 2): string => {
+export const getCountedNumber = (price: number, decimals: number = 2): string => {
   if (!price || typeof price !== "number") return "0";
   const formattedNumber = Number(price).toFixed(decimals);
   return formattedNumber === "NaN" ? "0" : formattedNumber;
+};
+
+// Format wallet address to show first 6 and last 6 characters
+export const getFormattedWalletAddress = (address: string): string => {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-6)}`;
+};
+
+// Copy text to clipboard
+export const copyToClipboard = async (text: string): Promise<boolean> => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (err) {
+    console.error("Failed to copy text: ", err);
+    return false;
+  }
 };

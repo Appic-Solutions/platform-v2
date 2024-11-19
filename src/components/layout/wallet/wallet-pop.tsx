@@ -3,9 +3,9 @@ import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { Dispatch, SetStateAction } from "react"
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
 import Image from "next/image";
-import { CloseIcon } from "@/components/icons";
+import { CloseIcon, CopyIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCountedNumber } from "@/lib/utils";
+import { copyToClipboard, getCountedNumber, getFormattedWalletAddress } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type WalletBalance = {
@@ -23,7 +23,8 @@ interface WalletCardProps {
   title: string,
   balance: WalletBalance,
   disconnect: () => void,
-  isLoading: boolean
+  isLoading: boolean,
+  address: string
 }
 
 export function WalletPop({
@@ -33,7 +34,8 @@ export function WalletPop({
   title,
   balance,
   disconnect,
-  isLoading
+  isLoading,
+  address
 }: WalletCardProps) {
   return (
     <Popover open={open} onOpenChange={openOnChange}>
@@ -56,6 +58,14 @@ export function WalletPop({
             <CloseIcon width={20} height={20} />
           </PopoverClose>
           {title}
+        </div>
+        <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
+          <span>
+            {getFormattedWalletAddress(address)}
+          </span>
+          <button onClick={() => copyToClipboard(address)}>
+            <CopyIcon width={20} height={20} />
+          </button>
         </div>
         <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
           <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
