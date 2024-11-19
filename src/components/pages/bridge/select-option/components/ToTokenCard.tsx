@@ -3,8 +3,8 @@ import { IcpToken, EvmToken } from "@/blockchain_api/types/tokens";
 import { isValidEvmAddress } from "@/lib/validation";
 
 import Card from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { cn, getChainLogo } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ToTokenCardProps {
   token: EvmToken | IcpToken;
@@ -12,9 +12,9 @@ interface ToTokenCardProps {
   usdPrice?: string;
   onWalletAddressChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   walletAddress?: string;
-  isWalletConnected?: boolean;
   onValidationError?: (error: string | null) => void;
   toWalletValidationError?: string | null;
+  showWalletAddress?: boolean;
 }
 
 const ToTokenCard = ({
@@ -22,9 +22,9 @@ const ToTokenCard = ({
   amount,
   onWalletAddressChange,
   walletAddress,
-  isWalletConnected,
   onValidationError,
   toWalletValidationError,
+  showWalletAddress,
 }: ToTokenCardProps) => {
   const validateWalletAddress = (address: string) => {
     if (!address) {
@@ -54,47 +54,45 @@ const ToTokenCard = ({
   return (
     <Card
       className={cn(
-        "py-2 px-4 rounded-lg flex-col justify-center gap-4 relative",
-        "md:px-10 md:py-2 md:rounded-lg",
+        "py-2 px-6 flex-col justify-center gap-4 relative",
+        "md:px-10 md:py-2",
         "sm:px-6",
-        "lg:rounded-lg lg:py-2",
-        "!h-28",
-        !isWalletConnected && "!h-52",
+        "lg:py-2",
+        showWalletAddress ? "!h-52" : "!h-32",
         "transition-all duration-200 ease-out"
       )}
     >
-      <p className="absolute top-3 left-6 text-muted text-sm font-semibold">
-        To
-      </p>
-      <div className="absolute top-8 left-0 right-0 px-4 md:px-10">
+      <div className="absolute top-5 left-0 right-0 px-6 md:px-10">
         <div className="flex items-center justify-between w-full">
-          {/* left section */}
-          <div className="flex items-center gap-x-3 max-w-[40%]">
-            <div
-              className={cn(
-                "relative flex flex-col gap-y-2",
-                "*:rounded-round"
-              )}
-            >
-              <Image
-                src={token.logo ?? "images/logo/placeholder.png"}
-                alt={token.name}
-                width={44}
-                height={44}
-              />
-              <Image
-                src={token.logo ?? "images/logo/placeholder.png"}
-                alt="token-logo"
-                width={20}
-                height={20}
-                className="w-5 h-5 absolute -right-1 -bottom-2 border-[2.5px] border-black dark:border-white"
-              />
-            </div>
-            <div>
-              <p className="text-xl md:text-3xl">{token.symbol}</p>
-              <p className="text-sm md:text-base font-semibold text-muted">
-                {token.name}
-              </p>
+          {/* LEFT SECTION */}
+          <div className="flex flex-col gap-y-2">
+            <p className="text-muted text-sm font-semibold">to</p>
+            <div className="flex items-center gap-x-4">
+              {/* <div className="border-2 border-primary rounded-full p-3"> */}
+              <div className="relative flex flex-col gap-y-2">
+                <Avatar className="w-11 h-11 rounded-full">
+                  <AvatarImage
+                    src={token?.logo || "images/logo/placeholder.png"}
+                  />
+                  <AvatarFallback>{token?.symbol}</AvatarFallback>
+                </Avatar>
+                <Avatar
+                  className={cn(
+                    "absolute -right-1 -bottom-1 w-5 h-5 rounded-full",
+                    "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+                  )}
+                >
+                  <AvatarImage src={getChainLogo(token?.chainId)} />
+                  <AvatarFallback>{token?.symbol}</AvatarFallback>
+                </Avatar>
+              </div>
+              {/* </div> */}
+              <div className="flex flex-col gap-y-1">
+                <p>{token.symbol}</p>
+                <p className="text-sm md:text-base font-semibold text-muted">
+                  {token.name}
+                </p>
+              </div>
             </div>
           </div>
           {/* right section */}
@@ -108,21 +106,22 @@ const ToTokenCard = ({
           </div>
         </div>
       </div>
+      {/* WALLET ADDRESS INPUT */}
       <div
         className={cn(
           "absolute left-0 right-0 px-4 md:px-10 transition-all duration-200",
-          isWalletConnected ? "opacity-0 top-32" : "opacity-100 top-28"
+          showWalletAddress ? "opacity-100 top-32" : "opacity-0 top-32"
         )}
       >
-        {!isWalletConnected && (
+        {showWalletAddress && (
           <div className="flex flex-col gap-y-1 items-start w-full">
-            <label className="text-muted text-xs md:text-sm font-semibold">
+            <label className="text-xs md:text-sm font-semibold">
               Send To Wallet
             </label>
             <input
               type="text"
               maxLength={token.chainTypes === "ICP" ? 64 : 42}
-              placeholder="Enter Wallet Address"
+              placeholder="0x0f70e...65A63"
               value={walletAddress}
               onChange={(e) => {
                 const newValue = e.target.value;
@@ -130,8 +129,7 @@ const ToTokenCard = ({
                 onWalletAddressChange?.(e);
               }}
               className={cn(
-                "border-[#1C68F8] dark:border-[#000000] rounded-m py-1 px-3 outline-none",
-                "bg-white/50 dark:bg-white/30 text-black dark:text-white",
+                "bg-transparent border-none outline-none",
                 "placeholder:text-black/50 dark:placeholder:text-white/50",
                 "text-lg md:text-xl w-full",
                 "font-semibold",

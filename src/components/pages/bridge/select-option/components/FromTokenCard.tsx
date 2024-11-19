@@ -1,10 +1,10 @@
 import { IcpToken } from "@/blockchain_api/types/tokens";
 
 import { EvmToken } from "@/blockchain_api/types/tokens";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Card from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { cn, getChainLogo } from "@/lib/utils";
 
 interface FromTokenCardProps {
   token: EvmToken | IcpToken;
@@ -24,47 +24,54 @@ const FromTokenCard = ({
   return (
     <Card
       className={cn(
-        "py-2 px-4 rounded-lg flex-col justify-center gap-1",
-        "md:px-10 md:py-2 md:rounded-lg",
+        "py-3 px-6 flex-col justify-center gap-1",
+        "md:px-10 md:py-2",
         "sm:px-6",
-        "lg:rounded-lg lg:py-4"
+        "lg:py-4"
       )}
     >
-      <p className="absolute top-3 left-6 text-muted text-sm font-semibold">
-        From
-      </p>
       <div className="flex items-center justify-between w-full">
         {/* left section */}
-        <div className="flex items-center gap-x-3 max-w-[40%]">
-          <div
-            className={cn("relative flex flex-col gap-y-2", "*:rounded-round")}
-          >
-            <Image
-              src={token.logo ?? "images/logo/placeholder.png"}
-              alt={token.name}
-              width={44}
-              height={44}
-            />
-            <Image
-              src={token.logo ?? "images/logo/placeholder.png"}
-              alt="token-logo"
-              width={20}
-              height={20}
-              className="w-5 h-5 absolute -right-1 -bottom-2 border-[2.5px] border-black dark:border-white"
-            />
-          </div>
-          <div>
-            <p className="text-xl md:text-3xl">{token.symbol}</p>
-            <p className="text-sm md:text-base font-semibold text-muted">
-              {token.name}
-            </p>
+        <div className="flex flex-col gap-y-2">
+          <p className="text-muted text-sm font-semibold">from</p>
+          <div className="flex items-center gap-x-4">
+            <div className="relative flex flex-col gap-y-2">
+              <Avatar className="w-11 h-11 rounded-full">
+                <AvatarImage
+                  src={token?.logo || "images/logo/placeholder.png"}
+                />
+                <AvatarFallback>{token?.symbol}</AvatarFallback>
+              </Avatar>
+              <Avatar
+                className={cn(
+                  "absolute -right-1 -bottom-1 w-5 h-5 rounded-full",
+                  "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+                )}
+              >
+                <AvatarImage src={getChainLogo(token?.chainId)} />
+                <AvatarFallback>{token?.symbol}</AvatarFallback>
+              </Avatar>
+            </div>
+            <div className="flex flex-col gap-y-1">
+              <p>{token.symbol}</p>
+              <p className="text-sm md:text-base font-semibold text-muted">
+                {token.name}
+              </p>
+            </div>
           </div>
         </div>
         {/* right section */}
-        <div className="flex flex-col w-1/2 gap-y-2 items-end">
-          <p className="text-muted text-xs md:text-sm font-semibold">
-            Available: {isWalletConnected ? "0.334 ETH" : "0"}
-          </p>
+        <div
+          className={cn(
+            "flex flex-col w-1/2 gap-y-3 items-end",
+            !isWalletConnected && "my-5"
+          )}
+        >
+          {isWalletConnected && (
+            <p className="text-muted text-xs md:text-sm font-semibold">
+              Available: 0.334 ETH
+            </p>
+          )}
           <input
             type="number"
             maxLength={15}
@@ -76,7 +83,7 @@ const FromTokenCard = ({
               }
             }}
             className={cn(
-              "border-[#1C68F8] dark:border-[#000000] rounded-m py-1 px-3 outline-none",
+              "border-[#1C68F8] dark:border-[#000000] rounded-md py-1 px-3 outline-none",
               "bg-white/50 dark:bg-white/30 text-black dark:text-white",
               "placeholder:text-black/50 dark:placeholder:text-white/50",
               amount && amount.length > 8
@@ -95,10 +102,17 @@ const FromTokenCard = ({
             )}
           >
             <span className="text-muted text-xs md:text-sm">$ {usdPrice}</span>
-
-            <span className="px-4 cursor-pointer py-1 text-xs md:text-sm text-black bg-gradient-to-r from-white to-white/35 rounded-ml">
-              max
-            </span>
+            {isWalletConnected && (
+              <span
+                className={cn(
+                  "px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md",
+                  "bg-gradient-to-r from-white to-white/35",
+                  "hover:bg-white/35 transition-all duration-300"
+                )}
+              >
+                max
+              </span>
+            )}
           </div>
         </div>
       </div>

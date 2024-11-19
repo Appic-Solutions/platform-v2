@@ -1,5 +1,5 @@
-import type { Config } from "tailwindcss"
-import scrollbar from "tailwind-scrollbar"
+import type { Config } from "tailwindcss";
+import scrollbar from "tailwind-scrollbar";
 
 const config: Config = {
   content: [
@@ -77,9 +77,9 @@ const config: Config = {
       animation: {
         "slide-in-from-right": "slideInFromRight 0.5s ease-in-out",
         "slide-in-from-left": "slideInFromLeft 0.5s ease-in-out",
-        "slide-in": "slide-in 0.3s ease-out forwards",
+        "slide-in": "slide-in 0.3s ease-out 0.1s forwards",
       },
     },
   },
-}
-export default config
+};
+export default config;

@@ -1,9 +1,21 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import BridgeOption from "./BridgeOption";
+import BridgeOptionSkeleton from "./BridgeOptionSkeleton";
 
 // TODO: This is a temporary code for testing purposes only
-const options = [
+
+type BridgeOptionType = {
+  id: number;
+  amount: number;
+  via: string;
+  time: number;
+  usdPrice: number;
+  isBest: boolean;
+  isActive: boolean;
+};
+
+const options: BridgeOptionType[] = [
   {
     id: 1,
     amount: 1.154844,
@@ -42,8 +54,6 @@ const options = [
   },
 ];
 
-export type BridgeOptionType = (typeof options)[number];
-
 interface BridgeOptionsListProps {
   selectedOption: BridgeOptionType | null;
   expandedOption: BridgeOptionType | null;
@@ -62,21 +72,30 @@ const BridgeOptionsList = ({
       className={cn(
         "flex flex-col items-start w-full",
         "lg:max-w-[45%] md:pr-2",
-        "animate-slide-in opacity-0 delay-300"
+        "animate-slide-in opacity-0"
       )}
     >
       <div className="w-full flex lg:flex-col gap-4 h-full overflow-x-scroll lg:overflow-y-scroll pr-4 hide-scrollbar">
-        {options.map((item) => (
-          <div key={item.id} className="flex-shrink-0 h-fit">
-            <BridgeOption
-              option={item}
-              isSelected={selectedOption?.id === item.id}
-              isExpanded={expandedOption?.id === item.id}
-              onSelect={handleOptionSelect}
-              onExpand={handleExpand}
-            />
-          </div>
-        ))}
+        {options && options.length > 0 ? (
+          options.map((item) => (
+            <div key={item.id} className="flex-shrink-0 h-fit">
+              <BridgeOption
+                option={item}
+                isSelected={selectedOption?.id === item.id}
+                isExpanded={expandedOption?.id === item.id}
+                onSelect={handleOptionSelect}
+                onExpand={handleExpand}
+              />
+            </div>
+          ))
+        ) : (
+          <>
+            <BridgeOptionSkeleton />
+            <BridgeOptionSkeleton />
+            <BridgeOptionSkeleton />
+            <BridgeOptionSkeleton />
+          </>
+        )}
       </div>
     </div>
   );

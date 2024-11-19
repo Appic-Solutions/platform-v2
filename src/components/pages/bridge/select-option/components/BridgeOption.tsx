@@ -25,10 +25,10 @@ const BridgeOption = ({
     <Card
       onClick={() => option.isActive && onSelect(option)}
       className={cn(
-        "py-2 md:py-2 lg:py-2 flex-col gap-3 items-start justify-center rounded-lg",
+        "py-2 md:py-2 lg:py-2 flex-col gap-3 items-start justify-center",
         "min-w-[300px]",
         "px-6",
-        "md:px-6 md:rounded-lg",
+        "md:px-6",
         option.isActive && "cursor-pointer",
         option.isBest && "bg-highlighted-card",
         isSelected && "border-2 border-blue-600",
