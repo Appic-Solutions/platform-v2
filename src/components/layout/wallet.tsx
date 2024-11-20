@@ -15,7 +15,6 @@ import {
   PopoverClose,
 } from "../ui/popover";
 import { CloseIcon } from "../icons";
-import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
 import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
 import { useAuthenticatedAgent } from "@/hooks/useAuthenticatedAgent";
 import { get_icp_wallet_tokens_balances } from "@/blockchain_api/functions/icp/get_icp_balances";
@@ -26,6 +25,7 @@ import {
 import { IcpToken } from "@/blockchain_api/types/tokens";
 import WalletCard from "./wallet/wallet-card";
 import { WalletPop } from "./wallet/wallet-pop";
+import { getStorageItem } from "@/lib/localstorage";
 
 const WalletPage = () => {
   // States Management
@@ -63,18 +63,17 @@ const WalletPage = () => {
     try {
       setIcpLoading(true);
       if (unauthenticatedAgent && authenticatedAgent && icpIdentity) {
-        const all_tokens = await get_all_icp_tokens(unauthenticatedAgent);
+        const all_tokens = getStorageItem("icpTokens");
         const icp_balance = await get_icp_wallet_tokens_balances(
           icpIdentity.getPrincipal().toString(),
-          all_tokens,
+          JSON.parse(all_tokens || "[]"),
           unauthenticatedAgent
         );
         setIcpBalance(icp_balance);
       }
+      setIcpLoading(false);
     } catch (error) {
       console.log("Line 70 Get Balance Error => ", error);
-    } finally {
-      setIcpLoading(false);
     }
   };
   const fetchEvmBalances = async () => {
@@ -84,10 +83,9 @@ const WalletPage = () => {
         const evm_balance = await get_evm_wallet_tokens_balances(evmAddress);
         setEvmBalance(evm_balance);
       }
+      setEvmLoading(false);
     } catch (error) {
       console.log("Line 70 Get Balance Error => ", error);
-    } finally {
-      setEvmLoading(false);
     }
   };
 

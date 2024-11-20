@@ -67,9 +67,9 @@ export default function SelectTokenPage({
       fromToken?.chainId === toToken?.chainId);
   const buttonText =
     fromToken &&
-    toToken &&
-    fromToken.contractAddress === toToken.contractAddress &&
-    fromToken.chainId === toToken.chainId
+      toToken &&
+      fromToken.contractAddress === toToken.contractAddress &&
+      fromToken.chainId === toToken.chainId
       ? "Please select different tokens"
       : "Confirm";
 

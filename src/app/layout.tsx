@@ -15,7 +15,7 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en" className="dark bg-[#060607] bg-no-repeat h-screen">
-      <body className="relative max-w-[1920px] mx-auto w-full h-full flex flex-col items-center justify-between">
+      <body className="relative max-w-[1920px] mx-auto w-full h-screen flex flex-col items-center justify-between">
         <WalletWrapper>
           <HeaderPage />
           <div className="flex items-center justify-between w-full px-6 pt-4 lg:hidden">

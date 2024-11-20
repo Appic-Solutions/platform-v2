@@ -2,7 +2,7 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { cn } from "@/lib/utils"
-import { SunIcon } from "../icons"
+import { CloseIcon } from "../icons"
 
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
@@ -16,7 +16,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80",
+      "fixed inset-0 z-50 backdrop-blur-sm duration-200",
       "data-[state=open]:animate-in",
       "data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0",
@@ -37,8 +37,11 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg bg-background p-6",
-        "translate-x-[-50%] translate-y-[-50%] gap-4 border shadow-lg duration-200",
+        "fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-50 overflow-hidden",
+        "flex flex-col gap-y-6 py-6 w-full max-w-lg rounded-[22px] backdrop-blur-md",
+        "border-[5px] border-box-border *:z-10",
+        "before:content-[''] before:absolute before:inset-0",
+        "before:bg-box-background before:bg-center before:bg-cover before:bg-no-repeat",
         "data-[state=open]:animate-in",
         "data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0",
@@ -49,23 +52,11 @@ const DialogContent = React.forwardRef<
         "data-[state=closed]:slide-out-to-top-[48%]",
         "data-[state=open]:slide-in-from-left-1/2",
         "data-[state=open]:slide-in-from-top-[48%]",
-        "sm:rounded-3xl",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className={cn(
-        "absolute right-4 top-4 rounded-md opacity-70",
-        "ring-offset-background transition-opacity hover:opacity-100",
-        "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-        "disabled:pointer-events-none",
-        "data-[state=open]:bg-accent",
-        "data-[state=open]:text-muted-foreground"
-      )}>
-        <SunIcon className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
@@ -73,31 +64,27 @@ DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
+      "flex items-center justify-center px-6",
+      "text-black dark:text-white",
       className
     )}
     {...props}
-  />
+  >
+    {children}
+    <DialogPrimitive.Close className={cn(
+      "absolute right-4 rounded-md",
+      "disabled:pointer-events-none",
+    )}>
+      <CloseIcon className="min-h-5 min-w-5" />
+    </DialogPrimitive.Close>
+  </div>
 )
 DialogHeader.displayName = "DialogHeader"
-
-const DialogFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className
-    )}
-    {...props}
-  />
-)
-DialogFooter.displayName = "DialogFooter"
 
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
@@ -120,7 +107,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("px-6", className)}
     {...props}
   />
 ))
@@ -134,7 +121,6 @@ export {
   DialogClose,
   DialogContent,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
   DialogDescription,
 }

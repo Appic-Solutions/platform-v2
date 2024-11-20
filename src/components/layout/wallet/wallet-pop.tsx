@@ -5,8 +5,10 @@ import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/compone
 import Image from "next/image";
 import { CloseIcon, CopyIcon } from "@/components/icons";
 import { Skeleton } from "@/components/ui/skeleton";
-import { copyToClipboard, getCountedNumber, getFormattedWalletAddress } from "@/lib/utils";
+import { copyToClipboard, getChainLogo, getChainName, getCountedNumber, getFormattedWalletAddress } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Pie, PieChart } from "recharts";
 
 type WalletBalance = {
   tokens: IcpToken[];
@@ -37,6 +39,25 @@ export function WalletPop({
   isLoading,
   address
 }: WalletCardProps) {
+
+  const chartData = balance?.tokens.map((token) => ({
+    name: token.symbol,
+    value: Number(token.usdBalance),
+    fill: `hsl(${Math.random() * 360}, 70%, 50%)`
+  })) || []
+
+  const chartConfig = balance?.tokens.reduce((acc, token) => ({
+    ...acc,
+    [token.symbol]: {
+      label: token.name,
+      color: `hsl(${Math.random() * 360}, 70%, 50%)`
+    }
+  }), {
+    value: {
+      label: "Value"
+    }
+  }) as ChartConfig || {}
+
   return (
     <Popover open={open} onOpenChange={openOnChange}>
       <PopoverTrigger>
@@ -52,13 +73,34 @@ export function WalletPop({
           />
         )}
       </PopoverTrigger>
-      <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4 px-10" align="end">
+      <PopoverContent className="w-[360px] translate-y-4 flex flex-col gap-y-4 px-10" align="end">
         <div className="flex items-center justify-center text-black font-medium dark:text-white">
           <PopoverClose className="absolute top-4 right-4">
             <CloseIcon width={20} height={20} />
           </PopoverClose>
           {title}
         </div>
+
+        <div >
+          <ChartContainer
+            config={chartConfig}
+            className="relative mx-auto aspect-square max-h-56"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel className="bg-white" />}
+              />
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={60}
+              />
+            </PieChart>
+          </ChartContainer>
+        </div>
+
         <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
           <span>
             {getFormattedWalletAddress(address)}
@@ -67,13 +109,13 @@ export function WalletPop({
             <CopyIcon width={20} height={20} />
           </button>
         </div>
+        <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+          <span>
+            Token
+          </span>
+          Value
+        </div>
         <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
-          <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-            <span>
-              Token
-            </span>
-            Value
-          </div>
           {isLoading ? (
             <>
               <div className="flex items-center justify-between">
@@ -91,12 +133,16 @@ export function WalletPop({
             </>
           ) : balance && balance.tokens.length > 0 ? balance.tokens.map((token, idx) => (
             <div key={idx} className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white">
-              <div className="flex items-center gap-x-5">
-                <Avatar className="w-6 h-6">
+              <div className="relative flex items-center gap-x-5">
+                <Avatar className="w-9 h-9">
                   <AvatarImage src={token.logo} alt={token.name} />
                   <AvatarFallback>{token.symbol}</AvatarFallback>
                 </Avatar>
-                <span>{token.symbol}</span>
+                <Avatar className="w-4 h-4 absolute top-5 left-7">
+                  <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
+                  <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
+                </Avatar>
+                <span>{`${getChainName(token.chainId)} (${token.symbol})`}</span>
               </div>
               <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
             </div>
@@ -126,6 +172,6 @@ export function WalletPop({
           Disconnect
         </button>
       </PopoverContent>
-    </Popover>
+    </Popover >
   )
 }
