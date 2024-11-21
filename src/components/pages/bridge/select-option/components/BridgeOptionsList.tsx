@@ -5,7 +5,7 @@ import BridgeOptionSkeleton from "./BridgeOptionSkeleton";
 
 // TODO: This is a temporary code for testing purposes only
 
-type BridgeOptionType = {
+export type BridgeOptionType = {
   id: number;
   amount: number;
   via: string;

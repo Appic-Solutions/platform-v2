@@ -141,7 +141,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     usdBalance: undefined,
     chainTypes: "ICP",
     disabled: true,
-    // TODO
-    // @jeef: Please add fee and tokenType fields
+    fee: "10000",
+    tokenType: "ICRC-2",
   },
 ]

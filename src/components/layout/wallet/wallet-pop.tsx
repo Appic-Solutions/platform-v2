@@ -142,7 +142,7 @@ export function WalletPop({
                   <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
                   <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
                 </Avatar>
-                <span>{`${getChainName(token.chainId)} (${token.symbol})`}</span>
+                <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
               </div>
               <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
             </div>

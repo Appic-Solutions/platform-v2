@@ -3,7 +3,7 @@ import { Principal } from "@dfinity/principal";
 import { icrcIdlFactory } from "@/did/ledger/icrc1.did";
 import { dip20IdleFactory } from "@/did/ledger/dip20.did";
 import { IcpToken } from "@/blockchain_api/types/tokens";
-import { Actor, Agent, HttpAgent } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
 
 const waitWithTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

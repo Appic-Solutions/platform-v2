@@ -52,7 +52,7 @@ const BridgeHome = () => {
 
       return res
     },
-    refetchInterval: 1000 * 10, // Refetch every 1 minute
+    refetchInterval: 1000 * 60 * 1.5, // Refetch every 1.5 minutes
   });
 
 

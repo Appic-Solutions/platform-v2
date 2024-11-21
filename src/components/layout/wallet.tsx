@@ -92,6 +92,7 @@ const WalletPage = () => {
   useEffect(() => {
     fetchEvmBalances();
     fetchIcpBalances();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unauthenticatedAgent, authenticatedAgent, icpIdentity, evmAddress]);
 
   const handleDisconnectIcp = () => {
