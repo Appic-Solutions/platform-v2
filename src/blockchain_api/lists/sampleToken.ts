@@ -1,4 +1,4 @@
-import { EvmToken, IcpToken } from "../types/tokens";
+import { EvmToken, IcpToken } from "../types/tokens"
 
 export const tokens: (EvmToken | IcpToken)[] = [
   {
@@ -16,21 +16,6 @@ export const tokens: (EvmToken | IcpToken)[] = [
     chainTypes: "EVM",
   },
   {
-    name: "Sepolia",
-    symbol: "ETH",
-    logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
-    contractAddress: "0x0000000000000000000000000000000000000000",
-    canisterId: undefined,
-    usdPrice: "2000", // Placeholder value
-    decimals: 18,
-    chainId: 11155111,
-    balance: undefined,
-    balanceRawInteger: "345354235234523",
-
-    usdBalance: undefined,
-    chainTypes: "EVM",
-  },
-  {
     name: "Arbitrum One",
     symbol: "ETH",
     logo: "https://cryptologos.cc/logos/arbitrum-arb-logo.png",
@@ -41,7 +26,6 @@ export const tokens: (EvmToken | IcpToken)[] = [
     chainId: 42161,
     balance: undefined,
     balanceRawInteger: "345354235234523",
-
     usdBalance: undefined,
     chainTypes: "EVM",
   },
@@ -56,7 +40,6 @@ export const tokens: (EvmToken | IcpToken)[] = [
     chainId: 56,
     balance: undefined,
     balanceRawInteger: "345354235234523",
-
     usdBalance: undefined,
     chainTypes: "EVM",
   },
@@ -72,7 +55,6 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     usdBalance: undefined,
     balanceRawInteger: "345354235234523",
-
     chainTypes: "EVM",
   },
   {
@@ -154,14 +136,12 @@ export const tokens: (EvmToken | IcpToken)[] = [
     usdPrice: "533", // Placeholder value
     decimals: 8,
     chainId: 0,
-    balanceRawInteger: "345354235234523",
     balance: undefined,
+    balanceRawInteger: "345354235234523",
     usdBalance: undefined,
     chainTypes: "ICP",
     disabled: true,
+    fee: "10000",
+    tokenType: "ICRC-2",
   },
-];
-
-export function filterTokensByChainId(chainId: number): (EvmToken | IcpToken)[] {
-  return tokens.filter((token) => token.chainId === chainId);
-}
+]

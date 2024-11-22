@@ -2,7 +2,6 @@ import axios from "axios";
 import { chains } from "../../lists/chains";
 import { Chain } from "../../types/chains";
 import { EvmToken } from "../../types/tokens";
-import { error } from "console";
 
 interface AnkrGetBalanceRequestParams {
   id: number;
@@ -41,14 +40,14 @@ interface AnkrResponse {
   };
 }
 
-interface EvmTokensBalances {
+export interface EvmTokensBalances {
   tokens: EvmToken[];
   totalBalanceUsd: string;
 }
 
 export async function get_evm_wallet_tokens_balances(wallet_address: string): Promise<EvmTokensBalances> {
-  let chains_ankr_array: string[] = chains.filter((chain): chain is Chain & { ankr_handle: string } => chain.ankr_handle !== undefined).map((chain) => chain.ankr_handle);
-  let requestParams: AnkrGetBalanceRequestParams = {
+  const chains_ankr_array: string[] = chains.filter((chain): chain is Chain & { ankr_handle: string } => chain.ankr_handle !== undefined).map((chain) => chain.ankr_handle);
+  const requestParams: AnkrGetBalanceRequestParams = {
     id: 1,
     jsonrpc: "2.0",
     method: "ankr_getAccountBalance",
@@ -60,10 +59,9 @@ export async function get_evm_wallet_tokens_balances(wallet_address: string): Pr
   };
 
   try {
-    const response = await axios.post<AnkrResponse>(`https://rpc.ankr.com/multichain/${process.env.ANKR_API_KEY}`, requestParams);
+    const response = await axios.post<AnkrResponse>(`https://rpc.ankr.com/multichain/${process.env.NEXT_PUBLIC_ANKR_API_KEY}`, requestParams);
     if (response.data.error) {
       console.error("Error fetching account balance:", response.data.error);
-      throw error;
     }
     return {
       totalBalanceUsd: response.data.result.totalBalanceUsd,

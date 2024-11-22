@@ -1,35 +1,18 @@
-"use client";
-import { NAVBAR_ITEMS } from "@/constants/layout/navbar";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+<<<<<<< HEAD
 import { usePathname } from "next/navigation";
 import { ConnectWallet, useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { useAppKit } from "@reown/appkit/react";
 import Tooltip from "../ui/Tooltip";
+=======
+import WalletPage from "./wallet";
+import NavbarPage from "./navbar";
+>>>>>>> origin/stage
 
 const HeaderPage = () => {
-  const path = usePathname();
-  const {
-    // isInitializing,
-    // user,
-    // isUserConnecting,
-    // icpBalance,
-    // signer,
-    // identity,
-    // delegationType,
-    // accounts,
-    // connect,
-    // disconnect,
-    // fetchIcpBalance,
-  } = useIdentityKit();
-  const {
-    open,
-    // close
-  } = useAppKit();
-
-  // console.log(sig);
   return (
+<<<<<<< HEAD
     <header className={cn("order-last lg:order-first w-full", "flex items-center justify-between", "pt-5 pb-3.5 px-6 xl:px-12 z-10")}>
       {/* Logo */}
       <Link href="/" className="min-w-[114px] min-h-11 hidden lg:flex items-center justify-center">
@@ -71,8 +54,16 @@ const HeaderPage = () => {
       >
         User Wallet
         <ConnectWallet></ConnectWallet>
+=======
+    <header className="order-last lg:order-first w-full flex items-center justify-between gap-x-4 pt-5 pb-3.5 px-6 xl:px-12 z-10">
+      <Link href="/" className="w-[165px] min-h-11 hidden lg:flex items-center justify-center">
+        <Image src={"/images/logo/white-logo.png"} alt="logo" width={52} height={44} />
+      </Link>
+      <NavbarPage />
+      <div className="hidden lg:flex">
+        <WalletPage />
+>>>>>>> origin/stage
       </div>
-      {/* <ConnectWalletDropdownMenuAddressItem value={""}></ConnectWalletDropdownMenuAddressItem> */}
     </header>
   );
 };

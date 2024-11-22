@@ -1,18 +1,19 @@
 "use client";
-
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
-
-import { ArrowDownIcon } from "@/components/icons";
+import { ArrowsUpDownIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import PageHeader from "@/components/ui/PageHeader";
-import TokenCard from "./components/TokenCard";
 import BridgeOptionsList, {
   BridgeOptionType,
 } from "./components/BridgeOptionsList";
 import ActionButton from "./components/ActionButton";
-import Tooltip from "@/components/ui/Tooltip";
+import BoxHeader from "@/components/ui/box-header";
+import FromTokenCard from "./components/FromTokenCard";
+import ToTokenCard from "./components/ToTokenCard";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useIdentityKit } from "@nfid/identitykit/react";
+import WalletIcon from "@/components/icons/wallet";
 
 const SelectOptionPage = ({
   fromToken,
@@ -35,7 +36,14 @@ const SelectOptionPage = ({
   const [selectedOption, setSelectedOption] = useState<BridgeOptionType | null>(
     null
   );
-  const [showAllOptions, setShowAllOptions] = useState(false);
+  const [toWalletAddress, setToWalletAddress] = useState("");
+  const [toWalletValidationError, setToWalletValidationError] = useState<
+    string | null
+  >(null);
+  const [showWalletAddress, setShowWalletAddress] = useState(false);
+  const { isConnected: isEvmConnected } = useAppKitAccount();
+  const { identity: icpIdentity } = useIdentityKit();
+
   const handleOptionSelect = (option: BridgeOptionType) => {
     if (option.isActive) {
       setSelectedOption(option);
@@ -61,73 +69,187 @@ const SelectOptionPage = ({
   return (
     <Box
       className={cn(
-        "flex flex-col overflow-y-scroll ",
+        "flex flex-col overflow-y-scroll",
         "lg:px-14 md:overflow-auto md:max-h-[607px] md:max-w-[617px]",
-        "lg:max-w-[1060px] lg:h-[607px] lg:pb-10"
+        "lg:h-[607px] lg:pb-10",
+        amount &&
+          "lg:max-w-[1060px] transition-[max-width] duration-100 ease-in-out"
       )}
     >
       {/* BACK BUTTON AND TITLE */}
-      <PageHeader title="Select Bridge Option" onBack={prevStepHandler} />
+      <BoxHeader title="Receive" onBack={prevStepHandler} />
       {/* BOX CONTENT */}
       <div
         className={cn(
-          "flex flex-col gap-10 w-full flex-1",
-          "lg:flex-row lg:overflow-hidden"
+          "flex flex-col gap-10 w-full flex-1 justify-between",
+          "lg:flex-row lg:overflow-hidden",
+          "animate-slide-in opacity-0"
         )}
       >
         {/* SELECTED TOKENS */}
         <div
           className={cn(
             "flex flex-col items-center w-full justify-between",
-            "lg:max-w-[55%]"
+            amount && "lg:max-w-[55%]"
           )}
         >
-          <div className="relative flex flex-col gap-y-4 w-full justify-between">
-            <TokenCard
-              type="from"
+          <div className="relative flex flex-col gap-y-2 w-full justify-between">
+            <FromTokenCard
               token={fromToken}
               amount={amount}
               usdPrice={usdPrice}
               onAmountChange={handleAmountChange}
+              isWalletConnected={false}
+              // isWalletConnected={(() => {
+              //   if (fromToken.chainTypes === "EVM" && isEvmConnected) return true;
+              //   if (fromToken.chainTypes === "ICP" && icpIdentity) return true;
+              //   return false;
+              // })()}
             />
             <div
               className={cn(
-                "absolute rounded-round inset-0 w-14 h-14 m-auto z-20 cursor-pointer group",
+                "absolute rounded-full inset-0 w-12 h-12 z-20 cursor-pointer group",
                 "flex items-center justify-center",
+                "-translate-x-1/2 left-1/2 top-[6.3rem]",
                 "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
-                "border-2 border-white dark:border-white/30"
+                "border-2 border-white dark:border-white/30",
+                "transition-transform duration-300 hover:rotate-180 hover:scale-110",
+                "md:w-14 md:h-14",
+                "lg:top-28"
               )}
               onClick={swapTokensHandler}
             >
-              <ArrowDownIcon width={24} height={24} />
-              <Tooltip>swap</Tooltip>
+              <ArrowsUpDownIcon width={24} height={24} />
             </div>
-            <TokenCard
-              type="to"
+            <ToTokenCard
               token={toToken}
               amount={toAmount}
               usdPrice={usdPrice}
+              walletAddress={toWalletAddress}
+              showWalletAddress={showWalletAddress}
+              onWalletAddressChange={(e) => {
+                setToWalletAddress(e.target.value);
+              }}
+              onValidationError={setToWalletValidationError}
+              toWalletValidationError={toWalletValidationError}
             />
           </div>
-          {/* SELECT OPTION BUTTON: DESKTOP */}
-          <ActionButton
-            isDisabled={!selectedOption || !Number(amount)}
-            onClick={(e) => e.preventDefault()}
-            isMobile={false}
+          {/* DESKTOP ACTION BUTTONS */}
+          <div
+            className={cn("flex items-center gap-x-2 w-full", "max-lg:hidden")}
           >
-            Select Option
-          </ActionButton>
+            <ActionButton
+              isDisabled={(() => {
+                if (!selectedOption || !Number(amount)) return true;
+
+                const isSourceWalletDisconnected =
+                  (fromToken.chainTypes === "EVM" && !isEvmConnected) ||
+                  (fromToken.chainTypes === "ICP" && !icpIdentity);
+                if (isSourceWalletDisconnected) return true;
+
+                if (showWalletAddress) {
+                  return !toWalletAddress || !!toWalletValidationError;
+                }
+
+                const isDestWalletDisconnected =
+                  (toToken.chainTypes === "EVM" && !isEvmConnected) ||
+                  (toToken.chainTypes === "ICP" && !icpIdentity);
+                if (isDestWalletDisconnected) return true;
+
+                return false;
+              })()}
+              onClick={(e) => e.preventDefault()}
+            >
+              {(() => {
+                if (!selectedOption || !Number(amount)) {
+                  return "Fill Required Fields";
+                }
+
+                const isSourceWalletDisconnected =
+                  (fromToken.chainTypes === "EVM" && !isEvmConnected) ||
+                  (fromToken.chainTypes === "ICP" && !icpIdentity);
+                if (isSourceWalletDisconnected) {
+                  return "Connect Source Wallet";
+                }
+
+                if (showWalletAddress) {
+                  return !toWalletAddress || toWalletValidationError
+                    ? "Enter Valid Address"
+                    : "Confirm";
+                }
+
+                const isDestWalletDisconnected =
+                  (toToken.chainTypes === "EVM" && !isEvmConnected) ||
+                  (toToken.chainTypes === "ICP" && !icpIdentity);
+                return isDestWalletDisconnected
+                  ? "Connect Destination Wallet"
+                  : "Confirm";
+              })()}
+            </ActionButton>
+            <div
+              onClick={() => setShowWalletAddress(!showWalletAddress)}
+              className={cn(
+                "rounded-full bg-primary-buttons flex items-center justify-center px-4 h-full",
+                "transition-colors duration-300 cursor-pointer"
+              )}
+            >
+              <WalletIcon className="text-white" />
+            </div>
+          </div>
         </div>
+
         {/* BRIDGE OPTIONS */}
-        <BridgeOptionsList
-          amount={amount}
-          selectedOption={selectedOption}
-          expandedOption={expandedOption}
-          handleOptionSelect={handleOptionSelect}
-          handleExpand={handleExpand}
-          showAllOptions={showAllOptions}
-          setShowAllOptions={setShowAllOptions}
-        />
+        {amount && (
+          <BridgeOptionsList
+            selectedOption={selectedOption}
+            expandedOption={expandedOption}
+            handleOptionSelect={handleOptionSelect}
+            handleExpand={handleExpand}
+          />
+        )}
+
+        {/* MOBILE ACTION BUTTONS */}
+        <div className={cn("flex items-center gap-x-2 w-full", "lg:hidden")}>
+          <ActionButton
+            isDisabled={(() => {
+              if (!selectedOption || !Number(amount)) return true;
+
+              const isSourceWalletDisconnected =
+                (fromToken.chainTypes === "EVM" && !isEvmConnected) ||
+                (fromToken.chainTypes === "ICP" && !icpIdentity);
+              if (isSourceWalletDisconnected) return true;
+
+              return !toWalletAddress || !!toWalletValidationError;
+            })()}
+            onClick={(e) => e.preventDefault()}
+          >
+            {(() => {
+              if (!selectedOption || !Number(amount)) {
+                return "Fill Required Fields";
+              }
+
+              const isSourceWalletDisconnected =
+                (fromToken.chainTypes === "EVM" && !isEvmConnected) ||
+                (fromToken.chainTypes === "ICP" && !icpIdentity);
+              if (isSourceWalletDisconnected) {
+                return "Connect Wallet";
+              }
+
+              return !toWalletAddress || toWalletValidationError
+                ? "Connect Wallet"
+                : "Confirm";
+            })()}
+          </ActionButton>
+          <div
+            onClick={() => setShowWalletAddress(!showWalletAddress)}
+            className={cn(
+              "rounded-full bg-primary-buttons flex items-center justify-center px-4 h-full",
+              "transition-colors duration-300 cursor-pointer"
+            )}
+          >
+            <WalletIcon className="text-white" />
+          </div>
+        </div>
       </div>
     </Box>
   );

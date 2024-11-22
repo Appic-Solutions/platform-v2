@@ -1,9 +1,12 @@
 "use client";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import SelectOptionPage from "@/components/pages/bridge/select-option/select-option";
-import SelectTokenPage from "@/components/pages/bridge/select-token";
-import TokenListPage from "@/components/pages/bridge/token-list";
+import SelectTokenPage from "@/components/pages/bridge/select-token/select-token";
+import TokenListPage from "@/components/pages/bridge/chain-token-list/token-list";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useUnAuthenticatedAgent } from "@/hooks/useUnauthenticatedAgent";
+import { get_all_icp_tokens } from "@/blockchain_api/functions/icp/get_all_icp_tokens";
+import { setStorageItem } from "@/lib/localstorage";
 
 type TokenType = EvmToken | IcpToken | null;
 type SelectionType = "from" | "to";
@@ -36,6 +39,21 @@ const BridgeHome = () => {
     setToToken(temp);
   };
 
+  const unauthenticatedAgent = useUnAuthenticatedAgent();
+  useQuery({
+    queryKey: ["IcpTokens"],
+    queryFn: async () => {
+      if (!unauthenticatedAgent) return [];
+      const res = await get_all_icp_tokens(unauthenticatedAgent);
+
+      if (!res) return [];
+      setStorageItem("icpTokens", JSON.stringify(res));
+
+      return res;
+    },
+    refetchInterval: 1000 * 60 * 1.5, // Refetch every 1.5 minutes
+  });
+
   const renderStep = () => {
     switch (activeStep) {
       case 1:
@@ -58,16 +76,16 @@ const BridgeHome = () => {
             toToken={toToken}
           />
         );
-      case 3:
-        return fromToken && toToken ? (
-          <SelectOptionPage
-            fromToken={fromToken}
-            toToken={toToken}
-            prevStepHandler={() => handleStepChange(1)}
-            nextStepHandler={() => handleStepChange("next")}
-            swapTokensHandler={swapTokensHandler}
-          />
-        ) : null;
+      // case 3:
+      //   return fromToken && toToken ? (
+      //     <SelectOptionPage
+      //       fromToken={fromToken}
+      //       toToken={toToken}
+      //       prevStepHandler={() => handleStepChange(1)}
+      //       nextStepHandler={() => handleStepChange("next")}
+      //       swapTokensHandler={swapTokensHandler}
+      //     />
+      //   ) : null;
       default:
         return null;
     }

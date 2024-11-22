@@ -1,27 +1,28 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { idlFactory as sonicIdlFactory, TokenInfoWithType, PairInfoExt } from "@/did/sonic/sonic.did";
+import { idlFactory as sonicIdlFactory } from "@/did/sonic/sonic.did";
 
 import BigNumber from "bignumber.js";
 
 import { Principal } from "@dfinity/principal";
 import { get_icp_price } from "./get_icp_price";
 import { IcpToken } from "@/blockchain_api/types/tokens";
+import { TokenInfoWithType, PairInfoExt } from "@/did/sonic/sonic_types.did";
 
 // The main function to be called
 export const get_all_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
-  let all_sonic_tokens: TokenInfoWithType[] = await get_all_sonic_tokens(agent);
+  const all_sonic_tokens: TokenInfoWithType[] = await get_all_sonic_tokens(agent);
 
   if (all_sonic_tokens.length == 0) return [];
 
-  let all_sonic_pairs: PairInfoExt[] = await get_all_sonic_pairs(agent);
+  const all_sonic_pairs: PairInfoExt[] = await get_all_sonic_pairs(agent);
 
   if (all_sonic_pairs.length == 0) return [];
 
-  let icp_price: number | null = await get_icp_price();
+  const icp_price: number | null = await get_icp_price();
 
   if (icp_price == null) return [];
 
-  let all_tokens_with_prices: TokenWithPrice[] = calculatePrice(all_sonic_tokens, all_sonic_pairs, icp_price);
+  const all_tokens_with_prices: TokenWithPrice[] = calculatePrice(all_sonic_tokens, all_sonic_pairs, icp_price);
 
   if (all_tokens_with_prices.length == 0) return [];
 
@@ -34,7 +35,7 @@ export const transformToIcpTokens = (tokensWithPrices: TokenWithPrice[]): IcpTok
     (token): IcpToken => ({
       name: token.name,
       symbol: token.symbol,
-      logo: `'https://cdn.sonic.ooo/icons/'${token.id}`,
+      logo: `https://cdn.sonic.ooo/icons/${token.id}`,
       usdPrice: token.price,
       decimals: token.decimals,
       chainId: 0, // Set to 0 for ICP tokens
