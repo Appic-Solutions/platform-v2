@@ -1,60 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
-import { usePathname } from "next/navigation";
-import { ConnectWallet, useAgent, useIdentityKit } from "@nfid/identitykit/react";
-import { useAppKit } from "@reown/appkit/react";
-import Tooltip from "../ui/Tooltip";
-=======
 import WalletPage from "./wallet";
 import NavbarPage from "./navbar";
->>>>>>> origin/stage
 
 const HeaderPage = () => {
   return (
-<<<<<<< HEAD
-    <header className={cn("order-last lg:order-first w-full", "flex items-center justify-between", "pt-5 pb-3.5 px-6 xl:px-12 z-10")}>
-      {/* Logo */}
-      <Link href="/" className="min-w-[114px] min-h-11 hidden lg:flex items-center justify-center">
-        <Image src={"/images/logo/white-logo.png"} alt="logo" width={52} height={44} />
-      </Link>
-
-      {/* Navbar Menu */}
-      <nav className={cn("border-2 border-white/30 py-0.5 px-4 rounded-round text-white", "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]", "w-full lg:w-auto md:py-1.5")}>
-        <ul className="flex items-center justify-center gap-x-1.5 max-h-[60px] sm:justify-between">
-          {NAVBAR_ITEMS.map((item, idx) =>
-            item.active ? (
-              <li key={idx}>
-                <Link href={item.href} className={cn("flex items-center justify-center gap-x-1 rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4", path === item.href && "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]")}>
-                  <item.Icon width={24} height={24} className="min-w-5 min-h-5" />
-                  <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
-                </Link>
-              </li>
-            ) : (
-              <div
-                key={idx}
-                className={cn("relative flex items-center justify-center gap-x-1 select-none", "rounded-round py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group", "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]")}
-              >
-                <item.Icon width={24} height={24} className="min-w-5 min-h-5" />
-                <span className={cn("hidden md:flex", "text-lg font-bold")}>{item.label}</span>
-
-                <Tooltip>Coming Soon</Tooltip>
-              </div>
-            )
-          )}
-        </ul>
-      </nav>
-
-      {/* User Wallet */}
-      <div
-        className="bg-[#FAF7FD80]/50 rounded-round border border-[#ECE6F5] py-2 px-4 hidden lg:flex"
-        onClick={() => {
-          open();
-        }}
-      >
-        User Wallet
-        <ConnectWallet></ConnectWallet>
-=======
     <header className="order-last lg:order-first w-full flex items-center justify-between gap-x-4 pt-5 pb-3.5 px-6 xl:px-12 z-10">
       <Link href="/" className="w-[165px] min-h-11 hidden lg:flex items-center justify-center">
         <Image src={"/images/logo/white-logo.png"} alt="logo" width={52} height={44} />
@@ -62,7 +12,6 @@ const HeaderPage = () => {
       <NavbarPage />
       <div className="hidden lg:flex">
         <WalletPage />
->>>>>>> origin/stage
       </div>
     </header>
   );
