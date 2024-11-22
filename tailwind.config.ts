@@ -61,6 +61,10 @@ const config: Config = {
           "0%": { transform: "translateX(-100%)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
         },
+        slideInFromTop: {
+          "0%": { transform: "translateY(-10%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
         "slide-in": {
           "0%": {
             opacity: "0",
@@ -71,6 +75,18 @@ const config: Config = {
             transform: "translateX(0)",
           },
         },
+        slideInFromTopWithHeight: {
+          "0%": {
+            transform: "translateY(-10%)",
+            opacity: "0",
+            maxHeight: "0",
+          },
+          "100%": {
+            transform: "translateY(0)",
+            opacity: "1",
+            maxHeight: "700px",
+          },
+        },
       },
 
       /* Animation */
@@ -78,6 +94,9 @@ const config: Config = {
         "slide-in-from-right": "slideInFromRight 0.5s ease-in-out",
         "slide-in-from-left": "slideInFromLeft 0.5s ease-in-out",
         "slide-in": "slide-in 0.3s ease-out 0.1s forwards",
+        "slide-in-from-top": "slideInFromTop 0.2s ease-out",
+        "slide-in-with-height":
+          "slideInFromTopWithHeight 0.3s ease-out forwards",
       },
     },
   },

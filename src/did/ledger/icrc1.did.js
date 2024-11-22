@@ -80,7 +80,11 @@ export const icrcIdlFactory = ({ IDL }) => {
   );
   const Block = Value;
   const BlockRange = IDL.Record({ blocks: IDL.Vec(Block) });
-  const QueryBlockArchiveFn = IDL.Func([GetBlocksArgs], [BlockRange], ["query"]);
+  const QueryBlockArchiveFn = IDL.Func(
+    [GetBlocksArgs],
+    [BlockRange],
+    ["query"]
+  );
   const GetBlocksResponse = IDL.Record({
     certificate: IDL.Opt(IDL.Vec(IDL.Nat8)),
     first_index: BlockIndex,
@@ -147,7 +151,11 @@ export const icrcIdlFactory = ({ IDL }) => {
   const TransactionRange = IDL.Record({
     transactions: IDL.Vec(Transaction),
   });
-  const QueryArchiveFn = IDL.Func([GetTransactionsRequest], [TransactionRange], ["query"]);
+  const QueryArchiveFn = IDL.Func(
+    [GetTransactionsRequest],
+    [TransactionRange],
+    ["query"]
+  );
   const GetTransactionsResponse = IDL.Record({
     first_index: TxIndex,
     log_length: IDL.Nat,
@@ -254,14 +262,26 @@ export const icrcIdlFactory = ({ IDL }) => {
     archives: IDL.Func([], [IDL.Vec(ArchiveInfo)], ["query"]),
     get_blocks: IDL.Func([GetBlocksArgs], [GetBlocksResponse], ["query"]),
     get_data_certificate: IDL.Func([], [DataCertificate], ["query"]),
-    get_transactions: IDL.Func([GetTransactionsRequest], [GetTransactionsResponse], ["query"]),
+    get_transactions: IDL.Func(
+      [GetTransactionsRequest],
+      [GetTransactionsResponse],
+      ["query"]
+    ),
     icrc1_balance_of: IDL.Func([Account], [Tokens], ["query"]),
     icrc1_decimals: IDL.Func([], [IDL.Nat8], ["query"]),
     icrc1_fee: IDL.Func([], [Tokens], ["query"]),
-    icrc1_metadata: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))], ["query"]),
+    icrc1_metadata: IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))],
+      ["query"]
+    ),
     icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ["query"]),
     icrc1_name: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ["query"]),
+    icrc1_supported_standards: IDL.Func(
+      [],
+      [IDL.Vec(StandardRecord)],
+      ["query"]
+    ),
     icrc1_symbol: IDL.Func([], [IDL.Text], ["query"]),
     icrc1_total_supply: IDL.Func([], [Tokens], ["query"]),
     icrc1_transfer: IDL.Func([TransferArg], [TransferResult], []),

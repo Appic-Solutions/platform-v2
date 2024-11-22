@@ -64,9 +64,17 @@ export default function TokenListPage({
   };
 
   return (
-    <Box className="justify-normal md:max-w-[611px] md:max-h-[716px] md:pt-6">
+    <Box
+      className={cn(
+        "justify-normal md:max-w-[611px] md:max-h-[716px] md:pt-6",
+        "animate-slide-in opacity-0"
+      )}
+    >
       <BoxHeader title="Bridge From" onBack={prevStepHandler} />
-      <ChainBoxPage selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
+      <ChainBoxPage
+        selectedChainId={selectedChainId}
+        onChainSelect={setSelectedChainId}
+      />
       <hr className="bg-white dark:bg-[#636363]/25 w-[calc(100%-52px)] max-md:hidden" />
       <input
         type="text"
@@ -78,7 +86,8 @@ export default function TokenListPage({
           "bg-white/50 dark:bg-white/30 text-black dark:text-white",
           "placeholder:text-black/50 dark:placeholder:text-white/50",
           "w-full"
-        )} />
+        )}
+      />
       <div className="w-full flex flex-col gap-y-5 overflow-y-auto">
         {filteredTokens.map((token, idx) => (
           <TokenCard
@@ -94,4 +103,4 @@ export default function TokenListPage({
       </div>
     </Box>
   );
-};
+}

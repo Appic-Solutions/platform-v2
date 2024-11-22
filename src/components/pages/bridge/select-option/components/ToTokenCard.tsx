@@ -1,7 +1,7 @@
 import { IcpToken, EvmToken } from "@/blockchain_api/types/tokens";
 import { isValidEvmAddress } from "@/lib/validation";
 
-import Card from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn, getChainLogo } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

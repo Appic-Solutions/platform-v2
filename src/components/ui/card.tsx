@@ -6,7 +6,7 @@ interface CardProps extends React.AllHTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export default function Card({ children, className, ...other }: CardProps) {
+function Card({ children, className, ...other }: CardProps) {
   return (
     <div
       className={cn(
@@ -24,3 +24,5 @@ export default function Card({ children, className, ...other }: CardProps) {
     </div>
   );
 }
+
+export { Card };

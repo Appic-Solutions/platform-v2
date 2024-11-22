@@ -1,7 +1,6 @@
 "use client";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import SelectOptionPage from "@/components/pages/bridge/select-option/select-option";
-import SelectTokenPage from "@/components/pages/bridge/select-token";
+import SelectTokenPage from "@/components/pages/bridge/select-token/select-token";
 import TokenListPage from "@/components/pages/bridge/chain-token-list/token-list";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -50,11 +49,10 @@ const BridgeHome = () => {
       if (!res) return [];
       setStorageItem("icpTokens", JSON.stringify(res));
 
-      return res
+      return res;
     },
     refetchInterval: 1000 * 60 * 1.5, // Refetch every 1.5 minutes
   });
-
 
   const renderStep = () => {
     switch (activeStep) {
@@ -78,16 +76,16 @@ const BridgeHome = () => {
             toToken={toToken}
           />
         );
-      case 3:
-        return fromToken && toToken ? (
-          <SelectOptionPage
-            fromToken={fromToken}
-            toToken={toToken}
-            prevStepHandler={() => handleStepChange(1)}
-            nextStepHandler={() => handleStepChange("next")}
-            swapTokensHandler={swapTokensHandler}
-          />
-        ) : null;
+      // case 3:
+      //   return fromToken && toToken ? (
+      //     <SelectOptionPage
+      //       fromToken={fromToken}
+      //       toToken={toToken}
+      //       prevStepHandler={() => handleStepChange(1)}
+      //       nextStepHandler={() => handleStepChange("next")}
+      //       swapTokensHandler={swapTokensHandler}
+      //     />
+      //   ) : null;
       default:
         return null;
     }
