@@ -1,6 +1,6 @@
 "use client";
 import { cn, getChainLogo } from "@/lib/utils";
-import { useIdentityKit } from "@nfid/identitykit/react";
+import { useAuth, useIdentity } from "@nfid/identitykit/react";
 import {
   useAppKit,
   useAppKitAccount,
@@ -46,11 +46,8 @@ const WalletPage = () => {
   const authenticatedAgent = useAuthenticatedAgent();
 
   // ICP Wallet Hooks
-  const {
-    identity: icpIdentity,
-    connect: connectIcp,
-    disconnect: disconnectIcp,
-  } = useIdentityKit();
+  const icpIdentity = useIdentity();
+  const { connect: connectIcp, disconnect: disconnectIcp } = useAuth()
 
   // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
@@ -73,7 +70,7 @@ const WalletPage = () => {
       }
       setIcpLoading(false);
     } catch (error) {
-      console.log("Line 70 Get Balance Error => ", error);
+      console.log("Line 73 Get Balance Error => ", error);
     }
   };
   const fetchEvmBalances = async () => {
@@ -85,7 +82,7 @@ const WalletPage = () => {
       }
       setEvmLoading(false);
     } catch (error) {
-      console.log("Line 70 Get Balance Error => ", error);
+      console.log("Line 85 Get Balance Error => ", error);
     }
   };
 
