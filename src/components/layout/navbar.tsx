@@ -30,7 +30,8 @@ const NavbarPage = () => {
                 className={cn(
                   "flex items-center justify-center gap-x-1 rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
                   path === item.href &&
-                    "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]"
+                  "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]",
+                  "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
                 )}
               >
                 {item.Icon}

@@ -40,6 +40,6 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     href: "/advanced",
     tooltip: "Coming Soon",
     Icon: <LockIcon width={24} height={24} className="min-w-5 min-h-5" />,
-    active: false,
+    active: true,
   },
 ]
