@@ -33,6 +33,7 @@ const config: Config = {
         fail: "rgb(var(--fail))",
         muted: "rgb(var(--muted))",
         "box-border": "var(--box-border)",
+        "card-background": "var(--card-background)",
       },
       /* Background */
       backgroundImage: {
@@ -87,6 +88,10 @@ const config: Config = {
             maxHeight: "700px",
           },
         },
+        "border-spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
 
       /* Animation */
@@ -97,6 +102,7 @@ const config: Config = {
         "slide-in-from-top": "slideInFromTop 0.2s ease-out",
         "slide-in-with-height":
           "slideInFromTopWithHeight 0.3s ease-out forwards",
+        "border-spin": "border-spin 2s linear infinite",
       },
     },
   },

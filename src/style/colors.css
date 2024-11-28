@@ -63,6 +63,7 @@
   );
 
   --box-border: #ffffff3d;
+  --card-background: rgba(255, 255, 255, 0.05);
 }
 
 /* Dark mode colors properties */
@@ -114,4 +115,9 @@
   );
 
   --box-border: #6363633d;
+  --card-background: linear-gradient(
+    180deg,
+    rgba(36, 36, 36, 0.8) 0%,
+    rgba(33, 33, 33, 0.24) 100%
+  );
 }

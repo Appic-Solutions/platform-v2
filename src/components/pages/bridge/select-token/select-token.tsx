@@ -13,6 +13,8 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useIdentity } from "@nfid/identitykit/react";
 import WalletIcon from "@/components/icons/wallet";
 import WalletAddressInput from "./_components/WalletAddressInput";
+import HistoryIcon from "@/components/icons/history";
+import Link from "next/link";
 
 interface SelectTokenProps {
   stepHandler: (value: "next" | "prev" | number) => void;
@@ -125,14 +127,27 @@ export default function SelectTokenPage({
         amount && "lg:max-w-[1060px]"
       )}
     >
-      <h1
+      <div
         className={cn(
-          "text-white md:text-black md:dark:text-white mr-auto mb-5",
-          "text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold"
+          "flex items-center justify-between w-full mb-5",
+          "text-white md:text-black md:dark:text-white"
         )}
       >
-        Bridge
-      </h1>
+        <h1
+          className={cn(
+            "text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold"
+          )}
+        >
+          Bridge
+        </h1>
+        <Link
+          href="/transactions"
+          className="flex items-center gap-x-2 text-sm"
+        >
+          <HistoryIcon width={20} height={20} />
+          <span>History</span>
+        </Link>
+      </div>
       <div
         className={cn(
           "flex flex-col gap-4 w-full flex-1 justify-between",
