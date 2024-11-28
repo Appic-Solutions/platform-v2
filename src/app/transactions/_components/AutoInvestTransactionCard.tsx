@@ -1,7 +1,7 @@
 import {
+  ArrowsUpDownIcon,
   ChevronDownIcon,
   FireIcon,
-  ParkOutlineBridgeIcon,
 } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
@@ -73,7 +73,7 @@ const AutoInvestTransactionCard = ({
                   "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
               )}
             >
-              <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
+              <ArrowsUpDownIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
             </div>
             <div
               className={cn(
@@ -172,7 +172,7 @@ const AutoInvestTransactionCard = ({
         {/* details section */}
         <div
           className={cn(
-            "overflow-hidden transition-[height] duration-300 ease-in-out",
+            "overflow-auto pr-2 transition-[height] duration-300 ease-in-out",
             showDetails ? "h-[280px]" : "h-0"
           )}
         >
@@ -188,15 +188,25 @@ const AutoInvestTransactionCard = ({
                     "p-2 rounded-full flex items-center justify-center relative",
                     "bg-gray-300",
                     index < steps.length - 1 &&
-                      "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-10 after:bg-gray-300"
+                      "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300"
                   )}
                 ></div>
-                <span className="text-sm md:text-[16px] w-full text-secondary text-start">
-                  {step.message}
-                </span>
-                <span className="text-xs md:text-[16px] text-secondary text-start">
-                  {step.timestamp}
-                </span>
+
+                <div className="flex flex-col gap-y-1 items-start text-xs md:text-[16px] text-secondary text-start w-full">
+                  <span className="font-thin">{step.amount}</span>
+                  <span>{step.message}</span>
+                </div>
+                <div className="flex flex-col gap-y-1 items-end font-thin text-xs md:text-[16px] text-secondary text-start">
+                  <span>{step.timestamp}</span>
+                  <span
+                    className={cn(
+                      step.status === "completed" && "text-green-600",
+                      step.status === "failed" && "text-red-600"
+                    )}
+                  >
+                    {step.status}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
