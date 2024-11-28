@@ -83,67 +83,67 @@ const AdvancedTransactionCard = ({
             <span className="text-xs md:text-sm text-nowrap">Twin Token</span>
           </div>
         </div>
-        {/* details section */}
-        <div
-          className={cn(
-            "overflow-hidden transition-[height] duration-300 ease-in-out",
-            showDetails ? "h-[250px]" : "h-0"
-          )}
-        >
-          <div className="flex items-center gap-x-2 mb-3">
-            <p className="text-secondary text-sm">Transaction ID: {id}</p>
-            <button onClick={() => copyToClipboard(id)}>
-              <CopyIcon width={20} height={20} />
-            </button>
-          </div>
-          <div className="flex flex-col gap-y-4">
-            <div className="flex items-center text-xs md:text-sm w-full justify-between">
-              <span className="text-primary">Original Token Name:</span>
-              <span className="text-secondary text-right">
-                {sourceToken.name}
-              </span>
-            </div>
-
-            <div className="flex items-center text-xs md:text-sm w-full justify-between">
-              <span className="text-primary">Original Token Symbol:</span>
-              <span className="text-secondary text-right">
-                {sourceToken.symbol}
-              </span>
-            </div>
-
-            <div className="flex items-center text-xs md:text-sm w-full justify-between">
-              <span className="text-primary">Blockchain:</span>
-              <span className="text-secondary text-right">
-                {getChainName(sourceToken.chainId)}
-              </span>
-            </div>
-
-            <hr className="w-full border-t border-secondary" />
-
-            <div className="flex items-center text-xs md:text-sm w-full justify-between">
-              <span className="text-primary">Twin Token Name:</span>
-              <span className="text-secondary text-right">
-                {destinationToken.name}
-              </span>
-            </div>
-
-            <div className="flex items-center text-xs md:text-sm w-full justify-between">
-              <span className="text-primary">Twin Token Symbol:</span>
-              <span className="text-secondary text-right">
-                {destinationToken.symbol}
-              </span>
-            </div>
-
-            <div className="flex items-center text-xs md:text-sm w-full justify-between">
-              <span className="text-primary">Twin Token Fee:</span>
-              <span className="text-[#12B76A] text-right">
-                {fee} {sourceToken.symbol}
-              </span>
-            </div>
-          </div>
-        </div>
         {/* end section */}
-        <div className="flex items-center justify-center w-full">
+        <div className="flex flex-col w-full items-center">
+          {/* details section */}
+          <div
+            className={cn(
+              "overflow-hidden transition-[height] duration-300 ease-in-out w-full",
+              showDetails ? "h-[250px]" : "h-0"
+            )}
+          >
+            <div className="flex items-center gap-x-2 mb-3">
+              <p className="text-secondary text-sm">Transaction ID: {id}</p>
+              <button onClick={() => copyToClipboard(id)}>
+                <CopyIcon width={20} height={20} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-y-4">
+              <div className="flex items-center text-xs md:text-sm w-full justify-between">
+                <span className="text-primary">Original Token Name:</span>
+                <span className="text-secondary text-right">
+                  {sourceToken.name}
+                </span>
+              </div>
+
+              <div className="flex items-center text-xs md:text-sm w-full justify-between">
+                <span className="text-primary">Original Token Symbol:</span>
+                <span className="text-secondary text-right">
+                  {sourceToken.symbol}
+                </span>
+              </div>
+
+              <div className="flex items-center text-xs md:text-sm w-full justify-between">
+                <span className="text-primary">Blockchain:</span>
+                <span className="text-secondary text-right">
+                  {getChainName(sourceToken.chainId)}
+                </span>
+              </div>
+
+              <hr className="w-full border-t border-secondary" />
+
+              <div className="flex items-center text-xs md:text-sm w-full justify-between">
+                <span className="text-primary">Twin Token Name:</span>
+                <span className="text-secondary text-right">
+                  {destinationToken.name}
+                </span>
+              </div>
+
+              <div className="flex items-center text-xs md:text-sm w-full justify-between">
+                <span className="text-primary">Twin Token Symbol:</span>
+                <span className="text-secondary text-right">
+                  {destinationToken.symbol}
+                </span>
+              </div>
+
+              <div className="flex items-center text-xs md:text-sm w-full justify-between">
+                <span className="text-primary">Twin Token Fee:</span>
+                <span className="text-[#12B76A] text-right">
+                  {fee} {sourceToken.symbol}
+                </span>
+              </div>
+            </div>
+          </div>
           {/* details button */}
           <button
             onClick={() => setShowDetails((prev) => !prev)}

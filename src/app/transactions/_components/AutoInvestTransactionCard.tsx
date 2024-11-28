@@ -145,70 +145,72 @@ const AutoInvestTransactionCard = ({
             )}
           </div>
         </div>
-        {/* end section */}
-        <div className="flex items-center justify-between w-full">
-          {/* details button */}
-          <button
-            onClick={() => setShowDetails((prev) => !prev)}
-            className="flex items-center gap-x-1 hover:bg-white hover:bg-opacity-10 rounded-lg p-1"
-          >
-            <span className="text-sm text-secondary">
-              {showDetails ? "Hide" : "View"} Transaction Details
-            </span>
-            <div className="p-1 rounded-full bg-black bg-opacity-10 w-min transition-all">
-              <ChevronDownIcon
-                width={8}
-                height={8}
-                className={cn(showDetails && "rotate-180")}
-              />
-            </div>
-          </button>
-          {/* time and fee */}
-          <span className="flex items-center gap-x-1 w-max">
-            <p className="text-xs font-thin text-primary">{fee}</p>
-            <FireIcon width={19} height={19} className="text-primary" />
-          </span>
-        </div>
-        {/* details section */}
-        <div
-          className={cn(
-            "overflow-auto pr-2 transition-[height] duration-300 ease-in-out",
-            showDetails ? "h-[280px]" : "h-0"
-          )}
-        >
-          <p className="text-secondary text-xl mb-4">Previous Transactions</p>
-          <div className="flex flex-col gap-y-6">
-            {steps.map((step, index) => (
-              <div
-                key={step.message}
-                className="flex w-full justify-between items-center gap-x-6"
-              >
-                <div
-                  className={cn(
-                    "p-2 rounded-full flex items-center justify-center relative",
-                    "bg-gray-300",
-                    index < steps.length - 1 &&
-                      "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300"
-                  )}
-                ></div>
-
-                <div className="flex flex-col gap-y-1 items-start text-xs md:text-[16px] text-secondary text-start w-full">
-                  <span className="font-thin">{step.amount}</span>
-                  <span>{step.message}</span>
-                </div>
-                <div className="flex flex-col gap-y-1 items-end font-thin text-xs md:text-[16px] text-secondary text-start">
-                  <span>{step.timestamp}</span>
-                  <span
-                    className={cn(
-                      step.status === "completed" && "text-green-600",
-                      step.status === "failed" && "text-red-600"
-                    )}
-                  >
-                    {step.status}
-                  </span>
-                </div>
+        <div className="flex flex-col w-full">
+          {/* end section */}
+          <div className="flex items-center justify-between w-full">
+            {/* details button */}
+            <button
+              onClick={() => setShowDetails((prev) => !prev)}
+              className="flex items-center gap-x-1 hover:bg-white hover:bg-opacity-10 rounded-lg p-1"
+            >
+              <span className="text-sm text-secondary">
+                {showDetails ? "Hide" : "View"} Transaction Details
+              </span>
+              <div className="p-1 rounded-full bg-black bg-opacity-10 w-min transition-all">
+                <ChevronDownIcon
+                  width={8}
+                  height={8}
+                  className={cn(showDetails && "rotate-180")}
+                />
               </div>
-            ))}
+            </button>
+            {/* time and fee */}
+            <span className="flex items-center gap-x-1 w-max">
+              <p className="text-xs font-thin text-primary">{fee}</p>
+              <FireIcon width={19} height={19} className="text-primary" />
+            </span>
+          </div>
+          {/* details section */}
+          <div
+            className={cn(
+              "overflow-auto pr-2 transition-[height] duration-300 ease-in-out",
+              showDetails ? "h-[280px]" : "h-0"
+            )}
+          >
+            <p className="text-secondary text-xl my-4">Previous Transactions</p>
+            <div className="flex flex-col gap-y-6">
+              {steps.map((step, index) => (
+                <div
+                  key={step.message}
+                  className="flex w-full justify-between items-center gap-x-6"
+                >
+                  <div
+                    className={cn(
+                      "p-2 rounded-full flex items-center justify-center relative",
+                      "bg-gray-300",
+                      index < steps.length - 1 &&
+                        "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300"
+                    )}
+                  ></div>
+
+                  <div className="flex flex-col gap-y-1 items-start text-xs md:text-[16px] text-secondary text-start w-full">
+                    <span className="font-thin">{step.amount}</span>
+                    <span>{step.message}</span>
+                  </div>
+                  <div className="flex flex-col gap-y-1 items-end font-thin text-xs md:text-[16px] text-secondary text-start">
+                    <span>{step.timestamp}</span>
+                    <span
+                      className={cn(
+                        step.status === "completed" && "text-green-600",
+                        step.status === "failed" && "text-red-600"
+                      )}
+                    >
+                      {step.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

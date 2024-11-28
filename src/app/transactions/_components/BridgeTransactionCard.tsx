@@ -142,99 +142,101 @@ const BridgeTransactionCard = ({
             </span>
           </div>
         </div>
-        {/* details section */}
-        <div
-          className={cn(
-            "overflow-auto transition-[height] duration-300 ease-in-out",
-            showDetails ? "h-[230px]" : "h-0"
-          )}
-        >
-          <div className="flex items-center gap-x-2 mb-3">
-            <p className="text-secondary text-sm">Transaction ID: {id}</p>
-            <button onClick={() => copyToClipboard(id)}>
-              <CopyIcon width={20} height={20} />
-            </button>
-          </div>
-          <div className="flex flex-col gap-y-6 pr-2">
-            {steps.map((step, index) => (
-              <div
-                key={step.message}
-                className="flex w-full justify-between items-center gap-x-6"
-              >
-                <div
-                  className={cn(
-                    "p-3 rounded-full flex items-center justify-center relative",
-                    "bg-opacity-20",
-                    step.status === "completed" && "bg-[#12B76A33]",
-                    step.status === "pending" && "bg-[#12B76A33]",
-                    step.status === "failed" && "bg-[#31201a73]",
-                    index < steps.length - 1 &&
-                      "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
-                  )}
-                >
-                  {step.status === "completed" && (
-                    <CheckIcon
-                      width={24}
-                      height={24}
-                      className="text-[#0D9857]"
-                    />
-                  )}
-                  {step.status === "pending" && (
-                    <Spinner className="fill-[#0D9857]" />
-                  )}
-                  {step.status === "failed" && (
-                    <CloseIcon
-                      width={24}
-                      height={24}
-                      className="text-[#FF5630]"
-                    />
-                  )}
-                </div>
-
-                <span className="text-sm md:text-[16px] w-full text-secondary text-start">
-                  {step.message}
-                </span>
-                <span className="text-xs md:text-[16px] text-secondary text-start">
-                  {step.timestamp}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* end section */}
-        <div className="flex items-center justify-between w-full">
-          {/* bridge provider */}
+        <div className="flex flex-col w-full">
+          {/* details section */}
           <div
             className={cn(
-              "px-4 py-1 rounded-2xl w-max flex items-center gap-x-1",
-              "bg-white opacity-60"
+              "overflow-auto transition-[height] duration-300 ease-in-out",
+              showDetails ? "h-[230px] mb-4" : "h-0"
             )}
           >
-            <span className="text-xs lg:text-sm text-black">
-              via {bridgeProvider.name}
+            <div className="flex items-center gap-x-2 mb-3">
+              <p className="text-secondary text-sm">Transaction ID: {id}</p>
+              <button onClick={() => copyToClipboard(id)}>
+                <CopyIcon width={20} height={20} />
+              </button>
+            </div>
+            <div className="flex flex-col gap-y-6 pr-2">
+              {steps.map((step, index) => (
+                <div
+                  key={step.message}
+                  className="flex w-full justify-between items-center gap-x-6"
+                >
+                  <div
+                    className={cn(
+                      "p-3 rounded-full flex items-center justify-center relative",
+                      "bg-opacity-20",
+                      step.status === "completed" && "bg-[#12B76A33]",
+                      step.status === "pending" && "bg-[#12B76A33]",
+                      step.status === "failed" && "bg-[#31201a73]",
+                      index < steps.length - 1 &&
+                        "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
+                    )}
+                  >
+                    {step.status === "completed" && (
+                      <CheckIcon
+                        width={24}
+                        height={24}
+                        className="text-[#0D9857]"
+                      />
+                    )}
+                    {step.status === "pending" && (
+                      <Spinner className="fill-[#0D9857]" />
+                    )}
+                    {step.status === "failed" && (
+                      <CloseIcon
+                        width={24}
+                        height={24}
+                        className="text-[#FF5630]"
+                      />
+                    )}
+                  </div>
+
+                  <span className="text-sm md:text-[16px] w-full text-secondary text-start">
+                    {step.message}
+                  </span>
+                  <span className="text-xs md:text-[16px] text-secondary text-start">
+                    {step.timestamp}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* end section */}
+          <div className="flex items-center justify-between w-full">
+            {/* bridge provider */}
+            <div
+              className={cn(
+                "px-4 py-1 rounded-2xl w-max flex items-center gap-x-1",
+                "bg-white opacity-60"
+              )}
+            >
+              <span className="text-xs lg:text-sm text-black">
+                via {bridgeProvider.name}
+              </span>
+            </div>
+            {/* details button */}
+            <button
+              onClick={() => setShowDetails((prev) => !prev)}
+              className="flex items-center gap-x-1 hover:bg-white hover:bg-opacity-10 rounded-lg p-1"
+            >
+              <span className="text-sm text-secondary px-1">
+                {showDetails ? "Hide" : "View"} Details
+              </span>
+              <div className="p-1 rounded-full bg-black bg-opacity-10 w-min transition-all">
+                <ChevronDownIcon
+                  width={8}
+                  height={8}
+                  className={cn(showDetails && "rotate-180")}
+                />
+              </div>
+            </button>
+            {/* time and fee */}
+            <span className="flex items-center gap-x-1 w-max">
+              <p className="text-xs font-thin text-primary">{fee}</p>
+              <FireIcon width={19} height={19} className="text-primary" />
             </span>
           </div>
-          {/* details button */}
-          <button
-            onClick={() => setShowDetails((prev) => !prev)}
-            className="flex items-center gap-x-1 hover:bg-white hover:bg-opacity-10 rounded-lg p-1"
-          >
-            <span className="text-sm text-secondary px-1">
-              {showDetails ? "Hide" : "View"} Details
-            </span>
-            <div className="p-1 rounded-full bg-black bg-opacity-10 w-min transition-all">
-              <ChevronDownIcon
-                width={8}
-                height={8}
-                className={cn(showDetails && "rotate-180")}
-              />
-            </div>
-          </button>
-          {/* time and fee */}
-          <span className="flex items-center gap-x-1 w-max">
-            <p className="text-xs font-thin text-primary">{fee}</p>
-            <FireIcon width={19} height={19} className="text-primary" />
-          </span>
         </div>
       </div>
     </Card>

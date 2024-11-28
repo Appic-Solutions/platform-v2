@@ -17,14 +17,11 @@ const TransactionTabsContent = ({
   return (
     <TabsContent
       value={value}
-      className="w-full h-full mt-0 overflow-y-visible md:overflow-y-scroll"
+      className="flex flex-col w-full h-full mt-0 overflow-y-visible md:overflow-y-scroll gap-y-4"
     >
       {transactions.length > 0 ? (
         transactions.map((transaction) => (
-          <div
-            key={transaction.id}
-            className="w-full lg:px-2 md:max-w-[617px] md:pb-4"
-          >
+          <div key={transaction.id} className="w-full lg:px-2 md:max-w-[617px]">
             {value === "bridge" && <BridgeTransactionCard {...transaction} />}
             {value === "advanced" && (
               <AdvancedTransactionCard {...transaction} />
