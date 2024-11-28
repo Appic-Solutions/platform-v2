@@ -15,7 +15,10 @@ const TransactionTabsContent = ({
   transactions,
 }: TransactionTabsContentProps) => {
   return (
-    <TabsContent value={value} className="w-full h-full mt-0">
+    <TabsContent
+      value={value}
+      className="w-full h-full mt-0 overflow-y-visible md:overflow-y-scroll"
+    >
       {transactions.length > 0 ? (
         transactions.map((transaction) => (
           <div
@@ -32,7 +35,7 @@ const TransactionTabsContent = ({
           </div>
         ))
       ) : (
-        <div className="flex flex-col items-center gap-2 justify-center text-center text-sm text-gray-500 h-full overflow-hidden">
+        <div className="flex flex-col items-center gap-2 justify-center text-center text-sm text-secondary h-full overflow-hidden">
           <NoteRemoveIcon width={80} height={80} />
           <p>There is no transaction</p>
         </div>

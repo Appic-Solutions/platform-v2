@@ -10,10 +10,10 @@ const TransactionTabsList = ({
   return (
     <TabsList
       className={cn(
-        "overflow-hidden w-[72px] h-fit bg-none",
-        "flex flex-col gap-2 items-center justify-between",
-        "absolute top-10 -left-24",
-        "md:border-[5px] border-box-border rounded-[35px]",
+        "overflow-hidden w-fit h-fit bg-none mb-4",
+        "flex md:flex-col gap-2 items-center justify-between",
+        "md:absolute md:top-10 md:-left-24",
+        "border-[5px] border-box-border rounded-[35px]",
         "*:z-20",
         // Box Background
         "backdrop-blur-md max-md:before:hidden before:content-[''] before:absolute before:inset-0",

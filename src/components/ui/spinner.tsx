@@ -3,7 +3,7 @@ import React from "react";
 
 const Spinner = ({ className, ...props }: { className?: string }) => {
   return (
-    <div className="grid w-full place-items-center overflow-x-scroll rounded-lg lg:overflow-visible">
+    <div className="grid w-full place-items-center overflow-hidden rounded-lg lg:overflow-visible">
       <svg
         aria-hidden="true"
         className={cn(

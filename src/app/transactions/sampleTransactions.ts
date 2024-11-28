@@ -1,30 +1,33 @@
 interface TransactionStep {
-  status?: "completed" | "in_progress" | "failed";
+  status?: "completed" | "pending" | "failed";
   amount?: string;
   message: string;
   timestamp: string;
+}
+
+interface TokenInfo {
+  chainId: number;
+  amount: string;
+  symbol: string;
+  logo: string;
+  name: string;
+}
+
+// New interfaces for twin token specific data
+interface TwinTokenInfo {
+  name?: string;
+  symbol?: string;
+  fee?: string;
 }
 
 export interface Transaction {
   id: string;
   date: string;
   time: string;
-  type: "bridge" | "auto-invest" | "advanced" | "swap";
-  sourceToken: {
-    chainId: number;
-    amount: string;
-    symbol: string;
-    logo: string;
-    name: string;
-  };
-  destinationToken: {
-    chainId: number;
-    amount: string;
-    symbol: string;
-    logo: string;
-    name: string;
-  };
-  status: "completed" | "in_progress" | "failed";
+  type: "bridge" | "auto-invest" | "advanced" | "swap" | "twin";
+  sourceToken: TokenInfo;
+  destinationToken: TokenInfo;
+  status: "completed" | "pending" | "failed";
   bridgeProvider: {
     name: string;
     logo: string;
@@ -32,6 +35,14 @@ export interface Transaction {
   fee: string;
   isExpanded?: boolean;
   steps: TransactionStep[];
+  // Additional fields for twin token transactions
+  value?: number;
+  originalToken?: {
+    name: string;
+    symbol: string;
+    blockchain: string;
+  };
+  twinToken?: TwinTokenInfo;
 }
 
 export const sampleTransactions: Transaction[] = [
@@ -54,7 +65,7 @@ export const sampleTransactions: Transaction[] = [
       logo: "/images/logo/chains-logos/ethereum.svg",
       name: "ETH on Ethereum",
     },
-    status: "in_progress",
+    status: "pending",
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -67,7 +78,7 @@ export const sampleTransactions: Transaction[] = [
         timestamp: "6:32am",
       },
       {
-        status: "in_progress",
+        status: "pending",
         message: "Bridge in progress",
         timestamp: "6:36am",
       },
@@ -183,7 +194,7 @@ export const sampleTransactions: Transaction[] = [
       logo: "/images/logo/chains-logos/optimism.svg",
       name: "ETH on Optimism",
     },
-    status: "in_progress",
+    status: "pending",
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -196,12 +207,12 @@ export const sampleTransactions: Transaction[] = [
         timestamp: "6:40am",
       },
       {
-        status: "in_progress",
+        status: "pending",
         message: "Middle step connected",
         timestamp: "6:41am",
       },
       {
-        status: "in_progress",
+        status: "pending",
         message: "Bridge Pending",
         timestamp: "-",
       },
@@ -226,7 +237,7 @@ export const sampleTransactions: Transaction[] = [
       logo: "/images/logo/chains-logos/optimism.svg",
       name: "ETH on Optimism",
     },
-    status: "in_progress",
+    status: "pending",
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -239,12 +250,12 @@ export const sampleTransactions: Transaction[] = [
         timestamp: "6:40am",
       },
       {
-        status: "in_progress",
+        status: "pending",
         message: "Middle step connected",
         timestamp: "6:41am",
       },
       {
-        status: "in_progress",
+        status: "pending",
         message: "Bridge Pending",
         timestamp: "-",
       },
@@ -356,4 +367,49 @@ export const sampleTransactions: Transaction[] = [
       },
     ],
   },
+  // {
+  //   id: "TW424537",
+  //   date: "January 11, 2024",
+  //   time: "6:32am",
+  //   type: "advanced",
+  //   sourceToken: {
+  //     chainId: 1,
+  //     amount: "4642.42",
+  //     symbol: "ETH",
+  //     logo: "/images/logo/chains-logos/ethereum.svg",
+  //     name: "ETH on Ethereum",
+  //   },
+  //   destinationToken: {
+  //     chainId: 1,
+  //     amount: "4642.42",
+  //     symbol: "ETH",
+  //     logo: "/images/logo/chains-logos/solana.svg",
+  //     name: "ETH on Solana",
+  //   },
+  //   status: "completed",
+  //   bridgeProvider: {
+  //     name: "Twin Token",
+  //     logo: "/images/logo/bridge-providers/twin.svg",
+  //   },
+  //   fee: "0.01 ICP",
+  //   steps: [
+  //     {
+  //       status: "completed",
+  //       message: "Twin token created",
+  //       timestamp: "6:32am",
+  //     },
+  //   ],
+  //   // Twin token specific fields
+  //   value: 4642.42,
+  //   originalToken: {
+  //     name: "Acme Coin",
+  //     symbol: "ACM",
+  //     blockchain: "Internet Computer (ICP)",
+  //   },
+  //   twinToken: {
+  //     name: "Acme Twin",
+  //     symbol: "ACMT",
+  //     fee: "0.01 ICP",
+  //   },
+  // },
 ];
