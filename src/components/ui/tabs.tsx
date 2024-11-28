@@ -20,6 +20,7 @@ const TabsList = React.forwardRef<
     {...props}
   />
 ));
+TabsList.displayName = TabsPrimitive.List.displayName;
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,

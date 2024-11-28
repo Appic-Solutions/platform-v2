@@ -1,5 +1,4 @@
 import {
-  ArrowsUpDownIcon,
   ChevronDownIcon,
   FireIcon,
   ParkOutlineBridgeIcon,
@@ -11,18 +10,14 @@ import { Transaction } from "../sampleTransactions";
 import { useState } from "react";
 
 const AutoInvestTransactionCard = ({
-  bridgeProvider,
   date,
   destinationToken,
   fee,
-  id,
   sourceToken,
   status,
   steps,
   time,
-  isExpanded,
   className,
-  type,
 }: Transaction & {
   className?: string;
 }) => {

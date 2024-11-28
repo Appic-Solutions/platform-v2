@@ -1,6 +1,5 @@
 import {
   ArrowsUpDownIcon,
-  BlockchainIcon,
   LockIcon,
   ParkOutlineBridgeIcon,
 } from "@/components/icons";
