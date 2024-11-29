@@ -107,6 +107,7 @@ const WalletPage = () => {
       className={cn(
         "flex items-center justify-evenly gap-2 relative min-w-fit lg:h-[42px]",
         "rounded-full bg-[#faf7fd]/50 border border-[#ECE6F5]",
+        "lg:col-span-2 lg:justify-self-end",
         (icpIdentity || isEvmConnected) && "px-3",
         "*:rounded-full"
       )}

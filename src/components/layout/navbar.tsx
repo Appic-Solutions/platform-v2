@@ -14,23 +14,41 @@ const NavbarPage = () => {
   const path = usePathname();
 
   return (
-    <nav
+    <ul
       className={cn(
-        "border-2 border-white/30 py-0.5 px-4 rounded-full text-white",
+        "fixed bottom-3.5 right-6 left-6 z-[999]",
+        "border-[1.63px] border-white/30 text-white rounded-full",
         "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]",
-        "w-full lg:w-auto md:py-1.5"
+        "grid grid-cols-4 items-center gap-x-1 py-1.5 px-3 h-[63px]",
+        "sm:h-[78px] sm:py-2 sm:px-4",
+        "md:w-full md:max-w-[610px] md:mx-auto",
+        "lg:static lg:col-span-8",
+        "xl:max-w-[775px]"
       )}
     >
-      <ul className="flex items-center justify-center gap-x-1.5 max-h-[60px] sm:justify-between">
-        {NAVBAR_ITEMS.map((item, idx) =>
-          item.active ? (
-            <li key={idx}>
-              <Link
-                href={item.href}
+      {NAVBAR_ITEMS.map((item, idx) =>
+        item.active ? (
+          <li key={idx} className={cn(
+            "w-full h-full flex items-center justify-center rounded-full",
+            path === item.href &&
+            "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]",
+            "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]",
+            "*:flex *:items-center *:justify-center *:w-full *:h-full *:gap-x-1.5"
+          )}>
+            <Link href={item.href}>
+              {item.Icon}
+              <span className={cn("hidden md:flex", "text-lg font-bold")}>
+                {item.label}
+              </span>
+            </Link>
+          </li>
+        ) : (
+          <TooltipProvider key={idx}>
+            <Tooltip>
+              <TooltipTrigger
+                key={idx}
                 className={cn(
-                  "flex items-center justify-center gap-x-1 rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4",
-                  path === item.href &&
-                  "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]",
+                  "w-full h-full flex items-center justify-center gap-x-1.5 rounded-full",
                   "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
                 )}
               >
@@ -38,31 +56,13 @@ const NavbarPage = () => {
                 <span className={cn("hidden md:flex", "text-lg font-bold")}>
                   {item.label}
                 </span>
-              </Link>
-            </li>
-          ) : (
-            <TooltipProvider key={idx}>
-              <Tooltip>
-                <TooltipTrigger
-                  key={idx}
-                  className={cn(
-                    "relative flex items-center justify-center gap-x-1 select-none",
-                    "rounded-full py-3 px-6 lg:px-8 xl:px-11 xl:py-4 group",
-                    "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]"
-                  )}
-                >
-                  {item.Icon}
-                  <span className={cn("hidden md:flex", "text-lg font-bold")}>
-                    {item.label}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>{item.tooltip}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )
-        )}
-      </ul>
-    </nav>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">{item.tooltip}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )
+      )}
+    </ul>
   );
 };
 
