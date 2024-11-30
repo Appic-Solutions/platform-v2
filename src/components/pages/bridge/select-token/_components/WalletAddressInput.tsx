@@ -60,7 +60,7 @@ const WalletAddressInput = ({
     <div
       className={cn(
         "overflow-hidden transition-[max-height] duration-300 ease-in-out",
-        show ? "max-h-[155px]" : "max-h-0"
+        show ? "max-h-[155px] mb-4" : "max-h-0"
       )}
     >
       <Card

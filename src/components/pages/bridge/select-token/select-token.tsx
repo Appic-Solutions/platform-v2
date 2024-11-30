@@ -116,44 +116,20 @@ export default function SelectTokenPage({
   };
 
   return (
-    <Box
-      className={cn(
-        "flex flex-col gap-4",
-        "lg:px-14 md:max-w-[617px] md:pb-10",
-        "h-full overflow-y-scroll md:overflow-hidden",
-        "lg:pb-8",
-        "transition-[max-height] duration-300 ease-in-out",
-        showWalletAddress ? "md:max-h-[750px]" : "md:max-h-[607px]",
-        amount && "lg:max-w-[1060px]"
-      )}
-    >
-      <div
-        className={cn(
-          "flex items-center justify-between w-full mb-5",
-          "text-white md:text-black md:dark:text-white"
-        )}
-      >
-        <h1
-          className={cn(
-            "text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold"
-          )}
-        >
+    <Box className="md:max-w-[612px] md:h-[607px] md:px-[65px] md:py-[55px]">
+
+      <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
+        <h1 className="text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold">
           Bridge
         </h1>
-        <Link
-          href="/transactions"
-          className="flex items-center gap-x-2 text-sm"
-        >
+        <Link href="/transactions" className="flex items-center gap-x-2 text-sm">
           <HistoryIcon width={20} height={20} />
-          <span>History</span>
+          History
         </Link>
       </div>
-      <div
-        className={cn(
-          "flex flex-col gap-4 w-full flex-1 justify-between",
-          "lg:flex-row lg:overflow-hidden"
-        )}
-      >
+
+      <div className="flex flex-col gap-4 w-full flex-1 justify-between lg:flex-row">
+
         {/* TOKENS AND AMOUNT INPUT */}
         <div className="flex flex-col justify-between h-full items-center gap-y-4 w-full lg:max-w-[482px]">
           <div className="flex flex-col gap-y-4 w-full h-full">
@@ -233,9 +209,7 @@ export default function SelectTokenPage({
             />
           </div>
           {/* DESKTOP ACTION BUTTONS */}
-          <div
-            className={cn("flex items-center gap-x-2 w-full", "max-lg:hidden")}
-          >
+          <div className={cn("flex items-center gap-x-2 w-full", "max-lg:hidden")}>
             <ActionButton isDisabled={disabled()}>
               {getButtonText()}
             </ActionButton>
@@ -250,6 +224,7 @@ export default function SelectTokenPage({
             </div>
           </div>
         </div>
+
         {/* BRIDGE OPTIONS */}
         {amount && (
           <BridgeOptionsList
@@ -257,7 +232,9 @@ export default function SelectTokenPage({
             handleOptionSelect={handleOptionSelect}
           />
         )}
+
       </div>
+
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn("flex items-center gap-x-2 w-full", "lg:hidden")}>
         <ActionButton isDisabled={disabled()}>{getButtonText()}</ActionButton>

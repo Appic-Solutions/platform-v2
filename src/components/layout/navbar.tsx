@@ -21,8 +21,7 @@ const NavbarPage = () => {
         "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]",
         "grid grid-cols-4 items-center gap-x-1 py-1.5 px-3 h-[63px]",
         "sm:h-[78px] sm:py-2 sm:px-4",
-        "md:w-full md:max-w-[610px] md:mx-auto",
-        "lg:static lg:col-span-8",
+        "md:w-full md:max-w-[610px] md:mx-auto md:static md:col-span-8",
         "xl:max-w-[775px]"
       )}
     >
@@ -37,7 +36,7 @@ const NavbarPage = () => {
           )}>
             <Link href={item.href}>
               {item.Icon}
-              <span className={cn("hidden md:flex", "text-lg font-bold")}>
+              <span className={cn("hidden md:flex", "lg:text-lg lg:font-bold")}>
                 {item.label}
               </span>
             </Link>
@@ -53,7 +52,7 @@ const NavbarPage = () => {
                 )}
               >
                 {item.Icon}
-                <span className={cn("hidden md:flex", "text-lg font-bold")}>
+                <span className={cn("hidden md:flex", "lg:text-lg lg:font-bold")}>
                   {item.label}
                 </span>
               </TooltipTrigger>

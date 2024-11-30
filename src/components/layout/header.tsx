@@ -9,14 +9,14 @@ const HeaderPage = () => {
   return (
     <header className={cn(
       "flex items-center justify-between px-6 pt-3.5 w-full",
-      "lg:grid lg:grid-cols-12 lg:place-items-center lg:justify-items-center",
-      "lg:pt-8 xl:px-16"
+      "md:grid md:grid-cols-12 md:place-items-center md:justify-items-center",
+      "md:pt-8 xl:px-16"
     )}>
 
       {/* Logo  */}
       <Link href="/" className={cn(
         "relative min-h-11 min-w-12 flex items-center justify-center",
-        "lg:col-span-2 lg:justify-self-start"
+        "md:col-span-2 md:justify-self-start"
       )}>
         <Image src={"/images/logo/white-logo.png"} alt="logo" fill />
       </Link>

@@ -76,16 +76,6 @@ const BridgeHome = () => {
             toToken={toToken}
           />
         );
-      // case 3:
-      //   return fromToken && toToken ? (
-      //     <SelectOptionPage
-      //       fromToken={fromToken}
-      //       toToken={toToken}
-      //       prevStepHandler={() => handleStepChange(1)}
-      //       nextStepHandler={() => handleStepChange("next")}
-      //       swapTokensHandler={swapTokensHandler}
-      //     />
-      //   ) : null;
       default:
         return null;
     }

@@ -13,7 +13,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "bg-primary-buttons w-full h-14 rounded-3xl text-white",
+          "bg-primary-buttons w-full h-14 rounded-[16px] text-white",
           isDisabled && "opacity-50 cursor-not-allowed"
         )}
         onClick={onClick}

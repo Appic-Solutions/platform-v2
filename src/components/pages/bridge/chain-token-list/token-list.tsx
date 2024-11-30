@@ -66,8 +66,8 @@ export default function TokenListPage({
   return (
     <Box
       className={cn(
-        "justify-normal md:max-w-[611px] md:max-h-[716px] md:pt-6",
-        "animate-slide-in opacity-0"
+        "justify-normal animate-slide-in opacity-0",
+        "md:max-w-[612px] md:h-[607px] md:px-9 md:py-8",
       )}
     >
       <BoxHeader title="Bridge From" onBack={prevStepHandler} />

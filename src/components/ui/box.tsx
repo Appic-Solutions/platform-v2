@@ -10,13 +10,14 @@ const Box: FC<BoxProps> = ({ children, className }) => {
   return (
     <div
       className={cn(
-        "relative overflow-hidden w-full h-fit px-6 pt-10 m-auto",
+        "max-md:px-6 max-md:pt-5",
+        "relative overflow-x-hidden overflow-y-auto",
+        "min-w-fit w-full h-full backdrop-blur-md",
         "flex flex-col items-center justify-between",
-        "md:border-[11px] md:border-box-border md:rounded-3xl md:pb-6",
+        "md:bg-box-background md:bg-center md:bg-no-repeat",
+        "md:border-[11px] md:border-box-border md:rounded-3xl md:m-auto",
+        "md:max-h-[75vh]",
         "*:z-10",
-        // Box Background
-        "backdrop-blur-md max-md:before:hidden before:content-[''] before:absolute before:inset-0",
-        "before:bg-box-background before:bg-center before:bg-no-repeat",
         className
       )}
     >
