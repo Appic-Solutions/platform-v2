@@ -88,8 +88,8 @@ const AdvancedTransactionCard = ({
           {/* details section */}
           <div
             className={cn(
-              "overflow-hidden transition-[height] duration-300 ease-in-out w-full",
-              showDetails ? "h-[250px]" : "h-0"
+              "transition-all duration-200 transform w-full",
+              showDetails ? "opacity-100 mb-4 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
             )}
           >
             <div className="flex items-center gap-x-2 mb-3">

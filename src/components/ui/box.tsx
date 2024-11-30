@@ -12,11 +12,11 @@ const Box: FC<BoxProps> = ({ children, className }) => {
       className={cn(
         "max-md:px-6 max-md:pt-5",
         "relative overflow-x-hidden overflow-y-auto",
-        "min-w-fit w-full h-full backdrop-blur-md",
+        "w-full h-fit backdrop-blur-md",
         "flex flex-col items-center justify-between",
         "md:bg-box-background md:bg-center md:bg-no-repeat",
-        "md:border-[11px] md:border-box-border md:rounded-3xl md:m-auto",
-        "md:max-h-[75vh]",
+        "md:ring-8 md:ring-box-border md:rounded-3xl md:m-auto",
+        "md:min-w-fit md:max-h-[80vh] md:min-h-fit",
         "*:z-10",
         className
       )}

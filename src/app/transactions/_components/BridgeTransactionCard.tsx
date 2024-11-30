@@ -77,7 +77,7 @@ const BridgeTransactionCard = ({
                 "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
                 status === "failed" && "border-2 border-solid border-red-500",
                 status === "pending" &&
-                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
+                "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
               )}
             >
               <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
@@ -146,10 +146,11 @@ const BridgeTransactionCard = ({
           {/* details section */}
           <div
             className={cn(
-              "overflow-auto transition-[height] duration-300 ease-in-out",
-              showDetails ? "h-[230px] mb-4" : "h-0"
+              "transition-all duration-200 transform",
+              showDetails ? "opacity-100 mb-4 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
             )}
           >
+          
             <div className="flex items-center gap-x-2 mb-3">
               <p className="text-secondary text-sm">Transaction ID: {id}</p>
               <button onClick={() => copyToClipboard(id)}>
@@ -170,7 +171,7 @@ const BridgeTransactionCard = ({
                       step.status === "pending" && "bg-[#12B76A33]",
                       step.status === "failed" && "bg-[#31201a73]",
                       index < steps.length - 1 &&
-                        "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
+                      "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
                     )}
                   >
                     {step.status === "completed" && (

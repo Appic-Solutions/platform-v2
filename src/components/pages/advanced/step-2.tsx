@@ -1,22 +1,31 @@
+import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { ArrowLongLeftIcon, ExpandLeftIcon } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Box from "@/components/ui/box";
 import { cn, getChainLogo, getChainName } from "@/lib/utils";
 
-export default function Step2({ stepHandler }: { stepHandler: (mode: "next" | "prev") => void }) {
+export default function Step2({
+  stepHandler,
+  selectedToken,
+  setSelectedToken
+}: {
+  stepHandler: (mode: "next" | "prev") => void,
+  selectedToken: EvmToken | IcpToken | null,
+  setSelectedToken: (token: EvmToken | IcpToken) => void
+}) {
 
   const data = [
     {
       title: "Original Token Name:",
-      value: "Acme Coin"
+      value: selectedToken?.name
     },
     {
       title: "Original Token Symbol:",
-      value: "ACME"
+      value: selectedToken?.symbol
     },
     {
       title: "Blockchain:",
-      value: "Internet Computer (ICP)"
+      value: getChainName(selectedToken?.chainId)
     },
     {
       title: "Twin Token Name:",
@@ -33,7 +42,7 @@ export default function Step2({ stepHandler }: { stepHandler: (mode: "next" | "p
   ]
 
   return (
-    <Box className="gap-y-5 justify-between h-full md:h-auto md:max-w-[612px] md:gap-y-16 md:px-10">
+    <Box className="gap-y-5 justify-between h-full md:h-auto md:max-w-[612px] md:gap-y-16 md:p-10">
 
 
       <div className="flex flex-col gap-y-8 w-full">
@@ -42,7 +51,7 @@ export default function Step2({ stepHandler }: { stepHandler: (mode: "next" | "p
             "flex items-center justify-center relative",
             "text-white md:text-black dark:text-white text-2xl font-bold",
             "md:text-4xl"
-          )}        >
+          )}>
           Token Summary
 
           <button
@@ -58,8 +67,8 @@ export default function Step2({ stepHandler }: { stepHandler: (mode: "next" | "p
         <div className="flex items-center self-start gap-4">
           <div className="relative">
             <Avatar className=" w-12 h-12 rounded-full">
-              <AvatarImage src={getChainLogo(137)} />
-              <AvatarFallback>Polygon</AvatarFallback>
+              <AvatarImage src={getChainLogo(selectedToken?.chainId)} />
+              <AvatarFallback>{getChainName(selectedToken?.chainId)}</AvatarFallback>
             </Avatar>
             <Avatar
               className={cn(
@@ -67,13 +76,13 @@ export default function Step2({ stepHandler }: { stepHandler: (mode: "next" | "p
                 "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
               )}
             >
-              <AvatarImage src={getChainLogo(137)} />
-              <AvatarFallback>Polygon</AvatarFallback>
+              <AvatarImage src={getChainLogo(selectedToken?.chainId)} />
+              <AvatarFallback>{getChainName(selectedToken?.chainId)}</AvatarFallback>
             </Avatar>
           </div>
           <div className="text-white md:text-black dark:text-white">
-            <p className="text-2xl">ACME Twin</p>
-            <p className="text-lg">{getChainName(137)}</p>
+            <p className="text-2xl">{selectedToken?.name}</p>
+            <p className="text-lg">{getChainName(selectedToken?.chainId)}</p>
           </div>
         </div>
 
@@ -86,7 +95,6 @@ export default function Step2({ stepHandler }: { stepHandler: (mode: "next" | "p
               )}>
                 <p className="font-medium">{item.title}</p>
                 <p className={cn(
-                  "md:text-[#464646] dark:md:text-black",
                   idx === 5 && "text-[#27AE60]"
                 )}>
                   {item.value}

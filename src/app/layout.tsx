@@ -10,9 +10,9 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en" className="dark bg-[#060607] relative overflow-hidden h-full pb-24 sm:pb-28 md:pb-0">
+    <html lang="en" className="dark bg-[#060607] relative overflow-hidden h-full">
       <WalletWrapper>
-        <body className="flex flex-col h-full isolate">
+        <body className="flex flex-col h-full isolate pb-24 sm:pb-28 md:pb-0">
           <HeaderPage />
           <ShapesPage />
           {children}

@@ -16,7 +16,7 @@ const NavbarPage = () => {
   return (
     <ul
       className={cn(
-        "fixed bottom-3.5 right-6 left-6 z-[999]",
+        "fixed bottom-3.5 right-6 left-6 z-[99]",
         "border-[1.63px] border-white/30 text-white rounded-full",
         "bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]",
         "grid grid-cols-4 items-center gap-x-1 py-1.5 px-3 h-[63px]",

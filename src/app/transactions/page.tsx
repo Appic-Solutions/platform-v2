@@ -76,7 +76,7 @@ const TransactionsPage = () => {
           {/* mobile title */}
           <div
             className={cn(
-              "items-center justify-center my-6 flex",
+              "flex items-center justify-center my-6",
               "text-white md:text-black md:dark:text-white md:hidden"
             )}
           >
@@ -101,7 +101,7 @@ const TransactionsPage = () => {
           />
           <Box
             className={cn(
-              "flex flex-col z-20 w-full h-full m-0 gap-0 px-0 pt-0 md:px-6 md:pt-6 overflow-visible",
+              "flex flex-col z-20 w-full h-full m-0 gap-0 max-md:max-h-fit max-md:px-0 pt-0 md:px-6 md:pt-6 overflow-visible",
               "lg:pb-8",
               "transition-[max-height] duration-300 ease-in-out justify-start"
             )}
@@ -127,7 +127,7 @@ const TransactionsPage = () => {
                 {tabTitleConverter(selectedTab)}
               </p>
             </div>
-            <div className="w-full h-[calc(100%-80px)]">
+            <div className="w-full ">
               <TransactionTabsContent
                 value={selectedTab}
                 transactions={selectedTransactions}

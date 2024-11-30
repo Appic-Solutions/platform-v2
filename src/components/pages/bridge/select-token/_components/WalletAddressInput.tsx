@@ -84,7 +84,7 @@ const WalletAddressInput = ({
             <input
               type="text"
               maxLength={token?.chainTypes === "ICP" ? 64 : 42}
-              placeholder="0x0f70e...65A63"
+              placeholder={token?.chainTypes === "ICP" ? "2vxsx-fae..." : "0x0f70e...65A63"}
               value={address}
               onChange={handleAddressChange}
               className={cn(

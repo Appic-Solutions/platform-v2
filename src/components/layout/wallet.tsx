@@ -26,12 +26,10 @@ import { IcpToken } from "@/blockchain_api/types/tokens";
 import WalletCard from "./wallet/wallet-card";
 import { WalletPop } from "./wallet/wallet-pop";
 import { getStorageItem } from "@/lib/localstorage";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from "../ui/drawer";
 
 const WalletPage = () => {
   // States Management
-  const [showPopover, setShowPopover] = useState(false);
-  const [showEvmPopover, setShowEvmPopover] = useState(false);
-  const [showIcpPopover, setShowIcpPopover] = useState(false);
   const [icpBalance, setIcpBalance] = useState<{
     tokens: IcpToken[];
     totalBalanceUsd: string;
@@ -113,38 +111,71 @@ const WalletPage = () => {
       )}
     >
       {!icpIdentity || !isEvmConnected ? (
-        <Popover open={showPopover} onOpenChange={setShowPopover}>
-          <PopoverTrigger className="w-full font-medium text-sm text-white py-2 px-3">
-            + Add Wallet
-          </PopoverTrigger>
-          <PopoverContent
-            className="w-72 translate-y-4 flex flex-col gap-y-4"
-            align="end"
-          >
-            <div className="flex items-center justify-center font-medium text-white">
-              <PopoverClose className="absolute top-4 right-4">
-                <CloseIcon width={20} height={20} />
-              </PopoverClose>
-              Select Wallet
-            </div>
-            <div className="flex flex-col gap-4">
-              {!icpIdentity && (
-                <WalletCard
-                  connectWallet={() => connectIcp()}
-                  walletLogo="/images/logo/wallet_logos/icp.svg"
-                  walletTitle="Connect ICP Wallet"
-                />
-              )}
-              {!isEvmConnected && (
-                <WalletCard
-                  connectWallet={() => openEvmModal()}
-                  walletLogo={getChainLogo(chainId)}
-                  walletTitle="Connect EVM Wallet"
-                />
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
+        <>
+          <div className="md:hidden">
+            <Drawer>
+              <DrawerTrigger className="w-full font-medium text-sm text-white py-2 px-3">
+                Connect Wallet
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  Select Wallet
+                </DrawerHeader>
+                <div className="flex flex-col gap-4">
+                  {!icpIdentity && (
+                    <WalletCard
+                      connectWallet={() => connectIcp()}
+                      walletLogo="/images/logo/wallet_logos/icp.svg"
+                      walletTitle="Connect ICP Wallet"
+                    />
+                  )}
+                  {!isEvmConnected && (
+                    <WalletCard
+                      connectWallet={() => openEvmModal()}
+                      walletLogo={getChainLogo(chainId)}
+                      walletTitle="Connect EVM Wallet"
+                    />
+                  )}
+                </div>
+              </DrawerContent>
+            </Drawer>
+          </div>
+
+          <div className="hidden md:block">
+            <Popover>
+              <PopoverTrigger className="w-full font-medium text-sm text-white py-2 px-3">
+                Connect Wallet
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-72 translate-y-4 flex flex-col gap-y-4"
+                align="end"
+              >
+                <div className="flex items-center justify-center font-medium text-white">
+                  <PopoverClose className="absolute top-4 right-4">
+                    <CloseIcon width={20} height={20} />
+                  </PopoverClose>
+                  Select Wallet
+                </div>
+                <div className="flex flex-col gap-4">
+                  {!icpIdentity && (
+                    <WalletCard
+                      connectWallet={() => connectIcp()}
+                      walletLogo="/images/logo/wallet_logos/icp.svg"
+                      walletTitle="Connect ICP Wallet"
+                    />
+                  )}
+                  {!isEvmConnected && (
+                    <WalletCard
+                      connectWallet={() => openEvmModal()}
+                      walletLogo={getChainLogo(chainId)}
+                      walletTitle="Connect EVM Wallet"
+                    />
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </>
       ) : (
         <div className="text-black dark:text-white text-sm py-2 px-3">
           <span className="hidden md:inline-block">Connected</span>{" "}
@@ -154,8 +185,6 @@ const WalletPage = () => {
 
       {icpBalance && (
         <WalletPop
-          open={showIcpPopover}
-          openOnChange={setShowIcpPopover}
           logo="/images/logo/wallet_logos/icp.svg"
           title="Your ICP Wallet"
           balance={icpBalance}
@@ -167,8 +196,6 @@ const WalletPage = () => {
 
       {evmBalance && (
         <WalletPop
-          open={showEvmPopover}
-          openOnChange={setShowEvmPopover}
           logo={getChainLogo(chainId)}
           title="Your EVM Wallet"
           balance={evmBalance}
