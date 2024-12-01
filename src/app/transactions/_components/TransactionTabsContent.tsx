@@ -17,7 +17,7 @@ const TransactionTabsContent = ({
   return (
     <TabsContent
       value={value}
-      className="flex flex-col w-full h-full mt-0 overflow-y-visible md:overflow-y-scroll gap-y-4"
+      className="flex flex-col justify-start w-full h-full mt-0 overflow-y-visible md:overflow-y-auto gap-y-4"
     >
       {transactions.length > 0 ? (
         transactions.map((transaction) => (

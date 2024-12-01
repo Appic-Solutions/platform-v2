@@ -8,7 +8,7 @@ interface BridgeOptionProps {
   option: BridgeOptionType;
   isSelected: boolean;
   isExpanded: boolean;
-  onSelect: (option: BridgeOptionType) => void;
+  handleOptionSelect: (option: BridgeOptionType) => void;
   onExpand: (option: BridgeOptionType) => void;
   className?: string;
 }
@@ -16,26 +16,21 @@ interface BridgeOptionProps {
 const BridgeOption = ({
   isSelected,
   isExpanded,
-  onSelect,
+  handleOptionSelect,
   onExpand,
   option,
   className,
 }: BridgeOptionProps) => {
   return (
     <Card
-      onClick={() => option.isActive && onSelect(option)}
+      onClick={() => handleOptionSelect(option)}
       className={cn(
-        "py-2 md:py-2 lg:py-2 flex-col gap-3 items-start justify-center",
-        "min-w-[300px]",
-        "px-6",
-        "md:px-6",
+        "!py-4 px-4 border min-w-[300px] flex-col gap-3 items-start justify-between overflow-hidden rounded-[20px]",
+        "md:px-6 md:rounded-[36px]",
+        "transition duration-300",
         option.isActive && "cursor-pointer",
         option.isBest && "bg-highlighted-card",
-        isSelected && "border-2 border-blue-600",
-        "h-[165px]",
-        isExpanded && "!h-[360px]",
-        "overflow-hidden",
-        "transition-[height] duration-300 ease-out",
+        isSelected ? "border-blue-600" : "border-gray-700",
         className
       )}
       key={option.id}
@@ -46,8 +41,8 @@ const BridgeOption = ({
           {option.isBest && (
             <p
               className={cn(
-                "text-muted text-xs lg:text-sm font-thin",
-                "bg-primary-buttons text-white rounded-[10px] px-2 w-fit",
+                "text-muted text-xs md:text-sm font-thin py-1 px-2 rounded-[10px] w-fit",
+                "bg-primary-buttons text-white",
                 !option.isActive && "opacity-50"
               )}
             >
@@ -59,7 +54,6 @@ const BridgeOption = ({
           onClick={() => option.isActive && onExpand(option)}
           className={cn(
             "bg-gray-400 bg-opacity-20 rounded-[10px] p-2 flex items-center ml-auto",
-            "transition-transform duration-300",
             isExpanded && "rotate-180",
             !option.isActive && "opacity-30"
           )}
@@ -70,8 +64,8 @@ const BridgeOption = ({
       {/* middle section */}
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-x-3">
-          <div className="border-2 border-primary rounded-full p-3">
-            <div className={cn("relative w-6 h-6", "lg:w-10 lg:h-10")}>
+          <div className="border-2 border-white/50 rounded-full p-2">
+            <div className={cn("relative w-7 h-7", "lg:w-10 lg:h-10")}>
               <Image
                 src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
                 alt="btc"
@@ -132,31 +126,38 @@ const BridgeOption = ({
       </div>
 
       {/* Expanded content */}
-      {isExpanded && (
-        <div className="mt-4 w-full border-t border-gray-200 dark:border-gray-700 pt-4">
-          <div className="space-y-4">
-            <p className="text-sm font-medium">Additional Details:</p>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Network Fee:</span>
-                <span>0.001 ETH</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Estimated Time:</span>
-                <span>{option.time} mins</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Route:</span>
-                <span>Direct Bridge</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted">Security:</span>
-                <span>High</span>
-              </div>
+
+      <div
+        className={cn(
+          "w-full border-t border-gray-200 dark:border-gray-700",
+          "transition-all duration-300 transform",
+          isExpanded
+            ? "opacity-100 mb-4 translate-y-0 pt-4 mt-4"
+            : "opacity-0 h-0 overflow-hidden -translate-y-2"
+        )}
+      >
+        <div className="space-y-4">
+          <p className="text-sm font-medium">Additional Details:</p>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted">Network Fee:</span>
+              <span>0.001 ETH</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted">Estimated Time:</span>
+              <span>{option.time} mins</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted">Route:</span>
+              <span>Direct Bridge</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted">Security:</span>
+              <span>High</span>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </Card>
   );
 };

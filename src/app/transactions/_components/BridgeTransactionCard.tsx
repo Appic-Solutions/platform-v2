@@ -25,6 +25,7 @@ const BridgeTransactionCard = ({
   time,
   className,
   type,
+  completedStep,
 }: Transaction & {
   className?: string;
 }) => {
@@ -70,24 +71,30 @@ const BridgeTransactionCard = ({
           </div>
           {/* connecting line and bridge icon */}
           <div className="flex items-center justify-center w-full">
-            <div className="h-[3px] flex-1 bg-black" />
+            <div
+              className={cn(
+                "h-[3px] flex-1 border-t-[3px] border-black",
+                completedStep === 0 && "border-dashed",
+                completedStep > 1 && "border-solid"
+              )}
+            />
             <div
               className={cn(
                 "rounded-full p-3 z-10 relative",
                 "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
                 status === "failed" && "border-2 border-solid border-red-500",
                 status === "pending" &&
-                "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
+                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
               )}
             >
               <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
             </div>
             <div
               className={cn(
-                "h-[3px] flex-1 border-t-[3px]",
-                status === "pending" && "border-dashed border-black",
-                status === "completed" && "border-solid border-black",
-                status === "failed" && "border-solid border-red-500"
+                "h-[3px] flex-1 border-t-[3px]  border-black",
+                completedStep === 0 && "border-dashed",
+                completedStep > 1 && "border-solid",
+                status === "failed" && "border-red-500"
               )}
             />
           </div>
@@ -147,10 +154,11 @@ const BridgeTransactionCard = ({
           <div
             className={cn(
               "transition-all duration-200 transform",
-              showDetails ? "opacity-100 mb-4 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
+              showDetails
+                ? "opacity-100 mb-4 translate-y-0"
+                : "opacity-0 h-0 overflow-hidden -translate-y-2"
             )}
           >
-          
             <div className="flex items-center gap-x-2 mb-3">
               <p className="text-secondary text-sm">Transaction ID: {id}</p>
               <button onClick={() => copyToClipboard(id)}>
@@ -171,7 +179,7 @@ const BridgeTransactionCard = ({
                       step.status === "pending" && "bg-[#12B76A33]",
                       step.status === "failed" && "bg-[#31201a73]",
                       index < steps.length - 1 &&
-                      "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
+                        "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
                     )}
                   >
                     {step.status === "completed" && (

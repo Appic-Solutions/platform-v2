@@ -1,7 +1,7 @@
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { ArrowsUpDownIcon } from "@/components/icons";
 import Box from "@/components/ui/box";
-import { cn } from "@/lib/utils";
+import { cn, getChainLogo } from "@/lib/utils";
 import { TokenCard } from "./_components/TokenCard";
 import AmountInput from "./_components/AmountInput";
 import { useState } from "react";
@@ -22,6 +22,10 @@ interface SelectTokenProps {
   fromToken: EvmToken | IcpToken | null;
   toToken: EvmToken | IcpToken | null;
   swapTokensHandler: () => void;
+  handleOptionSelect: (option: BridgeOptionType) => void;
+  selectedOption: BridgeOptionType | null;
+  amount: string;
+  setAmount: (amount: string) => void;
 }
 
 export default function SelectTokenPage({
@@ -30,22 +34,23 @@ export default function SelectTokenPage({
   fromToken,
   toToken,
   swapTokensHandler,
+  handleOptionSelect,
+  selectedOption,
+  amount,
+  setAmount,
 }: SelectTokenProps) {
-  const [amount, setAmount] = useState("");
   const [usdPrice, setUsdPrice] = useState("0");
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [toWalletAddress, setToWalletAddress] = useState("");
   const [toWalletValidationError, setToWalletValidationError] = useState<
     string | null
   >(null);
-  const [selectedOption, setSelectedOption] = useState<BridgeOptionType | null>(
-    null
-  );
 
   const { isConnected: isEvmConnected } = useAppKitAccount();
   const icpAgent = useIdentity();
 
   const disabled = () => {
+    if (!selectedOption) return true;
     if (!fromToken || !toToken) return true;
     if (
       fromToken.contractAddress === toToken.contractAddress &&
@@ -109,29 +114,32 @@ export default function SelectTokenPage({
     return isDestWalletDisconnected ? "Connect Destination Wallet" : "Confirm";
   };
 
-  const handleOptionSelect = (option: BridgeOptionType) => {
-    if (option.isActive) {
-      setSelectedOption(option);
-    }
-  };
-
   return (
-    <Box className="md:max-w-[612px] md:h-[607px] md:px-[65px] md:py-[55px]">
-
+    <Box
+      className={cn(
+        "flex flex-col gap-4 h-full md:min-h-[10vh]",
+        "md:px-[65px] md:py-[55px] md:max-w-[617px]",
+        "overflow-x-hidden",
+        "transition-[max-height] duration-300 ease-in-out",
+        amount && "lg:max-w-[1060px]",
+        showWalletAddress ? "md:max-h-[770px]" : "md:max-h-[607px]"
+      )}
+    >
       <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
         <h1 className="text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold">
           Bridge
         </h1>
-        <Link href="/transactions" className="flex items-center gap-x-2 text-sm">
+        <Link
+          href="/transactions"
+          className="flex items-center gap-x-2 text-sm"
+        >
           <HistoryIcon width={20} height={20} />
           History
         </Link>
       </div>
-
-      <div className="flex flex-col gap-4 w-full flex-1 justify-between lg:flex-row">
-
+      <div className="flex flex-col gap-x-4 flex-1 justify-between lg:flex-row lg:overflow-hidden w-full">
         {/* TOKENS AND AMOUNT INPUT */}
-        <div className="flex flex-col justify-between h-full items-center gap-y-4 w-full lg:max-w-[482px]">
+        <div className="flex flex-col justify-between h-full items-center gap-y-4 w-full lg:max-w-[482px] md:overflow-y-hidden">
           <div className="flex flex-col gap-y-4 w-full h-full">
             {/* TOKENS */}
             <div
@@ -206,11 +214,17 @@ export default function SelectTokenPage({
               validationError={toWalletValidationError}
               onValidationError={setToWalletValidationError}
               show={showWalletAddress}
+              avatar={getChainLogo(toToken?.chainId)}
             />
           </div>
           {/* DESKTOP ACTION BUTTONS */}
-          <div className={cn("flex items-center gap-x-2 w-full", "max-lg:hidden")}>
-            <ActionButton isDisabled={disabled()}>
+          <div
+            className={cn("flex items-center gap-x-2 w-full", "max-lg:hidden")}
+          >
+            <ActionButton
+              onClick={() => stepHandler(3)}
+              isDisabled={disabled()}
+            >
               {getButtonText()}
             </ActionButton>
             <div
@@ -232,12 +246,12 @@ export default function SelectTokenPage({
             handleOptionSelect={handleOptionSelect}
           />
         )}
-
       </div>
-
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn("flex items-center gap-x-2 w-full", "lg:hidden")}>
-        <ActionButton isDisabled={disabled()}>{getButtonText()}</ActionButton>
+        <ActionButton onClick={() => stepHandler(3)} isDisabled={disabled()}>
+          {getButtonText()}
+        </ActionButton>
         <div
           onClick={() => setShowWalletAddress(!showWalletAddress)}
           className={cn(

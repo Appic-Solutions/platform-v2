@@ -2,9 +2,9 @@ import { IcpToken } from "@/blockchain_api/types/tokens";
 import { EvmToken } from "@/blockchain_api/types/tokens";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { cn, getChainLogo } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import React from "react";
-import { isValidEvmAddress } from "@/lib/validation";
+import { isValidEvmAddress, isValidIcpAddress } from "@/lib/validation";
 
 interface WalletAddressInputProps {
   token: EvmToken | IcpToken | null;
@@ -14,6 +14,7 @@ interface WalletAddressInputProps {
   onValidationError: (error: string | null) => void;
   onWalletAddressChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   show: boolean;
+  avatar: string;
 }
 
 const WalletAddressInput = ({
@@ -24,16 +25,17 @@ const WalletAddressInput = ({
   onValidationError,
   onWalletAddressChange,
   show,
+  avatar,
 }: WalletAddressInputProps) => {
   const validateWalletAddress = (address: string) => {
+    if (!token) return false;
     if (!address) {
       onValidationError?.("Wallet Address cannot be empty");
       return false;
     }
 
     if (token?.chainTypes === "ICP") {
-      const icpAddressRegex = /^[a-z0-9]{64}$/i;
-      const isValid = icpAddressRegex.test(address);
+      const isValid = isValidIcpAddress(address);
       if (!isValid) {
         onValidationError?.("ICP Wallet Address is not valid");
         return false;
@@ -45,7 +47,6 @@ const WalletAddressInput = ({
         return false;
       }
     }
-
     onValidationError?.(null);
     return true;
   };
@@ -69,30 +70,28 @@ const WalletAddressInput = ({
         )}
       >
         <p className="text-sm font-semibold">Send To Wallet</p>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 w-full">
           <div className="relative">
             <Avatar className=" w-11 h-11 rounded-full">
-              <AvatarImage
-                src={
-                  getChainLogo(token?.chainId) || "images/logo/placeholder.png"
-                }
-              />
+              <AvatarImage src={avatar} />
               <AvatarFallback>{token?.symbol}</AvatarFallback>
             </Avatar>
           </div>
-          <div>
+          <div className="w-full">
             <input
               type="text"
               maxLength={token?.chainTypes === "ICP" ? 64 : 42}
-              placeholder={token?.chainTypes === "ICP" ? "2vxsx-fae..." : "0x0f70e...65A63"}
+              placeholder={
+                token?.chainTypes === "ICP" ? "2vxsx-fae..." : "0x0f70e...65A63"
+              }
               value={address}
               onChange={handleAddressChange}
               className={cn(
-                "border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none",
+                "border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none w-full",
                 "bg-transparent text-primary",
                 "placeholder:text-muted",
-                "w-full",
-                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                address.length > 30 && "text-lg"
               )}
             />
             {validationError && (

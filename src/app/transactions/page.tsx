@@ -56,11 +56,11 @@ const TransactionsPage = () => {
   return (
     <div
       className={cn(
-        "relative overflow-y-scroll md:overflow-y-hidden w-full h-fit px-6 m-auto",
+        "relative overflow-y-hidden md:overflow-y-hidden w-full h-full px-6 m-auto",
         "flex justify-center items-center",
         "*:z-10",
         "flex gap-4",
-        "h-full w-full"
+        "pb-36 md:pb-0"
       )}
     >
       <Tabs
@@ -69,7 +69,7 @@ const TransactionsPage = () => {
       >
         <div
           className={cn(
-            "w-full h-full overflow-visible relative m-auto",
+            "w-full h-full relative m-auto",
             "md:max-w-[617px] md:max-h-[750px]"
           )}
         >
@@ -101,9 +101,10 @@ const TransactionsPage = () => {
           />
           <Box
             className={cn(
-              "flex flex-col z-20 w-full h-full m-0 gap-0 max-md:max-h-fit max-md:px-0 pt-0 md:px-6 md:pt-6 overflow-visible",
-              "lg:pb-8",
-              "transition-[max-height] duration-300 ease-in-out justify-start"
+              "flex flex-col gap-4 h-full md:min-h-[10vh] justify-start max-md:px-0",
+              "md:px-[35px] md:py-[30px] md:max-w-[617px]",
+              "overflow-hidden",
+              "transition-[max-height] duration-300 ease-in-out"
             )}
           >
             {/* desktop title */}
@@ -127,7 +128,7 @@ const TransactionsPage = () => {
                 {tabTitleConverter(selectedTab)}
               </p>
             </div>
-            <div className="w-full ">
+            <div className="w-full overflow-y-scroll">
               <TransactionTabsContent
                 value={selectedTab}
                 transactions={selectedTransactions}

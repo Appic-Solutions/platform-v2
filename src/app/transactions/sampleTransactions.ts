@@ -28,6 +28,7 @@ export interface Transaction {
   sourceToken: TokenInfo;
   destinationToken: TokenInfo;
   status: "completed" | "pending" | "failed";
+  completedStep: 0 | 1 | 2;
   bridgeProvider: {
     name: string;
     logo: string;
@@ -52,6 +53,7 @@ export const sampleTransactions: Transaction[] = [
     date: "January 11, 2024",
     time: "6:32am",
     type: "bridge",
+    completedStep: 0,
     sourceToken: {
       chainId: 137,
       amount: "0.1241235",
@@ -105,6 +107,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Ethereum",
     },
     status: "failed",
+    completedStep: 1,
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -153,6 +156,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Ethereum",
     },
     status: "completed",
+    completedStep: 2,
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -197,6 +201,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Optimism",
     },
     status: "pending",
+    completedStep: 0,
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -240,6 +245,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Solana",
     },
     status: "completed",
+    completedStep: 2,
     bridgeProvider: {
       name: "Twin Token",
       logo: "/images/logo/bridge-providers/twin.svg",
@@ -286,6 +292,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Optimism",
     },
     status: "pending",
+    completedStep: 1,
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -326,6 +333,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Solana",
     },
     status: "completed",
+    completedStep: 2,
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",
@@ -384,6 +392,7 @@ export const sampleTransactions: Transaction[] = [
       name: "ETH on Arbitrum",
     },
     status: "failed",
+    completedStep: 0,
     bridgeProvider: {
       name: "Li.FI",
       logo: "/images/logo/bridge-providers/lifi.svg",

@@ -21,13 +21,13 @@ const options: BridgeOptionType[] = [
     amount: 1.154844,
     via: "ICP",
     time: 10,
-    usdPrice: 1.24,
+    usdPrice: 1.84,
     isBest: true,
     isActive: true,
   },
   {
     id: 2,
-    amount: 1.154844,
+    amount: 1.222,
     via: "ICP",
     time: 10,
     usdPrice: 1.24,
@@ -36,10 +36,10 @@ const options: BridgeOptionType[] = [
   },
   {
     id: 3,
-    amount: 1.154844,
+    amount: 1.363154,
     via: "ICP",
     time: 10,
-    usdPrice: 1.24,
+    usdPrice: 1.51,
     isBest: false,
     isActive: false,
   },
@@ -83,27 +83,27 @@ const BridgeOptionsList = ({
   return (
     <div
       className={cn(
-        "flex flex-col items-start w-full",
-        "lg:max-w-[45%] md:pr-2",
+        "flex flex-col items-start mb-5 max-h-full",
+        "lg:w-full md:pr-2",
         "animate-slide-in opacity-0"
       )}
     >
       <div
         className={cn(
-          "w-full flex lg:flex-col gap-4",
-          "lg:min-h-0 lg:max-h-full",
-          "overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto",
+          "flex lg:flex-col gap-4 w-full",
+          "lg:h-full",
+          "overflow-x-auto lg:overflow-y-auto",
           "pr-4 hide-scrollbar"
         )}
       >
         {!isLoading ? (
           options.map((item) => (
-            <div key={item.id} className="flex-shrink-0 h-fit">
+            <div key={item.id} className="flex-shrink-1 h-fit">
               <BridgeOption
                 option={item}
                 isSelected={selectedOption?.id === item.id}
                 isExpanded={expandedOption?.id === item.id}
-                onSelect={handleOptionSelect}
+                handleOptionSelect={(option) => handleOptionSelect(option)}
                 onExpand={handleExpand}
               />
             </div>

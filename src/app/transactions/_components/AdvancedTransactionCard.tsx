@@ -59,23 +59,15 @@ const AdvancedTransactionCard = ({
               </Avatar>
             </div>
             <div className="flex flex-col items-start">
-              <div
-                className={cn(
-                  "flex flex-col items-start md:flex-row md:items-center gap-x-1",
-                  showDetails
-                    ? "text-secondary text-xs md:text-sm"
-                    : "text-primary text-lg md:text-2xl"
-                )}
-              >
-                <span>{sourceToken.symbol}</span>
-                <span>on</span>
-                <span>{getChainName(destinationToken.chainId)}</span>
-              </div>
-              {showDetails && (
-                <span className="text-primary text-xl md:text-2xl">
-                  {sourceToken.amount}
+              <div className={cn("flex flex-col items-start gap-x-1")}>
+                <span className="text-primary text-lg md:text-2xl">
+                  {sourceToken.symbol}
                 </span>
-              )}
+                <div className="flex items-center gap-x-1 text-secondary text-xs md:text-sm">
+                  <span>on</span>
+                  <span>{getChainName(destinationToken.chainId)}</span>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-x-1 bg-black text-white rounded-full px-2 md:px-6 py-2">
@@ -89,7 +81,9 @@ const AdvancedTransactionCard = ({
           <div
             className={cn(
               "transition-all duration-200 transform w-full",
-              showDetails ? "opacity-100 mb-4 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
+              showDetails
+                ? "opacity-100 mb-4 translate-y-0"
+                : "opacity-0 h-0 overflow-hidden -translate-y-2"
             )}
           >
             <div className="flex items-center gap-x-2 mb-3">
