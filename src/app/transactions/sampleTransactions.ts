@@ -49,7 +49,7 @@ export interface Transaction {
 export const sampleTransactions: Transaction[] = [
   // bridge transactions
   {
-    id: "QW424532",
+    id: "QW4245232",
     date: "January 11, 2024",
     time: "6:32am",
     type: "bridge",
@@ -88,7 +88,7 @@ export const sampleTransactions: Transaction[] = [
     ],
   },
   {
-    id: "QW424532",
+    id: "QW42S45232",
     date: "January 11, 2024",
     time: "6:32am",
     type: "bridge",
@@ -182,7 +182,7 @@ export const sampleTransactions: Transaction[] = [
   },
   // advanced transactions
   {
-    id: "QW424533",
+    id: "QW424S533",
     date: "January 11, 2024",
     time: "6:40am",
     type: "advanced",

@@ -130,7 +130,7 @@ export default function SelectTokenPage({
           Bridge
         </h1>
         <Link
-          href="/transactions"
+          href="/transactions#bridge"
           className="flex items-center gap-x-2 text-sm"
         >
           <HistoryIcon width={20} height={20} />

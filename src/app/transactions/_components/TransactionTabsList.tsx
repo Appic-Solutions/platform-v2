@@ -27,7 +27,7 @@ const TransactionTabsList = ({
           value={item.value}
           onClick={() => customOnClick(item.value)}
         >
-          {item.Icon ? item.Icon : item.label}
+          {item.Icon}
         </TabsTrigger>
       ))}
     </TabsList>

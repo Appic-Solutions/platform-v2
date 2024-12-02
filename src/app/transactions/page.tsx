@@ -9,18 +9,25 @@ import {
 } from "@/constants/layout/transactions";
 import { sampleTransactions, Transaction } from "./sampleTransactions";
 import { useEffect, useState } from "react";
-import { ExpandLeftIcon } from "@/components/icons";
-import Link from "next/link";
 import TransactionTabsList from "./_components/TransactionTabsList";
 import TransactionTabsContent from "./_components/TransactionTabsContent";
+import BackButton from "@/components/ui/BackButton";
 
 const TransactionsPage = () => {
   const [selectedTab, setSelectedTab] = useState<TransactionTabItem["value"]>(
     TRANSACTION_TAB_ITEMS[0].value
   );
-
   const [selectedTransactions, setSelectedTransactions] =
     useState<Transaction[]>(sampleTransactions);
+
+  useEffect(() => {
+    if (window.location.hash) {
+      const newTab = window.location.hash.slice(
+        1
+      ) as TransactionTabItem["value"];
+      setSelectedTab(newTab);
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedTab === "bridge") {
@@ -64,7 +71,10 @@ const TransactionsPage = () => {
       )}
     >
       <Tabs
-        defaultValue={selectedTab}
+        value={selectedTab}
+        onValueChange={(value) => {
+          setSelectedTab(value as TransactionTabItem["value"]);
+        }}
         className="w-full h-full flex justify-center items-start m-auto relative"
       >
         <div
@@ -80,24 +90,16 @@ const TransactionsPage = () => {
               "text-white md:text-black md:dark:text-white md:hidden"
             )}
           >
-            <Link
-              href="/"
-              className={cn(
-                "flex items-center justify-center gap-x-1",
-                "absolute left-0 font-semibold md:left-8"
-              )}
-            >
-              <ExpandLeftIcon width={18} height={18} />
-              Back
-            </Link>
+            <BackButton />
             <p className="text-xl md:text-3xl font-bold">
               {tabTitleConverter(selectedTab)}
             </p>
           </div>
           <TransactionTabsList
-            customOnClick={(tab) =>
-              setSelectedTab(tab as TransactionTabItem["value"])
-            }
+            customOnClick={(tab) => {
+              setSelectedTab(tab as TransactionTabItem["value"]);
+              window.location.hash = tab;
+            }}
           />
           <Box
             className={cn(
@@ -114,16 +116,8 @@ const TransactionsPage = () => {
                 "text-white md:text-black md:dark:text-white md:flex"
               )}
             >
-              <Link
-                href="/"
-                className={cn(
-                  "flex items-center justify-center gap-x-1",
-                  "absolute left-4 font-semibold md:left-8"
-                )}
-              >
-                <ExpandLeftIcon width={18} height={18} />
-                Back
-              </Link>
+              <BackButton />
+
               <p className="text-xl md:text-3xl font-bold">
                 {tabTitleConverter(selectedTab)}
               </p>

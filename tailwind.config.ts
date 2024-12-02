@@ -52,6 +52,11 @@ const config: Config = {
         "appic-shadow": "4px 4px 0px 0px #00000040",
       },
 
+      /* Screen Sizes */
+      screens: {
+        xs: "480px",
+      },
+
       /* Keyframes */
       keyframes: {
         slideInFromRight: {

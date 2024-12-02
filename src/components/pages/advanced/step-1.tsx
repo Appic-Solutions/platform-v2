@@ -6,50 +6,67 @@ import { cn, getChainName } from "@/lib/utils";
 import { useState } from "react";
 import TokenListPage from "./chain-token-list/token-list";
 import RHFInput from "@/components/rhf/rhf-input";
+import Link from "next/link";
+import HistoryIcon from "@/components/icons/history";
 
 export default function Step1({
   stepHandler,
   selectedToken,
-  setSelectedToken
+  setSelectedToken,
 }: {
-  stepHandler: (mode: "next" | "prev") => void,
-  selectedToken: EvmToken | IcpToken | null,
-  setSelectedToken: (token: EvmToken | IcpToken) => void
+  stepHandler: (mode: "next" | "prev") => void;
+  selectedToken: EvmToken | IcpToken | null;
+  setSelectedToken: (token: EvmToken | IcpToken) => void;
 }) {
-  const [selectTokenBox, setSelectTokenBox] = useState(false)
+  const [selectTokenBox, setSelectTokenBox] = useState(false);
 
   if (selectTokenBox) {
-    return <TokenListPage
-      prevStepHandler={() => setSelectTokenBox(false)}
-      setTokenHandler={setSelectedToken}
-      selectedToken={selectedToken}
-    />
+    return (
+      <TokenListPage
+        prevStepHandler={() => setSelectTokenBox(false)}
+        setTokenHandler={setSelectedToken}
+        selectedToken={selectedToken}
+      />
+    );
   } else {
     return (
       <Box className="gap-y-6 justify-normal md:max-w-[617px] md:py-[55px] md:px-[65px]">
-        <div
-          className={cn(
-            "flex items-center self-start gap-3.5",
-            "text-white md:text-black dark:text-white text-2xl font-bold",
-            "md:text-4xl"
-          )}>
-          Create Twin Token
-          <InfoCircleIcon />
+        <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
+          <div
+            className={cn(
+              "flex items-center self-start gap-3.5",
+              "text-2xl font-bold",
+              "md:text-4xl"
+            )}
+          >
+            Create Twin Token
+            <InfoCircleIcon className="w-4 h-4 md:w-5 md:h-5" />
+          </div>
+          <Link
+            href="/transactions#advanced"
+            className="flex items-center gap-x-2 text-sm"
+          >
+            <HistoryIcon className="w-5 h-5 md:w-6 md:h-6" />
+            <span className="hidden xs:block">History</span>
+          </Link>
         </div>
         <div className="w-full flex flex-col items-center justify-between gap-6 md:flex-row">
-
           <div className="flex flex-col gap-y-1 min-w-fit w-full cursor-pointer">
-            <label className="text-white md:text-black dark:text-white">Select Token</label>
+            <label className="text-white md:text-black dark:text-white">
+              Select Token
+            </label>
             <div
               onClick={() => setSelectTokenBox(true)}
               className={cn(
                 "flex items-center w-full h-[42px] text-white md:text-black dark:text-white",
                 "bg-white/50 dark:bg-white/60 rounded-lg",
                 "text-[#0A0A0B] dark:text-[#333333]",
-                "px-3.5 py-2.5",
+                "px-3.5 py-2.5"
               )}
             >
-              {selectedToken ? `${getChainName(selectedToken.chainId)} (${selectedToken.symbol})` : "Select Token"}
+              {selectedToken
+                ? `${getChainName(selectedToken.chainId)} (${selectedToken.symbol})`
+                : "Select Token"}
             </div>
           </div>
 
@@ -59,8 +76,9 @@ export default function Step1({
               "flex items-center justify-center",
               "bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white",
               "border-2 border-white dark:border-white/30",
-              "transition-transform duration-300",
-            )}>
+              "transition-transform duration-300"
+            )}
+          >
             OR
           </div>
 
@@ -93,7 +111,7 @@ export default function Step1({
         >
           Continue
         </button>
-      </Box >
-    )
+      </Box>
+    );
   }
 }
