@@ -10,14 +10,14 @@ const TransactionTabsList = ({
   return (
     <TabsList
       className={cn(
-        "overflow-hidden w-fit h-fit bg-none",
+        "overflow-hidden w-fit h-fit border-none mb-2",
         "flex md:flex-col gap-2 items-center justify-between",
         "md:absolute md:top-10 md:-left-24",
-        "border-[5px] border-box-border rounded-[35px]",
+        "ring-4 ring-box-border !rounded-[35px]",
         "*:z-20",
         // Box Background
         "backdrop-blur-md max-md:before:hidden",
-        "bg-box-background bg-center bg-no-repeat"
+        "!bg-box-background bg-center bg-no-repeat"
       )}
     >
       {TRANSACTION_TAB_ITEMS.map((item) => (
