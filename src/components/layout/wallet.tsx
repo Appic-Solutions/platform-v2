@@ -110,7 +110,7 @@ const WalletPage = () => {
         "*:rounded-full"
       )}
     >
-      {!icpIdentity || !isEvmConnected ? (
+      {!icpIdentity && !isEvmConnected ? (
         <>
           <div className="md:hidden">
             <Drawer>
@@ -176,10 +176,14 @@ const WalletPage = () => {
             </Popover>
           </div>
         </>
-      ) : (
+      ) : icpIdentity && isEvmConnected ? (
         <div className="text-black dark:text-white text-sm py-2 px-3">
           <span className="hidden md:inline-block">Connected</span>{" "}
           <span>Wallets</span>
+        </div>
+      ) : (
+        <div className="text-black dark:text-white text-sm py-2 px-3">
+          Add Wallet
         </div>
       )}
 

@@ -73,25 +73,28 @@ export function WalletPop({
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>{title}</DrawerHeader>
-            <div >
-              <ChartContainer
-                config={chartConfig}
-                className="relative mx-auto aspect-square max-h-56"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel className="bg-white" />}
-                  />
-                  <Pie
-                    data={chartData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={60}
-                  />
-                </PieChart>
-              </ChartContainer>
-            </div>
+
+            {balance && balance.tokens.length > 0 ? (
+              <div >
+                <ChartContainer
+                  config={chartConfig}
+                  className="relative mx-auto aspect-square max-h-56"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel className="bg-white" />}
+                    />
+                    <Pie
+                      data={chartData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                    />
+                  </PieChart>
+                </ChartContainer>
+              </div>
+            ) : null}
 
             <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
               <span>
@@ -101,12 +104,14 @@ export function WalletPop({
                 <CopyIcon width={20} height={20} />
               </button>
             </div>
-            <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-              <span>
-                Token
-              </span>
-              Value
-            </div>
+            {balance && balance.tokens.length > 0 ? (
+              <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+                <span>
+                  Token
+                </span>
+                Value
+              </div>
+            ) : null}
             <div className="flex flex-col gap-y-5">
               {isLoading ? (
                 <>
@@ -144,20 +149,22 @@ export function WalletPop({
                 </div>
               )}
             </div>
-            <hr className="bg-[#494949]" />
+            {balance && balance.tokens.length > 0 ? (
+              <hr className="bg-[#494949]" />
+            ) : null}
             {isLoading ? (
               <div className="flex items-center justify-between">
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-4 w-20" />
               </div>
-            ) : balance && (
+            ) : balance && balance.tokens.length > 0 ? (
               <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
                 <span>
                   Total :
                 </span>
                 ${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
               </div>
-            )}
+            ) : null}
             <button
               onClick={disconnect}
               className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white">
@@ -189,25 +196,27 @@ export function WalletPop({
               {title}
             </div>
 
-            <div >
-              <ChartContainer
-                config={chartConfig}
-                className="relative mx-auto aspect-square max-h-56"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel className="bg-white" />}
-                  />
-                  <Pie
-                    data={chartData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={60}
-                  />
-                </PieChart>
-              </ChartContainer>
-            </div>
+            {balance && balance.tokens.length > 0 ? (
+              <div >
+                <ChartContainer
+                  config={chartConfig}
+                  className="relative mx-auto aspect-square max-h-56"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel className="bg-white" />}
+                    />
+                    <Pie
+                      data={chartData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                    />
+                  </PieChart>
+                </ChartContainer>
+              </div>
+            ) : null}
 
             <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
               <span>
@@ -217,12 +226,14 @@ export function WalletPop({
                 <CopyIcon width={20} height={20} />
               </button>
             </div>
-            <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-              <span>
-                Token
-              </span>
-              Value
-            </div>
+            {balance && balance.tokens.length > 0 ? (
+              <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+                <span>
+                  Token
+                </span>
+                Value
+              </div>
+            ) : null}
             <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
               {isLoading ? (
                 <>
@@ -260,20 +271,22 @@ export function WalletPop({
                 </div>
               )}
             </div>
-            <hr className="bg-[#494949]" />
+            {balance && balance.tokens.length > 0 ? (
+              <hr className="bg-[#494949]" />
+            ) : null}
             {isLoading ? (
               <div className="flex items-center justify-between">
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-4 w-20" />
               </div>
-            ) : balance && (
+            ) : balance && balance.tokens.length > 0 ? (
               <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
                 <span>
                   Total :
                 </span>
                 ${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
               </div>
-            )}
+            ) : null}
             <button
               onClick={disconnect}
               className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white">

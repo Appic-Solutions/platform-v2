@@ -26,7 +26,7 @@ export default function Step1({
     />
   } else {
     return (
-      <Box className="gap-y-6 justify-normal md:max-w-[620px] md:p-10">
+      <Box className="gap-y-6 justify-normal md:max-w-[617px] md:py-[55px] md:px-[65px]">
         <div
           className={cn(
             "flex items-center self-start gap-3.5",
@@ -36,9 +36,9 @@ export default function Step1({
           Create Twin Token
           <InfoCircleIcon />
         </div>
-        <div className="w-full flex flex-col items-center justify-between gap-6 md:grid md:grid-cols-7">
+        <div className="w-full flex flex-col items-center justify-between gap-6 md:flex-row">
 
-          <div className="flex flex-col gap-y-1 min-w-fit w-full cursor-pointer md:col-span-3">
+          <div className="flex flex-col gap-y-1 min-w-fit w-full cursor-pointer">
             <label className="text-white md:text-black dark:text-white">Select Token</label>
             <div
               onClick={() => setSelectTokenBox(true)}
@@ -66,16 +66,16 @@ export default function Step1({
 
           <RHFInput
             name="blockchainId"
-            label="Blockchain ID"
-            className="w-full md:col-span-3"
-            placeholder="Enter BlockChain ID"
+            label="Contract Address"
+            className="w-full"
+            placeholder="Enter Contract Address"
           />
         </div>
 
         <RHFInput
           name="symbol"
-          label="Select Symbol"
-          className="w-full md:col-span-3"
+          label="Symbol"
+          className="w-full"
           placeholder="Enter Symbol"
         />
 
