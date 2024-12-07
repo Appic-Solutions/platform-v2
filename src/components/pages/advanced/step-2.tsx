@@ -7,53 +7,49 @@ import { cn, getChainLogo, getChainName } from "@/lib/utils";
 export default function Step2({
   stepHandler,
   selectedToken,
-  setSelectedToken
 }: {
-  stepHandler: (mode: "next" | "prev") => void,
-  selectedToken: EvmToken | IcpToken | null,
-  setSelectedToken: (token: EvmToken | IcpToken) => void
+  stepHandler: (mode: "next" | "prev") => void;
+  selectedToken: EvmToken | IcpToken | null;
+  setSelectedToken: (token: EvmToken | IcpToken) => void;
 }) {
-
   const data = [
     {
       title: "Original Token Name:",
-      value: selectedToken?.name
+      value: selectedToken?.name,
     },
     {
       title: "Original Token Symbol:",
-      value: selectedToken?.symbol
+      value: selectedToken?.symbol,
     },
     {
       title: "Blockchain:",
-      value: getChainName(selectedToken?.chainId)
+      value: getChainName(selectedToken?.chainId),
     },
     {
       title: "Twin Token Name:",
-      value: "Acme Twin"
+      value: "Acme Twin",
     },
     {
       title: "Twin Token Symbol:",
-      value: "ACMT"
+      value: "ACMT",
     },
     {
       title: "Twin Token Fee:",
-      value: "0.01 ICP"
+      value: "0.01 ICP",
     },
-  ]
+  ];
 
   return (
     <Box className="gap-y-5 justify-between h-full md:h-auto md:max-w-[612px] md:gap-y-16 md:p-10">
-
-
       <div className="flex flex-col gap-y-8 w-full">
         <div
           className={cn(
             "flex items-center justify-center relative",
             "text-white md:text-black dark:text-white text-2xl font-bold",
             "md:text-4xl"
-          )}>
+          )}
+        >
           Token Summary
-
           <button
             className="hidden md:flex absolute left-0 text-base items-center gap-x-1"
             type="button"
@@ -68,7 +64,9 @@ export default function Step2({
           <div className="relative">
             <Avatar className=" w-12 h-12 rounded-full">
               <AvatarImage src={getChainLogo(selectedToken?.chainId)} />
-              <AvatarFallback>{getChainName(selectedToken?.chainId)}</AvatarFallback>
+              <AvatarFallback>
+                {getChainName(selectedToken?.chainId)}
+              </AvatarFallback>
             </Avatar>
             <Avatar
               className={cn(
@@ -77,7 +75,9 @@ export default function Step2({
               )}
             >
               <AvatarImage src={getChainLogo(selectedToken?.chainId)} />
-              <AvatarFallback>{getChainName(selectedToken?.chainId)}</AvatarFallback>
+              <AvatarFallback>
+                {getChainName(selectedToken?.chainId)}
+              </AvatarFallback>
             </Avatar>
           </div>
           <div className="text-white md:text-black dark:text-white">
@@ -87,21 +87,18 @@ export default function Step2({
         </div>
 
         <div className="rounded-[16px] bg-white/10 p-6 text-white flex flex-col gap-y-3 md:p-8 md:text-black dark:text-white">
-          {
-            data.map((item, idx) => (
-              <div key={idx} className={cn(
+          {data.map((item, idx) => (
+            <div
+              key={idx}
+              className={cn(
                 "flex items-center justify-between gap-x-1",
-                idx === 2 && "border-b border-white/15 pb-4 mb-1",
-              )}>
-                <p className="font-medium">{item.title}</p>
-                <p className={cn(
-                  idx === 5 && "text-[#27AE60]"
-                )}>
-                  {item.value}
-                </p>
-              </div>
-            ))
-          }
+                idx === 2 && "border-b border-white/15 pb-4 mb-1"
+              )}
+            >
+              <p className="font-medium">{item.title}</p>
+              <p className={cn(idx === 5 && "text-[#27AE60]")}>{item.value}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -114,10 +111,13 @@ export default function Step2({
           <ArrowLongLeftIcon />
           Back to Token
         </button>
-        <button className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white" type="submit">
+        <button
+          className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white"
+          type="submit"
+        >
           Continue
         </button>
       </div>
-    </Box >
-  )
+    </Box>
+  );
 }
