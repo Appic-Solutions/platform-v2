@@ -3,14 +3,14 @@ import {
   BlockchainIcon,
   LockIcon,
   ParkOutlineBridgeIcon,
-} from "@/components/icons"
+} from "@/components/icons";
 
 export interface NavbarItem {
-  label: string
-  href: string
-  tooltip?: string
-  Icon: React.ReactNode
-  active: boolean
+  label: string;
+  href: string;
+  tooltip?: string;
+  Icon: React.ReactNode;
+  active: boolean;
 }
 
 export const NAVBAR_ITEMS: NavbarItem[] = [
@@ -18,7 +18,13 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: "Bridge",
     href: "/",
     tooltip: "Bridge",
-    Icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-w-5 min-h-5" />,
+    Icon: (
+      <ParkOutlineBridgeIcon
+        width={24}
+        height={24}
+        className="min-w-5 min-h-5"
+      />
+    ),
     active: true,
   },
   {
@@ -32,8 +38,10 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: "Auto Invest",
     href: "/auto-invest",
     tooltip: "Coming Soon",
-    Icon: <ArrowsUpDownIcon width={24} height={24} className="min-w-5 min-h-5" />,
-    active: false,
+    Icon: (
+      <ArrowsUpDownIcon width={24} height={24} className="min-w-5 min-h-5" />
+    ),
+    active: true,
   },
   {
     label: "Advanced",
@@ -42,4 +50,4 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     Icon: <LockIcon width={24} height={24} className="min-w-5 min-h-5" />,
     active: true,
   },
-]
+];

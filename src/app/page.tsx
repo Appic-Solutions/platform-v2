@@ -1,6 +1,6 @@
 "use client";
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import SelectTokenPage from "@/components/pages/bridge/select-token/select-token";
+import BridgeSelectTokenPage from "@/components/pages/bridge/select-token/select-token";
 import TokenListPage from "@/components/pages/bridge/chain-token-list/token-list";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -70,7 +70,7 @@ const BridgeHome = () => {
     switch (activeStep) {
       case 1:
         return (
-          <SelectTokenPage
+          <BridgeSelectTokenPage
             stepHandler={handleStepChange}
             setSelectedType={setSelectedType}
             fromToken={fromToken}

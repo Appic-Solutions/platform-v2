@@ -28,7 +28,7 @@ interface SelectTokenProps {
   setAmount: (amount: string) => void;
 }
 
-export default function SelectTokenPage({
+export default function BridgeSelectTokenPage({
   stepHandler,
   setSelectedType,
   fromToken,

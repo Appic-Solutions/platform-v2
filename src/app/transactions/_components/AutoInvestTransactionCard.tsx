@@ -70,7 +70,7 @@ const AutoInvestTransactionCard = ({
                 "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
                 status === "failed" && "border-2 border-solid border-red-500",
                 status === "pending" &&
-                "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
+                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
               )}
             >
               <ArrowsUpDownIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
@@ -174,7 +174,9 @@ const AutoInvestTransactionCard = ({
           <div
             className={cn(
               "transition-all duration-200 transform",
-              showDetails ? "opacity-100 mb-4 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
+              showDetails
+                ? "opacity-100 mb-4 translate-y-0"
+                : "opacity-0 h-0 overflow-hidden -translate-y-2"
             )}
           >
             <p className="text-secondary text-xl my-4">Previous Transactions</p>
@@ -189,7 +191,7 @@ const AutoInvestTransactionCard = ({
                       "p-2 rounded-full flex items-center justify-center relative",
                       "bg-gray-300",
                       index < steps.length - 1 &&
-                      "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300"
+                        "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300"
                     )}
                   ></div>
 

@@ -1,14 +1,16 @@
 import { cn } from "@/lib/utils";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, RefObject } from "react";
 
 interface BoxProps {
   children: ReactNode;
   className?: string;
+  ref?: RefObject<HTMLDivElement>;
 }
 
-const Box: FC<BoxProps> = ({ children, className }) => {
+const Box: FC<BoxProps> = ({ children, className, ref }) => {
   return (
     <div
+      ref={ref}
       className={cn(
         "max-md:px-6 max-md:pt-5",
         "relative overflow-x-hidden overflow-y-auto",
