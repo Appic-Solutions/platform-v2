@@ -60,7 +60,7 @@ export default function TokenListPage({
         "md:max-w-[612px] md:h-[607px] md:px-9 md:py-8"
       )}
     >
-      <BoxHeader title="Invest From" onBack={prevStepHandler} />
+      <BoxHeader title="Select Token" onBack={prevStepHandler} />
       <input
         type="text"
         placeholder="Search token"
