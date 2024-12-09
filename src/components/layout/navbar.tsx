@@ -27,13 +27,16 @@ const NavbarPage = () => {
     >
       {NAVBAR_ITEMS.map((item, idx) =>
         item.active ? (
-          <li key={idx} className={cn(
-            "w-full h-full flex items-center justify-center rounded-full",
-            path === item.href &&
-            "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]",
-            "hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]",
-            "*:flex *:items-center *:justify-center *:w-full *:h-full *:gap-x-1.5"
-          )}>
+          <li
+            key={idx}
+            className={cn(
+              "w-full h-full flex items-center justify-center rounded-full",
+              path === item.href &&
+                "bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]",
+              "md:hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]",
+              "*:flex *:items-center *:justify-center *:w-full *:h-full *:gap-x-1.5"
+            )}
+          >
             <Link href={item.href}>
               {item.Icon}
               <span className={cn("hidden md:flex", "lg:text-lg lg:font-bold")}>
@@ -52,7 +55,9 @@ const NavbarPage = () => {
                 )}
               >
                 {item.Icon}
-                <span className={cn("hidden md:flex", "lg:text-lg lg:font-bold")}>
+                <span
+                  className={cn("hidden md:flex", "lg:text-lg lg:font-bold")}
+                >
                   {item.label}
                 </span>
               </TooltipTrigger>
