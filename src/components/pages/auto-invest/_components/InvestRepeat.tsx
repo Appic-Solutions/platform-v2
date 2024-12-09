@@ -1,6 +1,7 @@
 import DaySelect from "@/components/ui/day-select";
 import { TimePicker } from "@/components/ui/time-picker";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import React from "react";
 
 // if cycle is month, repeat should have an number between 1 and 28 and an time
@@ -21,17 +22,27 @@ interface InvestRepeatDayProps {
   repeatOn: number;
   setRepeatOn: (id: number) => void;
   selectedCycle: string;
+  date: Date;
 }
 
 const InvestRepeat = ({
   repeatOn,
   setRepeatOn,
   selectedCycle,
+  date,
 }: InvestRepeatDayProps) => {
   return (
     <div className="flex flex-col gap-y-2">
-      <p className="text-[18px] text-black dark:text-white">Repeat On</p>
-      <TimePicker />
+      <div className="flex gap-x-16">
+        <div className="flex flex-col gap-y-2">
+          <p className="text-[18px] text-black dark:text-white">Repeat On</p>
+          <TimePicker />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <p className="text-[18px] text-black dark:text-white">Ends On</p>
+          <div className="text-primary text-md">{format(date, "PP")}</div>
+        </div>
+      </div>
       {selectedCycle === "Week" && (
         <div className="flex gap-x-2 items-center mt-2 animate-slide-in opacity-0">
           {repeatOnWeekOptions.map((option, index) => (
