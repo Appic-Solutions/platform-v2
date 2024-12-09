@@ -38,23 +38,20 @@ const TimePicker = () => {
       </SelectTrigger>
       <SelectContent
         className={cn(
-          "text-[#0A0A0B] text-sm gap-x-4 rounded-lg py-6 border-[1px] border-white w-[120px]",
+          "text-[#0A0A0B] text-sm gap-x-4 rounded-lg py-2 border-[1px] border-white w-[120px] z-50",
           "bg-white/50 dark:bg-[#F5F5F5]"
         )}
       >
         <ScrollArea className="h-[15rem]">
-          {Array.from({ length: 48 }).map((_, i) => {
-            const hour = Math.floor(i / 2)
-              .toString()
-              .padStart(2, "0");
-            const minute = ((i % 2) * 30).toString().padStart(2, "0");
+          {Array.from({ length: 24 }).map((_, i) => {
+            const hour = i.toString().padStart(2, "0");
             return (
               <SelectItem
                 key={i}
-                value={`${hour}:${minute}`}
+                value={`${hour}:00`}
                 className="cursor-pointer hover:bg-gray-300"
               >
-                {hour}:{minute}
+                {hour}:00
               </SelectItem>
             );
           })}
