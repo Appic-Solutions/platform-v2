@@ -10,6 +10,7 @@ import { ArrowsUpDownIcon } from "@/components/icons";
 import AutoInvestReview from "./_components/AutoInvestReview";
 import InvestPeriod from "./_components/InvestPeriod";
 import InvestRepeat from "./_components/InvestRepeat";
+import { format } from "date-fns";
 
 interface AutoInvestSelectTokenProps {
   stepHandler: (value: "next" | "prev" | number) => void;
@@ -155,6 +156,14 @@ const AutoInvestSelectToken = ({
                   selectedCycle={selectedCycle}
                   date={date}
                 />
+                <div className="flex-col gap-y-2 flex md:hidden">
+                  <p className="text-[18px] text-black dark:text-white">
+                    Ends On
+                  </p>
+                  <div className="text-primary font-light text-md">
+                    {format(date, "PP")}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

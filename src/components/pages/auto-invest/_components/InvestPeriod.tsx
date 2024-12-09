@@ -26,9 +26,9 @@ const InvestPeriod = ({
   console.log(setSelectedCycle);
   return (
     <div className="flex items-center gap-x-12">
-      <span className="text-[18px] text-black dark:text-white">
+      <p className="text-[18px] text-black dark:text-white text-nowrap">
         Repeat Every
-      </span>
+      </p>
       <div className="flex items-center gap-x-4">
         <span className="text-[18px] text-black dark:text-white">
           {investmentPeriod}

@@ -48,7 +48,7 @@ const DaySelect = () => {
       </SelectTrigger>
       <SelectContent
         className={cn(
-          "text-[#0A0A0B] text-sm gap-x-4 rounded-lg py-6 border-[1px] border-white w-[120px]",
+          "text-[#0A0A0B] text-sm gap-x-4 rounded-lg py-2 border-[1px] border-white w-[120px]",
           "bg-white/50 dark:bg-[#F5F5F5]"
         )}
       >

@@ -38,7 +38,7 @@ const InvestRepeat = ({
           <p className="text-[18px] text-black dark:text-white">Repeat On</p>
           <TimePicker />
         </div>
-        <div className="flex flex-col gap-y-2">
+        <div className="flex-col gap-y-2 hidden md:flex">
           <p className="text-[18px] text-black dark:text-white">Ends On</p>
           <div className="text-primary text-md">{format(date, "PP")}</div>
         </div>
