@@ -41,7 +41,7 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     Icon: (
       <ArrowsUpDownIcon width={24} height={24} className="min-w-5 min-h-5" />
     ),
-    active: true,
+    active: false,
   },
   {
     label: "Advanced",
