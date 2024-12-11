@@ -3,6 +3,7 @@ import {
   CloseIcon,
   CopyIcon,
   FireIcon,
+  LinkIcon,
   ParkOutlineBridgeIcon,
 } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,6 +13,7 @@ import { Transaction } from "../sampleTransactions";
 import { useState } from "react";
 import CheckIcon from "@/components/icons/check";
 import Spinner from "@/components/ui/spinner";
+import Link from "next/link";
 
 const BridgeTransactionCard = ({
   bridgeProvider,
@@ -169,7 +171,7 @@ const BridgeTransactionCard = ({
               {steps.map((step, index) => (
                 <div
                   key={step.message}
-                  className="flex w-full justify-between items-center gap-x-6"
+                  className="flex w-full justify-between items-center gap-x-6 group/step"
                 >
                   <div
                     className={cn(
@@ -200,10 +202,28 @@ const BridgeTransactionCard = ({
                       />
                     )}
                   </div>
-
-                  <span className="text-sm md:text-[16px] w-full text-secondary text-start">
-                    {step.message}
-                  </span>
+                  <div className="overflow-hidden h-5 text-start w-full">
+                    <div
+                      className={cn(
+                        "flex flex-col transition-transform duration-300 group-hover/step:-translate-y-5",
+                        "text-sm md:text-[16px] text-secondary text-start"
+                      )}
+                    >
+                      <span className="w-full">{step.message}</span>
+                      <p className="flex items-center gap-x-2">
+                        Details
+                        <Link
+                          href={"google.com"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="rounded-md p-0.5 hover:bg-white/10"
+                        >
+                          <LinkIcon width={16} height={16} />
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
                   <span className="text-xs md:text-[16px] text-secondary text-start">
                     {step.timestamp}
                   </span>

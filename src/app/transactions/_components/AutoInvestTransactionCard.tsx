@@ -2,12 +2,14 @@ import {
   ArrowsUpDownIcon,
   ChevronDownIcon,
   FireIcon,
+  LinkIcon,
 } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn, getChainLogo, getChainName } from "@/lib/utils";
 import { Transaction } from "../sampleTransactions";
 import { useState } from "react";
+import Link from "next/link";
 
 const AutoInvestTransactionCard = ({
   date,
@@ -184,7 +186,7 @@ const AutoInvestTransactionCard = ({
               {steps.map((step, index) => (
                 <div
                   key={step.message}
-                  className="flex w-full justify-between items-center gap-x-6"
+                  className="flex w-full justify-between items-center gap-x-6 group/step"
                 >
                   <div
                     className={cn(
@@ -197,7 +199,23 @@ const AutoInvestTransactionCard = ({
 
                   <div className="flex flex-col gap-y-1 items-start text-xs md:text-[16px] text-secondary text-start w-full">
                     <span className="font-thin">{step.amount}</span>
-                    <span>{step.message}</span>
+                    <div className="overflow-hidden h-4">
+                      <div className="flex flex-col transition-transform duration-300 group-hover/step:-translate-y-[18px]">
+                        <p className="">{step.message}</p>
+                        <p className="flex items-center gap-x-2">
+                          Details
+                          <Link
+                            href={"google.com"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="rounded-md p-0.5 hover:bg-white/10"
+                          >
+                            <LinkIcon width={16} height={16} />
+                          </Link>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-y-1 items-end font-thin text-xs md:text-[16px] text-secondary text-start">
                     <span>{step.timestamp}</span>
