@@ -1,4 +1,4 @@
-import { EvmToken, IcpToken } from "../types/tokens"
+import { EvmToken, IcpToken } from "../types/tokens";
 
 export const tokens: (EvmToken | IcpToken)[] = [
   {
@@ -13,7 +13,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Arbitrum One",
@@ -27,7 +27,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Binance Smart Chain",
@@ -41,7 +41,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Binance Smart Chain(Testnet)",
@@ -55,7 +55,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     usdBalance: undefined,
     balanceRawInteger: "345354235234523",
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Polygon",
@@ -69,7 +69,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     usdBalance: undefined,
     balanceRawInteger: "345354235234523",
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Optimism",
@@ -83,7 +83,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     usdBalance: undefined,
     balanceRawInteger: "345354235234523",
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Base",
@@ -97,7 +97,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Avalanche",
@@ -111,7 +111,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Fantom",
@@ -125,7 +125,7 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "EVM",
+    chainType: "EVM",
   },
   {
     name: "Internet Computer",
@@ -139,9 +139,9 @@ export const tokens: (EvmToken | IcpToken)[] = [
     balance: undefined,
     balanceRawInteger: "345354235234523",
     usdBalance: undefined,
-    chainTypes: "ICP",
+    chainType: "ICP",
     disabled: true,
     fee: "10000",
     tokenType: "ICRC-2",
   },
-]
+];

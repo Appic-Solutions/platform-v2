@@ -17,16 +17,7 @@ interface WalletAddressInputProps {
   avatar: string;
 }
 
-const WalletAddressInput = ({
-  token,
-  address,
-  setAddress,
-  validationError,
-  onValidationError,
-  onWalletAddressChange,
-  show,
-  avatar,
-}: WalletAddressInputProps) => {
+const WalletAddressInput = ({ token, address, setAddress, validationError, onValidationError, onWalletAddressChange, show, avatar }: WalletAddressInputProps) => {
   const validateWalletAddress = (address: string) => {
     if (!token) return false;
     if (!address) {
@@ -34,7 +25,7 @@ const WalletAddressInput = ({
       return false;
     }
 
-    if (token?.chainTypes === "ICP") {
+    if (token?.chainType === "ICP") {
       const isValid = isValidIcpAddress(address);
       if (!isValid) {
         onValidationError?.("ICP Wallet Address is not valid");
@@ -58,17 +49,8 @@ const WalletAddressInput = ({
   };
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden transition-[max-height] duration-300 ease-in-out",
-        show ? "max-h-[155px] mb-4" : "max-h-0"
-      )}
-    >
-      <Card
-        className={cn(
-          "max-h-[133px] md:max-h-[155px] cursor-pointer flex-col items-start justify-center gap-y-2"
-        )}
-      >
+    <div className={cn("overflow-hidden transition-[max-height] duration-300 ease-in-out", show ? "max-h-[155px] mb-4" : "max-h-0")}>
+      <Card className={cn("max-h-[133px] md:max-h-[155px] cursor-pointer flex-col items-start justify-center gap-y-2")}>
         <p className="text-sm font-semibold">Send To Wallet</p>
         <div className="flex items-center gap-4 w-full">
           <div className="relative">
@@ -80,10 +62,8 @@ const WalletAddressInput = ({
           <div className="w-full">
             <input
               type="text"
-              maxLength={token?.chainTypes === "ICP" ? 64 : 42}
-              placeholder={
-                token?.chainTypes === "ICP" ? "2vxsx-fae..." : "0x0f70e...65A63"
-              }
+              maxLength={token?.chainType === "ICP" ? 64 : 42}
+              placeholder={token?.chainType === "ICP" ? "2vxsx-fae..." : "0x0f70e...65A63"}
               value={address}
               onChange={handleAddressChange}
               className={cn(
@@ -94,9 +74,7 @@ const WalletAddressInput = ({
                 address.length > 30 && "text-lg"
               )}
             />
-            {validationError && (
-              <p className="text-yellow-500 text-xs">{validationError}</p>
-            )}
+            {validationError && <p className="text-yellow-500 text-xs">{validationError}</p>}
           </div>
         </div>
       </Card>

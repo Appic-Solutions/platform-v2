@@ -185,6 +185,7 @@ export const idlFactory = ({ IDL }) => {
     getBlockedTokens: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Principal, TokenBlockType))], []),
     getBlocklistedUsers: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Bool))], []),
     getCapDetails: IDL.Func([], [CapDetails], ["query"]),
+    getHolderInfo: IDL.Func([IDL.Text], [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat))], ["query"]),
     getHolders: IDL.Func([IDL.Text], [IDL.Nat], ["query"]),
     getICRC1SubAccountBalance: IDL.Func([IDL.Principal, IDL.Text], [ICRC1SubAccountBalance], []),
     getLPTokenId: IDL.Func([IDL.Principal, IDL.Principal], [IDL.Text], ["query"]),
@@ -211,6 +212,7 @@ export const idlFactory = ({ IDL }) => {
     initiateICRC1TransferForUser: IDL.Func([IDL.Principal], [ICRCTxReceipt], []),
     log_test: IDL.Func([], [TxReceipt], []),
     log_test_ignore: IDL.Func([], [TxReceipt], []),
+    migrateLiquidity: IDL.Func([IDL.Principal, IDL.Principal, IDL.Principal, IDL.Principal], [TxReceipt], []),
     monitorMetrics: IDL.Func([], [MonitorMetrics], []),
     name: IDL.Func([IDL.Text], [IDL.Text], ["query"]),
     registerFundRecoveryForUser: IDL.Func([IDL.Principal, IDL.Principal, IDL.Nat], [TxReceipt], []),
@@ -244,5 +246,9 @@ export const idlFactory = ({ IDL }) => {
     validateExecuteFundRecoveryForUser: IDL.Func([IDL.Principal], [ValidateFunctionReturnType], []),
     validateRegisterFundRecoveryForUser: IDL.Func([IDL.Principal, IDL.Principal, IDL.Nat], [ValidateFunctionReturnType], []),
     withdraw: IDL.Func([IDL.Principal, IDL.Nat], [TxReceipt], []),
+    withdrawTo: IDL.Func([IDL.Principal, IDL.Principal], [TxReceipt], []),
   });
+};
+export const init = ({ IDL }) => {
+  return [];
 };

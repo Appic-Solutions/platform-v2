@@ -15,20 +15,12 @@ interface TokenListProps {
   toToken: IcpToken | null;
 }
 
-export default function TokenListPage({
-  prevStepHandler,
-  setTokenHandler,
-  selectedType,
-  fromToken,
-  toToken,
-}: TokenListProps) {
+export default function TokenListPage({ prevStepHandler, setTokenHandler, selectedType, fromToken, toToken }: TokenListProps) {
   const [query, setQuery] = useState("");
   const [icpTokens, setIcpTokens] = useState<IcpToken[]>([]);
 
   const getIcpTokens = () => {
-    const icpTokens = tokens.filter(
-      (token) => token.chainTypes === "ICP"
-    ) as IcpToken[];
+    const icpTokens = tokens.filter((token) => token.chainType === "ICP") as IcpToken[];
     setIcpTokens(icpTokens);
   };
 
@@ -38,12 +30,7 @@ export default function TokenListPage({
 
   const filteredTokens = useMemo(() => {
     const searchQuery = query.toLowerCase();
-    return icpTokens.filter(
-      (token) =>
-        token.name.toLowerCase().includes(searchQuery) ||
-        token.symbol.toLowerCase().includes(searchQuery) ||
-        token.canisterId?.toLowerCase().includes(searchQuery)
-    );
+    return icpTokens.filter((token) => token.name.toLowerCase().includes(searchQuery) || token.symbol.toLowerCase().includes(searchQuery) || token.canisterId?.toLowerCase().includes(searchQuery));
   }, [query, icpTokens]);
 
   const isTokenSelected = (token: IcpToken) => {
@@ -54,24 +41,14 @@ export default function TokenListPage({
   };
 
   return (
-    <Box
-      className={cn(
-        "justify-normal animate-slide-in opacity-0",
-        "md:max-w-[612px] md:h-[607px] md:px-9 md:py-8"
-      )}
-    >
+    <Box className={cn("justify-normal animate-slide-in opacity-0", "md:max-w-[612px] md:h-[607px] md:px-9 md:py-8")}>
       <BoxHeader title="Select Token" onBack={prevStepHandler} />
       <input
         type="text"
         placeholder="Search token"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className={cn(
-          "border-[#1C68F8] dark:border-[#000000] rounded-md py-2 px-3 mb-6",
-          "bg-white/50 dark:bg-white/30 text-black dark:text-white",
-          "placeholder:text-black/50 dark:placeholder:text-white/50",
-          "w-full"
-        )}
+        className={cn("border-[#1C68F8] dark:border-[#000000] rounded-md py-2 px-3 mb-6", "bg-white/50 dark:bg-white/30 text-black dark:text-white", "placeholder:text-black/50 dark:placeholder:text-white/50", "w-full")}
       />
       <div className="w-full flex flex-col gap-y-5 overflow-y-auto">
         {filteredTokens.map((token, idx) => (

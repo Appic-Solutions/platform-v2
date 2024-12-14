@@ -11,4 +11,5 @@ export interface Chain {
   logo: string;
   minter_address?: string;
   ankr_handle?: string;
+  trust_wallet_handle?: String;
 }

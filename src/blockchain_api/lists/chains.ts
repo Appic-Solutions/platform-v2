@@ -12,6 +12,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/icp.svg",
     minter_address: undefined,
     ankr_handle: undefined,
+    trust_wallet_handle: "internet_computer",
   },
   {
     chainId: 1,
@@ -24,6 +25,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/ethereum.svg",
     minter_address: "",
     ankr_handle: "eth",
+    trust_wallet_handle: "ethereum",
   },
   {
     chainId: 42161,
@@ -36,6 +38,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/arbitrum.svg",
     minter_address: "",
     ankr_handle: "arbitrum",
+    trust_wallet_handle: "arbitrum",
   },
   {
     chainId: 56,
@@ -48,6 +51,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/bsc.svg",
     minter_address: "",
     ankr_handle: "bsc",
+    trust_wallet_handle: "smartchain",
   },
   // {
   //   chainId: 97,
@@ -72,6 +76,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/polygon.svg",
     minter_address: "",
     ankr_handle: "polygon",
+    trust_wallet_handle: "polygon",
   },
   {
     chainId: 10,
@@ -84,6 +89,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/optimism.svg",
     minter_address: "",
     ankr_handle: "optimism",
+    trust_wallet_handle: "optimism",
   },
   {
     chainId: 8453,
@@ -96,6 +102,7 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/base.svg",
     minter_address: "",
     ankr_handle: "base",
+    trust_wallet_handle: "base",
   },
   {
     chainId: 43114,
@@ -107,7 +114,7 @@ export const chains: Chain[] = [
     disabled: false,
     logo: "/images/logo/chains-logos/avalanche.svg",
     minter_address: "",
-    ankr_handle: "avalanche",
+    ankr_handle: "avalanchec",
   },
   {
     chainId: 250,
@@ -120,5 +127,6 @@ export const chains: Chain[] = [
     logo: "/images/logo/chains-logos/fantom.svg",
     minter_address: "",
     ankr_handle: "fantom",
+    trust_wallet_handle: "fantom",
   },
 ];

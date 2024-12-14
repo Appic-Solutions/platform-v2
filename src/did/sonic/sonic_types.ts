@@ -169,6 +169,7 @@ export interface _SERVICE {
   getBlockedTokens: ActorMethod<[], Array<[Principal, TokenBlockType]>>;
   getBlocklistedUsers: ActorMethod<[], Array<[Principal, boolean]>>;
   getCapDetails: ActorMethod<[], CapDetails>;
+  getHolderInfo: ActorMethod<[string], Array<[Principal, bigint]>>;
   getHolders: ActorMethod<[string], bigint>;
   getICRC1SubAccountBalance: ActorMethod<[Principal, string], ICRC1SubAccountBalance>;
   getLPTokenId: ActorMethod<[Principal, Principal], string>;
@@ -195,6 +196,7 @@ export interface _SERVICE {
   initiateICRC1TransferForUser: ActorMethod<[Principal], ICRCTxReceipt>;
   log_test: ActorMethod<[], TxReceipt>;
   log_test_ignore: ActorMethod<[], TxReceipt>;
+  migrateLiquidity: ActorMethod<[Principal, Principal, Principal, Principal], TxReceipt>;
   monitorMetrics: ActorMethod<[], MonitorMetrics>;
   name: ActorMethod<[string], string>;
   registerFundRecoveryForUser: ActorMethod<[Principal, Principal, bigint], TxReceipt>;
@@ -228,6 +230,7 @@ export interface _SERVICE {
   validateExecuteFundRecoveryForUser: ActorMethod<[Principal], ValidateFunctionReturnType>;
   validateRegisterFundRecoveryForUser: ActorMethod<[Principal, Principal, bigint], ValidateFunctionReturnType>;
   withdraw: ActorMethod<[Principal, bigint], TxReceipt>;
+  withdrawTo: ActorMethod<[Principal, Principal], TxReceipt>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

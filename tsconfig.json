@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/did/sonic/sonic.did.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/did/sonic/sonic_types.ts", "src/did/icpswap/icp_swap_node.did.js", "src/did/icpswap/icp_swap_token_list.did.js"],
   "exclude": ["node_modules"]
 }
