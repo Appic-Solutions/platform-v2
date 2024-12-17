@@ -293,8 +293,8 @@ export const get_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
       const existingToken = tokenMap.get(token.canisterId);
 
       if (existingToken) {
-        existingToken.usdPrice = choose_better_price(existingToken.sonicPrice || "0", token.IcpSwapPrice || "0");
-        existingToken.IcpSwapPrice = token.IcpSwapPrice;
+        existingToken.usdPrice = choose_better_price(existingToken.sonicPrice || "0", token.icpSwapPrice || "0");
+        existingToken.icpSwapPrice = token.icpSwapPrice;
         tokenMap.set(existingToken.canisterId, existingToken);
       } else {
         tokenMap.set(token.canisterId, token);
