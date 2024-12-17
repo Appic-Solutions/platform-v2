@@ -11,12 +11,16 @@ import { PublicTokenOverview } from "@/did/icpswap/icp_swap_node_types";
 import { idlFactory as IcpSwapTokenListIdlFactory } from "@/did/icpswap/icp_swap_token_list.did";
 import { Tokens_result, TokenMetadata } from "@/did/icpswap/icp_swap_token_list_types";
 
+// Appic helper types and did
+import { idlFactory as AppicIdlFactory } from "@/did/appic/appic_helper.did";
+import { CandidIcpToken } from "@/did/appic/appic_helper_types";
+
 import BigNumber from "bignumber.js";
 
 import { get_icp_price } from "./get_icp_price";
 import { IcpToken } from "@/blockchain_api/types/tokens";
 
-import { sonic_dex_casniter_id, icp_swap_node_casniter_id, icp_swap_token_list_casniter_id, icp_ledger, wicp_ledger } from "@/canister_ids.json";
+import { sonic_dex_casniter_id, icp_swap_node_casniter_id, icp_swap_token_list_casniter_id, appic_helper_casniter_id, icp_ledger, wicp_ledger } from "@/canister_ids.json";
 
 // Function to fetch and remove deduplicate tokens from Sonic Swap and ICP Swap
 export const get_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
@@ -72,28 +76,18 @@ export const get_icpswap_tokens_usd_price = async (agent: HttpAgent): Promise<Pu
 };
 
 // Step 2
-export const get_icpswap_tokens_metadata = async (agent: HttpAgent): Promise<TokenMetadata[]> => {
-  const icp_swap_token_list_actor = Actor.createActor(IcpSwapTokenListIdlFactory, {
+export const get_valid_icp_tokens_from_appic_helper = async (agent: HttpAgent): Promise<CandidIcpToken[]> => {
+  const appic_actor = Actor.createActor(AppicIdlFactory, {
     agent,
-    canisterId: Principal.fromText(icp_swap_token_list_casniter_id),
+    canisterId: Principal.fromText(appic_helper_casniter_id),
   });
 
   try {
-    const tokens_metadata_result = (await icp_swap_token_list_actor.getList()) as Tokens_result[];
+    const validated_icp_tokens = (await appic_actor.get_icp_tokens()) as CandidIcpToken[];
 
-    if ("ok" in tokens_metadata_result) {
-      const tokenMetadata = tokens_metadata_result.ok as TokenMetadata[]; // Explicitly cast to TokenMetadata[]
-      // Filter the tokens based on custom criteria (e.g., non-spam or valid metadata)
-      return tokenMetadata;
+    return validated_icp_tokens;
 
-      // Error handling
-    } else if ("err" in tokens_metadata_result) {
-      console.warn("Invalid token metadata received:", tokens_metadata_result.err);
-      return [];
-    } else {
-      console.warn("Unexpected result format:", tokens_metadata_result);
-      return [];
-    }
+    // Error handling
   } catch (error) {
     console.error("Error fetching token list:", error);
     return [];
@@ -101,28 +95,28 @@ export const get_icpswap_tokens_metadata = async (agent: HttpAgent): Promise<Tok
 };
 
 // Step 3
-// Validate function to combine PublicTokenOverview and TokenMetadata into IcpToken[]
-export const validate_icp_swap_tokens = (publicTokens: PublicTokenOverview[], metadataTokens: TokenMetadata[]): IcpToken[] => {
-  const metadataMap = new Map(
-    metadataTokens
-      .filter((meta) => BigNumber(meta.decimals.toString()).toString() !== "0" && BigNumber(meta.fee.toString()).toString() !== "0") // Exclude tokens with decimals or fee equal to 0
-      .map((meta) => [meta.canisterId, meta])
+// Validate function to combine PublicTokenOverview and ValidTokens from Appic into IcpToken[]
+export const validate_icp_swap_tokens = (publicTokens: PublicTokenOverview[], validTokens: CandidIcpToken[]): IcpToken[] => {
+  const TokensMap = new Map(
+    validTokens
+      .filter((token) => BigNumber(token.decimals.toString()).toString() !== "0" && BigNumber(token.fee.toString()).toString() !== "0") // Exclude tokens with decimals or fee equal to 0
+      .map((token) => [token.ledger_id.toString(), token])
   );
 
   return publicTokens
-    .filter((publicToken) => metadataMap.has(publicToken.address)) // Match by canisterId/address
+    .filter((publicToken) => TokensMap.has(publicToken.address)) // Match by canisterId/address
     .map((publicToken) => {
-      const meta = metadataMap.get(publicToken.address)!; // Metadata is guaranteed to exist at this point
+      const token = TokensMap.get(publicToken.address)!; // Metadata is guaranteed to exist at this point
       return {
         name: publicToken.name,
         symbol: publicToken.symbol,
         logo: `https://wqfao-piaaa-aaaag-qj5ba-cai.raw.icp0.io/${publicToken.address}`, // Placeholder for logo if needed
         usdPrice: publicToken.priceUSD.toString(),
-        decimals: BigNumber(meta.decimals.toString()).toNumber(),
+        decimals: BigNumber(token.decimals.toString()).toNumber(),
         chainId: 0, // Chain ID for ICP
         chainType: "ICP", // Chain type is ICP
-        canisterId: meta.canisterId,
-        fee: meta.fee.toString(),
+        canisterId: token.ledger_id.toString(),
+        fee: token.fee.toString(),
         tokenType: publicToken.standard,
         IcpSwapPrice: publicToken.priceUSD.toString(),
         balance: undefined, // Optional, can be added later
@@ -133,18 +127,18 @@ export const validate_icp_swap_tokens = (publicTokens: PublicTokenOverview[], me
 };
 
 // Step 4
-// Fetch and transform all sonic tokens
+// Fetch and transform all icp_swap tokens and validated appic tokens tokens
 export const get_icp_swap_transformed_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
   // Fetch token usd price and metadata
-  const [icp_swap_tokens_usd_price, icp_swap_tokens_metadata] = await Promise.all([
+  const [icp_swap_tokens_usd_price, validated_appic_icp_tokens] = await Promise.all([
     get_icpswap_tokens_usd_price(agent), // Implement this function
-    get_icpswap_tokens_metadata(agent),
+    get_valid_icp_tokens_from_appic_helper(agent),
   ]);
 
   if (icp_swap_tokens_usd_price.length == 0) return [];
-  if (icp_swap_tokens_metadata.length == 0) return [];
+  if (validated_appic_icp_tokens.length == 0) return [];
 
-  const validated_icp_swap_tokens = validate_icp_swap_tokens(icp_swap_tokens_usd_price, icp_swap_tokens_metadata);
+  const validated_icp_swap_tokens = validate_icp_swap_tokens(icp_swap_tokens_usd_price, validated_appic_icp_tokens);
   if (validated_icp_swap_tokens.length == 0) return [];
 
   return validated_icp_swap_tokens;

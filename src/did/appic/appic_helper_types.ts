@@ -48,6 +48,14 @@ export interface CandidEvmToIcp {
   icrc_ledger_id: [] | [Principal];
   total_gas_spent: [] | [bigint];
 }
+export interface CandidEvmToken {
+  decimals: number;
+  logo: string;
+  name: string;
+  erc20_contract_address: string;
+  chain_id: bigint;
+  symbol: string;
+}
 export interface CandidIcpToEvm {
   effective_gas_price: [] | [bigint];
   status: IcpToEvmStatus;
@@ -69,22 +77,29 @@ export interface CandidIcpToEvm {
   total_gas_spent: [] | [bigint];
   native_ledger_burn_index: bigint;
 }
+export interface CandidIcpToken {
+  fee: bigint;
+  decimals: number;
+  name: string;
+  rank: [] | [number];
+  ledger_id: Principal;
+  token_type: IcpTokenType;
+  symbol: string;
+}
 export type EvmToIcpStatus = { Invalid: string } | { PendingVerification: null } | { Minted: null } | { Accepted: null } | { Quarantined: null };
+export interface GetEvmTokenArgs {
+  chain_id: bigint;
+  address: string;
+}
+export interface GetIcpTokenArgs {
+  ledger_id: Principal;
+}
 export interface GetTxParams {
   chain_id: bigint;
   search_param: TransactionSearchParam;
 }
-export type IcpToEvmStatus =
-  | { Failed: null }
-  | { SignedTransaction: null }
-  | { ReplacedTransaction: null }
-  | { QuarantinedReimbursement: null }
-  | { PendingVerification: null }
-  | { Accepted: null }
-  | { Reimbursed: null }
-  | { Successful: null }
-  | { Created: null }
-  | { FinalizedTransaction: null };
+export type IcpToEvmStatus = { Failed: null } | { SignedTransaction: null } | { ReplacedTransaction: null } | { QuarantinedReimbursement: null } | { PendingVerification: null } | { Accepted: null } | { Reimbursed: null } | { Successful: null } | { Created: null } | { FinalizedTransaction: null };
+export type IcpTokenType = { ICRC1: null } | { ICRC2: null } | { ICRC3: null } | { DIP20: null } | { Other: string };
 export interface Icrc28TrustedOriginsResponse {
   trusted_origins: Array<string>;
 }
@@ -106,9 +121,8 @@ export type Result = { Ok: null } | { Err: AddEvmToIcpTxError };
 export type Result_1 = { Ok: null } | { Err: AddIcpToEvmTxError };
 export interface TokenPair {
   operator: Operator;
-  ledger_id: Principal;
-  chain_id: bigint;
-  erc20_address: string;
+  evm_token: CandidEvmToken;
+  icp_token: CandidIcpToken;
 }
 export type Transaction = { EvmToIcp: CandidEvmToIcp } | { IcpToEvm: CandidIcpToEvm };
 export type TransactionSearchParam = { TxWithdrawalId: bigint } | { TxMintId: bigint } | { TxHash: string };
@@ -124,10 +138,13 @@ export interface UpgradeArg {
   update_minters: [] | [Array<UpdateMinterArgs>];
 }
 export interface _SERVICE {
-  get_all_tx_by_address: ActorMethod<[string], Array<Transaction>>;
-  get_all_tx_by_principal: ActorMethod<[Principal], Array<Transaction>>;
-  get_supported_token_pairs: ActorMethod<[], Array<TokenPair>>;
+  get_bridge_pairs: ActorMethod<[], Array<TokenPair>>;
+  get_evm_token: ActorMethod<[GetEvmTokenArgs], [] | [CandidEvmToken]>;
+  get_icp_token: ActorMethod<[GetIcpTokenArgs], [] | [CandidIcpToken]>;
+  get_icp_tokens: ActorMethod<[], Array<CandidIcpToken>>;
   get_transaction: ActorMethod<[GetTxParams], [] | [Transaction]>;
+  get_txs_by_address: ActorMethod<[string], Array<Transaction>>;
+  get_txs_by_principal: ActorMethod<[Principal], Array<Transaction>>;
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
   new_evm_to_icp_tx: ActorMethod<[AddEvmToIcpTx], Result>;
   new_icp_to_evm_tx: ActorMethod<[AddIcpToEvmTx], Result_1>;

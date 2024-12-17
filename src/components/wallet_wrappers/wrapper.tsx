@@ -44,7 +44,7 @@ export const WalletWrapper = ({
 }>) => {
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
-      <IdentityKitProvider authType={IdentityKitAuthType.DELEGATION} signerClientOptions={{ targets: ["2ztvj-yaaaa-aaaap-ahiza-cai"] }}>
+      <IdentityKitProvider authType={IdentityKitAuthType.DELEGATION} signerClientOptions={{ targets: ["zjydy-zyaaa-aaaaj-qnfka-cai"] }}>
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       </IdentityKitProvider>
     </WagmiProvider>
