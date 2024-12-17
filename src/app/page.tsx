@@ -58,7 +58,7 @@ const BridgeHome = () => {
 
       return res;
     },
-    refetchInterval: 1000 * 60 * 1.5, // Refetch every 1.5 minutes
+    refetchInterval: 1000 * 60 * 3, // Refetch every 3 minutes
   });
 
   const renderStep = () => {

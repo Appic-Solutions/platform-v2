@@ -1,132 +1,115 @@
-// import { Actor, HttpAgent } from "@dfinity/agent";
-// import { idlFactory as appicTransactionLoggerIDLfactory } from "@/did/sonic/sonic.did";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { idlFactory as appicHelperIdlFactory } from "@/did/appic/appic_helper.did";
+import { TokenPair, Operator as BackendOperator, IcpTokenType } from "@/did/appic/appic_helper_types";
 
-// import BigNumber from "bignumber.js";
-// import { EvmToken, IcpToken, Operator } from "../../types/tokens";
-// import { Principal } from "@dfinity/principal";
-// import { get_icp_price } from "./get_icp_price";
-// import { TokenPair } from "@/did/appic/transaction-logger-types.did";
-// import { MetadataValue } from "@dfinity/ledger-icrc/dist/candid/icrc_ledger";
-// import { idlFactory as icrcIDLFactory } from "@dfinity/ledger-icrc/dist/candid/icrc_ledger.idl";
+import BigNumber from "bignumber.js";
+import { EvmToken, IcpToken, Operator, BridgePair } from "../../types/tokens";
 
-// interface Fetched_Metadata {
-//   logo?: string;
-//   decimals?: number;
-//   name?: string;
-//   symbol?: string;
-//   fee?: string;
-//   maxMemoLength?: number;
-// }
+import { appic_helper_casniter_id } from "@/canister_ids.json";
+import { Principal } from "@dfinity/principal";
+import { get_evm_token_price } from "../evm/get_tokens_price";
+import { ICPToken } from "@dfinity/utils";
 
-// // Get all bridge pairs from appictranasction logger dex
-// export const get_all_bridge_token_pairs = async (agent: HttpAgent): Promise<TokenPair[]> => {
-//   const transaction_logger_actro = Actor.createActor(appicTransactionLoggerIDLfactory, {
-//     agent,
-//     canisterId: Principal.fromText("zjydy-zyaaa-aaaaj-qnfka-cai"),
-//   });
+export const get_bridge_pairs = async (agent: HttpAgent, icp_tokens: IcpToken[]): Promise<Array<EvmToken | IcpToken>> => {
+  const appic_actor = Actor.createActor(appicHelperIdlFactory, {
+    agent,
+    canisterId: Principal.fromText(appic_helper_casniter_id),
+  });
 
-//   try {
-//     // Type assertion to let TypeScript know the return type is PairInfoExt[]
-//     const bridge_token_pairs = (await transaction_logger_actro.get_supported_token_pairs()) as TokenPair[];
-//     // You can now use allIcpTokens here
-//     return bridge_token_pairs;
-//   } catch (error) {
-//     console.error("Error fetching appic bridge token pairs list:", error);
-//     return [];
-//   }
-// };
+  try {
+    const bridge_pairs = (await appic_actor.get_icp_tokens()) as TokenPair[];
 
-// export const populate_bridge_pairs_with_data = async (agent: HttpAgent, all_pairs: TokenPair[]): Promise<(EvmToken | IcpToken)[]> => {
-//   all_pairs.map(async (pair) => {
-//     let fetched_Metadata: Fetched_Metadata = await fetch_metadata(agent, pair.ledger_id);
-//     let operator: Operator;
-//     if ("AppicMinter" in pair.operator) {
-//       operator = "Appic";
-//     } else {
-//       operator = "Dfinity";
-//     }
+    return parseBridgePairs(bridge_pairs, icp_tokens);
 
-//     let icp_token: IcpToken = {
-//       canisterId: pair.ledger_id.toString(),
-//       chainId: 0,
-//       chainType: "ICP",
-//       decimals: fetched_Metadata.decimals,
-//       fee: fetched_Metadata.fee,
-//       logo: fetched_Metadata.logo,
-//       tokenType: "ICRC-3",
-//       usdPrice: "0",
-//       balance: "0",
-//       balanceRawInteger: "0",
-//       bridgePairs: [{ chain_id: BigNumber(pair.chain_id.toString()).toNumber(), contract_or_cansiter_id: pair.erc20_address }],
-//       contractAddress: undefined,
-//       disabled: false,
-//       name: fetched_Metadata.name,
-//       symbol: fetched_Metadata.symbol,
-//       usdBalance: "0",
-//       operator: operator,
-//     };
+    // Error handling
+  } catch (error) {
+    console.error("Error fetching token list:", error);
+    return [];
+  }
+};
 
-//     let evm_token: EvmToken = {
-//       chainId:BigNumber(pair.chain_id.toString()).toNumber(),
-//       chainType:"EVM",
-//       contractAddress:pair.erc20_address,
-//       bridgePairs:[
-//         {chain_id:0,contract_or_cansiter_id:pair.ledger_id.toString()}
-//       ],
-//       usdPrice:"0",
-//       decimals:fetched_Metadata.decimals,
+function parseOperator(operator: BackendOperator): Operator {
+  if ("AppicMinter" in operator) {
+    return "Appic";
+  } else if ("DfinityCkEthMinter" in operator) {
+    return "Dfinity";
+  }
+  throw new Error("Unknown operator");
+}
 
-//     };
-//     // let : number = (await icrc_actor.icrc1_decimals()) as number;
+async function parseBridgePairs(response: TokenPair[], icp_tokens: IcpToken[]): Promise<Array<EvmToken | IcpToken>> {
+  try {
+    const tokensMap = new Map<string, EvmToken | IcpToken>();
+    const icpTokensMap = new Map<string, IcpToken>(icp_tokens.map((token) => [token.canisterId, token]));
+    // Use a for...of loop to handle async/await properly
+    for (const pair of response) {
+      const { operator, evm_token, icp_token } = pair;
 
-//     // let evm_token:EvmToken={
+      const parsedOperator = parseOperator(operator);
 
-//     // };
-//   });
-// };
+      const evmKey = evm_token.erc20_contract_address;
+      const icpKey = icp_token.ledger_id.toString();
 
-// const fetch_metadata = async (agent: HttpAgent, cansiter_id: Principal): Promise<Fetched_Metadata> => {
-//   let icrc_actor = Actor.createActor(icrcIDLFactory, {
-//     agent,
-//     canisterId: cansiter_id,
-//   });
-//   let metadata: Array<[string, MetadataValue]> = (await icrc_actor.icrc1_metadata()) as Array<[string, MetadataValue]>;
+      const parsed_chain_id: number = BigNumber(evm_token.chain_id.toString()).toNumber();
 
-//   // Initialize variables to hold extracted metadata
-//   let fetch_metadata: Fetched_Metadata = {
-//     logo: "", // Initialize with default values (empty string or other default values)
-//     decimals: 0,
-//     name: "",
-//     symbol: "",
-//     fee: "",
-//   };
+      // Parse EVM token
+      if (!tokensMap.has(evmKey)) {
+        const usd_price = await get_evm_token_price(evm_token.erc20_contract_address, parsed_chain_id);
+        tokensMap.set(evmKey, {
+          name: evm_token.name,
+          symbol: evm_token.symbol,
+          logo: evm_token.logo,
+          decimals: evm_token.decimals,
+          chainId: parsed_chain_id,
+          contractAddress: evm_token.erc20_contract_address,
+          chainType: "EVM",
+          operator: parsedOperator,
+          bridgePairs: [],
+          usdPrice: usd_price,
+        });
+      }
 
-//   // Iterate over the metadata array and extract values
-//   metadata.forEach(([key, value]) => {
-//     switch (key) {
-//       case "icrc1:logo":
-//         if ("Text" in value) {
-//           fetch_metadata.logo = value.Text; // Safely extract the string from the `Text` field
-//         }
-//       case "icrc1:decimals":
-//         if ("Nat" in value) {
-//           fetch_metadata.decimals = new BigNumber(value.Nat.toString()).toNumber(); // Safely extract the string from the `Text` field
-//         }
+      // Parse ICP token
+      if (!tokensMap.has(icpKey)) {
+        let icp_token_data = icpTokensMap.get(icpKey);
 
-//       case "icrc1:name":
-//         if ("Text" in value) {
-//           fetch_metadata.name = value.Text; // Safely extract the string from the `Text` field
-//         }
-//       case "icrc1:symbol":
-//         if ("Text" in value) {
-//           fetch_metadata.symbol = value.Text; // Safely extract the string from the `Text` field
-//         }
-//       case "icrc1:fee":
-//         if ("Nat" in value) {
-//           fetch_metadata.fee = new BigNumber(value.Nat.toString()).toString(); // Safely extract the string from the `Text` field
-//         }
-//     }
-//   });
+        tokensMap.set(icpKey, {
+          name: icp_token.name,
+          symbol: icp_token.symbol,
+          logo: icp_token_data?.logo || "", // Use the same logo for both
+          decimals: icp_token.decimals,
+          chainId: 0, // ICP chain ID is considered 0
+          canisterId: icp_token.ledger_id.toString(),
+          fee: icp_token.fee.toString(),
+          tokenType: "",
+          chainType: "ICP",
+          operator: parsedOperator,
+          bridgePairs: [],
+          usdPrice: icp_token_data?.usdPrice || "0",
+          sonicPrice: icp_token_data?.sonicPrice || "0",
+          icpSwapPrice: icp_token_data?.icpSwapPrice || "0",
+        });
+      }
 
-//   return fetch_metadata;
-// };
+      // Add bridge pair information
+      const evmToken = tokensMap.get(evmKey) as EvmToken;
+      const icpToken = tokensMap.get(icpKey) as IcpToken;
+
+      evmToken.bridgePairs!.push({
+        contract_or_cansiter_id: icpToken.canisterId!,
+        chain_id: icpToken.chainId,
+      });
+
+      icpToken.bridgePairs!.push({
+        contract_or_cansiter_id: evmToken.contractAddress,
+        chain_id: evmToken.chainId,
+      });
+    }
+
+    // Return unique tokens as an array
+    return Array.from(tokensMap.values());
+  } catch (error) {
+    console.error("Error parsing bridge pairs:", error);
+    return [];
+  }
+}

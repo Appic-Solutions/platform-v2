@@ -1,4 +1,51 @@
 export const idlFactory = ({ IDL }) => {
+  const Operator = IDL.Variant({
+    AppicMinter: IDL.Null,
+    DfinityCkEthMinter: IDL.Null,
+  });
+  const CandidEvmToken = IDL.Record({
+    decimals: IDL.Nat8,
+    logo: IDL.Text,
+    name: IDL.Text,
+    erc20_contract_address: IDL.Text,
+    chain_id: IDL.Nat,
+    symbol: IDL.Text,
+  });
+  const IcpTokenType = IDL.Variant({
+    ICRC1: IDL.Null,
+    ICRC2: IDL.Null,
+    ICRC3: IDL.Null,
+    DIP20: IDL.Null,
+    Other: IDL.Text,
+  });
+  const CandidIcpToken = IDL.Record({
+    fee: IDL.Nat64,
+    decimals: IDL.Nat8,
+    name: IDL.Text,
+    rank: IDL.Opt(IDL.Nat32),
+    ledger_id: IDL.Principal,
+    token_type: IcpTokenType,
+    symbol: IDL.Text,
+  });
+  const TokenPair = IDL.Record({
+    operator: Operator,
+    evm_token: CandidEvmToken,
+    icp_token: CandidIcpToken,
+  });
+  const GetEvmTokenArgs = IDL.Record({
+    chain_id: IDL.Nat,
+    address: IDL.Text,
+  });
+  const GetIcpTokenArgs = IDL.Record({ ledger_id: IDL.Principal });
+  const TransactionSearchParam = IDL.Variant({
+    TxWithdrawalId: IDL.Nat,
+    TxMintId: IDL.Nat,
+    TxHash: IDL.Text,
+  });
+  const GetTxParams = IDL.Record({
+    chain_id: IDL.Nat,
+    search_param: TransactionSearchParam,
+  });
   const EvmToIcpStatus = IDL.Variant({
     Invalid: IDL.Text,
     PendingVerification: IDL.Null,
@@ -6,24 +53,21 @@ export const idlFactory = ({ IDL }) => {
     Accepted: IDL.Null,
     Quarantined: IDL.Null,
   });
-  const Oprator = IDL.Variant({
-    AppicMinter: IDL.Null,
-    DfinityCkEthMinter: IDL.Null,
-  });
   const CandidEvmToIcp = IDL.Record({
     status: EvmToIcpStatus,
     principal: IDL.Principal,
     verified: IDL.Bool,
     transaction_hash: IDL.Text,
     value: IDL.Nat,
+    operator: Operator,
     time: IDL.Nat64,
     subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     block_number: IDL.Opt(IDL.Nat),
     erc20_contract_address: IDL.Text,
     actual_received: IDL.Opt(IDL.Nat),
+    ledger_mint_index: IDL.Opt(IDL.Nat),
     chain_id: IDL.Nat,
     from_address: IDL.Text,
-    oprator: Oprator,
     icrc_ledger_id: IDL.Opt(IDL.Principal),
     total_gas_spent: IDL.Opt(IDL.Nat),
   });
@@ -48,61 +92,21 @@ export const idlFactory = ({ IDL }) => {
     transaction_hash: IDL.Opt(IDL.Text),
     withdrawal_amount: IDL.Nat,
     from: IDL.Principal,
+    operator: Operator,
     time: IDL.Nat64,
     from_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     erc20_contract_address: IDL.Text,
     actual_received: IDL.Opt(IDL.Nat),
     chain_id: IDL.Nat,
     max_transaction_fee: IDL.Opt(IDL.Nat),
-    toatal_gas_spent: IDL.Opt(IDL.Nat),
-    oprator: Oprator,
     icrc_ledger_id: IDL.Opt(IDL.Principal),
     gas_used: IDL.Opt(IDL.Nat),
+    total_gas_spent: IDL.Opt(IDL.Nat),
     native_ledger_burn_index: IDL.Nat,
   });
   const Transaction = IDL.Variant({
     EvmToIcp: CandidEvmToIcp,
     IcpToEvm: CandidIcpToEvm,
-  });
-  const CanisterStatusType = IDL.Variant({
-    stopped: IDL.Null,
-    stopping: IDL.Null,
-    running: IDL.Null,
-  });
-  const LogVisibility = IDL.Variant({
-    controllers: IDL.Null,
-    public: IDL.Null,
-  });
-  const DefiniteCanisterSettings = IDL.Record({
-    freezing_threshold: IDL.Nat,
-    controllers: IDL.Vec(IDL.Principal),
-    reserved_cycles_limit: IDL.Nat,
-    log_visibility: LogVisibility,
-    wasm_memory_limit: IDL.Nat,
-    memory_allocation: IDL.Nat,
-    compute_allocation: IDL.Nat,
-  });
-  const QueryStats = IDL.Record({
-    response_payload_bytes_total: IDL.Nat,
-    num_instructions_total: IDL.Nat,
-    num_calls_total: IDL.Nat,
-    request_payload_bytes_total: IDL.Nat,
-  });
-  const CanisterStatusResponse = IDL.Record({
-    status: CanisterStatusType,
-    memory_size: IDL.Nat,
-    cycles: IDL.Nat,
-    settings: DefiniteCanisterSettings,
-    query_stats: QueryStats,
-    idle_cycles_burned_per_day: IDL.Nat,
-    module_hash: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    reserved_cycles: IDL.Nat,
-  });
-  const TokenPair = IDL.Record({
-    ledger_id: IDL.Principal,
-    chain_id: IDL.Nat,
-    erc20_address: IDL.Text,
-    oprator: Oprator,
   });
   const Icrc28TrustedOriginsResponse = IDL.Record({
     trusted_origins: IDL.Vec(IDL.Text),
@@ -111,12 +115,12 @@ export const idlFactory = ({ IDL }) => {
     principal: IDL.Principal,
     transaction_hash: IDL.Text,
     value: IDL.Nat,
+    operator: Operator,
     time: IDL.Nat,
     subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     erc20_contract_address: IDL.Text,
     chain_id: IDL.Nat,
     from_address: IDL.Text,
-    oprator: Oprator,
     icrc_ledger_id: IDL.Principal,
     total_gas_spent: IDL.Nat,
   });
@@ -132,12 +136,12 @@ export const idlFactory = ({ IDL }) => {
     destination: IDL.Text,
     withdrawal_amount: IDL.Nat,
     from: IDL.Principal,
+    operator: Operator,
     time: IDL.Nat,
     from_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     erc20_contract_address: IDL.Text,
     chain_id: IDL.Nat,
     max_transaction_fee: IDL.Nat,
-    oprator: Oprator,
     icrc_ledger_id: IDL.Principal,
     native_ledger_burn_index: IDL.Nat,
   });
@@ -150,10 +154,13 @@ export const idlFactory = ({ IDL }) => {
   });
   const Result_1 = IDL.Variant({ Ok: IDL.Null, Err: AddIcpToEvmTxError });
   return IDL.Service({
-    get_all_tx_by_address: IDL.Func([IDL.Text], [IDL.Vec(Transaction)], ["query"]),
-    get_all_tx_by_principal: IDL.Func([IDL.Principal], [IDL.Vec(Transaction)], ["query"]),
-    get_canister_status: IDL.Func([], [CanisterStatusResponse], []),
-    get_supported_token_pairs: IDL.Func([], [IDL.Vec(TokenPair)], ["query"]),
+    get_bridge_pairs: IDL.Func([], [IDL.Vec(TokenPair)], ["query"]),
+    get_evm_token: IDL.Func([GetEvmTokenArgs], [IDL.Opt(CandidEvmToken)], ["query"]),
+    get_icp_token: IDL.Func([GetIcpTokenArgs], [IDL.Opt(CandidIcpToken)], ["query"]),
+    get_icp_tokens: IDL.Func([], [IDL.Vec(CandidIcpToken)], ["query"]),
+    get_transaction: IDL.Func([GetTxParams], [IDL.Opt(Transaction)], ["query"]),
+    get_txs_by_address: IDL.Func([IDL.Text], [IDL.Vec(Transaction)], ["query"]),
+    get_txs_by_principal: IDL.Func([IDL.Principal], [IDL.Vec(Transaction)], ["query"]),
     icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOriginsResponse], []),
     new_evm_to_icp_tx: IDL.Func([AddEvmToIcpTx], [Result], []),
     new_icp_to_evm_tx: IDL.Func([AddIcpToEvmTx], [Result_1], []),

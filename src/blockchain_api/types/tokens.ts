@@ -1,6 +1,6 @@
 import { ChainType } from "./chains";
 
-interface BridgePair {
+export interface BridgePair {
   contract_or_cansiter_id: string;
   chain_id: number;
 }
@@ -17,7 +17,7 @@ interface Token {
   usdBalance?: string; // Optional: Value in USD of the user's holdings
   chainType: ChainType;
   disabled?: boolean; // Optional: Whether the token is disabled
-  bridgePairs?: [BridgePair];
+  bridgePairs?: BridgePair[];
   operator?: Operator;
 }
 
@@ -39,6 +39,6 @@ export type IcpToken = Token & {
   tokenType: string;
   contractAddress?: never; // Address of the token's contract if the token is an EVm token
   sonicPrice?: string;
-  IcpSwapPrice?: string;
+  icpSwapPrice?: string;
   evmPrice?: never;
 };
