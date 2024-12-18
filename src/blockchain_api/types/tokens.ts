@@ -27,10 +27,7 @@ export type EvmToken = Token & {
   contractAddress: string; // Address of the token's contract if the token is an EVm token
   canisterId?: never; // Address of the token's cansiter id if the token is an ICP token
   fee?: never;
-  evmPrice?: string;
   tokenType?: never;
-  sonicPrice?: never;
-  IcpSwapPrice?: never;
 };
 
 export type IcpToken = Token & {
@@ -38,7 +35,4 @@ export type IcpToken = Token & {
   fee?: string; // Token transfer fee on icp network
   tokenType: string;
   contractAddress?: never; // Address of the token's contract if the token is an EVm token
-  sonicPrice?: string;
-  icpSwapPrice?: string;
-  evmPrice?: never;
 };

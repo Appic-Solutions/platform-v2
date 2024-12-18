@@ -8,18 +8,17 @@ import { EvmToken, IcpToken, Operator, BridgePair } from "../../types/tokens";
 import { appic_helper_casniter_id } from "@/canister_ids.json";
 import { Principal } from "@dfinity/principal";
 import { get_evm_token_price } from "../evm/get_tokens_price";
-import { ICPToken } from "@dfinity/utils";
 
-export const get_bridge_pairs = async (agent: HttpAgent, icp_tokens: IcpToken[]): Promise<Array<EvmToken | IcpToken>> => {
+export const get_bridge_pairs = async (agent: HttpAgent): Promise<Array<EvmToken | IcpToken>> => {
   const appic_actor = Actor.createActor(appicHelperIdlFactory, {
     agent,
     canisterId: Principal.fromText(appic_helper_casniter_id),
   });
 
   try {
-    const bridge_pairs = (await appic_actor.get_icp_tokens()) as TokenPair[];
+    const bridge_pairs = (await appic_actor.get_bridge_pairs()) as TokenPair[];
 
-    return parseBridgePairs(bridge_pairs, icp_tokens);
+    return parseBridgePairs(bridge_pairs);
 
     // Error handling
   } catch (error) {
@@ -37,12 +36,12 @@ function parseOperator(operator: BackendOperator): Operator {
   throw new Error("Unknown operator");
 }
 
-async function parseBridgePairs(response: TokenPair[], icp_tokens: IcpToken[]): Promise<Array<EvmToken | IcpToken>> {
+async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken | IcpToken>> {
   try {
     const tokensMap = new Map<string, EvmToken | IcpToken>();
-    const icpTokensMap = new Map<string, IcpToken>(icp_tokens.map((token) => [token.canisterId, token]));
     // Use a for...of loop to handle async/await properly
     for (const pair of response) {
+      console.log(pair);
       const { operator, evm_token, icp_token } = pair;
 
       const parsedOperator = parseOperator(operator);
@@ -71,12 +70,10 @@ async function parseBridgePairs(response: TokenPair[], icp_tokens: IcpToken[]): 
 
       // Parse ICP token
       if (!tokensMap.has(icpKey)) {
-        let icp_token_data = icpTokensMap.get(icpKey);
-
         tokensMap.set(icpKey, {
           name: icp_token.name,
           symbol: icp_token.symbol,
-          logo: icp_token_data?.logo || "", // Use the same logo for both
+          logo: icp_token.logo, // Use the same logo for both
           decimals: icp_token.decimals,
           chainId: 0, // ICP chain ID is considered 0
           canisterId: icp_token.ledger_id.toString(),
@@ -85,9 +82,7 @@ async function parseBridgePairs(response: TokenPair[], icp_tokens: IcpToken[]): 
           chainType: "ICP",
           operator: parsedOperator,
           bridgePairs: [],
-          usdPrice: icp_token_data?.usdPrice || "0",
-          sonicPrice: icp_token_data?.sonicPrice || "0",
-          icpSwapPrice: icp_token_data?.icpSwapPrice || "0",
+          usdPrice: icp_token.usd_price || "0",
         });
       }
 
