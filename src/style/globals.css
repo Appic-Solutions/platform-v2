@@ -20,3 +20,11 @@
     height: 100% !important;
   }
 }
+
+/* Text overflow */
+.text-ellipsis {
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  display: block !important;
+}
