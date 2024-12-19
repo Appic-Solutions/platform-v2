@@ -80,6 +80,8 @@ export interface CandidIcpToEvm {
 export interface CandidIcpToken {
   fee: bigint;
   decimals: number;
+  usd_price: string;
+  logo: string;
   name: string;
   rank: [] | [number];
   ledger_id: Principal;

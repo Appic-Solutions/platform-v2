@@ -19,8 +19,10 @@ export const idlFactory = ({ IDL }) => {
     Other: IDL.Text,
   });
   const CandidIcpToken = IDL.Record({
-    fee: IDL.Nat64,
+    fee: IDL.Nat,
     decimals: IDL.Nat8,
+    usd_price: IDL.Text,
+    logo: IDL.Text,
     name: IDL.Text,
     rank: IDL.Opt(IDL.Nat32),
     ledger_id: IDL.Principal,
@@ -165,7 +167,4 @@ export const idlFactory = ({ IDL }) => {
     new_evm_to_icp_tx: IDL.Func([AddEvmToIcpTx], [Result], []),
     new_icp_to_evm_tx: IDL.Func([AddIcpToEvmTx], [Result_1], []),
   });
-};
-export const init = ({ IDL }) => {
-  return [];
 };
