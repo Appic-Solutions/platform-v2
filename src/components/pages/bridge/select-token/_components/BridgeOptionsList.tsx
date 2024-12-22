@@ -83,7 +83,7 @@ const BridgeOptionsList = ({
   return (
     <div
       className={cn(
-        "flex flex-col items-start mb-5 max-h-full",
+        "flex flex-col items-start mb-5",
         "lg:w-full md:pr-2",
         "animate-slide-in opacity-0"
       )}

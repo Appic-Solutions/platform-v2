@@ -30,7 +30,12 @@ export default function Step1({
     );
   } else {
     return (
-      <Box className="gap-y-6 justify-normal md:max-w-[617px] md:py-[55px] md:px-[65px]">
+      <Box
+        className={cn(
+          "gap-y-6 justify-normal h-full flex flex-col",
+          "md:h-fit md:max-w-[617px] md:py-[55px] md:px-[65px]"
+        )}
+      >
         <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
           <div
             className={cn(
@@ -107,7 +112,7 @@ export default function Step1({
         <button
           type="button"
           onClick={() => stepHandler("next")}
-          className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white"
+          className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
         >
           Continue
         </button>

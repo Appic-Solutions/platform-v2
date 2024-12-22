@@ -67,7 +67,7 @@ export default function TokenListPage({
     <Box
       className={cn(
         "justify-normal animate-slide-in opacity-0",
-        "md:max-w-[612px] md:h-[607px] md:px-9 md:py-8",
+        "md:max-w-[612px] md:h-[607px] md:px-9 md:py-8"
       )}
     >
       <BoxHeader title="Bridge From" onBack={prevStepHandler} />
@@ -88,7 +88,7 @@ export default function TokenListPage({
           "w-full"
         )}
       />
-      <div className="w-full flex flex-col gap-y-5 overflow-y-auto">
+      <div className="w-full flex flex-col gap-y-5 overflow-y-scroll">
         {filteredTokens.map((token, idx) => (
           <TokenCard
             key={idx}

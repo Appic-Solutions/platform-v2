@@ -49,8 +49,15 @@ export function TokenCard({
           </Avatar>
         </div>
         <div>
-          <p>{token?.symbol || "Select Token"}</p>
-          <p className="text-sm">{getChainName(token?.chainId)}</p>
+          <p className="text-nowrap ">{token?.symbol || "Select Token"}</p>
+          <p
+            className={cn(
+              "text-sm",
+              getChainName(token?.chainId).length > 3 && "text-ellipsis w-20"
+            )}
+          >
+            {getChainName(token?.chainId)}
+          </p>
         </div>
       </div>
     </Card>
