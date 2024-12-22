@@ -54,11 +54,11 @@ const BridgeHome = () => {
       const res = await get_icp_tokens(unauthenticatedAgent);
       console.log(res);
       if (!res) return [];
-      setStorageItem("icpTokens", JSON.stringify(res));
+      setStorageItem("icpTokens", JSON.stringify(res.result));
 
       return res;
     },
-    refetchInterval: 1000 * 60 * 3, // Refetch every 3 minutes
+    refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
   });
 
   const renderStep = () => {

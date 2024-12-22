@@ -1,6 +1,6 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
-
+import { Response } from "@/blockchain_api/types/response";
 // Appic helper types and did
 import { idlFactory as AppicIdlFactory } from "@/did/appic/appic_helper.did";
 import { CandidIcpToken, IcpTokenType } from "@/did/appic/appic_helper_types";
@@ -17,7 +17,7 @@ import { appic_helper_casniter_id } from "@/canister_ids.json";
 
 // Step 1
 // Get valid appic tokens
-export const get_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
+export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToken[]>> => {
   const appic_actor = Actor.createActor(AppicIdlFactory, {
     agent,
     canisterId: Principal.fromText(appic_helper_casniter_id),
@@ -26,12 +26,19 @@ export const get_icp_tokens = async (agent: HttpAgent): Promise<IcpToken[]> => {
   try {
     const validated_icp_tokens = (await appic_actor.get_icp_tokens()) as CandidIcpToken[];
 
-    return transform_icp_tokens(validated_icp_tokens);
+    return {
+      result: transform_icp_tokens(validated_icp_tokens),
+      success: true,
+      message: "",
+    };
 
     // Error handling
   } catch (error) {
-    console.error("Error fetching token list:", error);
-    return [];
+    return {
+      result: [],
+      message: `Error fetching icp token list, ${error}`,
+      success: false,
+    };
   }
 };
 

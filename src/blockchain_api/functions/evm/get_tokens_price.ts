@@ -1,6 +1,6 @@
 import { chains } from "../../lists/chains";
 import axios from "axios";
-
+import { Response } from "../../types/response";
 interface AnkrTokenPriceRequest {
   id: number;
   jsonrpc: string;
@@ -22,7 +22,7 @@ interface AnkrResponse {
   };
 }
 
-export async function get_evm_token_price(contract_address: string, chain_id: number): Promise<string> {
+export async function get_evm_token_price(contract_address: string, chain_id: number): Promise<Response<string>> {
   const blockchain: string = chains.find((chain) => chain.chainId == chain_id)?.ankr_handle!;
   const requestParams: AnkrTokenPriceRequest = {
     id: 1,
@@ -37,11 +37,17 @@ export async function get_evm_token_price(contract_address: string, chain_id: nu
   try {
     const response = await axios.post<AnkrResponse>(`https://rpc.ankr.com/multichain/${process.env.NEXT_PUBLIC_ANKR_API_KEY}`, requestParams);
     if (response.data.error) {
-      console.error("Error fetching Token Price:", response.data.error);
+      let error_response: Response<string> = { message: `Error fetching account balance ${response.data.error}`, result: "0", success: false };
+      return error_response;
     }
-    return response.data.result.usdPrice;
+
+    return {
+      result: response.data.result.usdPrice as string,
+      success: true,
+      message: "",
+    };
   } catch (error) {
-    console.error("Error fetching account balance:", error);
-    return "0";
+    let error_response: Response<string> = { message: `Error fetching account balance ${error}`, result: "0", success: false };
+    return error_response;
   }
 }

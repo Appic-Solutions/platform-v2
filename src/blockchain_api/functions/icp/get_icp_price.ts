@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { Response } from "@/blockchain_api/types/response";
 interface IcpPriceResponse {
   icp_usd_rate: [number, string][];
 }
@@ -11,21 +11,22 @@ interface ErrorResponse {
   status: string;
 }
 
-export async function get_icp_price(): Promise<number | null> {
+export async function get_icp_price(): Promise<Response<string>> {
   const url = "https://ic-api.internetcomputer.org/api/v3/icp-usd-rate";
 
   try {
     const response = await axios.get<IcpPriceResponse>(url);
-    const icpPriceString = response.data.icp_usd_rate[0][1];
-    const icpPrice = parseFloat(icpPriceString);
-    return icpPrice;
+    const icp_price = response.data.icp_usd_rate[0][1];
+    return {
+      result: icp_price,
+      message: "",
+      success: true,
+    };
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      const errData = error.response.data as ErrorResponse;
-      console.error(`Error: ${errData.message}, Status: ${errData.status}`);
-    } else {
-      console.error("An unknown error occurred");
-    }
-    return null;
+    return {
+      result: "0",
+      message: `Failed to get icp USD price ${error}`,
+      success: true,
+    };
   }
 }

@@ -46,7 +46,7 @@ const WalletPage = () => {
       if (unauthenticatedAgent && authenticatedAgent && icpIdentity) {
         const all_tokens = getStorageItem("icpTokens");
         const icp_balance = await get_icp_wallet_tokens_balances(icpIdentity.getPrincipal().toString(), JSON.parse(all_tokens || "[]"), unauthenticatedAgent);
-        setIcpBalance(icp_balance);
+        setIcpBalance(icp_balance.result);
       }
       setIcpLoading(false);
     } catch (error) {
@@ -58,7 +58,7 @@ const WalletPage = () => {
       setEvmLoading(true);
       if (evmAddress) {
         const evm_balance = await get_evm_wallet_tokens_balances(evmAddress);
-        setEvmBalance(evm_balance);
+        setEvmBalance(evm_balance.result);
       }
       setEvmLoading(false);
     } catch (error) {

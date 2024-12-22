@@ -3,6 +3,7 @@ import { Principal } from "@dfinity/principal";
 import { idlFactory as icrcIdlFactory } from "@/did/ledger/icrc.did";
 import { idlFactory as dip20IdleFactory } from "@/did/ledger/dip20.did";
 import { IcpToken } from "@/blockchain_api/types/tokens";
+import { Response } from "@/blockchain_api/types/response";
 import { Actor, HttpAgent } from "@dfinity/agent";
 
 const waitWithTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -12,7 +13,7 @@ interface IcpTokensBalances {
   totalBalanceUsd: string;
 }
 
-export async function get_icp_wallet_tokens_balances(principal_id: string, all_tokens: IcpToken[], unauthenticated_agent: HttpAgent): Promise<IcpTokensBalances> {
+export async function get_icp_wallet_tokens_balances(principal_id: string, all_tokens: IcpToken[], unauthenticated_agent: HttpAgent): Promise<Response<IcpTokensBalances>> {
   let totalBalanceUsd = new BigNumber(0);
 
   try {
@@ -24,12 +25,22 @@ export async function get_icp_wallet_tokens_balances(principal_id: string, all_t
       }
     });
     return {
-      tokens: non_zero_balances,
-      totalBalanceUsd: totalBalanceUsd.toString(),
+      result: {
+        tokens: non_zero_balances,
+        totalBalanceUsd: totalBalanceUsd.toString(),
+      },
+      message: "",
+      success: true,
     };
   } catch (error) {
-    console.error("Error fetching account balance:", error);
-    throw error;
+    return {
+      result: {
+        tokens: [],
+        totalBalanceUsd: "",
+      },
+      message: `Failed to get user icp balance ${error}`,
+      success: false,
+    };
   }
 }
 
@@ -55,7 +66,6 @@ export const get_tokens_balances = async (all_token: IcpToken[], userPrincipal: 
         }
         return { ...token, balance: "0", usdBalance: "0" };
       } catch (error) {
-        console.error(`Error fetching balance for token ${canisterId}:`, error);
         return { ...token, balance: "0", usdBalance: "0" }; // Default values in case of error
       }
     })
@@ -65,9 +75,8 @@ export const get_tokens_balances = async (all_token: IcpToken[], userPrincipal: 
 };
 
 const get_single_token_balance = async (canisterId: string, tokenType: string, userPrincipal: string, agent: HttpAgent): Promise<bigint> => {
-  const tokenTypeLower = tokenType.toLowerCase();
   let tokenBalance: bigint = BigInt(0);
-  const idleFactory = tokenTypeLower === "dip20" || tokenTypeLower === "yc" ? dip20IdleFactory : icrcIdlFactory;
+  const idleFactory = tokenType === "DIP20" || tokenType === "YC" ? dip20IdleFactory : icrcIdlFactory;
 
   try {
     const tokenActor = Actor.createActor(idleFactory, {
@@ -75,9 +84,9 @@ const get_single_token_balance = async (canisterId: string, tokenType: string, u
       canisterId,
     });
 
-    if (tokenTypeLower === "dip20" || tokenTypeLower === "yc") {
+    if (tokenType === "DIP20" || tokenType === "YC") {
       tokenBalance = (await Promise.race([tokenActor.balanceOf(Principal.fromText(userPrincipal)), waitWithTimeout(10000)])) as bigint;
-    } else if (tokenTypeLower === "icrc1" || tokenTypeLower === "icrc2") {
+    } else if (tokenType === "ICRC1" || tokenType === "ICRC2") {
       tokenBalance = (await Promise.race([
         tokenActor.icrc1_balance_of({
           owner: Principal.fromText(userPrincipal),
@@ -87,7 +96,6 @@ const get_single_token_balance = async (canisterId: string, tokenType: string, u
       ])) as bigint;
     }
   } catch (error) {
-    console.error(`Error in get_single_token_balance for canisterId ${canisterId}:`, error);
     tokenBalance = BigInt(0);
   }
   return tokenBalance;
