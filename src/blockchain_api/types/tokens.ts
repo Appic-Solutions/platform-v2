@@ -15,7 +15,7 @@ interface Token {
   balance?: string; // Optional: Amount the user holds of this token
   balanceRawInteger?: string;
   usdBalance?: string; // Optional: Value in USD of the user's holdings
-  chainType: ChainType;
+  chain_type: ChainType;
   disabled?: boolean; // Optional: Whether the token is disabled
   bridgePairs?: BridgePair[];
   operator?: Operator;

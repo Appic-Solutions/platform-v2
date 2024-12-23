@@ -2,8 +2,8 @@ import { Actor, HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import { Response } from "@/blockchain_api/types/response";
 // Appic helper types and did
-import { idlFactory as AppicIdlFactory } from "@/did/appic/appic_helper.did";
-import { CandidIcpToken, IcpTokenType } from "@/did/appic/appic_helper_types";
+import { idlFactory as AppicIdlFactory } from "@/blockchain_api/did/appic/appic_helper/appic_helper.did";
+import { CandidIcpToken, IcpTokenType } from "@/blockchain_api/did/appic/appic_helper/appic_helper_types";
 
 import BigNumber from "bignumber.js";
 
@@ -55,7 +55,7 @@ export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] =
         usdPrice: token.usd_price,
         decimals: token.decimals,
         chainId: 0, // Chain ID for ICP
-        chainType: "ICP", // Chain type is ICP
+        chain_type: "ICP", // Chain type is ICP
         canisterId: token.ledger_id.toString(),
         fee: BigNumber(token.fee.toString()).toString(),
         tokenType: parse_token_type(token.token_type),

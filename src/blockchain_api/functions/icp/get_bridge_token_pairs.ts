@@ -1,6 +1,6 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
-import { idlFactory as appicHelperIdlFactory } from "@/did/appic/appic_helper.did";
-import { TokenPair, Operator as BackendOperator, IcpTokenType } from "@/did/appic/appic_helper_types";
+import { idlFactory as appicHelperIdlFactory } from "@/blockchain_api/did/appic/appic_helper/appic_helper.did";
+import { TokenPair, Operator as BackendOperator, IcpTokenType } from "@/blockchain_api/did/appic/appic_helper/appic_helper_types";
 import { Response } from "@/blockchain_api/types/response";
 import BigNumber from "bignumber.js";
 import { EvmToken, IcpToken, Operator, BridgePair } from "../../types/tokens";
@@ -69,7 +69,7 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
           decimals: evm_token.decimals,
           chainId: parsed_chain_id,
           contractAddress: evm_token.erc20_contract_address,
-          chainType: "EVM",
+          chain_type: "EVM",
           operator: parsedOperator,
           bridgePairs: [],
           usdPrice: usd_price.result,
@@ -82,7 +82,7 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
           decimals: evm_token.decimals,
           chainId: parsed_chain_id,
           contractAddress: evm_token.erc20_contract_address,
-          chainType: "EVM",
+          chain_type: "EVM",
           operator: parsedOperator,
           bridgePairs: [],
           usdPrice: "0",
@@ -102,7 +102,7 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
         canisterId: icp_token.ledger_id.toString(),
         fee: icp_token.fee.toString(),
         tokenType: "",
-        chainType: "ICP",
+        chain_type: "ICP",
         operator: parsedOperator,
         bridgePairs: [],
         usdPrice: icp_token.usd_price || "0",

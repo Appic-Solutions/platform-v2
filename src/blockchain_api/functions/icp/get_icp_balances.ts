@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Principal } from "@dfinity/principal";
-import { idlFactory as icrcIdlFactory } from "@/did/ledger/icrc.did";
-import { idlFactory as dip20IdleFactory } from "@/did/ledger/dip20.did";
+import { idlFactory as icrcIdlFactory } from "@/blockchain_api/did/ledger/icrc.did";
+import { idlFactory as dip20IdleFactory } from "@/blockchain_api/did/ledger/dip20.did";
 import { IcpToken } from "@/blockchain_api/types/tokens";
 import { Response } from "@/blockchain_api/types/response";
 import { Actor, HttpAgent } from "@dfinity/agent";
