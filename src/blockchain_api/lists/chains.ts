@@ -1,4 +1,5 @@
 import { Chain } from "../types/chains";
+import { Operator } from "../types/tokens";
 
 export const chains: Chain[] = [
   {
@@ -10,8 +11,6 @@ export const chains: Chain[] = [
     type: "ICP",
     disabled: false,
     logo: "/images/logo/chains-logos/icp.svg",
-    minter_address: undefined,
-    ankr_handle: undefined,
   },
   {
     chainId: 1,
@@ -22,7 +21,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/ethereum.svg",
-    minter_address: "",
+    dfinity_ck_minter_address: "sv3dd-oaaaa-aaaar-qacoa-cai",
     ankr_handle: "eth",
   },
   {
@@ -34,7 +33,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/arbitrum.svg",
-    minter_address: "",
+
     ankr_handle: "arbitrum",
   },
   {
@@ -46,7 +45,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/bsc.svg",
-    minter_address: "",
+
     ankr_handle: "bsc",
   },
   // {
@@ -70,7 +69,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/polygon.svg",
-    minter_address: "",
+
     ankr_handle: "polygon",
   },
   {
@@ -82,7 +81,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/optimism.svg",
-    minter_address: "",
+
     ankr_handle: "optimism",
   },
   {
@@ -94,7 +93,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/base.svg",
-    minter_address: "",
+
     ankr_handle: "base",
   },
   {
@@ -106,7 +105,7 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/avalanche.svg",
-    minter_address: "",
+
     ankr_handle: "avalanchec",
   },
   {
@@ -118,7 +117,16 @@ export const chains: Chain[] = [
     type: "EVM",
     disabled: false,
     logo: "/images/logo/chains-logos/fantom.svg",
-    minter_address: "",
+
     ankr_handle: "fantom",
   },
 ];
+
+export const get_minter_addresses = (operator: Operator, chain_id: number): string | undefined => {
+  switch (operator) {
+    case "Appic":
+      return chains.find((chain) => chain.chainId == chain_id)?.appic_minter_address;
+    case "Dfinity":
+      return chains.find((chain) => chain.chainId == chain_id)?.dfinity_ck_minter_address;
+  }
+};

@@ -114,12 +114,12 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
     const icpToken = tokensMap.get(icpKey) as IcpToken;
 
     evmToken.bridgePairs!.push({
-      contract_or_cansiter_id: icpToken.canisterId!,
+      contract_or_canister_id: icpToken.canisterId!,
       chain_id: icpToken.chainId,
     });
 
     icpToken.bridgePairs!.push({
-      contract_or_cansiter_id: evmToken.contractAddress,
+      contract_or_canister_id: evmToken.contractAddress,
       chain_id: evmToken.chainId,
     });
   }

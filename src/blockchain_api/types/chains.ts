@@ -9,6 +9,7 @@ export interface Chain {
   type: ChainType;
   disabled: boolean;
   logo: string;
-  minter_address?: string;
+  dfinity_ck_minter_address?: string;
+  appic_minter_address?: string;
   ankr_handle?: string;
 }
