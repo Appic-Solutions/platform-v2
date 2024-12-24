@@ -1,4 +1,4 @@
-import { ChainType } from "./chains";
+import { ChainType } from './chains';
 
 export interface BridgePair {
   contract_or_canister_id: string;
@@ -21,7 +21,7 @@ interface Token {
   operator?: Operator;
 }
 
-export type Operator = "Appic" | "Dfinity";
+export type Operator = 'Appic' | 'Dfinity';
 
 export type EvmToken = Token & {
   contractAddress: string; // Address of the token's contract if the token is an EVm token
@@ -37,7 +37,11 @@ export type IcpToken = Token & {
   contractAddress?: never; // Address of the token's contract if the token is an EVm token
 };
 
-export const get_bridge_pairs_for_token = (bridge_tokens: (EvmToken | IcpToken)[], token_id: string, chain_id: number): (EvmToken | IcpToken)[] => {
+export const get_bridge_pairs_for_token = (
+  bridge_tokens: (EvmToken | IcpToken)[],
+  token_id: string,
+  chain_id: number,
+): (EvmToken | IcpToken)[] => {
   // Find the base token by matching `token_id` with `canisterId` or `contractAddress`
   const base_token = bridge_tokens.find((token) => token.canisterId === token_id || token.contractAddress === token_id);
 
@@ -49,7 +53,12 @@ export const get_bridge_pairs_for_token = (bridge_tokens: (EvmToken | IcpToken)[
   const pairs = base_token.bridgePairs.filter((pair) => pair.chain_id === chain_id);
 
   // Map over pairs and gather matching tokens efficiently
-  const filtered_token_pairs = pairs.flatMap((pair) => bridge_tokens.filter((token) => token.canisterId === pair.contract_or_canister_id || token.contractAddress === pair.contract_or_canister_id));
+  const filtered_token_pairs = pairs.flatMap((pair) =>
+    bridge_tokens.filter(
+      (token) =>
+        token.canisterId === pair.contract_or_canister_id || token.contractAddress === pair.contract_or_canister_id,
+    ),
+  );
 
   return filtered_token_pairs;
 };
