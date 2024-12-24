@@ -1,11 +1,12 @@
-export type ChainType = "ICP" | "EVM";
+export type ChainType = 'ICP' | 'EVM';
 
 export interface Chain {
-  chainId: number | null;
+  chainId: number;
   name: string;
   nativeTokenSymbol: string;
   scannerAddress: string;
-  depositHelperAddress: string | null;
+  dfinity_ck_deposit_helper_contract?: string;
+  appic_deposit_helper_contract?: string;
   type: ChainType;
   disabled: boolean;
   logo: string;
