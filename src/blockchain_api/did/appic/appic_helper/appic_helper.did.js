@@ -1,16 +1,4 @@
 export const idlFactory = ({ IDL }) => {
-  const Operator = IDL.Variant({
-    AppicMinter: IDL.Null,
-    DfinityCkEthMinter: IDL.Null,
-  });
-  const CandidEvmToken = IDL.Record({
-    decimals: IDL.Nat8,
-    logo: IDL.Text,
-    name: IDL.Text,
-    erc20_contract_address: IDL.Text,
-    chain_id: IDL.Nat,
-    symbol: IDL.Text,
-  });
   const IcpTokenType = IDL.Variant({
     ICRC1: IDL.Null,
     ICRC2: IDL.Null,
@@ -29,10 +17,41 @@ export const idlFactory = ({ IDL }) => {
     token_type: IcpTokenType,
     symbol: IDL.Text,
   });
+  const Operator = IDL.Variant({
+    AppicMinter: IDL.Null,
+    DfinityCkEthMinter: IDL.Null,
+  });
+  const CandidEvmToken = IDL.Record({
+    decimals: IDL.Nat8,
+    logo: IDL.Text,
+    name: IDL.Text,
+    erc20_contract_address: IDL.Text,
+    chain_id: IDL.Nat,
+    symbol: IDL.Text,
+  });
   const TokenPair = IDL.Record({
     operator: Operator,
     evm_token: CandidEvmToken,
     icp_token: CandidIcpToken,
+  });
+  const CandidErc20TwinLedgerSuiteStatus = IDL.Variant({
+    PendingApproval: IDL.Null,
+    Created: IDL.Null,
+    Installed: IDL.Null,
+  });
+  const CandidErc20TwinLedgerSuiteFee = IDL.Variant({
+    Icp: IDL.Nat,
+    Appic: IDL.Nat,
+  });
+  const CandidLedgerSuiteRequest = IDL.Record({
+    erc20_contract: IDL.Text,
+    status: CandidErc20TwinLedgerSuiteStatus,
+    creator: IDL.Principal,
+    evm_token: IDL.Opt(CandidEvmToken),
+    created_at: IDL.Nat64,
+    fee_charged: CandidErc20TwinLedgerSuiteFee,
+    chain_id: IDL.Nat,
+    icp_token: IDL.Opt(CandidIcpToken),
   });
   const GetEvmTokenArgs = IDL.Record({
     chain_id: IDL.Nat,
@@ -155,16 +174,35 @@ export const idlFactory = ({ IDL }) => {
     TxAlreadyExsits: IDL.Null,
   });
   const Result_1 = IDL.Variant({ Ok: IDL.Null, Err: AddIcpToEvmTxError });
+  const CandidAddErc20TwinLedgerSuiteRequest = IDL.Record({
+    status: CandidErc20TwinLedgerSuiteStatus,
+    creator: IDL.Principal,
+    icp_ledger_id: IDL.Opt(IDL.Principal),
+    icp_token_name: IDL.Text,
+    created_at: IDL.Nat64,
+    fee_charged: CandidErc20TwinLedgerSuiteFee,
+    icp_token_symbol: IDL.Text,
+    evm_token_contract: IDL.Text,
+    evm_token_chain_id: IDL.Nat,
+  });
   return IDL.Service({
-    get_bridge_pairs: IDL.Func([], [IDL.Vec(TokenPair)], ["query"]),
-    get_evm_token: IDL.Func([GetEvmTokenArgs], [IDL.Opt(CandidEvmToken)], ["query"]),
-    get_icp_token: IDL.Func([GetIcpTokenArgs], [IDL.Opt(CandidIcpToken)], ["query"]),
-    get_icp_tokens: IDL.Func([], [IDL.Vec(CandidIcpToken)], ["query"]),
-    get_transaction: IDL.Func([GetTxParams], [IDL.Opt(Transaction)], ["query"]),
-    get_txs_by_address: IDL.Func([IDL.Text], [IDL.Vec(Transaction)], ["query"]),
-    get_txs_by_principal: IDL.Func([IDL.Principal], [IDL.Vec(Transaction)], ["query"]),
+    add_icp_token: IDL.Func([CandidIcpToken], [], []),
+    get_bridge_pairs: IDL.Func([], [IDL.Vec(TokenPair)], ['query']),
+    get_erc20_twin_ls_reqests_by_creator: IDL.Func([IDL.Principal], [IDL.Vec(CandidLedgerSuiteRequest)], ['query']),
+    get_evm_token: IDL.Func([GetEvmTokenArgs], [IDL.Opt(CandidEvmToken)], ['query']),
+    get_icp_token: IDL.Func([GetIcpTokenArgs], [IDL.Opt(CandidIcpToken)], ['query']),
+    get_icp_tokens: IDL.Func([], [IDL.Vec(CandidIcpToken)], ['query']),
+    get_transaction: IDL.Func([GetTxParams], [IDL.Opt(Transaction)], ['query']),
+    get_txs_by_address: IDL.Func([IDL.Text], [IDL.Vec(Transaction)], ['query']),
+    get_txs_by_principal: IDL.Func([IDL.Principal], [IDL.Vec(Transaction)], ['query']),
     icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOriginsResponse], []),
     new_evm_to_icp_tx: IDL.Func([AddEvmToIcpTx], [Result], []),
     new_icp_to_evm_tx: IDL.Func([AddIcpToEvmTx], [Result_1], []),
+    new_twin_ls_request: IDL.Func([CandidAddErc20TwinLedgerSuiteRequest], [], []),
+    request_update_bridge_pairs: IDL.Func([], [], []),
+    update_twin_ls_request: IDL.Func([CandidAddErc20TwinLedgerSuiteRequest], [], []),
   });
+};
+export const init = ({ IDL }) => {
+  return [];
 };

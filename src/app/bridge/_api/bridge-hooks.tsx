@@ -18,7 +18,7 @@ const getBridgePairsWithTime = () => {
   return { data: data ? JSON.parse(data) : null, lastFetchTime: lastFetchTime ? parseInt(lastFetchTime) : null };
 };
 
-const useGetBridgePairs = () => {
+const useGetBridgePairs = (agent: HttpAgent | undefined) => {
   const fetchBridgePairs = async () => {
     const { data, lastFetchTime } = getBridgePairsWithTime();
     const currentTime = new Date().getTime();
@@ -27,8 +27,7 @@ const useGetBridgePairs = () => {
     if (data && timeDiff < 1000 * 60 * 10) {
       return data;
     } else {
-      console.log('ahhhhhhhhh');
-      const agent = await HttpAgent.create({ host: process.env.NEXT_PUBLIC_ICP_API_HOST });
+      if (!agent) return [];
       const response = await get_bridge_pairs(agent);
       setBridgePairsWithTime(response.result);
       return response.result;

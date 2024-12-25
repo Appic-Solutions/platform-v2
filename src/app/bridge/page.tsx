@@ -23,7 +23,9 @@ const BridgeHome = () => {
   const [selectedOption, setSelectedOption] = useState<BridgeOptionType | null>(null);
   const [bridgePairs, setBridgePairs] = useState<(EvmToken | IcpToken)[]>();
 
-  const { data: bridgePairsData, isPending, isError } = useGetBridgePairs();
+  const unauthenticatedAgent = useUnAuthenticatedAgent();
+
+  const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unauthenticatedAgent);
 
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
@@ -53,8 +55,6 @@ const BridgeHome = () => {
       setSelectedOption(option);
     }
   };
-
-  const unauthenticatedAgent = useUnAuthenticatedAgent();
 
   useQuery({
     queryKey: ['IcpTokens'],

@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
-import type { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface AddEvmToIcpTx {
   principal: Principal;
@@ -15,7 +15,12 @@ export interface AddEvmToIcpTx {
   icrc_ledger_id: Principal;
   total_gas_spent: bigint;
 }
-export type AddEvmToIcpTxError = { InvalidAddress: null } | { ChinNotSupported: null } | { InvalidTokenPairs: null } | { InvalidTokenContract: null } | { TxAlreadyExsits: null };
+export type AddEvmToIcpTxError =
+  | { InvalidAddress: null }
+  | { ChinNotSupported: null }
+  | { InvalidTokenPairs: null }
+  | { InvalidTokenContract: null }
+  | { TxAlreadyExsits: null };
 export interface AddIcpToEvmTx {
   destination: string;
   withdrawal_amount: bigint;
@@ -29,7 +34,25 @@ export interface AddIcpToEvmTx {
   icrc_ledger_id: Principal;
   native_ledger_burn_index: bigint;
 }
-export type AddIcpToEvmTxError = { InvalidDestination: null } | { ChinNotSupported: null } | { InvalidTokenPairs: null } | { InvalidTokenContract: null } | { TxAlreadyExsits: null };
+export type AddIcpToEvmTxError =
+  | { InvalidDestination: null }
+  | { ChinNotSupported: null }
+  | { InvalidTokenPairs: null }
+  | { InvalidTokenContract: null }
+  | { TxAlreadyExsits: null };
+export interface CandidAddErc20TwinLedgerSuiteRequest {
+  status: CandidErc20TwinLedgerSuiteStatus;
+  creator: Principal;
+  icp_ledger_id: [] | [Principal];
+  icp_token_name: string;
+  created_at: bigint;
+  fee_charged: CandidErc20TwinLedgerSuiteFee;
+  icp_token_symbol: string;
+  evm_token_contract: string;
+  evm_token_chain_id: bigint;
+}
+export type CandidErc20TwinLedgerSuiteFee = { Icp: bigint } | { Appic: bigint };
+export type CandidErc20TwinLedgerSuiteStatus = { PendingApproval: null } | { Created: null } | { Installed: null };
 export interface CandidEvmToIcp {
   status: EvmToIcpStatus;
   principal: Principal;
@@ -88,7 +111,22 @@ export interface CandidIcpToken {
   token_type: IcpTokenType;
   symbol: string;
 }
-export type EvmToIcpStatus = { Invalid: string } | { PendingVerification: null } | { Minted: null } | { Accepted: null } | { Quarantined: null };
+export interface CandidLedgerSuiteRequest {
+  erc20_contract: string;
+  status: CandidErc20TwinLedgerSuiteStatus;
+  creator: Principal;
+  evm_token: [] | [CandidEvmToken];
+  created_at: bigint;
+  fee_charged: CandidErc20TwinLedgerSuiteFee;
+  chain_id: bigint;
+  icp_token: [] | [CandidIcpToken];
+}
+export type EvmToIcpStatus =
+  | { Invalid: string }
+  | { PendingVerification: null }
+  | { Minted: null }
+  | { Accepted: null }
+  | { Quarantined: null };
 export interface GetEvmTokenArgs {
   chain_id: bigint;
   address: string;
@@ -100,7 +138,17 @@ export interface GetTxParams {
   chain_id: bigint;
   search_param: TransactionSearchParam;
 }
-export type IcpToEvmStatus = { Failed: null } | { SignedTransaction: null } | { ReplacedTransaction: null } | { QuarantinedReimbursement: null } | { PendingVerification: null } | { Accepted: null } | { Reimbursed: null } | { Successful: null } | { Created: null } | { FinalizedTransaction: null };
+export type IcpToEvmStatus =
+  | { Failed: null }
+  | { SignedTransaction: null }
+  | { ReplacedTransaction: null }
+  | { QuarantinedReimbursement: null }
+  | { PendingVerification: null }
+  | { Accepted: null }
+  | { Reimbursed: null }
+  | { Successful: null }
+  | { Created: null }
+  | { FinalizedTransaction: null };
 export type IcpTokenType = { ICRC1: null } | { ICRC2: null } | { ICRC3: null } | { DIP20: null } | { Other: string };
 export interface Icrc28TrustedOriginsResponse {
   trusted_origins: Array<string>;
@@ -140,7 +188,9 @@ export interface UpgradeArg {
   update_minters: [] | [Array<UpdateMinterArgs>];
 }
 export interface _SERVICE {
+  add_icp_token: ActorMethod<[CandidIcpToken], undefined>;
   get_bridge_pairs: ActorMethod<[], Array<TokenPair>>;
+  get_erc20_twin_ls_reqests_by_creator: ActorMethod<[Principal], Array<CandidLedgerSuiteRequest>>;
   get_evm_token: ActorMethod<[GetEvmTokenArgs], [] | [CandidEvmToken]>;
   get_icp_token: ActorMethod<[GetIcpTokenArgs], [] | [CandidIcpToken]>;
   get_icp_tokens: ActorMethod<[], Array<CandidIcpToken>>;
@@ -150,6 +200,9 @@ export interface _SERVICE {
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
   new_evm_to_icp_tx: ActorMethod<[AddEvmToIcpTx], Result>;
   new_icp_to_evm_tx: ActorMethod<[AddIcpToEvmTx], Result_1>;
+  new_twin_ls_request: ActorMethod<[CandidAddErc20TwinLedgerSuiteRequest], undefined>;
+  request_update_bridge_pairs: ActorMethod<[], undefined>;
+  update_twin_ls_request: ActorMethod<[CandidAddErc20TwinLedgerSuiteRequest], undefined>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];
