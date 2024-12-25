@@ -67,7 +67,7 @@ interface BridgeOption {
 
 // Constants
 const DEFAULT_SUBACCOUNT = '0x0000000000000000000000000000000000000000000000000000000000000000';
-
+const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 /**
  * Get bridge options for a transaction.
  */
@@ -76,10 +76,15 @@ export const get_bridge_options = async (
   to_token: EvmToken | IcpToken,
   amount: string,
   agent: HttpAgent,
-  native_currency: EvmToken | IcpToken,
+  bridge_pairs: (EvmToken | IcpToken)[],
 ): Promise<Response<BridgeOption[]>> => {
   const bridge_metadata = get_bridge_metadata(from_token, to_token);
-
+  const native_currency = get_native_currency(
+    bridge_metadata.operator,
+    bridge_metadata.chain_id,
+    bridge_metadata.tx_type,
+    bridge_pairs,
+  );
   try {
     const value = bridge_metadata.is_native ? amount : '0';
     const encoded_function_data = encode_function_data(from_token, bridge_metadata, amount);
@@ -323,4 +328,45 @@ const calculate_bridge_options = async (
     console.error('Error calculating bridge options:', error);
     return [];
   }
+};
+
+/**
+ * Get native currency.
+ */
+const get_native_currency = (
+  operator: Operator,
+  chain_id: number,
+  tx_type: TxType,
+  bridge_pairs: (EvmToken | IcpToken)[],
+): EvmToken | IcpToken => {
+  const chain = chains.find((chain) => chain.chainId === chain_id);
+
+  if (!chain) {
+    throw new Error(`Chain with chainId ${chain_id} not found.`);
+  }
+
+  if (tx_type === TxType.Deposit) {
+    return (
+      bridge_pairs.find((token) => token.chain_type === 'EVM' && token.contractAddress === NATIVE_TOKEN_ADDRESS) ??
+      (() => {
+        throw new Error('Native currency for deposit transaction not found in bridge pairs.');
+      })()
+    );
+  } else if (tx_type === TxType.Withdrawal) {
+    const native_twin_ledger =
+      operator === 'Appic' ? chain.appic_twin_native_ledger_cansiter_id : chain.dfinity_ck_native_ledger_casniter_id;
+
+    if (!native_twin_ledger) {
+      throw new Error(`Native twin ledger ID not found for operator ${operator}.`);
+    }
+
+    return (
+      bridge_pairs.find((token) => token.chain_type === 'ICP' && token.canisterId === native_twin_ledger) ??
+      (() => {
+        throw new Error('Native currency for withdrawal transaction not found in bridge pairs.');
+      })()
+    );
+  }
+
+  throw new Error(`Unsupported transaction type: ${tx_type}`);
 };
