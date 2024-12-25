@@ -4,14 +4,14 @@
  * @param {string} text The textual representation of a principal.
  * @return {string} A 32-byte hex-encoded byte string.
  */
-export function principalToBytes32(text: string) {
+export function principal_to_bytes32(text: string) {
   /**
    * Decodes a base32-encoded string into a byte array.
    * @param {string} text A base-32 encoded string.
    * @return {Array<number>} A byte array.
    */
   function base32Decode(text: string) {
-    const ALPHABET = "abcdefghijklmnopqrstuvwxyz234567";
+    const ALPHABET = 'abcdefghijklmnopqrstuvwxyz234567';
     let width = 0;
     let acc = 0;
     const bytes = [];
@@ -29,7 +29,7 @@ export function principalToBytes32(text: string) {
       }
     }
     if (acc > 0) {
-      throw Error("Invalid principal: non-zero padding");
+      throw Error('Invalid principal: non-zero padding');
     }
     return bytes;
   }
@@ -53,24 +53,24 @@ export function principalToBytes32(text: string) {
    */
   function bytes32Encode(bytes: number[]) {
     const n = bytes.length;
-    let s = "0x";
+    let s = '0x';
     s = appendHexByte(s, n);
     for (let i = 0; i < bytes.length; i++) {
       s = appendHexByte(s, bytes[i]);
     }
     for (let i = 0; i < 31 - bytes.length; i++) {
-      s += "00";
+      s += '00';
     }
     return s;
   }
 
-  const ungroup = text.replace(/-/g, "");
+  const ungroup = text.replace(/-/g, '');
   const rawBytes = base32Decode(ungroup);
   if (rawBytes.length < 4) {
-    throw Error("Invalid principal: too short");
+    throw Error('Invalid principal: too short');
   }
   if (rawBytes.length > 33) {
-    throw Error("Invalid principal: too long");
+    throw Error('Invalid principal: too long');
   }
   return bytes32Encode(rawBytes.slice(4));
 }

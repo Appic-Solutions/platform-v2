@@ -1,17 +1,14 @@
-import { ChainType } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken, Operator } from '@/blockchain_api/types/tokens';
-import { useEstimateGas } from 'wagmi';
-import { encodeFunctionData, prepareEncodeFunctionData } from 'viem';
+import { encodeFunctionData } from 'viem';
 import appic_minter_abi from '../../abi/appic_minter.json';
 import dfinity_ck_minter_abi from '../../abi/dfinity_minter.json';
-
+import { Response } from '@/blockchain_api/types/response';
 import { Principal } from '@dfinity/principal';
 import { chains } from '@/blockchain_api/lists/chains';
-import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { Actor, HttpAgent } from '@dfinity/agent';
 
-// Appic minter idl factory and types
+// Appic minter IDL and types
 import { idlFactory as AppicIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
   MinterInfo,
@@ -19,8 +16,8 @@ import {
   Eip1559TransactionPriceArg as AppicEip1559TransactionPriceArg,
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 
-// Dfinity minter idl factory and types
-import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
+// Dfinity minter IDL and types
+import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
 import {
   Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
   Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
@@ -28,7 +25,8 @@ import {
 
 import { is_native_token } from '../evm/utils/erc20_helpers';
 import BigNumber from 'bignumber.js';
-import { principalToBytes32 } from './utils/principal_to_hex';
+import { principal_to_bytes32 } from './utils/principal_to_hex';
+import { createPublicClient, http, Chain as ViemChain } from 'viem';
 
 // Enums and Types
 enum Badge {
@@ -43,251 +41,286 @@ enum TxType {
 }
 
 interface BridgeMetadata {
-  txType: TxType;
-  minterAddress: Principal;
+  tx_type: TxType;
+  minter_address: Principal;
   operator: Operator;
-  chainId: number;
-  isNative: boolean;
-  depositHelperContract: string;
+  chain_id: number;
+  is_native: boolean;
+  deposit_helper_contract: `0x${string}`;
+  viem_chain: ViemChain;
 }
 
 interface BridgeOption {
-  bridgeTxType: TxType;
-  minterId: string;
+  bridge_tx_type: TxType;
+  minter_id: string;
   operator: Operator;
-  estimatedReturn: string;
-  minterFee: string;
-  totalFee: string;
+  estimated_return: string;
+  minter_fee: string;
+  total_fee: string;
   via: string;
   duration: string;
-  totalFeeusdPrice: string;
-  isBest: boolean;
-  isActive: boolean;
+  total_fee_usd_price: string;
+  is_best: boolean;
+  is_active: boolean;
   badge: Badge;
 }
 
-interface GasEstimation {
-  data: `0x${string}`;
-  chainId: number;
-  value: bigint;
-  type: 'eip1559';
-  to: `0x${string}`;
-}
-
-// Utilities
+// Constants
 const DEFAULT_SUBACCOUNT = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-const fetchMinterFee = async (
+/**
+ * Get bridge options for a transaction.
+ */
+export const get_bridge_options = async (
+  from_token: EvmToken | IcpToken,
+  to_token: EvmToken | IcpToken,
+  amount: string,
   agent: HttpAgent,
-  operator: string,
-  minterAddress: Principal,
-  txType: TxType,
-): Promise<string> => {
-  if (operator === 'Appic') {
-    const appicMinterActor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minterAddress });
-    try {
-      const minterInfo = (await appicMinterActor.get_minter_info()) as MinterInfo;
-      return txType === TxType.Deposit
-        ? minterInfo.deposit_native_fee.toString()
-        : minterInfo.withdrawal_native_fee.toString();
-    } catch (error) {
-      console.error('Error fetching Appic minter fee:', error);
-      throw new Error('Failed to fetch Appic minter fee');
-    }
-  }
-  return '0';
-};
-
-const fetchWithdrawalFee = async (
-  agent: HttpAgent,
-  operator: string,
-  minterAddress: Principal,
-  isNativeToken: boolean,
-  tokenCanisterId: string,
-): Promise<string> => {
-  const handleError = (message: string, error: any) => {
-    console.error(message, error);
-    return '0';
-  };
+  native_currency: EvmToken | IcpToken,
+): Promise<Response<BridgeOption[]>> => {
+  const bridge_metadata = get_bridge_metadata(from_token, to_token);
 
   try {
-    // Appic Operator Logic
-    if (operator === 'Appic') {
-      const appicMinterActor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minterAddress });
+    const value = bridge_metadata.is_native ? amount : '0';
+    const encoded_function_data = encode_function_data(from_token, bridge_metadata, amount);
 
-      const eip1559TransactionPrice = isNativeToken
-        ? ((await appicMinterActor.eip_1559_transaction_price()) as AppicEip1559TransactionPrice)
-        : ((await appicMinterActor.eip_1559_transaction_price({
-            erc20_ledger_id: Principal.fromText(tokenCanisterId),
-          } as AppicEip1559TransactionPriceArg)) as AppicEip1559TransactionPrice);
+    const gas_estimation =
+      bridge_metadata.tx_type === TxType.Deposit
+        ? await estimate_deposit_gas(
+            value,
+            encoded_function_data,
+            bridge_metadata.deposit_helper_contract,
+            bridge_metadata.viem_chain,
+          )
+        : await estimate_withdrawal_gas(
+            agent,
+            bridge_metadata.operator,
+            bridge_metadata.minter_address,
+            bridge_metadata.is_native,
+            from_token.canisterId!,
+          );
 
-      return eip1559TransactionPrice.max_transaction_fee.toString();
-    }
-
-    // Dfinity Operator Logic
-    if (operator === 'Dfinity') {
-      const dfinityMinterActor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minterAddress });
-
-      const eip1559TransactionPrice = isNativeToken
-        ? ((await dfinityMinterActor.eip_1559_transaction_price()) as DfinityEip1559TransactionPrice)
-        : ((await dfinityMinterActor.eip_1559_transaction_price({
-            ckerc20_ledger_id: Principal.fromText(tokenCanisterId),
-          } as DfinityEip1559TransactionPriceArg)) as DfinityEip1559TransactionPrice);
-
-      return eip1559TransactionPrice.max_transaction_fee.toString();
-    }
-
-    // Default for unsupported operators
-    return '0';
+    const bridge_options = await calculate_bridge_options(
+      agent,
+      bridge_metadata,
+      gas_estimation,
+      amount,
+      native_currency,
+    );
+    return { result: bridge_options, message: '', success: true };
   } catch (error) {
-    return handleError('Error fetching withdrawal fee:', error);
+    console.error('Error getting bridge options:', error);
+    return { result: [], message: `Failed to calculate bridge options: ${error}`, success: false };
   }
 };
 
-const getBridgeMetadata = (fromToken: EvmToken | IcpToken, toToken: EvmToken | IcpToken): BridgeMetadata => {
-  const isDeposit = fromToken.chain_type === 'EVM' && toToken.chain_type === 'ICP';
-  const operator = isDeposit ? toToken.operator! : fromToken.operator!;
-  const chainId = isDeposit ? fromToken.chainId : toToken.chainId;
+// Helpers
+
+/**
+ * Fetch the minter fee for a transaction.
+ */
+const fetch_minter_fee = async (
+  agent: HttpAgent,
+  operator: string,
+  minter_address: Principal,
+  tx_type: TxType,
+): Promise<string> => {
+  try {
+    if (operator === 'Appic') {
+      const appic_minter_actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address });
+      const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
+      return tx_type === TxType.Deposit
+        ? minter_info.deposit_native_fee.toString()
+        : minter_info.withdrawal_native_fee.toString();
+    }
+    return '0';
+  } catch (error) {
+    console.error('Error fetching minter fee:', error);
+    throw new Error('Failed to fetch minter fee');
+  }
+};
+
+/**
+ * Estimate gas for a withdrawal transaction.
+ */
+const estimate_withdrawal_gas = async (
+  agent: HttpAgent,
+  operator: string,
+  minter_address: Principal,
+  is_native_token: boolean,
+  token_canister_id: string,
+): Promise<string> => {
+  try {
+    if (operator === 'Appic') {
+      // Cast actor to Appic Minter Type
+      const actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address }) as {
+        eip_1559_transaction_price: (arg?: AppicEip1559TransactionPriceArg) => Promise<AppicEip1559TransactionPrice>;
+      };
+
+      const price = is_native_token
+        ? await actor.eip_1559_transaction_price()
+        : await actor.eip_1559_transaction_price({
+            erc20_ledger_id: Principal.fromText(token_canister_id),
+          });
+
+      return price.max_transaction_fee.toString();
+    }
+
+    if (operator === 'Dfinity') {
+      // Cast actor to Dfinity Minter Type
+      const actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address }) as {
+        eip_1559_transaction_price: (
+          arg?: DfinityEip1559TransactionPriceArg,
+        ) => Promise<DfinityEip1559TransactionPrice>;
+      };
+
+      const price = is_native_token
+        ? await actor.eip_1559_transaction_price()
+        : await actor.eip_1559_transaction_price({
+            ckerc20_ledger_id: Principal.fromText(token_canister_id),
+          });
+
+      return price.max_transaction_fee.toString();
+    }
+
+    // Fallback for unsupported operators
+    return '0';
+  } catch (error) {
+    console.error('Error estimating withdrawal gas:', error);
+    return '0';
+  }
+};
+
+/**
+ * Estimate gas for a deposit transaction.
+ */
+const estimate_deposit_gas = async (
+  value: string,
+  encoded_function_data: `0x${string}`,
+  deposit_helper_contract: `0x${string}`,
+  chain: ViemChain,
+): Promise<string> => {
+  try {
+    const client = createPublicClient({ transport: http(), chain });
+    const estimated_gas = await client.estimateGas({
+      to: deposit_helper_contract,
+      value: BigInt(value),
+      type: 'eip1559',
+      data: encoded_function_data,
+    });
+    return estimated_gas.toString();
+  } catch (error) {
+    console.error('Error estimating deposit gas:', error);
+    return '0';
+  }
+};
+
+/**
+ * Get metadata for the bridge transaction.
+ */
+const get_bridge_metadata = (from_token: EvmToken | IcpToken, to_token: EvmToken | IcpToken): BridgeMetadata => {
+  const is_deposit = from_token.chain_type === 'EVM' && to_token.chain_type === 'ICP';
+  const operator = is_deposit ? to_token.operator! : from_token.operator!;
+  const chain_id = is_deposit ? from_token.chainId : to_token.chainId;
+  const viem_chain = chains.find((chain) => chain.chainId === chain_id)?.viem_config!;
 
   return {
-    txType: isDeposit ? TxType.Deposit : TxType.Withdrawal,
-    minterAddress: getMinterAddress(operator, chainId),
+    tx_type: is_deposit ? TxType.Deposit : TxType.Withdrawal,
+    minter_address: get_minter_address(operator, chain_id),
     operator,
-    chainId,
-    isNative: is_native_token(isDeposit ? fromToken.contractAddress! : toToken.contractAddress!),
-    depositHelperContract: getDepositHelperContract(operator, chainId),
+    chain_id,
+    is_native: is_native_token(is_deposit ? from_token.contractAddress! : to_token.contractAddress!),
+    deposit_helper_contract: get_deposit_helper_contract(operator, chain_id),
+    viem_chain,
   };
 };
 
-const getMinterAddress = (operator: string, chainId: number): Principal => {
-  const chain = chains.find((chain) => chain.chainId === chainId);
+/**
+ * Get the minter address for a chain and operator.
+ */
+const get_minter_address = (operator: string, chain_id: number): Principal => {
+  const chain = chains.find((chain) => chain.chainId === chain_id);
   const address = operator === 'Appic' ? chain?.appic_minter_address : chain?.dfinity_ck_minter_address;
   return Principal.fromText(address!);
 };
 
-const getDepositHelperContract = (operator: string, chainId: number): string => {
-  const chain = chains.find((chain) => chain.chainId === chainId);
-  return operator === 'Appic' ? chain?.appic_deposit_helper_contract! : chain?.dfinity_ck_deposit_helper_contract!;
+/**
+ * Get the deposit helper contract address.
+ */
+const get_deposit_helper_contract = (operator: string, chain_id: number): `0x${string}` => {
+  const chain = chains.find((chain) => chain.chainId === chain_id);
+  return operator === 'Appic'
+    ? (chain?.appic_deposit_helper_contract! as `0x${string}`)
+    : (chain?.dfinity_ck_deposit_helper_contract! as `0x${string}`);
 };
 
-// Hook: useGetBridgeOptions
-export const useGetBridgeOptions = (
-  fromToken: EvmToken | IcpToken,
-  toToken: EvmToken | IcpToken,
+/**
+ * Encode function data for a transaction.
+ */
+const encode_function_data = (
+  from_token: EvmToken | IcpToken,
+  bridge_metadata: BridgeMetadata,
   amount: string,
+): `0x${string}` => {
+  const principal = principal_to_bytes32('6b5ll-mteg5-kmyav-a6l7g-lpwje-jc4ln-moggr-wrfvu-n54bz-gh3nr-wae');
+
+  if (bridge_metadata.operator === 'Appic') {
+    return encodeFunctionData({
+      abi: appic_minter_abi,
+      functionName: 'deposit',
+      args: [from_token.contractAddress!, amount, principal, DEFAULT_SUBACCOUNT],
+    });
+  }
+
+  return encodeFunctionData({
+    abi: dfinity_ck_minter_abi,
+    functionName: bridge_metadata.is_native ? 'depositEth' : 'depositErc20',
+    args: bridge_metadata.is_native
+      ? [principal, DEFAULT_SUBACCOUNT]
+      : [from_token.contractAddress!, amount, principal, DEFAULT_SUBACCOUNT],
+  });
+};
+
+/**
+ * Calculate bridge options.
+ */
+const calculate_bridge_options = async (
   agent: HttpAgent,
+  bridge_metadata: BridgeMetadata,
+  estimated_gas: string,
+  amount: string,
   native_currency: EvmToken | IcpToken,
-) => {
-  const [bridgeOptions, setBridgeOptions] = useState<BridgeOption[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+): Promise<BridgeOption[]> => {
+  try {
+    const minter_fee = await fetch_minter_fee(
+      agent,
+      bridge_metadata.operator,
+      bridge_metadata.minter_address,
+      bridge_metadata.tx_type,
+    );
 
-  const bridgeMetadata = useMemo(() => getBridgeMetadata(fromToken, toToken), [fromToken, toToken]);
+    const total_fee = new BigNumber(minter_fee).plus(estimated_gas).toString();
+    const estimated_return = new BigNumber(amount).minus(total_fee).toString();
+    const duration = bridge_metadata.operator === 'Appic' ? '1 - 2 min' : '15 - 20 min';
 
-  const fetchEncodedFunctionData = useCallback((): `0x${string}` => {
-    if (fromToken.chain_type == 'EVM') {
-      const principal = principalToBytes32('6b5ll-mteg5-kmyav-a6l7g-lpwje-jc4ln-moggr-wrfvu-n54bz-gh3nr-wae');
-      const value = bridgeMetadata.isNative ? amount : '0';
-
-      if (bridgeMetadata.operator === 'Appic') {
-        return encodeFunctionData({
-          abi: appic_minter_abi,
-          functionName: 'deposit',
-          args: [fromToken.contractAddress!, amount, principal, DEFAULT_SUBACCOUNT],
-        });
-      }
-
-      if (bridgeMetadata.operator === 'Dfinity') {
-        return encodeFunctionData({
-          abi: dfinity_ck_minter_abi,
-          functionName: bridgeMetadata.isNative ? 'depositEth' : 'depositErc20',
-          args: bridgeMetadata.isNative
-            ? [principal, DEFAULT_SUBACCOUNT]
-            : [fromToken.contractAddress!, amount, principal, DEFAULT_SUBACCOUNT],
-        });
-      }
-    }
-    return '' as `0x${string}`;
-  }, [bridgeMetadata, fromToken, amount]);
-
-  const estimateWithdrawalGas = useCallback(async (): Promise<string> => {
-    if (fromToken.chain_type == 'ICP') {
-      try {
-        return await fetchWithdrawalFee(
-          agent,
-          bridgeMetadata.operator,
-          bridgeMetadata.minterAddress,
-          bridgeMetadata.isNative,
-          fromToken.canisterId!,
-        );
-      } catch (error) {
-        setError('Failed to Get withdrawal fee estimate');
-        return '0';
-      }
-    }
-    return '0';
-  }, [bridgeMetadata, fromToken]);
-
-  const encodedFunctionData = fetchEncodedFunctionData();
-
-  const estimatedWithdrawalGas = estimateWithdrawalGas();
-  const {
-    data: estimateDepositGas,
-    status: estimateDepositGasStatus,
-    isFetched: isEstimationFetched,
-  } = useEstimateGas({
-    data: encodedFunctionData,
-    chainId: bridgeMetadata.chainId,
-    value: BigInt(bridgeMetadata.isNative ? amount : '0'),
-    type: 'eip1559',
-    to: bridgeMetadata.depositHelperContract as `0x${string}`,
-  } as GasEstimation);
-
-  const calculateBridgeOptions = useCallback(async () => {
-    setLoading(true);
-    try {
-      const minterFee = await fetchMinterFee(
-        agent,
-        bridgeMetadata.operator,
-        bridgeMetadata.minterAddress,
-        bridgeMetadata.txType,
-      );
-
-      let totalFee = new BigNumber(minterFee)
-        .plus(
-          bridgeMetadata.txType == TxType.Deposit ? estimateDepositGas?.toString() || 0 : await estimatedWithdrawalGas,
-        )
-        .toString();
-
-      let estimatedReturn = BigNumber(amount).minus(totalFee).toString();
-
-      let duration = bridgeMetadata.operator == 'Appic' ? '1 - 2 min' : '15 - 20 min';
-
-      setBridgeOptions([
-        {
-          bridgeTxType: bridgeMetadata.txType,
-          minterId: bridgeMetadata.minterAddress.toText(),
-          operator: bridgeMetadata.operator,
-          estimatedReturn,
-          minterFee,
-          totalFee,
-          via: bridgeMetadata.operator,
-          duration,
-          isBest: true,
-          isActive: true,
-          badge: Badge.BEST,
-          totalFeeusdPrice: BigNumber(totalFee).multipliedBy(native_currency.usdPrice).toString(),
-        },
-      ]);
-    } catch (err: any) {
-      setError(err.message || 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  }, [bridgeMetadata, amount, estimateDepositGas, estimatedWithdrawalGas]);
-
-  // useEffect for calculating bridge options
-  useEffect(() => {}, [bridgeMetadata, estimateDepositGas, estimatedWithdrawalGas]);
-
-  return { bridgeOptions, error, loading };
+    return [
+      {
+        bridge_tx_type: bridge_metadata.tx_type,
+        minter_id: bridge_metadata.minter_address.toText(),
+        operator: bridge_metadata.operator,
+        estimated_return,
+        minter_fee,
+        total_fee,
+        via: bridge_metadata.operator,
+        duration,
+        is_best: true,
+        is_active: true,
+        badge: Badge.BEST,
+        total_fee_usd_price: new BigNumber(total_fee).multipliedBy(native_currency.usdPrice).toString(),
+      },
+    ];
+  } catch (error) {
+    console.error('Error calculating bridge options:', error);
+    return [];
+  }
 };
