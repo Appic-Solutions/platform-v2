@@ -1,6 +1,5 @@
 import { Chain } from '../types/chains';
 import { Operator } from '../types/tokens';
-import { Chain as VeimChain } from 'viem/chains';
 import { mainnet, bsc, polygon, fantom, arbitrum, base, avalanche, optimism } from 'viem/chains';
 export const chains: Chain[] = [
   {
