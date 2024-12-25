@@ -2,6 +2,7 @@ import { EvmToken, IcpToken, Operator } from '@/blockchain_api/types/tokens';
 import { encodeFunctionData } from 'viem';
 import appic_minter_abi from '../../abi/appic_minter.json';
 import dfinity_ck_minter_abi from '../../abi/dfinity_minter.json';
+import erc20_abi from '../../abi/erc20_tokens.json';
 import { Response } from '@/blockchain_api/types/response';
 import { Principal } from '@dfinity/principal';
 import { chains } from '@/blockchain_api/lists/chains';
@@ -52,11 +53,15 @@ interface BridgeMetadata {
 
 interface BridgeOption {
   bridge_tx_type: TxType;
-  minter_id: string;
+  minter_id: Principal;
+  chain_id: number;
+  deposit_helper_contract: string;
   operator: Operator;
-  estimated_return: string;
   minter_fee: string;
-  total_fee: string;
+  max_network_fee: string;
+  approval_fee: string;
+  estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
+  total_fee: string; // max_network_fee + minter_fee + approval_fee
   via: string;
   duration: string;
   total_fee_usd_price: string;
@@ -87,32 +92,57 @@ export const get_bridge_options = async (
   );
   try {
     const value = bridge_metadata.is_native ? amount : '0';
-    const encoded_function_data = encode_function_data(from_token, bridge_metadata, amount);
+    if (bridge_metadata.tx_type == TxType.Deposit) {
+      const encoded_function_data = encode_function_data(from_token, bridge_metadata, amount);
+      const encoded_approval_data = encode_approval_function_data(bridge_metadata, amount);
 
-    const gas_estimation =
-      bridge_metadata.tx_type === TxType.Deposit
-        ? await estimate_deposit_gas(
-            value,
-            encoded_function_data,
-            bridge_metadata.deposit_helper_contract,
-            bridge_metadata.viem_chain,
-          )
-        : await estimate_withdrawal_gas(
-            agent,
-            bridge_metadata.operator,
-            bridge_metadata.minter_address,
-            bridge_metadata.is_native,
-            from_token.canisterId!,
-          );
+      const estimated_approval_gas = await estimate_deposit_approval_gas(
+        encoded_approval_data,
+        from_token.contractAddress! as `0x${string}`,
+        bridge_metadata.viem_chain,
+      );
 
-    const bridge_options = await calculate_bridge_options(
-      agent,
-      bridge_metadata,
-      gas_estimation,
-      amount,
-      native_currency,
-    );
-    return { result: bridge_options, message: '', success: true };
+      const estimated_deposit_gas = await estimate_deposit_gas(
+        value,
+        encoded_function_data,
+        bridge_metadata.deposit_helper_contract,
+        bridge_metadata.viem_chain,
+      );
+
+      const bridge_options = await calculate_bridge_options(
+        agent,
+        bridge_metadata,
+        estimated_deposit_gas,
+        estimated_approval_gas,
+        '0',
+        amount,
+        native_currency,
+      );
+      return { result: bridge_options, message: '', success: true };
+    } else if (bridge_metadata.tx_type == TxType.Withdrawal) {
+      const estimated_approval_gas = native_currency.fee!;
+      const estimated_approval_fee_erc20 = bridge_metadata.is_native ? '0' : from_token.fee!;
+      const estimated_withdrawal_gas = await estimate_withdrawal_gas(
+        agent,
+        bridge_metadata.operator,
+        bridge_metadata.minter_address,
+        bridge_metadata.is_native,
+        from_token.canisterId!,
+      );
+      const bridge_options = await calculate_bridge_options(
+        agent,
+        bridge_metadata,
+        estimated_withdrawal_gas,
+        estimated_approval_gas,
+        estimated_approval_fee_erc20,
+        amount,
+        native_currency,
+      );
+
+      return { result: bridge_options, message: '', success: true };
+    } else {
+      return { result: [], message: 'Failed to calculate bridge options, Tx type not supported', success: false };
+    }
   } catch (error) {
     console.error('Error getting bridge options:', error);
     return { result: [], message: `Failed to calculate bridge options: ${error}`, success: false };
@@ -185,7 +215,9 @@ const estimate_withdrawal_gas = async (
             ckerc20_ledger_id: Principal.fromText(token_canister_id),
           });
 
-      return price.max_transaction_fee.toString();
+      return BigNumber(price.max_transaction_fee.toString())
+        .plus(BigNumber(price.max_transaction_fee.toString()).multipliedBy(12.5).dividedBy(100).toString())
+        .toString(); // plus 12.5 percent to add a buffer for gas fee
     }
 
     // Fallback for unsupported operators
@@ -210,6 +242,28 @@ const estimate_deposit_gas = async (
     const estimated_gas = await client.estimateGas({
       to: deposit_helper_contract,
       value: BigInt(value),
+      type: 'eip1559',
+      data: encoded_function_data,
+    });
+    return estimated_gas.toString();
+  } catch (error) {
+    console.error('Error estimating deposit gas:', error);
+    return '0';
+  }
+};
+
+/**
+ * Estimate gas for a deposit approval in case of erc20 tokens.
+ */
+const estimate_deposit_approval_gas = async (
+  encoded_function_data: `0x${string}`,
+  token_contract_address: `0x${string}`,
+  chain: ViemChain,
+): Promise<string> => {
+  try {
+    const client = createPublicClient({ transport: http(), chain });
+    const estimated_gas = await client.estimateGas({
+      to: token_contract_address,
       type: 'eip1559',
       data: encoded_function_data,
     });
@@ -273,7 +327,7 @@ const encode_function_data = (
     return encodeFunctionData({
       abi: appic_minter_abi,
       functionName: 'deposit',
-      args: [from_token.contractAddress!, amount, principal, DEFAULT_SUBACCOUNT],
+      args: [from_token.contractAddress, amount, principal, DEFAULT_SUBACCOUNT],
     });
   }
 
@@ -287,12 +341,25 @@ const encode_function_data = (
 };
 
 /**
+ * Encode function data for a transaction.
+ */
+const encode_approval_function_data = (bridge_metadata: BridgeMetadata, amount: string): `0x${string}` => {
+  return encodeFunctionData({
+    abi: erc20_abi,
+    functionName: 'approve',
+    args: [bridge_metadata.deposit_helper_contract, amount],
+  });
+};
+
+/**
  * Calculate bridge options.
  */
 const calculate_bridge_options = async (
   agent: HttpAgent,
   bridge_metadata: BridgeMetadata,
-  estimated_gas: string,
+  estimated_network_fee: string,
+  approval_fee: string,
+  approval_fee_erc20: string,
   amount: string,
   native_currency: EvmToken | IcpToken,
 ): Promise<BridgeOption[]> => {
@@ -304,24 +371,30 @@ const calculate_bridge_options = async (
       bridge_metadata.tx_type,
     );
 
-    const total_fee = new BigNumber(minter_fee).plus(estimated_gas).toString();
-    const estimated_return = new BigNumber(amount).minus(total_fee).toString();
+    const total_netowrk_fee = new BigNumber(minter_fee).plus(estimated_network_fee).plus(approval_fee).toString();
+    const estimated_return = bridge_metadata.is_native
+      ? new BigNumber(amount).minus(total_netowrk_fee).toString()
+      : new BigNumber(amount).minus(approval_fee_erc20).toString();
     const duration = bridge_metadata.operator === 'Appic' ? '1 - 2 min' : '15 - 20 min';
 
     return [
       {
         bridge_tx_type: bridge_metadata.tx_type,
-        minter_id: bridge_metadata.minter_address.toText(),
+        minter_id: bridge_metadata.minter_address,
         operator: bridge_metadata.operator,
+        chain_id: bridge_metadata.chain_id,
         estimated_return,
         minter_fee,
-        total_fee,
+        max_network_fee: estimated_network_fee,
+        approval_fee: approval_fee,
+        total_fee: total_netowrk_fee,
         via: bridge_metadata.operator,
         duration,
         is_best: true,
         is_active: true,
         badge: Badge.BEST,
-        total_fee_usd_price: new BigNumber(total_fee).multipliedBy(native_currency.usdPrice).toString(),
+        total_fee_usd_price: new BigNumber(total_netowrk_fee).multipliedBy(native_currency.usdPrice).toString(),
+        deposit_helper_contract: '',
       },
     ];
   } catch (error) {
