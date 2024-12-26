@@ -4,6 +4,40 @@ import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.d
 import { Approve, Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
+import { Operator } from '@/blockchain_api/types/tokens';
+import { BridgeOption } from './get_bridge_options';
+import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
+import {
+  WithdrawalArg as AppicWithdrawalArg,
+  WithdrawErc20Arg as AppicWithdrawErc20Arg,
+  WithdrawalNativeResult as AppicWithdrawalNativeResult,
+  WithdrawalErc20Result as AppicWithdrawalErc20Result,
+} from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
+
+import { idlFactory as DfinityMinterIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
+import {
+  WithdrawalArg as DfinityWithdrawalArg,
+  WithdrawErc20Arg as DfinityWithdrawErc20Arg,
+  WithdrawErc20Error as DfinityWithdrawErc20Error,
+  WithdrawalError as DfinityWithdrawalError,
+  RetrieveErc20Request as DfinityRetrieveErc20Request,
+  RetrieveEthRequest as DfinityRetrieveEthRequest,
+} from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
+
+import { idlFactory as AppicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
+import {
+  AddEvmToIcpTx,
+  AddIcpToEvmTx,
+  NewEvmToIcpResult,
+  NewIcpToEvmResult,
+  Operator as AppicHelperOperator,
+  GetTxParams,
+  Transaction,
+  TransactionSearchParam,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+
+import { appic_helper_casniter_id } from '@/canister_ids.json';
+import { parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
 /**
  * Bridge Transactions: Overview
  *
@@ -43,33 +77,26 @@ import { Response } from '@/blockchain_api/types/response';
 // Step 1
 // Approval
 export const icrc2_approve = async (
+  bridge_option: BridgeOption,
   authenticated_agent: Agent,
-  is_native: boolean,
-  approval_fee: string, // in case of native
-  approval_erc20_fee: string, // in case of erc20
-  total_fee: string, // in case of erc20, show how much native tokens minter can take
-  from_token_cansiter_id: Principal,
-  native_casniter_id: Principal,
-  amount: string,
-  minter_id: Principal,
 ): Promise<Response<string>> => {
   let native_actor = Actor.createActor(IcrcIdlFactory, {
     agent: authenticated_agent,
-    canisterId: is_native ? native_casniter_id : from_token_cansiter_id,
+    canisterId: bridge_option.is_native ? bridge_option.native_fee_token_id : bridge_option.from_token_id,
   });
 
   try {
-    if (is_native) {
+    if (bridge_option.is_native) {
       // In case of Native withdrawal
       let native_approval_result = (await native_actor.icrc2_approve({
-        amount: BigInt(BigNumber(amount).minus(approval_fee).toString()),
+        amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_native_fee).toString()),
         created_at_time: [],
         expected_allowance: [],
         expires_at: [],
         fee: [],
         from_subaccount: [],
         memo: [],
-        spender: { owner: minter_id, subaccount: [] } as Account,
+        spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
       } as ApproveArgs)) as Result_2;
 
       if ('Ok' in native_approval_result) {
@@ -81,18 +108,20 @@ export const icrc2_approve = async (
       // In case of Erc20
       let erc20_actor = Actor.createActor(IcrcIdlFactory, {
         agent: authenticated_agent,
-        canisterId: from_token_cansiter_id,
+        canisterId: bridge_option.from_token_id,
       });
 
       let native_approval_result = (await native_actor.icrc2_approve({
-        amount: BigInt(BigNumber(total_fee).minus(approval_fee).toString()),
+        amount: BigInt(
+          BigNumber(bridge_option.fees.total_native_fee).minus(bridge_option.fees.approval_native_fee).toString(),
+        ),
         created_at_time: [],
         expected_allowance: [],
         expires_at: [],
         fee: [],
         from_subaccount: [],
         memo: [],
-        spender: { owner: minter_id, subaccount: [] } as Account,
+        spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
       } as ApproveArgs)) as Result_2;
 
       if ('Ok' in native_approval_result) {
@@ -101,14 +130,14 @@ export const icrc2_approve = async (
       }
 
       let erc20_approval_result = (await erc20_actor.icrc2_approve({
-        amount: BigInt(BigNumber(amount).minus(approval_erc20_fee).toString()),
+        amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_erc20_fee).toString()),
         created_at_time: [],
         expected_allowance: [],
         expires_at: [],
         fee: [],
         from_subaccount: [],
         memo: [],
-        spender: { owner: minter_id, subaccount: [] } as Account,
+        spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
       } as ApproveArgs)) as Result_2;
 
       if ('Ok' in erc20_approval_result) {
@@ -130,7 +159,277 @@ export const icrc2_approve = async (
   }
 };
 
+type WithdrawalId = string;
 // Step 2
+// After given approval to minter, the withdrawal request should be sumbmited to the mitnter
+// there are 4 possible scenaraios
+// 1. Dfinity minter -> native token: withdraw_eth function should be called
+// 2. Dfinity minter -> erc20 token: withdraw_erc20 function should be called
+// 3. Appic minter -> native token: withdraw_native_token function should be called
+// 4. Appic minter -> erc20 tokn: withdraw_erc20 function should be called
+// Function to handle withdrawal requests for both Appic and Dfinity minters
+export const request_withdraw = async (
+  bridge_option: BridgeOption,
+  recipient: string,
+  authenticated_agent: Agent,
+): Promise<Response<WithdrawalId>> => {
+  // Check if the operator is Appic
+  if (bridge_option.operator === 'Appic') {
+    // Create an actor for the Appic minter
+    let appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+      canisterId: bridge_option.minter_id,
+      agent: authenticated_agent,
+    });
+
+    // Handle native token withdrawal for Appic minter
+    if (bridge_option.is_native) {
+      try {
+        const native_withdrawal_result = (await appic_minter_actor.withdraw_native_token({
+          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_native_fee).toString()),
+          recipient,
+        } as AppicWithdrawalArg)) as AppicWithdrawalNativeResult;
+
+        if ('Ok' in native_withdrawal_result) {
+          return {
+            result: native_withdrawal_result.Ok.block_index.toString(),
+            message: '',
+            success: true,
+          };
+        } else {
+          return {
+            result: '',
+            message: `Failed to withdraw native token from Appic minter: ${native_withdrawal_result.Err}`,
+            success: false,
+          };
+        }
+      } catch (error) {
+        return {
+          result: '',
+          message: `Failed to withdraw native token from Appic minter: ${error}`,
+          success: false,
+        };
+      }
+    } else {
+      // Handle ERC20 token withdrawal for Appic minter
+      try {
+        const erc20_withdrawal_result = (await appic_minter_actor.withdraw_erc20({
+          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_erc20_fee).toString()),
+          erc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
+          recipient,
+        } as AppicWithdrawErc20Arg)) as AppicWithdrawalErc20Result;
+
+        if ('Ok' in erc20_withdrawal_result) {
+          return {
+            result: erc20_withdrawal_result.Ok.native_block_index.toString(),
+            message: '',
+            success: true,
+          };
+        } else {
+          return {
+            result: '',
+            message: `Failed to withdraw ERC20 token from Appic minter: ${erc20_withdrawal_result.Err}`,
+            success: false,
+          };
+        }
+      } catch (error) {
+        return {
+          result: '',
+          message: `Failed to withdraw ERC20 token from Appic minter: ${error}`,
+          success: false,
+        };
+      }
+    }
+  } else if (bridge_option.operator === 'Dfinity') {
+    // Create an actor for the Dfinity minter
+    let dfinity_minter_actor = Actor.createActor(DfinityMinterIdlFactory, {
+      canisterId: bridge_option.minter_id,
+      agent: authenticated_agent,
+    }) as {
+      withdraw_eth: (
+        arg?: DfinityWithdrawalArg,
+      ) => Promise<{ Ok: DfinityRetrieveEthRequest } | { Err: DfinityWithdrawalError }>;
+      withdraw_erc20: (
+        arg?: DfinityWithdrawErc20Arg,
+      ) => Promise<{ Ok: DfinityRetrieveErc20Request } | { Err: DfinityWithdrawErc20Error }>;
+    };
+
+    // Handle native token withdrawal for Dfinity minter
+    if (bridge_option.is_native) {
+      try {
+        const native_withdrawal_result = await dfinity_minter_actor.withdraw_eth({
+          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_native_fee).toString()),
+          recipient,
+          from_subaccount: [],
+        });
+
+        if ('Ok' in native_withdrawal_result) {
+          return {
+            result: native_withdrawal_result.Ok.block_index.toString(),
+            message: '',
+            success: true,
+          };
+        } else {
+          return {
+            result: '',
+            message: `Failed to withdraw native token from Dfinity minter: ${native_withdrawal_result.Err}`,
+            success: false,
+          };
+        }
+      } catch (error) {
+        return {
+          result: '',
+          message: `Failed to withdraw native token from Dfinity minter: ${error}`,
+          success: false,
+        };
+      }
+    } else {
+      // Handle ERC20 token withdrawal for Dfinity minter
+      try {
+        const erc20_withdrawal_result = await dfinity_minter_actor.withdraw_erc20({
+          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_erc20_fee).toString()),
+          ckerc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
+          recipient,
+          from_ckerc20_subaccount: [],
+          from_cketh_subaccount: [],
+        });
+
+        if ('Ok' in erc20_withdrawal_result) {
+          return {
+            result: erc20_withdrawal_result.Ok.cketh_block_index.toString(),
+            message: '',
+            success: true,
+          };
+        } else {
+          return {
+            result: '',
+            message: `Failed to withdraw ERC20 token from Dfinity minter: ${erc20_withdrawal_result.Err}`,
+            success: false,
+          };
+        }
+      } catch (error) {
+        return {
+          result: '',
+          message: `Failed to withdraw ERC20 token from Dfinity minter: ${error}`,
+          success: false,
+        };
+      }
+    }
+  } else {
+    // Handle unsupported minter types
+    return {
+      result: '',
+      message: `Failed to withdraw: Unsupported minter type`,
+      success: false,
+    };
+  }
+};
+
+// Step3
+// Notify Appic helper of new ICP => EVM Transaction
+export const notify_appic_helper_withdrawal = async (
+  bridge_option: BridgeOption,
+  withdrawal_id: string,
+  recipient: string,
+  user_wallet_principal: string,
+  authenticated_agent: Agent,
+): Promise<Response<string>> => {
+  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+    canisterId: Principal.fromText(appic_helper_casniter_id),
+    agent: authenticated_agent,
+  });
+
+  let parsed_operator = (
+    bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
+  ) as AppicHelperOperator;
+  try {
+    let notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
+      chain_id: BigInt(bridge_option.chain_id),
+      destination: recipient,
+      erc20_contract_address: bridge_option.to_token_id,
+      icrc_ledger_id: Principal.fromText(bridge_option.from_token_id),
+      from: Principal.fromText(user_wallet_principal),
+      from_subaccount: [],
+      max_transaction_fee: BigInt(bridge_option.fees.max_network_fee),
+      native_ledger_burn_index: BigInt(withdrawal_id),
+      operator: parsed_operator,
+      time: BigInt(Date.now()) * BigInt(1_000_000),
+      withdrawal_amount: BigInt(bridge_option.amount),
+    } as AddIcpToEvmTx)) as NewIcpToEvmResult;
+    if ('Ok' in notify_withdrawal_result) {
+      return {
+        result: '',
+        success: true,
+        message: '',
+      };
+    } else {
+      return {
+        result: '',
+        success: false,
+        message: `Failed to notify minter ${notify_withdrawal_result.Err}`,
+      };
+    }
+  } catch (error) {
+    return {
+      result: '',
+      success: false,
+      message: `Failed to notify minter ${error}`,
+    };
+  }
+};
+
+export type WithdrawalTxStatus =
+  | 'Successful'
+  | 'Failed'
+  | 'SignedTransaction'
+  | 'ReplacedTransaction'
+  | 'QuarantinedReimbursement'
+  | 'PendingVerification'
+  | 'Accepted'
+  | 'Reimbursed'
+  | 'Successful'
+  | 'Created'
+  | 'Call Failed';
+
+// Step 4
+export const check_withdraw_status = async (
+  withdrawal_id: WithdrawalId,
+  bridge_option: BridgeOption,
+  authenticated_agent: Agent,
+): Promise<Response<WithdrawalTxStatus>> => {
+  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+    canisterId: Principal.fromText(appic_helper_casniter_id),
+    agent: authenticated_agent,
+  });
+
+  try {
+    let tx_status = (await appic_helper_actor.get_transaction({
+      chain_id: BigInt(bridge_option.chain_id),
+      search_param: { TxWithdrawalId: BigInt(withdrawal_id) } as TransactionSearchParam,
+    } as GetTxParams)) as [] | Transaction;
+    if ('IcpToEvm' in tx_status) {
+      let parsed_status = parse_icp_to_evm_tx_status(tx_status.IcpToEvm.status);
+      return {
+        result: parsed_status,
+        message: '',
+        success: true,
+      };
+    } else {
+      return {
+        result: 'PendingVerification',
+        message: '',
+        success: true,
+      };
+    }
+  } catch (error) {
+    return {
+      result: 'Call Failed',
+      message: `Canister call error ${error}`,
+      success: false,
+    };
+  }
+};
+
+// Step 4
 
 /**
  * Deposit Transactions: Steps

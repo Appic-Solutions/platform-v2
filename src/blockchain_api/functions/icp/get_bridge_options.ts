@@ -41,7 +41,7 @@ enum TxType {
   Withdrawal,
 }
 
-interface BridgeMetadata {
+export interface BridgeMetadata {
   tx_type: TxType;
   minter_address: Principal;
   operator: Operator;
@@ -51,27 +51,33 @@ interface BridgeMetadata {
   viem_chain: ViemChain;
 }
 
+export interface BridgeFees {
+  minter_fee: string; // Fee that appic minter takes for deposit and withdrawal
+  max_network_fee: string; // Fee required to pay trasnaction gas fees, Can be paid either by native tokens or twin pairs of native tokens
+  approval_native_fee: string; // Fee required for transaction approval, can be 0 as well in case of native deposit transactions
+  approval_erc20_fee: string; // Fee required for approval of erc20 tokens, can be 0 if transaction is_native
+  total_native_fee: string; // max_network_fee + minter_fee + approval_native_fee
+  total_fee_usd_price: string; // Total fee converted to usd
+  native_fee_token_symbol: string;
+}
+
 export interface BridgeOption {
-  bridge_tx_type: TxType;
-  minter_id: Principal;
-  chain_id: number;
-  deposit_helper_contract: string;
-  operator: Operator;
-  minter_fee: string;
-  max_network_fee: string;
-  approval_fee: string; // native currency
-  approval_fee_erc20: string;
+  is_native: boolean;
+  from_token_id: string; //casniter id or contract address
+  to_token_id: string; //casniter id or contract address
+  native_fee_token_id: string; //casniter id or contract address
+  bridge_tx_type: TxType; // Deposit or withdrawal
+  minter_id: Principal; // Minter id related to transaction, Dfinity-ckEth or appic minter
+  deposit_helper_contract: string; // Helper contract address for depositing and withdrawing
+  chain_id: number; // the cahin id that tokens are gonna be deposited from or withdrawn to
+  operator: Operator; // whether dfinity or appic
+  fees: BridgeFees;
   amount: string;
   estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
-  total_fee: string; // max_network_fee + minter_fee + approval_fee
   via: string;
   duration: string;
-  total_fee_usd_price: string;
   is_best: boolean;
-  is_active: boolean;
   badge: Badge;
-  native_symbol: string;
-  native_cansiter_id_or_contract_address: string;
 }
 
 // Constants
@@ -114,6 +120,8 @@ export const get_bridge_options = async (
       );
 
       const bridge_options = await calculate_bridge_options(
+        from_token.contractAddress!,
+        to_token.canisterId!,
         agent,
         bridge_metadata,
         estimated_deposit_gas,
@@ -125,7 +133,7 @@ export const get_bridge_options = async (
       return { result: bridge_options, message: '', success: true };
     } else if (bridge_metadata.tx_type == TxType.Withdrawal) {
       const estimated_approval_gas = native_currency.fee!;
-      const estimated_approval_fee_erc20 = bridge_metadata.is_native ? '0' : from_token.fee!;
+      const estimated_approval_erc20_fee = bridge_metadata.is_native ? '0' : from_token.fee!;
       const estimated_withdrawal_gas = await estimate_withdrawal_gas(
         agent,
         bridge_metadata.operator,
@@ -134,11 +142,13 @@ export const get_bridge_options = async (
         from_token.canisterId!,
       );
       const bridge_options = await calculate_bridge_options(
+        from_token.canisterId!,
+        to_token.contractAddress!,
         agent,
         bridge_metadata,
         estimated_withdrawal_gas,
         estimated_approval_gas,
-        estimated_approval_fee_erc20,
+        estimated_approval_erc20_fee,
         amount,
         native_currency,
       );
@@ -359,11 +369,13 @@ const encode_approval_function_data = (bridge_metadata: BridgeMetadata, amount: 
  * Calculate bridge options.
  */
 const calculate_bridge_options = async (
+  from_token_id: string,
+  to_token_id: string,
   agent: HttpAgent,
   bridge_metadata: BridgeMetadata,
   estimated_network_fee: string,
-  approval_fee: string,
-  approval_fee_erc20: string,
+  approval_native_fee: string,
+  approval_erc20_fee: string,
   amount: string,
   native_currency: EvmToken | IcpToken,
 ): Promise<BridgeOption[]> => {
@@ -375,34 +387,41 @@ const calculate_bridge_options = async (
       bridge_metadata.tx_type,
     );
 
-    const total_netowrk_fee = new BigNumber(minter_fee).plus(estimated_network_fee).plus(approval_fee).toString();
+    const total_native_fee = new BigNumber(minter_fee).plus(estimated_network_fee).plus(approval_native_fee).toString();
     const estimated_return = bridge_metadata.is_native
-      ? new BigNumber(amount).minus(total_netowrk_fee).toString()
-      : new BigNumber(amount).minus(approval_fee_erc20).toString();
+      ? new BigNumber(amount).minus(total_native_fee).toString()
+      : new BigNumber(amount).minus(approval_erc20_fee).toString();
     const duration = bridge_metadata.operator === 'Appic' ? '1 - 2 min' : '15 - 20 min';
-
+    const native_fee_token_id =
+      bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
     return [
       {
+        from_token_id,
+        to_token_id,
+        native_fee_token_id,
         bridge_tx_type: bridge_metadata.tx_type,
         minter_id: bridge_metadata.minter_address,
         operator: bridge_metadata.operator,
         chain_id: bridge_metadata.chain_id,
         amount,
         estimated_return,
-        minter_fee,
-        max_network_fee: estimated_network_fee,
-        approval_fee: approval_fee, //native currency
-        approval_fee_erc20: approval_fee_erc20,
-        total_fee: total_netowrk_fee,
+        fees: {
+          approval_erc20_fee: approval_erc20_fee,
+          approval_native_fee: approval_native_fee,
+          max_network_fee: estimated_network_fee,
+          minter_fee: minter_fee,
+          total_native_fee: total_native_fee,
+          native_fee_token_symbol: native_currency.symbol,
+          total_fee_usd_price: BigNumber(total_native_fee).multipliedBy(native_currency.usdPrice).toString(),
+        },
+
         via: bridge_metadata.operator,
         duration,
         is_best: true,
-        is_active: true,
+
         badge: Badge.BEST,
-        total_fee_usd_price: new BigNumber(total_netowrk_fee).multipliedBy(native_currency.usdPrice).toString(),
         deposit_helper_contract: bridge_metadata.deposit_helper_contract,
-        native_symbol: native_currency.symbol,
-        native_cansiter_id_or_contract_address: (native_currency.canisterId || native_currency.contractAddress)!,
+        is_native: bridge_metadata.is_native,
       },
     ];
   } catch (error) {
