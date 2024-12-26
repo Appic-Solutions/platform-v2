@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
-import type { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface AccessListItem {
   storage_keys: Array<Uint8Array | number[]>;
@@ -184,7 +184,17 @@ export interface EventSource {
   transaction_hash: string;
   log_index: bigint;
 }
-export type EvmNetwork = { BSC: null } | { Fantom: null } | { Base: null } | { Ethereum: null } | { BSCTestnet: null } | { ArbitrumOne: null } | { Sepolia: null } | { Polygon: null } | { Optimism: null } | { Avalanche: null };
+export type EvmNetwork =
+  | { BSC: null }
+  | { Fantom: null }
+  | { Base: null }
+  | { Ethereum: null }
+  | { BSCTestnet: null }
+  | { ArbitrumOne: null }
+  | { Sepolia: null }
+  | { Polygon: null }
+  | { Optimism: null }
+  | { Avalanche: null };
 export type FeeError =
   | { TemporarilyUnavailable: string }
   | {
@@ -304,10 +314,13 @@ export type ReimbursementIndex =
       };
     }
   | { Native: { ledger_burn_index: bigint } };
-export type RequestScrapingError = { BlockAlreadyObserved: null } | { CalledTooManyTimes: null } | { InvalidBlockNumber: null };
-export type Result = { Ok: null } | { Err: RequestScrapingError };
-export type Result_1 = { Ok: RetrieveErc20Request } | { Err: WithdrawErc20Error };
-export type Result_2 = { Ok: RetrieveNativeRequest } | { Err: WithdrawalError };
+export type RequestScrapingError =
+  | { BlockAlreadyObserved: null }
+  | { CalledTooManyTimes: null }
+  | { InvalidBlockNumber: null };
+export type LogScrapingResult = { Ok: null } | { Err: RequestScrapingError };
+export type WithdrawalErc20Result = { Ok: RetrieveErc20Request } | { Err: WithdrawErc20Error };
+export type WithdrawalNativeResult = { Ok: RetrieveNativeRequest } | { Err: WithdrawalError };
 export interface RetrieveErc20Request {
   erc20_block_index: bigint;
   native_block_index: bigint;
@@ -315,7 +328,12 @@ export interface RetrieveErc20Request {
 export interface RetrieveNativeRequest {
   block_index: bigint;
 }
-export type RetrieveWithdrawalStatus = { NotFound: null } | { TxFinalized: TxFinalizedStatus } | { TxSent: Transaction } | { TxCreated: null } | { Pending: null };
+export type RetrieveWithdrawalStatus =
+  | { NotFound: null }
+  | { TxFinalized: TxFinalizedStatus }
+  | { TxSent: Transaction }
+  | { TxCreated: null }
+  | { Pending: null };
 export interface Transaction {
   transaction_hash: string;
 }
@@ -399,9 +417,21 @@ export interface WithdrawalDetail {
   max_transaction_fee: [] | [bigint];
   recipient_address: string;
 }
-export type WithdrawalError = { TemporarilyUnavailable: string } | { InvalidDestination: string } | { InsufficientAllowance: { allowance: bigint } } | { AmountTooLow: { min_withdrawal_amount: bigint } } | { InsufficientFunds: { balance: bigint } };
-export type WithdrawalSearchParameter = { ByRecipient: string } | { BySenderAccount: Account } | { ByWithdrawalId: bigint };
-export type WithdrawalStatus = { TxFinalized: TxFinalizedStatus } | { TxSent: Transaction } | { TxCreated: null } | { Pending: null };
+export type WithdrawalError =
+  | { TemporarilyUnavailable: string }
+  | { InvalidDestination: string }
+  | { InsufficientAllowance: { allowance: bigint } }
+  | { AmountTooLow: { min_withdrawal_amount: bigint } }
+  | { InsufficientFunds: { balance: bigint } };
+export type WithdrawalSearchParameter =
+  | { ByRecipient: string }
+  | { BySenderAccount: Account }
+  | { ByWithdrawalId: bigint };
+export type WithdrawalStatus =
+  | { TxFinalized: TxFinalizedStatus }
+  | { TxSent: Transaction }
+  | { TxCreated: null }
+  | { Pending: null };
 export interface _SERVICE {
   add_erc20_token: ActorMethod<[AddErc20Token], undefined>;
   check_new_deposits: ActorMethod<[], undefined>;
@@ -411,11 +441,11 @@ export interface _SERVICE {
   get_minter_info: ActorMethod<[], MinterInfo>;
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
   minter_address: ActorMethod<[], string>;
-  request_scraping_logs: ActorMethod<[bigint], Result>;
+  request_scraping_logs: ActorMethod<[bigint], LogScrapingResult>;
   retrieve_witdrawal_status: ActorMethod<[bigint], RetrieveWithdrawalStatus>;
   smart_contract_address: ActorMethod<[], string>;
-  withdraw_erc20: ActorMethod<[WithdrawErc20Arg], Result_1>;
-  withdraw_native_token: ActorMethod<[WithdrawalArg], Result_2>;
+  withdraw_erc20: ActorMethod<[WithdrawErc20Arg], WithdrawalErc20Result>;
+  withdraw_native_token: ActorMethod<[WithdrawalArg], WithdrawalNativeResult>;
   withdrawal_status: ActorMethod<[WithdrawalSearchParameter], Array<WithdrawalDetail>>;
 }
 export declare const idlFactory: IDL.InterfaceFactory;

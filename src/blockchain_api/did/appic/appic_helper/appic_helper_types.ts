@@ -147,8 +147,7 @@ export type IcpToEvmStatus =
   | { Accepted: null }
   | { Reimbursed: null }
   | { Successful: null }
-  | { Created: null }
-  | { FinalizedTransaction: null };
+  | { Created: null };
 export type IcpTokenType = { ICRC1: null } | { ICRC2: null } | { ICRC3: null } | { DIP20: null } | { Other: string };
 export interface Icrc28TrustedOriginsResponse {
   trusted_origins: Array<string>;
@@ -167,8 +166,8 @@ export interface MinterArgs {
   minter_id: Principal;
 }
 export type Operator = { AppicMinter: null } | { DfinityCkEthMinter: null };
-export type Result = { Ok: null } | { Err: AddEvmToIcpTxError };
-export type Result_1 = { Ok: null } | { Err: AddIcpToEvmTxError };
+export type NewEvmToIcpResult = { Ok: null } | { Err: AddEvmToIcpTxError };
+export type NewIcpToEvmResult = { Ok: null } | { Err: AddIcpToEvmTxError };
 export interface TokenPair {
   operator: Operator;
   evm_token: CandidEvmToken;
@@ -198,8 +197,8 @@ export interface _SERVICE {
   get_txs_by_address: ActorMethod<[string], Array<Transaction>>;
   get_txs_by_principal: ActorMethod<[Principal], Array<Transaction>>;
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
-  new_evm_to_icp_tx: ActorMethod<[AddEvmToIcpTx], Result>;
-  new_icp_to_evm_tx: ActorMethod<[AddIcpToEvmTx], Result_1>;
+  new_evm_to_icp_tx: ActorMethod<[AddEvmToIcpTx], NewEvmToIcpResult>;
+  new_icp_to_evm_tx: ActorMethod<[AddIcpToEvmTx], NewIcpToEvmResult>;
   new_twin_ls_request: ActorMethod<[CandidAddErc20TwinLedgerSuiteRequest], undefined>;
   request_update_bridge_pairs: ActorMethod<[], undefined>;
   update_twin_ls_request: ActorMethod<[CandidAddErc20TwinLedgerSuiteRequest], undefined>;
