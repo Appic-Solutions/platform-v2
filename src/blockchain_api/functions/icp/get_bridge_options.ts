@@ -59,7 +59,9 @@ interface BridgeOption {
   operator: Operator;
   minter_fee: string;
   max_network_fee: string;
-  approval_fee: string;
+  approval_fee: string; // native currency
+  approval_fee_erc20: string;
+  amount: string;
   estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
   total_fee: string; // max_network_fee + minter_fee + approval_fee
   via: string;
@@ -68,6 +70,8 @@ interface BridgeOption {
   is_best: boolean;
   is_active: boolean;
   badge: Badge;
+  native_symbol: string;
+  native_cansiter_id_or_contract_address: string;
 }
 
 // Constants
@@ -383,10 +387,12 @@ const calculate_bridge_options = async (
         minter_id: bridge_metadata.minter_address,
         operator: bridge_metadata.operator,
         chain_id: bridge_metadata.chain_id,
+        amount,
         estimated_return,
         minter_fee,
         max_network_fee: estimated_network_fee,
-        approval_fee: approval_fee,
+        approval_fee: approval_fee, //native currency
+        approval_fee_erc20: approval_fee_erc20,
         total_fee: total_netowrk_fee,
         via: bridge_metadata.operator,
         duration,
@@ -394,7 +400,9 @@ const calculate_bridge_options = async (
         is_active: true,
         badge: Badge.BEST,
         total_fee_usd_price: new BigNumber(total_netowrk_fee).multipliedBy(native_currency.usdPrice).toString(),
-        deposit_helper_contract: '',
+        deposit_helper_contract: bridge_metadata.deposit_helper_contract,
+        native_symbol: native_currency.symbol,
+        native_cansiter_id_or_contract_address: (native_currency.canisterId || native_currency.contractAddress)!,
       },
     ];
   } catch (error) {

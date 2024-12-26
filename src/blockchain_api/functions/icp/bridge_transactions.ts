@@ -1,3 +1,9 @@
+import { Actor, Agent } from '@dfinity/agent';
+import { Principal } from '@dfinity/principal';
+import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
+import { Approve, Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
+import BigNumber from 'bignumber.js';
+import { Response } from '@/blockchain_api/types/response';
 /**
  * Bridge Transactions: Overview
  *
@@ -7,9 +13,6 @@
  *
  * Withdrawal transactions involve multiple steps depending on the token type.
  */
-
-import { HttpAgent } from '@dfinity/agent';
-import { Principal } from '@dfinity/principal';
 
 /**
  * Withdrawal Transactions: Steps
@@ -39,12 +42,95 @@ import { Principal } from '@dfinity/principal';
 
 // Step 1
 // Approval
-export const icrc2_approve = (
-  authenticated_agent: HttpAgent,
-  token_casniter_id: Principal,
+export const icrc2_approve = async (
+  authenticated_agent: Agent,
+  is_native: boolean,
+  approval_fee: string, // in case of native
+  approval_erc20_fee: string, // in case of erc20
+  total_fee: string, // in case of erc20, show how much native tokens minter can take
+  from_token_cansiter_id: Principal,
+  native_casniter_id: Principal,
   amount: string,
   minter_id: Principal,
-) => {};
+): Promise<Response<string>> => {
+  let native_actor = Actor.createActor(IcrcIdlFactory, {
+    agent: authenticated_agent,
+    canisterId: is_native ? native_casniter_id : from_token_cansiter_id,
+  });
+
+  try {
+    if (is_native) {
+      // In case of Native withdrawal
+      let native_approval_result = (await native_actor.icrc2_approve({
+        amount: BigInt(BigNumber(amount).minus(approval_fee).toString()),
+        created_at_time: [],
+        expected_allowance: [],
+        expires_at: [],
+        fee: [],
+        from_subaccount: [],
+        memo: [],
+        spender: { owner: minter_id, subaccount: [] } as Account,
+      } as ApproveArgs)) as Result_2;
+
+      if ('Ok' in native_approval_result) {
+        return { result: native_approval_result.Ok.toString(), success: true, message: '' };
+      } else {
+        return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
+      }
+    } else {
+      // In case of Erc20
+      let erc20_actor = Actor.createActor(IcrcIdlFactory, {
+        agent: authenticated_agent,
+        canisterId: from_token_cansiter_id,
+      });
+
+      let native_approval_result = (await native_actor.icrc2_approve({
+        amount: BigInt(BigNumber(total_fee).minus(approval_fee).toString()),
+        created_at_time: [],
+        expected_allowance: [],
+        expires_at: [],
+        fee: [],
+        from_subaccount: [],
+        memo: [],
+        spender: { owner: minter_id, subaccount: [] } as Account,
+      } as ApproveArgs)) as Result_2;
+
+      if ('Ok' in native_approval_result) {
+      } else {
+        return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
+      }
+
+      let erc20_approval_result = (await erc20_actor.icrc2_approve({
+        amount: BigInt(BigNumber(amount).minus(approval_erc20_fee).toString()),
+        created_at_time: [],
+        expected_allowance: [],
+        expires_at: [],
+        fee: [],
+        from_subaccount: [],
+        memo: [],
+        spender: { owner: minter_id, subaccount: [] } as Account,
+      } as ApproveArgs)) as Result_2;
+
+      if ('Ok' in erc20_approval_result) {
+        return { result: erc20_approval_result.Ok.toString(), success: true, message: '' };
+      } else {
+        return {
+          result: '',
+          success: false,
+          message: `Failed to approve allowance:${erc20_approval_result.Err}`,
+        };
+      }
+    }
+  } catch (error) {
+    return {
+      result: '',
+      success: false,
+      message: `Failed to approve allowance:${error}`,
+    };
+  }
+};
+
+// Step 2
 
 /**
  * Deposit Transactions: Steps
