@@ -53,7 +53,7 @@ export interface BridgeMetadata {
 
 export interface BridgeFees {
   minter_fee: string; // Fee that appic minter takes for deposit and withdrawal
-  max_network_fee: string; // Fee required to pay trasnaction gas fees, Can be paid either by native tokens or twin pairs of native tokens
+  max_network_fee: string; // Fee required to pay transaction gas fees, Can be paid either by native tokens or twin pairs of native tokens
   approval_fee_in_native_token: string; // Fee required for transaction approval, can be 0 as well in case of native deposit transactions
   total_native_fee: string; // max_network_fee + minter_fee + approval_fee_in_native_token
   total_fee_usd_price: string; // Total fee converted to usd
@@ -70,13 +70,13 @@ export interface BridgeFees {
 
 export interface BridgeOption {
   is_native: boolean;
-  from_token_id: string; //casniter id or contract address
-  to_token_id: string; //casniter id or contract address
-  native_fee_token_id: string; //casniter id or contract address
+  from_token_id: string; //canister id or contract address
+  to_token_id: string; //canister id or contract address
+  native_fee_token_id: string; //canister id or contract address
   bridge_tx_type: TxType; // Deposit or withdrawal
   minter_id: Principal; // Minter id related to transaction, Dfinity-ckEth or appic minter
   deposit_helper_contract: string; // Helper contract address for depositing and withdrawing
-  chain_id: number; // the cahin id that tokens are gonna be deposited from or withdrawn to
+  chain_id: number; // the chain id that tokens are gonna be deposited from or withdrawn to
   viem_chain: ViemChain;
   operator: Operator; // whether dfinity or appic
   fees: BridgeFees;
@@ -391,14 +391,14 @@ export const encode_deposit_function_data = (
   from_token_id: string,
   operator: Operator,
   is_native: boolean,
-  parincipal_bytes: string,
+  principal_bytes: string,
   amount: string,
 ): `0x${string}` => {
   if (operator === 'Appic') {
     return encodeFunctionData({
       abi: appic_minter_abi,
       functionName: 'deposit',
-      args: [from_token_id, amount, parincipal_bytes, DEFAULT_SUBACCOUNT],
+      args: [from_token_id, amount, principal_bytes, DEFAULT_SUBACCOUNT],
     });
   }
 
@@ -406,8 +406,8 @@ export const encode_deposit_function_data = (
     abi: dfinity_ck_minter_abi,
     functionName: is_native ? 'depositEth' : 'depositErc20',
     args: is_native
-      ? [parincipal_bytes, DEFAULT_SUBACCOUNT]
-      : [from_token_id!, amount, parincipal_bytes, DEFAULT_SUBACCOUNT],
+      ? [principal_bytes, DEFAULT_SUBACCOUNT]
+      : [from_token_id!, amount, principal_bytes, DEFAULT_SUBACCOUNT],
   });
 };
 
@@ -527,7 +527,7 @@ const get_native_currency = (
     );
   } else if (tx_type === TxType.Withdrawal) {
     const native_twin_ledger =
-      operator === 'Appic' ? chain.appic_twin_native_ledger_cansiter_id : chain.dfinity_ck_native_ledger_casniter_id;
+      operator === 'Appic' ? chain.appic_twin_native_ledger_canister_id : chain.dfinity_ck_native_ledger_canister_id;
 
     if (!native_twin_ledger) {
       throw new Error(`Native twin ledger ID not found for operator ${operator}.`);

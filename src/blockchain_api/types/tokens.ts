@@ -25,13 +25,13 @@ export type Operator = 'Appic' | 'Dfinity';
 
 export type EvmToken = Token & {
   contractAddress: string; // Address of the token's contract if the token is an EVm token
-  canisterId?: never; // Address of the token's cansiter id if the token is an ICP token
+  canisterId?: never; // Address of the token's canister id if the token is an ICP token
   fee?: never;
   tokenType?: never;
 };
 
 export type IcpToken = Token & {
-  canisterId: string; // Address of the token's cansiter id if the token is an ICP token
+  canisterId: string; // Address of the token's canister id if the token is an ICP token
   fee?: string; // Token transfer fee on icp network
   tokenType: string;
   contractAddress?: never; // Address of the token's contract if the token is an EVm token

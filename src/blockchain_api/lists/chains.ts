@@ -21,7 +21,7 @@ export const chains: Chain[] = [
     logo: '/images/logo/chains-logos/ethereum.svg',
     dfinity_ck_minter_address: 'sv3dd-oaaaa-aaaar-qacoa-cai',
     dfinity_ck_deposit_helper_contract: '0x18901044688D3756C35Ed2b36D93e6a5B8e00E68',
-    dfinity_ck_native_ledger_casniter_id: 'ss2fx-dyaaa-aaaar-qacoq-cai',
+    dfinity_ck_native_ledger_canister_id: 'ss2fx-dyaaa-aaaar-qacoq-cai',
     ankr_handle: 'eth',
     viem_config: mainnet,
   },

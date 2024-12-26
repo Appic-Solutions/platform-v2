@@ -1,18 +1,18 @@
-import { Actor, HttpAgent } from "@dfinity/agent";
-import { Principal } from "@dfinity/principal";
-import { Response } from "@/blockchain_api/types/response";
+import { Actor, HttpAgent } from '@dfinity/agent';
+import { Principal } from '@dfinity/principal';
+import { Response } from '@/blockchain_api/types/response';
 // Appic helper types and did
-import { idlFactory as AppicIdlFactory } from "@/blockchain_api/did/appic/appic_helper/appic_helper.did";
-import { CandidIcpToken, IcpTokenType } from "@/blockchain_api/did/appic/appic_helper/appic_helper_types";
+import { idlFactory as AppicIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
+import { CandidIcpToken, IcpTokenType } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
-import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js';
 
-import { IcpToken } from "@/blockchain_api/types/tokens";
+import { IcpToken } from '@/blockchain_api/types/tokens';
 
-import { appic_helper_casniter_id } from "@/canister_ids.json";
+import { appic_helper_canister_id } from '@/canister_ids.json';
 
 // The flow is as follow
-// 1: The validated tokens are fetched from appic helper cansiter(Appic helper makes sure that the token cansiter exsists and vlaidates their wasm module)
+// 1: The validated tokens are fetched from appic helper canister(Appic helper makes sure that the token canister exists and validates their wasm module)
 // 2: The response is transformed into icp token interface
 
 // Step 1
@@ -20,7 +20,7 @@ import { appic_helper_casniter_id } from "@/canister_ids.json";
 export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToken[]>> => {
   const appic_actor = Actor.createActor(AppicIdlFactory, {
     agent,
-    canisterId: Principal.fromText(appic_helper_casniter_id),
+    canisterId: Principal.fromText(appic_helper_canister_id),
   });
 
   try {
@@ -29,7 +29,7 @@ export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToke
     return {
       result: transform_icp_tokens(validated_icp_tokens),
       success: true,
-      message: "",
+      message: '',
     };
 
     // Error handling
@@ -55,7 +55,7 @@ export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] =
         usdPrice: token.usd_price,
         decimals: token.decimals,
         chainId: 0, // Chain ID for ICP
-        chain_type: "ICP", // Chain type is ICP
+        chain_type: 'ICP', // Chain type is ICP
         canisterId: token.ledger_id.toString(),
         fee: BigNumber(token.fee.toString()).toString(),
         tokenType: parse_token_type(token.token_type),
@@ -68,15 +68,15 @@ export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] =
 
 // Helper converts token_type into supported token_type
 const parse_token_type = (type: IcpTokenType): string => {
-  if ("ICRC1" in type) {
-    return "ICRC1";
-  } else if ("ICRC2" in type) {
-    return "ICRC2";
-  } else if ("ICRC3" in type) {
-    return "ICRC2";
-  } else if ("DIP20" in type) {
-    return "DIP20";
+  if ('ICRC1' in type) {
+    return 'ICRC1';
+  } else if ('ICRC2' in type) {
+    return 'ICRC2';
+  } else if ('ICRC3' in type) {
+    return 'ICRC2';
+  } else if ('DIP20' in type) {
+    return 'DIP20';
   } else {
-    return "Not Suported";
+    return 'Not Supported';
   }
 };

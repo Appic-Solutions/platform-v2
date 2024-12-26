@@ -9,14 +9,14 @@ import { Response } from '@/blockchain_api/types/response';
 import BigNumber from 'bignumber.js';
 import { EvmToken, IcpToken, Operator, BridgePair } from '../../types/tokens';
 
-import { appic_helper_casniter_id } from '@/canister_ids.json';
+import { appic_helper_canister_id } from '@/canister_ids.json';
 import { Principal } from '@dfinity/principal';
 import { get_evm_token_price } from '../evm/get_tokens_price';
 
 export const get_bridge_pairs = async (agent: HttpAgent): Promise<Response<Array<EvmToken | IcpToken>>> => {
   const appic_actor = Actor.createActor(appicHelperIdlFactory, {
     agent,
-    canisterId: Principal.fromText(appic_helper_casniter_id),
+    canisterId: Principal.fromText(appic_helper_canister_id),
   });
 
   try {

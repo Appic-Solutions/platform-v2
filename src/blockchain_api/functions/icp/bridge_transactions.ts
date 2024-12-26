@@ -43,7 +43,7 @@ import {
   TransactionSearchParam,
 } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
-import { appic_helper_casniter_id } from '@/canister_ids.json';
+import { appic_helper_canister_id } from '@/canister_ids.json';
 import { parse_evm_to_icp_tx_status, parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
 /**
@@ -175,12 +175,12 @@ export const icrc2_approve = async (
 
 type WithdrawalId = string;
 // Step 2
-// After given approval to minter, the withdrawal request should be sumbmited to the mitnter
-// there are 4 possible scenaraios
+// After given approval to minter, the withdrawal request should be submitted to the minter
+// there are 4 possible scenarios
 // 1. Dfinity minter -> native token: withdraw_eth function should be called
 // 2. Dfinity minter -> erc20 token: withdraw_erc20 function should be called
 // 3. Appic minter -> native token: withdraw_native_token function should be called
-// 4. Appic minter -> erc20 tokn: withdraw_erc20 function should be called
+// 4. Appic minter -> erc20 token: withdraw_erc20 function should be called
 // Function to handle withdrawal requests for both Appic and Dfinity minters
 export const request_withdraw = async (
   bridge_option: BridgeOption,
@@ -356,7 +356,7 @@ export const notify_appic_helper_withdrawal = async (
   authenticated_agent: Agent,
 ): Promise<Response<string>> => {
   let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
-    canisterId: Principal.fromText(appic_helper_casniter_id),
+    canisterId: Principal.fromText(appic_helper_canister_id),
     agent: authenticated_agent,
   });
 
@@ -413,14 +413,14 @@ export type WithdrawalTxStatus =
   | 'Call Failed';
 
 // Step 4
-// This function should be called intervally until the transaction status is either "Failed" or "Successful" or "Reimbursed"
+// This function should be called on regular intervals until the transaction status is either "Failed" or "Successful" or "Reimbursed"
 export const check_withdraw_status = async (
   withdrawal_id: WithdrawalId,
   bridge_option: BridgeOption,
   authenticated_agent: Agent,
 ): Promise<Response<WithdrawalTxStatus>> => {
   let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
-    canisterId: Principal.fromText(appic_helper_casniter_id),
+    canisterId: Principal.fromText(appic_helper_canister_id),
     agent: authenticated_agent,
   });
 
@@ -461,7 +461,7 @@ export const check_withdraw_status = async (
  *
  * 1. **Create Wallet Client**:
  *   - Creates the wallet client and switches the chain:
- *      - **Create wallet clinet and return it**.
+ *      - **Create wallet client and return it**.
  *      - **Change chain if necessary**: Change the cain from wallet if necessary.
  *
  *
@@ -488,7 +488,7 @@ export const check_withdraw_status = async (
  */
 
 // Step 1
-// create wallet client and switch cahin
+// create wallet client and switch chain
 export const create_wallet_client = async (bridge_option: BridgeOption): Promise<WalletClient<any>> => {
   const ethereum = (window as any).ethereum;
 
@@ -519,7 +519,7 @@ export const approve_erc20 = async (
   } else {
     try {
       const [account] = await wallet_client.getAddresses();
-      let ecoded_function_data = encode_approval_function_data(
+      let encoded_function_data = encode_approval_function_data(
         bridge_option.deposit_helper_contract as `0x${string}`,
         bridge_option.amount,
       );
@@ -527,7 +527,7 @@ export const approve_erc20 = async (
         chain: bridge_option.viem_chain as ViemChain,
         account: account as `0x${string}`,
         to: bridge_option.from_token_id as `0x${string}`,
-        data: ecoded_function_data as `0x${string}`,
+        data: encoded_function_data as `0x${string}`,
         maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
         type: 'eip1559',
       });
@@ -555,7 +555,7 @@ export const approve_erc20 = async (
 
 type TxHash = `0x${string}`;
 // Step 3
-// Submit deposit request through deposit helperes
+// Submit deposit request through deposit helpers
 export const request_deposit = async (
   wallet_client: WalletClient<any>,
   bridge_option: BridgeOption,
@@ -613,7 +613,7 @@ export const notify_appic_helper_deposit = async (
   unauthenticated_agent: HttpAgent | Agent,
 ): Promise<Response<string>> => {
   let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
-    canisterId: Principal.fromText(appic_helper_casniter_id),
+    canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
   });
 
@@ -659,14 +659,14 @@ export const notify_appic_helper_deposit = async (
 export type DepositTxStatus = 'Invalid' | 'PendingVerification' | 'Minted' | 'Accepted' | 'Quarantined';
 
 //  Step 5
-// This function should be called intervally until the transaction status is either "Minted" or "Invalid" or "Quarantined"
+// This function should be called internally until the transaction status is either "Minted" or "Invalid" or "Quarantined"
 export const check_deposit_status = async (
   tx_hash: TxHash,
   bridge_option: BridgeOption,
   unauthenticated_agent: Agent | HttpAgent,
 ): Promise<Response<DepositTxStatus>> => {
   let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
-    canisterId: Principal.fromText(appic_helper_casniter_id),
+    canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
   });
 
