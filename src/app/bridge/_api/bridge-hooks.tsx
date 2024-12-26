@@ -21,7 +21,6 @@ const getBridgePairsFromLocalStorage = () => {
   let parsedData: (EvmToken | IcpToken)[] | null = null;
   try {
     if (rawData?.length && rawData?.length > 0) {
-      console.log(rawData);
       const data = JSON.parse(rawData);
       if (Array.isArray(data)) {
         parsedData = data as (EvmToken | IcpToken)[];

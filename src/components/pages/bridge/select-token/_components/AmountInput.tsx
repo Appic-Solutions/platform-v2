@@ -15,7 +15,7 @@ interface AmountInputProps {
   isWalletConnected: boolean;
 }
 
-const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnected = true }: AmountInputProps) => {
+const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnected }: AmountInputProps) => {
   const [inputAmount, setInputAmount] = useState('');
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnecte
           <div className="w-full flex items-center">
             <input
               type="number"
-              maxLength={15}
+              maxLength={10}
               placeholder="0"
               onChange={(e) => setInputAmount(e.target.value)}
               className={cn(

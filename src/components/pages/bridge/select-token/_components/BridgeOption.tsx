@@ -41,10 +41,9 @@ const BridgeOption = ({
             className={cn(
               'text-muted text-xs md:text-sm font-thin py-1 px-2 rounded-[10px] w-fit',
               'bg-primary-buttons text-white',
-              'opacity-50',
             )}
           >
-            Best Return
+            {option.badge}
           </p>
         </div>
         <button
@@ -52,7 +51,6 @@ const BridgeOption = ({
           className={cn(
             'bg-gray-400 bg-opacity-20 rounded-[10px] p-2 flex items-center ml-auto',
             isExpanded && 'rotate-180',
-            'opacity-30',
           )}
         >
           <ChevronDownIcon width={10} height={10} />
@@ -71,19 +69,21 @@ const BridgeOption = ({
               />
             </div>
           </div>
-          <p className={cn('text-base lg:text-xl', 'opacity-30')}>{option.amount}</p>
+          <p className={cn('text-base lg:text-xl', option.estimated_return.length > 7 && 'text-ellipsis w-36')}>
+            {option.estimated_return}
+          </p>
         </div>
         <div className="flex flex-col gap-y-3 items-end">
-          <div className={cn('px-4 py-1 rounded-2xl flex items-center gap-x-1', 'bg-white', 'opacity-30')}>
+          <div className="px-4 py-1 rounded-2xl flex items-center gap-x-1 bg-white">
             <span className={cn('text-xs lg:text-sm text-blue-600')}>via {option.via}</span>
             <Image src="images/logo/icp-logo.png" alt="logo" width={15} height={15} />
           </div>
         </div>
       </div>
       {/* bottom section */}
-      <div className={cn('flex items-end w-full justify-end gap-x-4', 'opacity-30')}>
+      <div className="flex items-end w-full justify-end gap-x-4">
         <span className="flex items-center gap-x-1 w-max">
-          <p className="text-xs font-thin text-primary">1.24</p>
+          <p className="text-xs font-thin text-primary">${option.fees.total_fee_usd_price}</p>
           <FireIcon width={15} height={15} className="text-primary" />
         </span>
         <span className="flex items-center gap-x-1 w-max">
@@ -102,24 +102,24 @@ const BridgeOption = ({
         )}
       >
         <div className="space-y-4">
-          <p className="text-sm font-medium">Additional Details:</p>
+          <p className="text-sm font-medium">Option Details:</p>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted">Network Fee:</span>
-              <span>0.001 ETH</span>
+              <span>${option.fees.max_network_fee}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted">Estimated Time:</span>
-              <span>{option.duration} mins</span>
+              <span>{option.duration}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            {/* <div className="flex justify-between text-sm">
               <span className="text-muted">Route:</span>
               <span>Direct Bridge</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted">Security:</span>
               <span>High</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
