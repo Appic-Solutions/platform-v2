@@ -89,8 +89,8 @@ export interface BridgeOption {
 }
 
 // Constants
-const DEFAULT_SUBACCOUNT = '0x0000000000000000000000000000000000000000000000000000000000000000';
-const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const DEFAULT_SUBACCOUNT = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 /**
  * Get bridge options for a transaction.
  */
@@ -111,7 +111,14 @@ export const get_bridge_options = async (
   try {
     const value = bridge_metadata.is_native ? amount : '0';
     if (bridge_metadata.tx_type == TxType.Deposit) {
-      const encoded_function_data = encode_deposit_function_data(from_token, bridge_metadata, amount);
+      const principal_bytes = principal_to_bytes32('6b5ll-mteg5-kmyav-a6l7g-lpwje-jc4ln-moggr-wrfvu-n54bz-gh3nr-wae');
+      const encoded_function_data = encode_deposit_function_data(
+        from_token.contractAddress!,
+        bridge_metadata.operator,
+        bridge_metadata.is_native,
+        principal_bytes,
+        amount,
+      );
       const encoded_approval_data = encode_approval_function_data(bridge_metadata.deposit_helper_contract, amount);
 
       const { max_fee_per_gas } = await get_gas_price(bridge_metadata.viem_chain);
@@ -380,27 +387,27 @@ const get_deposit_helper_contract = (operator: string, chain_id: number): `0x${s
 /**
  * Encode function data for a transaction.
  */
-const encode_deposit_function_data = (
-  from_token: EvmToken | IcpToken,
-  bridge_metadata: BridgeMetadata,
+export const encode_deposit_function_data = (
+  from_token_id: string,
+  operator: Operator,
+  is_native: boolean,
+  parincipal_bytes: string,
   amount: string,
 ): `0x${string}` => {
-  const principal = principal_to_bytes32('6b5ll-mteg5-kmyav-a6l7g-lpwje-jc4ln-moggr-wrfvu-n54bz-gh3nr-wae');
-
-  if (bridge_metadata.operator === 'Appic') {
+  if (operator === 'Appic') {
     return encodeFunctionData({
       abi: appic_minter_abi,
       functionName: 'deposit',
-      args: [from_token.contractAddress, amount, principal, DEFAULT_SUBACCOUNT],
+      args: [from_token_id, amount, parincipal_bytes, DEFAULT_SUBACCOUNT],
     });
   }
 
   return encodeFunctionData({
     abi: dfinity_ck_minter_abi,
-    functionName: bridge_metadata.is_native ? 'depositEth' : 'depositErc20',
-    args: bridge_metadata.is_native
-      ? [principal, DEFAULT_SUBACCOUNT]
-      : [from_token.contractAddress!, amount, principal, DEFAULT_SUBACCOUNT],
+    functionName: is_native ? 'depositEth' : 'depositErc20',
+    args: is_native
+      ? [parincipal_bytes, DEFAULT_SUBACCOUNT]
+      : [from_token_id!, amount, parincipal_bytes, DEFAULT_SUBACCOUNT],
   });
 };
 

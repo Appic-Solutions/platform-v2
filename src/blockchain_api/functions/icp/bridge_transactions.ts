@@ -1,19 +1,18 @@
-import { Actor, Agent } from '@dfinity/agent';
+import { Actor, Agent, HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
-import {
-  createWalletClient,
-  custom,
-  WalletClient,
-  Chain as ViemChain,
-  PrepareTransactionRequestReturnType,
-} from 'viem';
+import { createWalletClient, custom, WalletClient, Chain as ViemChain } from 'viem';
 
 import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
 import { Approve, Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
 import { Operator } from '@/blockchain_api/types/tokens';
-import { BridgeOption, encode_approval_function_data } from './get_bridge_options';
+import {
+  BridgeOption,
+  DEFAULT_SUBACCOUNT,
+  encode_approval_function_data,
+  encode_deposit_function_data,
+} from './get_bridge_options';
 import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
   WithdrawalArg as AppicWithdrawalArg,
@@ -45,7 +44,8 @@ import {
 } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
 import { appic_helper_casniter_id } from '@/canister_ids.json';
-import { parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
+import { parse_evm_to_icp_tx_status, parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
+import { principal_to_bytes32 } from './utils/principal_to_hex';
 /**
  * Bridge Transactions: Overview
  *
@@ -528,6 +528,7 @@ export const approve_erc20 = async (
         account: account as `0x${string}`,
         to: bridge_option.from_token_id as `0x${string}`,
         data: ecoded_function_data as `0x${string}`,
+        maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
         type: 'eip1559',
       });
 
@@ -552,50 +553,147 @@ export const approve_erc20 = async (
   }
 };
 
+type TxHash = `0x${string}`;
 // Step 3
 // Submit deposit request through deposit helperes
-// export const request_deposit = async (
-//   wallet_client: WalletClient<any>,
-//   bridge_option: BridgeOption,
-// ): Promise<Response<boolean | `0x${string}`>> => {
-//   if (bridge_option.is_native == true) {
-//     return {
-//       result: true,
-//       success: true,
-//       message: '',
-//     };
-//   } else {
-//     try {
-//       const [account] = await wallet_client.getAddresses();
-//       let ecoded_function_data = encode_approval_function_data(
-//         bridge_option.deposit_helper_contract as `0x${string}`,
-//         bridge_option.amount,
-//       );
-//       let prepared_transaction = await wallet_client.prepareTransactionRequest({
-//         chain: bridge_option.viem_chain as ViemChain,
-//         account: account as `0x${string}`,
-//         to: bridge_option.from_token_id as `0x${string}`,
-//         data: ecoded_function_data as `0x${string}`,
-//         type: 'eip1559',
-//       });
+export const request_deposit = async (
+  wallet_client: WalletClient<any>,
+  bridge_option: BridgeOption,
+  recipient: Principal,
+): Promise<Response<TxHash>> => {
+  let principal_bytes = principal_to_bytes32(recipient.toText());
+  let default_subaccount = DEFAULT_SUBACCOUNT;
+  let encoded_deposit_function_data = encode_deposit_function_data(
+    bridge_option.from_token_id,
+    bridge_option.operator,
+    bridge_option.is_native,
+    principal_bytes,
+    default_subaccount,
+  );
 
-//       const signed_transaction = await wallet_client.signTransaction({
-//         account: account,
-//         ...prepared_transaction,
-//       });
+  try {
+    const [account] = await wallet_client.getAddresses();
 
-//       const hash = await wallet_client.sendRawTransaction({ serializedTransaction: signed_transaction });
-//       return {
-//         result: hash,
-//         message: '',
-//         success: true,
-//       };
-//     } catch (error) {
-//       return {
-//         result: false,
-//         message: `Failed to get erc20 approval ${error}`,
-//         success: false,
-//       };
-//     }
-//   }
-// };
+    let prepared_transaction = await wallet_client.prepareTransactionRequest({
+      chain: bridge_option.viem_chain as ViemChain,
+      account: account as `0x${string}`,
+      to: bridge_option.deposit_helper_contract as `0x${string}`,
+      data: encoded_deposit_function_data as `0x${string}`,
+      type: 'eip1559',
+      maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
+    });
+
+    const signed_transaction = await wallet_client.signTransaction({
+      account: account,
+      ...prepared_transaction,
+    });
+
+    const hash = await wallet_client.sendRawTransaction({ serializedTransaction: signed_transaction });
+    return {
+      result: hash,
+      message: '',
+      success: true,
+    };
+  } catch (error) {
+    return {
+      result: '0x',
+      message: `Failed to request deposit ${error}`,
+      success: false,
+    };
+  }
+};
+
+// Step 4
+// Notify Appic helper of new EVM => ICP Transaction
+export const notify_appic_helper_deposit = async (
+  bridge_option: BridgeOption,
+  tx_hash: string,
+  user_wallet_address: string,
+  recipient_principal: string,
+  unauthenticated_agent: HttpAgent | Agent,
+): Promise<Response<string>> => {
+  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+    canisterId: Principal.fromText(appic_helper_casniter_id),
+    agent: unauthenticated_agent,
+  });
+
+  let parsed_operator = (
+    bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
+  ) as AppicHelperOperator;
+  try {
+    let notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
+      chain_id: BigInt(bridge_option.chain_id),
+      from_address: user_wallet_address,
+      principal: Principal.fromText(recipient_principal),
+      subaccount: [],
+      total_gas_spent: BigInt(bridge_option.fees.max_network_fee),
+      transaction_hash: tx_hash,
+      value: BigInt(bridge_option.amount),
+      erc20_contract_address: bridge_option.from_token_id,
+      icrc_ledger_id: Principal.fromText(bridge_option.to_token_id),
+      operator: parsed_operator,
+      time: BigInt(Date.now()) * BigInt(1_000_000),
+    } as AddEvmToIcpTx)) as NewEvmToIcpResult;
+    if ('Ok' in notify_withdrawal_result) {
+      return {
+        result: '',
+        success: true,
+        message: '',
+      };
+    } else {
+      return {
+        result: '',
+        success: false,
+        message: `Failed to notify minter ${notify_withdrawal_result.Err}`,
+      };
+    }
+  } catch (error) {
+    return {
+      result: '',
+      success: false,
+      message: `Failed to notify minter ${error}`,
+    };
+  }
+};
+
+export type DepositTxStatus = 'Invalid' | 'PendingVerification' | 'Minted' | 'Accepted' | 'Quarantined';
+
+//  Step 5
+// This function should be called intervally until the transaction status is either "Minted" or "Invalid" or "Quarantined"
+export const check_deposit_status = async (
+  tx_hash: TxHash,
+  bridge_option: BridgeOption,
+  unauthenticated_agent: Agent | HttpAgent,
+): Promise<Response<DepositTxStatus>> => {
+  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+    canisterId: Principal.fromText(appic_helper_casniter_id),
+    agent: unauthenticated_agent,
+  });
+
+  try {
+    let tx_status = (await appic_helper_actor.get_transaction({
+      chain_id: BigInt(bridge_option.chain_id),
+      search_param: { TxHash: tx_hash } as TransactionSearchParam,
+    } as GetTxParams)) as [] | Transaction;
+    if ('EvmToIcp' in tx_status) {
+      let parsed_status = parse_evm_to_icp_tx_status(tx_status.EvmToIcp.status);
+      return {
+        result: parsed_status,
+        message: '',
+        success: true,
+      };
+    } else {
+      return {
+        result: 'PendingVerification',
+        message: '',
+        success: true,
+      };
+    }
+  } catch (error) {
+    return {
+      result: 'PendingVerification',
+      message: `Canister call error ${error}`,
+      success: false,
+    };
+  }
+};
