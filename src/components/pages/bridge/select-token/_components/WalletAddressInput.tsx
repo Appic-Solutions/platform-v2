@@ -1,10 +1,10 @@
-import { IcpToken } from "@/blockchain_api/types/tokens";
-import { EvmToken } from "@/blockchain_api/types/tokens";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { isValidEvmAddress, isValidIcpAddress } from "@/lib/validation";
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { EvmToken } from '@/blockchain_api/types/tokens';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import React from 'react';
+import { isValidEvmAddress, isValidIcpAddress } from '@/lib/validation';
 
 interface WalletAddressInputProps {
   token: EvmToken | IcpToken | null;
@@ -17,24 +17,33 @@ interface WalletAddressInputProps {
   avatar: string;
 }
 
-const WalletAddressInput = ({ token, address, setAddress, validationError, onValidationError, onWalletAddressChange, show, avatar }: WalletAddressInputProps) => {
+const WalletAddressInput = ({
+  token,
+  address,
+  setAddress,
+  validationError,
+  onValidationError,
+  onWalletAddressChange,
+  show,
+  avatar,
+}: WalletAddressInputProps) => {
   const validateWalletAddress = (address: string) => {
     if (!token) return false;
     if (!address) {
-      onValidationError?.("Wallet Address cannot be empty");
+      onValidationError?.('Wallet Address cannot be empty');
       return false;
     }
 
-    if (token?.chainType === "ICP") {
+    if (token?.chain_type === 'ICP') {
       const isValid = isValidIcpAddress(address);
       if (!isValid) {
-        onValidationError?.("ICP Wallet Address is not valid");
+        onValidationError?.('ICP Wallet Address is not valid');
         return false;
       }
     } else {
       const isValid = isValidEvmAddress(address);
       if (!isValid) {
-        onValidationError?.("EVM Wallet Address is not valid");
+        onValidationError?.('EVM Wallet Address is not valid');
         return false;
       }
     }
@@ -49,8 +58,13 @@ const WalletAddressInput = ({ token, address, setAddress, validationError, onVal
   };
 
   return (
-    <div className={cn("overflow-hidden transition-[max-height] duration-300 ease-in-out", show ? "max-h-[155px] mb-4" : "max-h-0")}>
-      <Card className={cn("max-h-[133px] md:max-h-[155px] cursor-pointer flex-col items-start justify-center gap-y-2")}>
+    <div
+      className={cn(
+        'overflow-hidden transition-[max-height] duration-300 ease-in-out',
+        show ? 'max-h-[155px] mb-4' : 'max-h-0',
+      )}
+    >
+      <Card className={cn('max-h-[133px] md:max-h-[155px] cursor-pointer flex-col items-start justify-center gap-y-2')}>
         <p className="text-sm font-semibold">Send To Wallet</p>
         <div className="flex items-center gap-4 w-full">
           <div className="relative">
@@ -62,16 +76,16 @@ const WalletAddressInput = ({ token, address, setAddress, validationError, onVal
           <div className="w-full">
             <input
               type="text"
-              maxLength={token?.chainType === "ICP" ? 64 : 42}
-              placeholder={token?.chainType === "ICP" ? "2vxsx-fae..." : "0x0f70e...65A63"}
+              maxLength={token?.chain_type === 'ICP' ? 64 : 42}
+              placeholder={token?.chain_type === 'ICP' ? '2vxsx-fae...' : '0x0f70e...65A63'}
               value={address}
               onChange={handleAddressChange}
               className={cn(
-                "border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none w-full",
-                "bg-transparent text-primary",
-                "placeholder:text-muted",
-                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                address.length > 30 && "text-lg"
+                'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none w-full',
+                'bg-transparent text-primary',
+                'placeholder:text-muted',
+                '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                address.length > 30 && 'text-lg',
               )}
             />
             {validationError && <p className="text-yellow-500 text-xs">{validationError}</p>}

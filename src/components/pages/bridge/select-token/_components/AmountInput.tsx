@@ -1,10 +1,10 @@
-import { getChainLogo } from "@/lib/utils";
-import { IcpToken } from "@/blockchain_api/types/tokens";
-import { EvmToken } from "@/blockchain_api/types/tokens";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import React from "react";
+import { getChainLogo } from '@/lib/utils';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { EvmToken } from '@/blockchain_api/types/tokens';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import React, { useEffect, useState } from 'react';
 
 interface AmountInputProps {
   token: EvmToken | IcpToken | null;
@@ -15,19 +15,21 @@ interface AmountInputProps {
   isWalletConnected: boolean;
 }
 
-const AmountInput = ({
-  token,
-  amount,
-  setAmount,
-  setUsdPrice,
-  usdPrice,
-  isWalletConnected = true,
-}: AmountInputProps) => {
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnected = true }: AmountInputProps) => {
+  const [inputAmount, setInputAmount] = useState('');
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleAmountChange(inputAmount);
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [inputAmount]);
+
+  const handleAmountChange = (value: string) => {
     const usdPrice = Number(value) * Number(token?.usdPrice ?? 0);
     setUsdPrice(usdPrice.toFixed(2));
-    setAmount(e.target.value);
+    setAmount(value);
   };
 
   return (
@@ -36,13 +38,13 @@ const AmountInput = ({
       <div className="flex items-center gap-4">
         <div className="relative">
           <Avatar className=" w-11 h-11 rounded-full">
-            <AvatarImage src={token?.logo || "images/logo/placeholder.png"} />
+            <AvatarImage src={token?.logo || 'images/logo/placeholder.png'} />
             <AvatarFallback>{token?.symbol}</AvatarFallback>
           </Avatar>
           <Avatar
             className={cn(
-              "absolute -right-1 -bottom-1 w-5 h-5 rounded-full",
-              "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+              'absolute -right-1 -bottom-1 w-5 h-5 rounded-full',
+              'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
             )}
           >
             <AvatarImage src={getChainLogo(token?.chainId)} />
@@ -55,22 +57,21 @@ const AmountInput = ({
               type="number"
               maxLength={15}
               placeholder="0"
-              value={amount}
-              onChange={handleAmountChange}
+              onChange={(e) => setInputAmount(e.target.value)}
               className={cn(
-                "border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none",
-                "bg-transparent text-primary",
-                "placeholder:text-primary/50",
-                "w-full",
-                "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
+                'bg-transparent text-primary',
+                'placeholder:text-primary/50',
+                'w-full',
+                '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
               )}
             />
             {isWalletConnected && (
               <span
                 className={cn(
-                  "px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md",
-                  "bg-gradient-to-r from-white to-white/35",
-                  "hover:bg-white/35 transition-all duration-300"
+                  'px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md',
+                  'bg-gradient-to-r from-white to-white/35',
+                  'hover:bg-white/35 transition-all duration-300',
                 )}
               >
                 max

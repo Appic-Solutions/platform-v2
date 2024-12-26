@@ -8,8 +8,8 @@ import { useMemo, useState, useEffect } from 'react';
 import ChainBoxPage from './chain-box';
 import TokenCard from './token-card';
 import BoxHeader from '@/components/ui/box-header';
-import Spinner from '@/components/ui/spinner';
 import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
+import TokenSkeleton from './token-skeleton';
 
 interface TokenListProps {
   prevStepHandler: () => void;
@@ -107,9 +107,13 @@ export default function TokenListPage({
       />
       <div className="w-full flex flex-col gap-y-5 overflow-y-scroll h-full">
         {isPending ? (
-          <div className="h-full flex items-center justify-center">
-            <Spinner className="fill-white w-12 h-12" />
-          </div>
+          <>
+            <TokenSkeleton />
+            <TokenSkeleton />
+            <TokenSkeleton />
+            <TokenSkeleton />
+            <TokenSkeleton />
+          </>
         ) : isError ? (
           <div>Error While loading. Please try again</div>
         ) : tokens && filteredTokens && filteredTokens.length > 0 ? (

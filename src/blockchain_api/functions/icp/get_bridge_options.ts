@@ -51,7 +51,7 @@ interface BridgeMetadata {
   viem_chain: ViemChain;
 }
 
-interface BridgeOption {
+export interface BridgeOption {
   bridge_tx_type: TxType;
   minter_id: Principal;
   chain_id: number;
