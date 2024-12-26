@@ -1,11 +1,19 @@
 import { Actor, Agent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
+import {
+  createWalletClient,
+  custom,
+  WalletClient,
+  Chain as ViemChain,
+  PrepareTransactionRequestReturnType,
+} from 'viem';
+
 import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
 import { Approve, Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
 import { Operator } from '@/blockchain_api/types/tokens';
-import { BridgeOption } from './get_bridge_options';
+import { BridgeOption, encode_approval_function_data } from './get_bridge_options';
 import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
   WithdrawalArg as AppicWithdrawalArg,
@@ -89,7 +97,9 @@ export const icrc2_approve = async (
     if (bridge_option.is_native) {
       // In case of Native withdrawal
       let native_approval_result = (await native_actor.icrc2_approve({
-        amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_native_fee).toString()),
+        amount: BigInt(
+          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
+        ),
         created_at_time: [],
         expected_allowance: [],
         expires_at: [],
@@ -113,7 +123,9 @@ export const icrc2_approve = async (
 
       let native_approval_result = (await native_actor.icrc2_approve({
         amount: BigInt(
-          BigNumber(bridge_option.fees.total_native_fee).minus(bridge_option.fees.approval_native_fee).toString(),
+          BigNumber(bridge_option.fees.total_native_fee)
+            .minus(bridge_option.fees.approval_fee_in_native_token)
+            .toString(),
         ),
         created_at_time: [],
         expected_allowance: [],
@@ -130,7 +142,9 @@ export const icrc2_approve = async (
       }
 
       let erc20_approval_result = (await erc20_actor.icrc2_approve({
-        amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_erc20_fee).toString()),
+        amount: BigInt(
+          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+        ),
         created_at_time: [],
         expected_allowance: [],
         expires_at: [],
@@ -185,7 +199,9 @@ export const request_withdraw = async (
     if (bridge_option.is_native) {
       try {
         const native_withdrawal_result = (await appic_minter_actor.withdraw_native_token({
-          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_native_fee).toString()),
+          amount: BigInt(
+            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
+          ),
           recipient,
         } as AppicWithdrawalArg)) as AppicWithdrawalNativeResult;
 
@@ -213,7 +229,9 @@ export const request_withdraw = async (
       // Handle ERC20 token withdrawal for Appic minter
       try {
         const erc20_withdrawal_result = (await appic_minter_actor.withdraw_erc20({
-          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_erc20_fee).toString()),
+          amount: BigInt(
+            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+          ),
           erc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
           recipient,
         } as AppicWithdrawErc20Arg)) as AppicWithdrawalErc20Result;
@@ -257,7 +275,9 @@ export const request_withdraw = async (
     if (bridge_option.is_native) {
       try {
         const native_withdrawal_result = await dfinity_minter_actor.withdraw_eth({
-          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_native_fee).toString()),
+          amount: BigInt(
+            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
+          ),
           recipient,
           from_subaccount: [],
         });
@@ -286,7 +306,9 @@ export const request_withdraw = async (
       // Handle ERC20 token withdrawal for Dfinity minter
       try {
         const erc20_withdrawal_result = await dfinity_minter_actor.withdraw_erc20({
-          amount: BigInt(BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_erc20_fee).toString()),
+          amount: BigInt(
+            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+          ),
           ckerc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
           recipient,
           from_ckerc20_subaccount: [],
@@ -391,6 +413,7 @@ export type WithdrawalTxStatus =
   | 'Call Failed';
 
 // Step 4
+// This function should be called intervally until the transaction status is either "Failed" or "Successful" or "Reimbursed"
 export const check_withdraw_status = async (
   withdrawal_id: WithdrawalId,
   bridge_option: BridgeOption,
@@ -429,8 +452,6 @@ export const check_withdraw_status = async (
   }
 };
 
-// Step 4
-
 /**
  * Deposit Transactions: Steps
  *
@@ -438,13 +459,19 @@ export const check_withdraw_status = async (
  *
  * Steps:
  *
- * 1. **Token Approval**:
+ * 1. **Create Wallet Client**:
+ *   - Creates the wallet client and switches the chain:
+ *      - **Create wallet clinet and return it**.
+ *      - **Change chain if necessary**: Change the cain from wallet if necessary.
+ *
+ *
+ * 2. **Token Approval**:
  *    - Allow the Deposit Helper contract to access the token.
  *    - Token-specific rules:
  *      - **Native Tokens**: No approval required.
  *      - **ERC20 Tokens**: A single approval is required.
  *
- * 2. **Submit Deposit Request**:
+ * 3. **Submit Deposit Request**:
  *    - Call the appropriate deposit function on the Deposit Helper contract:
  *      - **Appic Deposit Helper**:
  *        - Use the `deposit` function for both native and ERC20 tokens.
@@ -452,10 +479,123 @@ export const check_withdraw_status = async (
  *        - Use the `depositEth` function for native tokens.
  *        - Use the `depositErc20` function for ERC20 tokens.
  *
- * 3. **Notify Appic Helper**:
+ * 4. **Notify Appic Helper**:
  *    - Inform the `appic_helper` service about the successful deposit request.
  *
- * 4. **Monitor Transaction Status**:
+ * 5. **Monitor Transaction Status**:
  *    - Periodically check the transaction status by querying the `appic_helper` service.
  *    - Repeat every minute until the transaction is confirmed as successful.
  */
+
+// Step 1
+// create wallet client and switch cahin
+export const create_wallet_client = async (bridge_option: BridgeOption): Promise<WalletClient<any>> => {
+  const ethereum = (window as any).ethereum;
+
+  if (!ethereum) {
+    throw new Error('MetaMask is not installed or ethereum object is not available');
+  }
+
+  let walletClient = createWalletClient({
+    transport: custom(ethereum!),
+  });
+
+  await walletClient.switchChain({ id: bridge_option.chain_id });
+  return walletClient;
+};
+
+// Step 2
+// Tokens approval
+export const approve_erc20 = async (
+  wallet_client: WalletClient<any>,
+  bridge_option: BridgeOption,
+): Promise<Response<boolean | `0x${string}`>> => {
+  if (bridge_option.is_native == true) {
+    return {
+      result: true,
+      success: true,
+      message: '',
+    };
+  } else {
+    try {
+      const [account] = await wallet_client.getAddresses();
+      let ecoded_function_data = encode_approval_function_data(
+        bridge_option.deposit_helper_contract as `0x${string}`,
+        bridge_option.amount,
+      );
+      let prepared_transaction = await wallet_client.prepareTransactionRequest({
+        chain: bridge_option.viem_chain as ViemChain,
+        account: account as `0x${string}`,
+        to: bridge_option.from_token_id as `0x${string}`,
+        data: ecoded_function_data as `0x${string}`,
+        type: 'eip1559',
+      });
+
+      const signed_transaction = await wallet_client.signTransaction({
+        account: account,
+        ...prepared_transaction,
+      });
+
+      const hash = await wallet_client.sendRawTransaction({ serializedTransaction: signed_transaction });
+      return {
+        result: hash,
+        message: '',
+        success: true,
+      };
+    } catch (error) {
+      return {
+        result: false,
+        message: `Failed to get erc20 approval ${error}`,
+        success: false,
+      };
+    }
+  }
+};
+
+// Step 3
+// Submit deposit request through deposit helperes
+// export const request_deposit = async (
+//   wallet_client: WalletClient<any>,
+//   bridge_option: BridgeOption,
+// ): Promise<Response<boolean | `0x${string}`>> => {
+//   if (bridge_option.is_native == true) {
+//     return {
+//       result: true,
+//       success: true,
+//       message: '',
+//     };
+//   } else {
+//     try {
+//       const [account] = await wallet_client.getAddresses();
+//       let ecoded_function_data = encode_approval_function_data(
+//         bridge_option.deposit_helper_contract as `0x${string}`,
+//         bridge_option.amount,
+//       );
+//       let prepared_transaction = await wallet_client.prepareTransactionRequest({
+//         chain: bridge_option.viem_chain as ViemChain,
+//         account: account as `0x${string}`,
+//         to: bridge_option.from_token_id as `0x${string}`,
+//         data: ecoded_function_data as `0x${string}`,
+//         type: 'eip1559',
+//       });
+
+//       const signed_transaction = await wallet_client.signTransaction({
+//         account: account,
+//         ...prepared_transaction,
+//       });
+
+//       const hash = await wallet_client.sendRawTransaction({ serializedTransaction: signed_transaction });
+//       return {
+//         result: hash,
+//         message: '',
+//         success: true,
+//       };
+//     } catch (error) {
+//       return {
+//         result: false,
+//         message: `Failed to get erc20 approval ${error}`,
+//         success: false,
+//       };
+//     }
+//   }
+// };
