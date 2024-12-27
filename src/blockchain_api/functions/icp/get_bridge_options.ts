@@ -116,7 +116,6 @@ export const get_bridge_options = async (
   );
 
   amount = BigNumber(amount).multipliedBy(BigNumber(10).pow(from_token.decimals)).toFixed();
-  console.log(amount);
   try {
     const value = bridge_metadata.is_native ? amount : '0';
     if (bridge_metadata.tx_type == TxType.Deposit) {
@@ -146,6 +145,7 @@ export const get_bridge_options = async (
         encoded_function_data,
         bridge_metadata.deposit_helper_contract,
         max_fee_per_gas,
+        bridge_metadata.is_native,
         bridge_metadata.viem_chain,
         bridge_metadata.rpc_url,
       );
@@ -273,8 +273,6 @@ const estimate_withdrawal_gas = async (
             },
           ]);
 
-      console.log(price);
-
       return {
         max_transaction_fee: price.max_transaction_fee.toString(),
         max_fee_per_gas: price.max_fee_per_gas.toString(),
@@ -337,20 +335,21 @@ const estimate_deposit_fee = async (
   encoded_function_data: `0x${string}`,
   deposit_helper_contract: `0x${string}`,
   max_fee_per_gas: string,
+  is_native: boolean,
   chain: ViemChain,
   rpc_url: string,
 ): Promise<{ deposit_gas: string; total_deposit_fee: string }> => {
   try {
     const client = createPublicClient({ transport: http(rpc_url), chain });
-    let estimated_gas = await client.estimateGas({
-      account: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+    const estimated_gas = await client.estimateGas({
+      account: is_native ? undefined : '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
       to: deposit_helper_contract,
       value: BigInt(value),
       type: 'eip1559',
       data: encoded_function_data,
     });
 
-    let estimated_gas_plus_10_percent = BigNumber(estimated_gas.toString())
+    const estimated_gas_plus_10_percent = BigNumber(estimated_gas.toString())
       .plus(BigNumber(estimated_gas.toString()).multipliedBy(10).dividedBy(100).decimalPlaces(0))
       .toFixed(); // plus 10 percent in case gas consumption is higher
     return {
@@ -378,13 +377,6 @@ const estimate_deposit_approval_fee = async (
     return { approval_gas: '0', total_approval_fee: '0' };
   }
   try {
-    console.log({
-      encoded_function_data,
-      token_contract_address,
-      max_fee_per_gas,
-      is_native,
-      rpc_url,
-    });
     const client = createPublicClient({ transport: http(rpc_url), chain });
     const estimated_gas = await client.estimateGas({
       account: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
@@ -393,11 +385,6 @@ const estimate_deposit_approval_fee = async (
       data: encoded_function_data,
     });
 
-    console.log({
-      max_fee_per_gas,
-      total_approval_fee: BigNumber(estimated_gas.toString()).multipliedBy(max_fee_per_gas).toFixed(),
-      approval_gas: estimated_gas.toString(),
-    });
     return {
       total_approval_fee: BigNumber(estimated_gas.toString()).multipliedBy(max_fee_per_gas).toFixed(),
       approval_gas: estimated_gas.toString(),
@@ -415,7 +402,7 @@ const get_bridge_metadata = (from_token: EvmToken | IcpToken, to_token: EvmToken
   const is_deposit = from_token.chain_type === 'EVM' && to_token.chain_type === 'ICP';
   const operator = is_deposit ? to_token.operator! : from_token.operator!;
   const chain_id = is_deposit ? from_token.chainId : to_token.chainId;
-  let chain = chains.find((chain) => chain.chainId === chain_id)!;
+  const chain = chains.find((chain) => chain.chainId === chain_id)!;
   const [viem_chain, rpc_url] = [chain.viem_config!, chain.rpc_url];
 
   return {
@@ -443,10 +430,10 @@ const get_minter_address = (operator: string, chain_id: number): Principal => {
  * Get the deposit helper contract address.
  */
 const get_deposit_helper_contract = (operator: string, chain_id: number): `0x${string}` => {
-  const chain = chains.find((chain) => chain.chainId === chain_id);
+  const chain = chains.find((chain) => chain.chainId === chain_id)!;
   return operator === 'Appic'
-    ? (chain?.appic_deposit_helper_contract! as `0x${string}`)
-    : (chain?.dfinity_ck_deposit_helper_contract! as `0x${string}`);
+    ? (chain?.appic_deposit_helper_contract as `0x${string}`)
+    : (chain?.dfinity_ck_deposit_helper_contract as `0x${string}`);
 };
 
 /**
