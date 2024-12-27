@@ -53,9 +53,12 @@ export interface BridgeMetadata {
 
 export interface BridgeFees {
   minter_fee: string; // Fee that appic minter takes for deposit and withdrawal
+  human_readable_minter_fee: string;
   max_network_fee: string; // Fee required to pay transaction gas fees, Can be paid either by native tokens or twin pairs of native tokens
+  human_readable_max_network_fee: string;
   approval_fee_in_native_token: string; // Fee required for transaction approval, can be 0 as well in case of native deposit transactions
   total_native_fee: string; // max_network_fee + minter_fee + approval_fee_in_native_token
+  human_readable_total_native_fee: string; // total native fee in human readable format
   total_fee_usd_price: string; // Total fee converted to usd
   native_fee_token_symbol: string;
 
@@ -82,6 +85,7 @@ export interface BridgeOption {
   fees: BridgeFees;
   amount: string;
   estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
+  human_readable_estimated_return: string; // estimated return in human_readable format
   via: string;
   duration: string;
   is_best: boolean;
@@ -108,6 +112,9 @@ export const get_bridge_options = async (
     bridge_metadata.tx_type,
     bridge_pairs,
   );
+
+  amount = BigNumber(amount).multipliedBy(BigNumber(10).pow(from_token.decimals)).toString();
+
   try {
     const value = bridge_metadata.is_native ? amount : '0';
     if (bridge_metadata.tx_type == TxType.Deposit) {
@@ -141,6 +148,7 @@ export const get_bridge_options = async (
       const bridge_options = await calculate_bridge_options(
         from_token.contractAddress!,
         to_token.canisterId!,
+        to_token.decimals.toString(),
         agent,
         bridge_metadata,
         total_deposit_fee,
@@ -167,6 +175,7 @@ export const get_bridge_options = async (
       const bridge_options = await calculate_bridge_options(
         from_token.canisterId!,
         to_token.contractAddress!,
+        to_token.decimals.toString(),
         agent,
         bridge_metadata,
         estimated_withdrawal_gas,
@@ -185,8 +194,7 @@ export const get_bridge_options = async (
       return { result: [], message: 'Failed to calculate bridge options, Tx type not supported', success: false };
     }
   } catch (error) {
-    console.error('Error getting bridge options:', error);
-    return { result: [], message: `Failed to calculate bridge options: ${error}`, success: false };
+    throw error;
   }
 };
 
@@ -246,15 +254,19 @@ const estimate_withdrawal_gas = async (
       // Cast actor to Dfinity Minter Type
       const actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address }) as {
         eip_1559_transaction_price: (
-          arg?: DfinityEip1559TransactionPriceArg,
+          arg: [] | [DfinityEip1559TransactionPriceArg],
         ) => Promise<DfinityEip1559TransactionPrice>;
       };
 
       const price = is_native_token
-        ? await actor.eip_1559_transaction_price()
-        : await actor.eip_1559_transaction_price({
-            ckerc20_ledger_id: Principal.fromText(token_canister_id),
-          });
+        ? await actor.eip_1559_transaction_price([])
+        : await actor.eip_1559_transaction_price([
+            {
+              ckerc20_ledger_id: Principal.fromText(token_canister_id),
+            },
+          ]);
+
+      console.log(price);
 
       return BigNumber(price.max_transaction_fee.toString())
         .plus(BigNumber(price.max_transaction_fee.toString()).multipliedBy(12.5).dividedBy(100).toString())
@@ -270,7 +282,10 @@ const estimate_withdrawal_gas = async (
 };
 
 const get_gas_price = async (chain: ViemChain): Promise<{ max_fee_per_gas: string }> => {
-  const client = createPublicClient({ transport: http(), chain });
+  const client = createPublicClient({
+    transport: http(),
+    chain,
+  });
   const fee_history = await client.getFeeHistory({
     blockCount: 4,
     rewardPercentiles: [20, 50, 70],
@@ -431,6 +446,7 @@ export const encode_approval_function_data = (
 const calculate_bridge_options = async (
   from_token_id: string,
   to_token_id: string,
+  decimals: string,
   agent: HttpAgent,
   bridge_metadata: BridgeMetadata,
   estimated_network_fee: string,
@@ -471,13 +487,26 @@ const calculate_bridge_options = async (
         viem_chain: bridge_metadata.viem_chain,
         amount,
         estimated_return,
+        human_readable_estimated_return: BigNumber(estimated_return).dividedBy(BigNumber(10).pow(decimals)).toString(),
         fees: {
           max_network_fee: estimated_network_fee,
+          human_readable_max_network_fee: BigNumber(estimated_network_fee)
+            .dividedBy(BigNumber(10).pow(native_currency.decimals))
+            .toString(),
           minter_fee: minter_fee,
+          human_readable_minter_fee: BigNumber(minter_fee)
+            .dividedBy(BigNumber(10).pow(native_currency.decimals))
+            .toString(),
           approval_fee_in_native_token: approve_native_fee,
           total_native_fee: total_native_fee,
+          human_readable_total_native_fee: BigNumber(total_native_fee)
+            .dividedBy(BigNumber(10).pow(native_currency.decimals))
+            .toString(),
           native_fee_token_symbol: native_currency.symbol,
-          total_fee_usd_price: BigNumber(total_native_fee).multipliedBy(native_currency.usdPrice).toString(),
+          total_fee_usd_price: BigNumber(total_native_fee)
+            .dividedBy(BigNumber(10).pow(native_currency.decimals))
+            .multipliedBy(native_currency.usdPrice)
+            .toString(),
 
           // Withdrawal params
           approval_fee_in_erc20_tokens: approve_erc20_fee,

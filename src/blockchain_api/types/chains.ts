@@ -1,4 +1,4 @@
-import { Chain as VeimChain } from 'viem/chains';
+import { Chain as ViemChain } from 'viem/chains';
 
 export type ChainType = 'ICP' | 'EVM';
 
@@ -17,5 +17,5 @@ export interface Chain {
   dfinity_ck_minter_address?: string;
   appic_minter_address?: string;
   ankr_handle?: string;
-  viem_config?: VeimChain;
+  viem_config?: ViemChain;
 }

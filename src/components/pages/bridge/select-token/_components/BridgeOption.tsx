@@ -69,8 +69,13 @@ const BridgeOption = ({
               />
             </div>
           </div>
-          <p className={cn('text-base lg:text-xl', option.estimated_return.length > 7 && 'text-ellipsis w-36')}>
-            {option.estimated_return}
+          <p
+            className={cn(
+              'text-base lg:text-xl',
+              option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-36',
+            )}
+          >
+            {option.human_readable_estimated_return}
           </p>
         </div>
         <div className="flex flex-col gap-y-3 items-end">
@@ -106,7 +111,9 @@ const BridgeOption = ({
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted">Network Fee:</span>
-              <span>${option.fees.max_network_fee}</span>
+              <span>
+                {option.fees.human_readable_max_network_fee} {option.fees.native_fee_token_symbol}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted">Estimated Time:</span>
