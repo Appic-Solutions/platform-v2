@@ -1,7 +1,7 @@
 "use client"
 import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import Step1 from "@/components/pages/advanced/step-1";
-import Step2 from "@/components/pages/advanced/step-2";
+import Step1 from "@/common/components/pages/advanced/step-1";
+import Step2 from "@/common/components/pages/advanced/step-2";
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
