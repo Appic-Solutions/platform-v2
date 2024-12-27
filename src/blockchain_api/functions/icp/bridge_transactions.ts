@@ -1,18 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Actor, Agent, HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { createWalletClient, custom, WalletClient, Chain as ViemChain } from 'viem';
 
 import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
-import { Approve, Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
+import { Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
-import { Operator } from '@/blockchain_api/types/tokens';
-import {
-  BridgeOption,
-  DEFAULT_SUBACCOUNT,
-  encode_approval_function_data,
-  encode_deposit_function_data,
-} from './get_bridge_options';
+import { BridgeOption, encode_approval_function_data, encode_deposit_function_data } from './get_bridge_options';
 import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
   WithdrawalArg as AppicWithdrawalArg,
@@ -88,7 +83,7 @@ export const icrc2_approve = async (
   bridge_option: BridgeOption,
   authenticated_agent: Agent,
 ): Promise<Response<string>> => {
-  let native_actor = Actor.createActor(IcrcIdlFactory, {
+  const native_actor = Actor.createActor(IcrcIdlFactory, {
     agent: authenticated_agent,
     canisterId: bridge_option.is_native ? bridge_option.native_fee_token_id : bridge_option.from_token_id,
   });
@@ -96,7 +91,7 @@ export const icrc2_approve = async (
   try {
     if (bridge_option.is_native) {
       // In case of Native withdrawal
-      let native_approval_result = (await native_actor.icrc2_approve({
+      const native_approval_result = (await native_actor.icrc2_approve({
         amount: BigInt(
           BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
         ),
@@ -116,12 +111,12 @@ export const icrc2_approve = async (
       }
     } else {
       // In case of Erc20
-      let erc20_actor = Actor.createActor(IcrcIdlFactory, {
+      const erc20_actor = Actor.createActor(IcrcIdlFactory, {
         agent: authenticated_agent,
         canisterId: bridge_option.from_token_id,
       });
 
-      let native_approval_result = (await native_actor.icrc2_approve({
+      const native_approval_result = (await native_actor.icrc2_approve({
         amount: BigInt(
           BigNumber(bridge_option.fees.total_native_fee)
             .minus(bridge_option.fees.approval_fee_in_native_token)
@@ -141,7 +136,7 @@ export const icrc2_approve = async (
         return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
       }
 
-      let erc20_approval_result = (await erc20_actor.icrc2_approve({
+      const erc20_approval_result = (await erc20_actor.icrc2_approve({
         amount: BigInt(
           BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
         ),
@@ -184,13 +179,13 @@ type WithdrawalId = string;
 // Function to handle withdrawal requests for both Appic and Dfinity minters
 export const request_withdraw = async (
   bridge_option: BridgeOption,
-  recipient: string,
+  recipient: string, // Users evm wallet address
   authenticated_agent: Agent,
 ): Promise<Response<WithdrawalId>> => {
   // Check if the operator is Appic
   if (bridge_option.operator === 'Appic') {
     // Create an actor for the Appic minter
-    let appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+    const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
       canisterId: bridge_option.minter_id,
       agent: authenticated_agent,
     });
@@ -259,7 +254,7 @@ export const request_withdraw = async (
     }
   } else if (bridge_option.operator === 'Dfinity') {
     // Create an actor for the Dfinity minter
-    let dfinity_minter_actor = Actor.createActor(DfinityMinterIdlFactory, {
+    const dfinity_minter_actor = Actor.createActor(DfinityMinterIdlFactory, {
       canisterId: bridge_option.minter_id,
       agent: authenticated_agent,
     }) as {
@@ -355,16 +350,16 @@ export const notify_appic_helper_withdrawal = async (
   user_wallet_principal: string,
   authenticated_agent: Agent,
 ): Promise<Response<string>> => {
-  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+  const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: authenticated_agent,
   });
 
-  let parsed_operator = (
+  const parsed_operator = (
     bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
   ) as AppicHelperOperator;
   try {
-    let notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
+    const notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
       chain_id: BigInt(bridge_option.chain_id),
       destination: recipient,
       erc20_contract_address: bridge_option.to_token_id,
@@ -419,18 +414,18 @@ export const check_withdraw_status = async (
   bridge_option: BridgeOption,
   authenticated_agent: Agent,
 ): Promise<Response<WithdrawalTxStatus>> => {
-  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+  const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: authenticated_agent,
   });
 
   try {
-    let tx_status = (await appic_helper_actor.get_transaction({
+    const tx_status = (await appic_helper_actor.get_transaction({
       chain_id: BigInt(bridge_option.chain_id),
       search_param: { TxWithdrawalId: BigInt(withdrawal_id) } as TransactionSearchParam,
     } as GetTxParams)) as [] | Transaction;
     if ('IcpToEvm' in tx_status) {
-      let parsed_status = parse_icp_to_evm_tx_status(tx_status.IcpToEvm.status);
+      const parsed_status = parse_icp_to_evm_tx_status(tx_status.IcpToEvm.status);
       return {
         result: parsed_status,
         message: '',
@@ -496,7 +491,7 @@ export const create_wallet_client = async (bridge_option: BridgeOption): Promise
     throw new Error('MetaMask is not installed or ethereum object is not available');
   }
 
-  let walletClient = createWalletClient({
+  const walletClient = createWalletClient({
     transport: custom(ethereum!),
   });
 
@@ -519,11 +514,11 @@ export const approve_erc20 = async (
   } else {
     try {
       const [account] = await wallet_client.getAddresses();
-      let encoded_function_data = encode_approval_function_data(
+      const encoded_function_data = encode_approval_function_data(
         bridge_option.deposit_helper_contract as `0x${string}`,
         bridge_option.amount,
       );
-      let prepared_transaction = await wallet_client.prepareTransactionRequest({
+      const prepared_transaction = await wallet_client.prepareTransactionRequest({
         chain: bridge_option.viem_chain as ViemChain,
         account: account as `0x${string}`,
         to: bridge_option.from_token_id as `0x${string}`,
@@ -561,20 +556,21 @@ export const request_deposit = async (
   bridge_option: BridgeOption,
   recipient: Principal,
 ): Promise<Response<TxHash>> => {
-  let principal_bytes = principal_to_bytes32(recipient.toText());
-  let default_subaccount = DEFAULT_SUBACCOUNT;
-  let encoded_deposit_function_data = encode_deposit_function_data(
+  const principal_bytes = principal_to_bytes32(recipient.toText());
+  const encoded_deposit_function_data = encode_deposit_function_data(
     bridge_option.from_token_id,
     bridge_option.operator,
     bridge_option.is_native,
     principal_bytes,
-    default_subaccount,
+    BigNumber(bridge_option.amount)
+      .minus(BigNumber(bridge_option.fees.max_network_fee).plus(bridge_option.fees.approval_fee_in_native_token))
+      .toFixed(),
   );
 
   try {
     const [account] = await wallet_client.getAddresses();
 
-    let prepared_transaction = await wallet_client.prepareTransactionRequest({
+    const prepared_transaction = await wallet_client.prepareTransactionRequest({
       chain: bridge_option.viem_chain as ViemChain,
       account: account as `0x${string}`,
       to: bridge_option.deposit_helper_contract as `0x${string}`,
@@ -612,16 +608,16 @@ export const notify_appic_helper_deposit = async (
   recipient_principal: string,
   unauthenticated_agent: HttpAgent | Agent,
 ): Promise<Response<string>> => {
-  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+  const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
   });
 
-  let parsed_operator = (
+  const parsed_operator = (
     bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
   ) as AppicHelperOperator;
   try {
-    let notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
+    const notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
       chain_id: BigInt(bridge_option.chain_id),
       from_address: user_wallet_address,
       principal: Principal.fromText(recipient_principal),
@@ -665,18 +661,18 @@ export const check_deposit_status = async (
   bridge_option: BridgeOption,
   unauthenticated_agent: Agent | HttpAgent,
 ): Promise<Response<DepositTxStatus>> => {
-  let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+  const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
   });
 
   try {
-    let tx_status = (await appic_helper_actor.get_transaction({
+    const tx_status = (await appic_helper_actor.get_transaction({
       chain_id: BigInt(bridge_option.chain_id),
       search_param: { TxHash: tx_hash } as TransactionSearchParam,
     } as GetTxParams)) as [] | Transaction;
     if ('EvmToIcp' in tx_status) {
-      let parsed_status = parse_evm_to_icp_tx_status(tx_status.EvmToIcp.status);
+      const parsed_status = parse_evm_to_icp_tx_status(tx_status.EvmToIcp.status);
       return {
         result: parsed_status,
         message: '',
