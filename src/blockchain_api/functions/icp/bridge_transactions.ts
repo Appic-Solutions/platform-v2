@@ -351,8 +351,8 @@ export const request_withdraw = async (
 export const notify_appic_helper_withdrawal = async (
   bridge_option: BridgeOption,
   withdrawal_id: string,
-  recipient: string,
-  user_wallet_principal: string,
+  recipient: string, // Destination EVM Address
+  user_wallet_principal: string, //from ICP Principal Address
   authenticated_agent: Agent,
 ): Promise<Response<string>> => {
   let appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
@@ -414,6 +414,7 @@ export type WithdrawalTxStatus =
 
 // Step 4
 // This function should be called intervally until the transaction status is either "Failed" or "Successful" or "Reimbursed"
+// Should call every 1 minute
 export const check_withdraw_status = async (
   withdrawal_id: WithdrawalId,
   bridge_option: BridgeOption,
@@ -425,7 +426,7 @@ export const check_withdraw_status = async (
   });
 
   try {
-    let tx_status = (await appic_helper_actor.get_transaction({
+    const tx_status = (await appic_helper_actor.get_transaction({
       chain_id: BigInt(bridge_option.chain_id),
       search_param: { TxWithdrawalId: BigInt(withdrawal_id) } as TransactionSearchParam,
     } as GetTxParams)) as [] | Transaction;
