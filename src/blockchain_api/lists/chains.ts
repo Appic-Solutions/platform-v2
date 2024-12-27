@@ -8,6 +8,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'ICP',
     scannerAddress: 'https://dashboard.internetcomupter.org',
     type: 'ICP',
+    rpc_url: '',
     disabled: false,
     logo: '/images/logo/chains-logos/icp.svg',
   },
@@ -17,11 +18,12 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'ETH',
     scannerAddress: 'https://etherscan.io',
     type: 'EVM',
+    rpc_url: 'https://ethereum-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/ethereum.svg',
     dfinity_ck_minter_address: 'sv3dd-oaaaa-aaaar-qacoa-cai',
     dfinity_ck_deposit_helper_contract: '0x18901044688D3756C35Ed2b36D93e6a5B8e00E68',
-    dfinity_ck_native_ledger_casniter_id: 'ss2fx-dyaaa-aaaar-qacoq-cai',
+    dfinity_ck_native_ledger_canister_id: 'ss2fx-dyaaa-aaaar-qacoq-cai',
     ankr_handle: 'eth',
     viem_config: mainnet,
   },
@@ -31,6 +33,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'ETH',
     scannerAddress: 'https://arbiscan.io',
     type: 'EVM',
+    rpc_url: 'https://arbitrum-one-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/arbitrum.svg',
     ankr_handle: 'arbitrum',
@@ -42,6 +45,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'BNB',
     scannerAddress: 'https://bscscan.com',
     type: 'EVM',
+    rpc_url: 'https://base-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/bsc.svg',
 
@@ -55,6 +59,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'MATIC',
     scannerAddress: 'https://polygonscan.com',
     type: 'EVM',
+    rpc_url: 'https://base-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/polygon.svg',
 
@@ -67,6 +72,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'ETH',
     scannerAddress: 'https://optimistic.etherscan.io',
     type: 'EVM',
+    rpc_url: 'https://base-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/optimism.svg',
 
@@ -79,6 +85,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'ETH',
     scannerAddress: 'https://basescan.org',
     type: 'EVM',
+    rpc_url: 'https://base-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/base.svg',
 
@@ -91,6 +98,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'AVAX',
     scannerAddress: 'https://snowtrace.io',
     type: 'EVM',
+    rpc_url: 'https://base-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/avalanche.svg',
 
@@ -103,6 +111,7 @@ export const chains: Chain[] = [
     nativeTokenSymbol: 'FTM',
     scannerAddress: 'https://ftmscan.com',
     type: 'EVM',
+    rpc_url: 'https://fantom-rpc.publicnode.com',
     disabled: false,
     logo: '/images/logo/chains-logos/fantom.svg',
 
