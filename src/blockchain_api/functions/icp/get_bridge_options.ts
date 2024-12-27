@@ -299,7 +299,7 @@ const get_gas_price = async (chain: ViemChain, rpc_url: string): Promise<{ max_f
 
     const fee_history = await client.getFeeHistory({
       blockCount: 5,
-      rewardPercentiles: [20],
+      rewardPercentiles: [20, 50, 70],
       blockTag: 'latest',
     });
 
