@@ -1,13 +1,9 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { idlFactory as appicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
-import {
-  TokenPair,
-  Operator as BackendOperator,
-  IcpTokenType,
-} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import { TokenPair, Operator as BackendOperator } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { Response } from '@/blockchain_api/types/response';
 import BigNumber from 'bignumber.js';
-import { EvmToken, IcpToken, Operator, BridgePair } from '../../types/tokens';
+import { EvmToken, IcpToken, Operator } from '../../types/tokens';
 
 import { appic_helper_canister_id } from '@/canister_ids.json';
 import { Principal } from '@dfinity/principal';
