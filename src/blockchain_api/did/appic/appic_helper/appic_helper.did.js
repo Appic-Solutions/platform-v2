@@ -102,7 +102,6 @@ export const idlFactory = ({ IDL }) => {
     Reimbursed: IDL.Null,
     Successful: IDL.Null,
     Created: IDL.Null,
-    FinalizedTransaction: IDL.Null,
   });
   const CandidIcpToEvm = IDL.Record({
     effective_gas_price: IDL.Opt(IDL.Nat),
@@ -150,7 +149,7 @@ export const idlFactory = ({ IDL }) => {
     ChinNotSupported: IDL.Null,
     InvalidTokenPairs: IDL.Null,
     InvalidTokenContract: IDL.Null,
-    TxAlreadyExsits: IDL.Null,
+    TxAlreadyExists: IDL.Null,
   });
   const Result = IDL.Variant({ Ok: IDL.Null, Err: AddEvmToIcpTxError });
   const AddIcpToEvmTx = IDL.Record({
@@ -171,7 +170,7 @@ export const idlFactory = ({ IDL }) => {
     ChinNotSupported: IDL.Null,
     InvalidTokenPairs: IDL.Null,
     InvalidTokenContract: IDL.Null,
-    TxAlreadyExsits: IDL.Null,
+    TxAlreadyExists: IDL.Null,
   });
   const Result_1 = IDL.Variant({ Ok: IDL.Null, Err: AddIcpToEvmTxError });
   const CandidAddErc20TwinLedgerSuiteRequest = IDL.Record({
@@ -188,7 +187,7 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     add_icp_token: IDL.Func([CandidIcpToken], [], []),
     get_bridge_pairs: IDL.Func([], [IDL.Vec(TokenPair)], ['query']),
-    get_erc20_twin_ls_reqests_by_creator: IDL.Func([IDL.Principal], [IDL.Vec(CandidLedgerSuiteRequest)], ['query']),
+    get_erc20_twin_ls_requests_by_creator: IDL.Func([IDL.Principal], [IDL.Vec(CandidLedgerSuiteRequest)], ['query']),
     get_evm_token: IDL.Func([GetEvmTokenArgs], [IDL.Opt(CandidEvmToken)], ['query']),
     get_icp_token: IDL.Func([GetIcpTokenArgs], [IDL.Opt(CandidIcpToken)], ['query']),
     get_icp_tokens: IDL.Func([], [IDL.Vec(CandidIcpToken)], ['query']),

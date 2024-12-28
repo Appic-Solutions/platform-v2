@@ -3,7 +3,7 @@ import { LinkIcon } from '@/common/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { cn } from '@/common/helpers/utils';
 import Link from 'next/link';
-
+import { Skeleton } from '@/common/components/ui/skeleton';
 const TokenCard = ({
   token,
   onClick,

@@ -20,7 +20,7 @@ export type AddEvmToIcpTxError =
   | { ChinNotSupported: null }
   | { InvalidTokenPairs: null }
   | { InvalidTokenContract: null }
-  | { TxAlreadyExsits: null };
+  | { TxAlreadyExists: null };
 export interface AddIcpToEvmTx {
   destination: string;
   withdrawal_amount: bigint;
@@ -39,7 +39,7 @@ export type AddIcpToEvmTxError =
   | { ChinNotSupported: null }
   | { InvalidTokenPairs: null }
   | { InvalidTokenContract: null }
-  | { TxAlreadyExsits: null };
+  | { TxAlreadyExists: null };
 export interface CandidAddErc20TwinLedgerSuiteRequest {
   status: CandidErc20TwinLedgerSuiteStatus;
   creator: Principal;
@@ -189,7 +189,7 @@ export interface UpgradeArg {
 export interface _SERVICE {
   add_icp_token: ActorMethod<[CandidIcpToken], undefined>;
   get_bridge_pairs: ActorMethod<[], Array<TokenPair>>;
-  get_erc20_twin_ls_reqests_by_creator: ActorMethod<[Principal], Array<CandidLedgerSuiteRequest>>;
+  get_erc20_twin_ls_requests_by_creator: ActorMethod<[Principal], Array<CandidLedgerSuiteRequest>>;
   get_evm_token: ActorMethod<[GetEvmTokenArgs], [] | [CandidEvmToken]>;
   get_icp_token: ActorMethod<[GetIcpTokenArgs], [] | [CandidIcpToken]>;
   get_icp_tokens: ActorMethod<[], Array<CandidIcpToken>>;
