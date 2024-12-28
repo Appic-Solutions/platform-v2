@@ -524,6 +524,7 @@ export const approve_erc20 = async (
         to: bridge_option.from_token_id as `0x${string}`,
         data: encoded_function_data as `0x${string}`,
         maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
+        gas: BigInt(bridge_option.fees.approve_erc20_gas),
         type: 'eip1559',
       });
 
@@ -577,6 +578,7 @@ export const request_deposit = async (
       data: encoded_deposit_function_data as `0x${string}`,
       type: 'eip1559',
       maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
+      gas: BigInt(bridge_option.fees.deposit_gas),
     });
 
     const signed_transaction = await wallet_client.signTransaction({
