@@ -32,6 +32,9 @@ const BridgeOptionsList = ({
 
   return (
     <div className={cn('flex flex-col items-start mb-5', 'lg:w-full md:pr-2', 'animate-slide-in opacity-0')}>
+      <p className="text-primary mb-5 md:hidden text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold">
+        Bridge Options
+      </p>
       <div
         className={cn(
           'flex lg:flex-col gap-4 w-full',
@@ -47,16 +50,18 @@ const BridgeOptionsList = ({
           </>
         ) : !isPending && bridgeOptions ? (
           bridgeOptions.map((item, idx) => (
-            <div key={idx} className="flex-shrink-1 h-fit">
-              <BridgeOption
-                option={item}
-                isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                handleOptionSelect={(option) => handleOptionSelect(option)}
-                onExpand={handleExpand}
-                toTokenLogo={toTokenLogo}
-              />
-            </div>
+            <>
+              <div key={idx} className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : '')}>
+                <BridgeOption
+                  option={item}
+                  isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
+                  isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
+                  handleOptionSelect={(option) => handleOptionSelect(option)}
+                  onExpand={handleExpand}
+                  toTokenLogo={toTokenLogo}
+                />
+              </div>
+            </>
           ))
         ) : (
           <></>

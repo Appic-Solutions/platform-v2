@@ -72,7 +72,7 @@ const BridgeOption = ({
               option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-36',
             )}
           >
-            {option.human_readable_estimated_return}
+            {formatToSignificantFigures(option.human_readable_estimated_return)}
           </p>
         </div>
         <div className="flex flex-col gap-y-3 items-end">
@@ -85,9 +85,7 @@ const BridgeOption = ({
       {/* bottom section */}
       <div className="flex items-end w-full justify-end gap-x-4">
         <span className="flex items-center gap-x-1 w-max">
-          <p className="text-xs font-thin text-primary">
-            ${formatToSignificantFigures(option.fees.human_readable_max_network_fee)}
-          </p>
+          <p className="text-xs font-thin text-primary">${Number(option.fees.total_fee_usd_price).toFixed(2)}</p>
           <FireIcon width={15} height={15} className="text-primary" />
         </span>
         <span className="flex items-center gap-x-1 w-max">

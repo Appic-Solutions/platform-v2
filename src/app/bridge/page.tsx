@@ -8,6 +8,9 @@ import BridgeReview from '@/common/components/pages/bridge/bridge-review/BridgeR
 import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
 import { BridgeOptionsListRequest } from './_api/types/request';
 import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { useAuthenticatedAgent } from '@/common/hooks/useAuthenticatedAgent';
+import { useAppKitAccount } from '@reown/appkit/react';
+import { useIdentity } from '@nfid/identitykit/react';
 
 type TokenType = EvmToken | IcpToken | null;
 type SelectionType = 'from' | 'to';
@@ -23,6 +26,11 @@ const BridgeHome = () => {
   const [bridgeOptions, setBridgeOptions] = useState<BridgeOptionType[]>();
 
   const unauthenticatedAgent = useUnAuthenticatedAgent();
+  // ICP user wallet
+  const authenticatedAgent = useAuthenticatedAgent();
+  const icpIdentity = useIdentity();
+  // EVM user wallet
+  const { address: userEvmWalletAddress } = useAppKitAccount();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unauthenticatedAgent);
   const {

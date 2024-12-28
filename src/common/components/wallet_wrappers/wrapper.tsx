@@ -55,11 +55,11 @@ export const WalletWrapper = ({
 
       return res.result;
     },
-    enabled: !!unauthenticatedAgent,
-    refetchInterval: 1000 * 60 * 10,
+    enabled: true,
+    refetchInterval: 1000 * 30,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60,
     gcTime: 1000 * 60 * 10,
   });
 

@@ -80,7 +80,8 @@ export default function BridgeSelectTokenPage({
     }
 
     if (!selectedOption || !Number(amount)) {
-      return 'Fill Required Fields';
+      if (!selectedOption) return 'Select Bridge Option';
+      return 'Fill Amount Field';
     }
 
     const isSourceWalletDisconnected =
@@ -111,7 +112,7 @@ export default function BridgeSelectTokenPage({
         'overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         amount && Number(amount) > 0 && 'lg:max-w-[1060px]',
-        showWalletAddress ? 'md:max-h-[780px]' : 'md:max-h-[600px]',
+        showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
       <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">

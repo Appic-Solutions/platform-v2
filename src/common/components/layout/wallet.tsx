@@ -68,8 +68,10 @@ const WalletPage = () => {
   };
 
   useEffect(() => {
-    fetchEvmBalances();
-    fetchIcpBalances();
+    if (authenticatedAgent && icpIdentity && evmAddress) {
+      fetchEvmBalances();
+      fetchIcpBalances();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticatedAgent, icpIdentity, evmAddress]);
 
@@ -98,7 +100,7 @@ const WalletPage = () => {
           <div className="md:hidden">
             <Drawer>
               <DrawerTrigger className="w-full font-medium text-sm text-white py-2 px-3">
-                {(icpIdentity || isEvmConnected) ? "Add Wallet" : "Connect Wallet"}
+                {icpIdentity || isEvmConnected ? 'Add Wallet' : 'Connect Wallet'}
               </DrawerTrigger>
               <DrawerContent>
                 <DrawerHeader>Select Wallet</DrawerHeader>
@@ -125,7 +127,7 @@ const WalletPage = () => {
           <div className="hidden md:block">
             <Popover>
               <PopoverTrigger className="w-full font-medium text-sm text-white py-2 px-3">
-                {(icpIdentity || isEvmConnected) ? "Add Wallet" : "Connect Wallet"}
+                {icpIdentity || isEvmConnected ? 'Add Wallet' : 'Connect Wallet'}
               </PopoverTrigger>
               <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
                 <div className="flex items-center justify-center font-medium text-white">
@@ -156,7 +158,9 @@ const WalletPage = () => {
         </>
       )}
 
-      {(icpIdentity && isEvmConnected) && <span className='w-full font-medium text-sm text-white py-2 px-3'>Connected Wallets</span>}
+      {icpIdentity && isEvmConnected && (
+        <span className="w-full font-medium text-sm text-white py-2 px-3">Connected Wallets</span>
+      )}
 
       {icpBalance && (
         <WalletPop

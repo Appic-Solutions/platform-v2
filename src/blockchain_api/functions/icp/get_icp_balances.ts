@@ -100,7 +100,7 @@ const get_single_token_balance = async (
     if (tokenType === 'DIP20' || tokenType === 'YC') {
       tokenBalance = (await Promise.race([
         tokenActor.balanceOf(Principal.fromText(userPrincipal)),
-        waitWithTimeout(10000),
+        waitWithTimeout(5000),
       ])) as bigint;
     } else if (tokenType === 'ICRC1' || tokenType === 'ICRC2') {
       tokenBalance = (await Promise.race([
@@ -108,7 +108,7 @@ const get_single_token_balance = async (
           owner: Principal.fromText(userPrincipal),
           subaccount: [],
         }),
-        waitWithTimeout(10000),
+        waitWithTimeout(5000),
       ])) as bigint;
     }
   } catch (error) {
