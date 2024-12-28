@@ -2,74 +2,29 @@ import { cn } from '@/common/helpers/utils';
 import React, { useState } from 'react';
 import BridgeOption from './BridgeOption';
 import BridgeOptionSkeleton from './BridgeOptionSkeleton';
-
-// TODO: This is a temporary code for testing purposes only
-
-export type BridgeOptionType = {
-  id: number;
-  amount: number;
-  via: string;
-  time: number;
-  usdPrice: number;
-  isBest: boolean;
-  isActive: boolean;
-};
-
-const options: BridgeOptionType[] = [
-  {
-    id: 1,
-    amount: 1.154844,
-    via: 'ICP',
-    time: 10,
-    usdPrice: 1.84,
-    isBest: true,
-    isActive: true,
-  },
-  {
-    id: 2,
-    amount: 1.222,
-    via: 'ICP',
-    time: 10,
-    usdPrice: 1.24,
-    isBest: false,
-    isActive: true,
-  },
-  {
-    id: 3,
-    amount: 1.363154,
-    via: 'ICP',
-    time: 10,
-    usdPrice: 1.51,
-    isBest: false,
-    isActive: false,
-  },
-  {
-    id: 4,
-    amount: 1.154844,
-    via: 'ICP',
-    time: 10,
-    usdPrice: 1.24,
-    isBest: false,
-    isActive: true,
-  },
-];
+import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
 
 interface BridgeOptionsListProps {
   handleOptionSelect: (option: BridgeOptionType) => void;
   selectedOption: BridgeOptionType | null;
+  bridgeOptions: BridgeOptionType[] | undefined;
+  isPending: boolean;
+  isError: boolean;
+  toTokenLogo: string;
 }
 
-const BridgeOptionsList = ({ selectedOption, handleOptionSelect }: BridgeOptionsListProps) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [expandedOption, setExpandedOption] = useState<BridgeOptionType | null>(null);
-
-  setTimeout(() => {
-    setIsLoading(false);
-  }, 1000);
+const BridgeOptionsList = ({
+  selectedOption,
+  handleOptionSelect,
+  bridgeOptions,
+  isPending,
+  toTokenLogo,
+}: BridgeOptionsListProps) => {
+  const [expandedOption, setExpandedOption] = useState<BridgeOptionType | undefined>(bridgeOptions && bridgeOptions[0]);
 
   const handleExpand = (option: BridgeOptionType) => {
-    if (expandedOption === option) {
-      setExpandedOption(null);
+    if (expandedOption?.deposit_helper_contract === option.deposit_helper_contract) {
+      setExpandedOption(undefined);
     } else {
       setExpandedOption(option);
     }
@@ -85,25 +40,26 @@ const BridgeOptionsList = ({ selectedOption, handleOptionSelect }: BridgeOptions
           'pr-4 hide-scrollbar',
         )}
       >
-        {!isLoading ? (
-          options.map((item) => (
-            <div key={item.id} className="flex-shrink-1 h-fit">
+        {typeof bridgeOptions === 'undefined' || isPending ? (
+          <>
+            <BridgeOptionSkeleton />
+            <BridgeOptionSkeleton />
+          </>
+        ) : !isPending && bridgeOptions ? (
+          bridgeOptions.map((item, idx) => (
+            <div key={idx} className="flex-shrink-1 h-fit">
               <BridgeOption
                 option={item}
-                isSelected={selectedOption?.id === item.id}
-                isExpanded={expandedOption?.id === item.id}
+                isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
+                isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
                 handleOptionSelect={(option) => handleOptionSelect(option)}
                 onExpand={handleExpand}
+                toTokenLogo={toTokenLogo}
               />
             </div>
           ))
         ) : (
-          <>
-            <BridgeOptionSkeleton />
-            <BridgeOptionSkeleton />
-            <BridgeOptionSkeleton />
-            <BridgeOptionSkeleton />
-          </>
+          <></>
         )}
       </div>
     </div>

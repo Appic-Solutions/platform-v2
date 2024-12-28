@@ -44,7 +44,9 @@ export function TokenCard({ token, customOnClick, label, className }: TokenCardP
           </Avatar>
         </div>
         <div>
-          <p className="text-nowrap ">{token?.symbol || 'Select Token'}</p>
+          <p className={cn('text-nowrap ', token?.symbol.length && token?.symbol.length > 7 && 'text-ellipsis w-28')}>
+            {token?.symbol || 'Select Token'}
+          </p>
           <p className={cn('text-sm', getChainName(token?.chainId).length > 3 && 'text-ellipsis w-20')}>
             {getChainName(token?.chainId)}
           </p>

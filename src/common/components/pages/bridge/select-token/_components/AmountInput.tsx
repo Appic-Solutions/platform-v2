@@ -4,7 +4,7 @@ import { EvmToken } from '@/blockchain_api/types/tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface AmountInputProps {
   token: EvmToken | IcpToken | null;
@@ -15,19 +15,21 @@ interface AmountInputProps {
   isWalletConnected: boolean;
 }
 
-const AmountInput = ({
-  token,
-  amount,
-  setAmount,
-  setUsdPrice,
-  usdPrice,
-  isWalletConnected = true,
-}: AmountInputProps) => {
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnected }: AmountInputProps) => {
+  const [inputAmount, setInputAmount] = useState('');
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleAmountChange(inputAmount);
+    }, 1000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [inputAmount]);
+
+  const handleAmountChange = (value: string) => {
     const usdPrice = Number(value) * Number(token?.usdPrice ?? 0);
     setUsdPrice(usdPrice.toFixed(2));
-    setAmount(e.target.value);
+    setAmount(value);
   };
 
   return (
@@ -53,10 +55,9 @@ const AmountInput = ({
           <div className="w-full flex items-center">
             <input
               type="number"
-              maxLength={15}
+              maxLength={10}
               placeholder="0"
-              value={amount}
-              onChange={handleAmountChange}
+              onChange={(e) => setInputAmount(e.target.value)}
               className={cn(
                 'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
                 'bg-transparent text-primary',

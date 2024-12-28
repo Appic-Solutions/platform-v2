@@ -34,7 +34,7 @@ const WalletAddressInput = ({
       return false;
     }
 
-    if (token?.chainType === 'ICP') {
+    if (token?.chain_type === 'ICP') {
       const isValid = isValidIcpAddress(address);
       if (!isValid) {
         onValidationError?.('ICP Wallet Address is not valid');
@@ -76,8 +76,8 @@ const WalletAddressInput = ({
           <div className="w-full">
             <input
               type="text"
-              maxLength={token?.chainType === 'ICP' ? 64 : 42}
-              placeholder={token?.chainType === 'ICP' ? '2vxsx-fae...' : '0x0f70e...65A63'}
+              maxLength={token?.chain_type === 'ICP' ? 64 : 42}
+              placeholder={token?.chain_type === 'ICP' ? '2vxsx-fae...' : '0x0f70e...65A63'}
               value={address}
               onChange={handleAddressChange}
               className={cn(

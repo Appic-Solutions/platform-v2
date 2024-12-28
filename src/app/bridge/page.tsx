@@ -4,9 +4,10 @@ import BridgeSelectTokenPage from '@/common/components/pages/bridge/select-token
 import TokenListPage from '@/common/components/pages/bridge/chain-token-list/token-list';
 import { useEffect, useState } from 'react';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import { BridgeOptionType } from '@/common/components/pages/bridge/select-token/_components/BridgeOptionsList';
 import BridgeReview from '@/common/components/pages/bridge/bridge-review/BridgeReview';
-import { useGetBridgePairs } from './_api';
+import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
+import { BridgeOptionsListRequest } from './_api/types/request';
+import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
 
 type TokenType = EvmToken | IcpToken | null;
 type SelectionType = 'from' | 'to';
@@ -19,14 +20,41 @@ const BridgeHome = () => {
   const [amount, setAmount] = useState('');
   const [selectedOption, setSelectedOption] = useState<BridgeOptionType | null>(null);
   const [bridgePairs, setBridgePairs] = useState<(EvmToken | IcpToken)[]>();
+  const [bridgeOptions, setBridgeOptions] = useState<BridgeOptionType[]>();
 
   const unauthenticatedAgent = useUnAuthenticatedAgent();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unauthenticatedAgent);
+  const {
+    mutateAsync: getBridgeOptions,
+    isPending: isPendingBridgeOptions,
+    isError: isErrorBridgeOptions,
+  } = useGetBridgeOptions();
 
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
   }, [bridgePairsData]);
+
+  useEffect(() => {
+    if (amount && unauthenticatedAgent && fromToken && toToken && bridgePairs) {
+      const getBridgeOptionsParams: BridgeOptionsListRequest = {
+        agent: unauthenticatedAgent,
+        amount: amount,
+        bridge_pairs: bridgePairs,
+        from_token: fromToken,
+        to_token: toToken,
+      };
+      try {
+        getBridgeOptions(getBridgeOptionsParams).then((res) => {
+          if (res.success) {
+            setBridgeOptions(res.result);
+          }
+        });
+      } catch (error) {
+        throw new Error(`Error! ${error}`);
+      }
+    }
+  }, [amount, bridgePairs, unauthenticatedAgent, fromToken, toToken, getBridgeOptions]);
 
   const handleStepChange = (direction: 'next' | 'prev' | number) => {
     setActiveStep((prev) => {
@@ -37,6 +65,11 @@ const BridgeHome = () => {
 
   const handleTokenSelection = (token: EvmToken | IcpToken) => {
     const setToken = selectedType === 'from' ? setFromToken : setToToken;
+    if (fromToken && toToken) {
+      setFromToken(null);
+      setToToken(null);
+      setAmount('');
+    }
     setToken(token);
   };
 
@@ -45,12 +78,6 @@ const BridgeHome = () => {
     const temp = fromToken;
     setFromToken(toToken);
     setToToken(temp);
-  };
-
-  const handleOptionSelect = (option: BridgeOptionType) => {
-    if (option.isActive) {
-      setSelectedOption(option);
-    }
   };
 
   const renderStep = () => {
@@ -63,10 +90,13 @@ const BridgeHome = () => {
             fromToken={fromToken}
             toToken={toToken}
             swapTokensHandler={swapTokensHandler}
-            handleOptionSelect={handleOptionSelect}
+            handleOptionSelect={(option) => setSelectedOption(option)}
             selectedOption={selectedOption}
             amount={amount}
             setAmount={(amount) => setAmount(amount)}
+            bridgeOptions={bridgeOptions}
+            isErrorBridgeOptions={isErrorBridgeOptions}
+            isPendingBridgeOptions={isPendingBridgeOptions}
           />
         );
       case 2:

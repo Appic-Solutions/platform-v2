@@ -8,7 +8,6 @@ import { useMemo, useState, useEffect } from 'react';
 import ChainBoxPage from './chain-box';
 import TokenCard from './token-card';
 import BoxHeader from '@/common/components/ui/box-header';
-import Spinner from '@/common/components/ui/spinner';
 import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import TokenSkeleton from './token-skeleton';
 

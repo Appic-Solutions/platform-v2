@@ -1,8 +1,8 @@
 import { Card } from '@/common/components/ui/card';
-import { cn } from '@/common/helpers/utils';
+import { cn, formatToSignificantFigures } from '@/common/helpers/utils';
 import Image from 'next/image';
-import { BridgeOptionType } from './BridgeOptionsList';
 import { ChevronDownIcon, ClockIcon, FireIcon } from '@/common/components/icons';
+import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
 
 interface BridgeOptionProps {
   option: BridgeOptionType;
@@ -11,6 +11,7 @@ interface BridgeOptionProps {
   handleOptionSelect: (option: BridgeOptionType) => void;
   onExpand: (option: BridgeOptionType) => void;
   className?: string;
+  toTokenLogo: string;
 }
 
 const BridgeOption = ({
@@ -20,6 +21,7 @@ const BridgeOption = ({
   onExpand,
   option,
   className,
+  toTokenLogo,
 }: BridgeOptionProps) => {
   return (
     <Card
@@ -28,34 +30,29 @@ const BridgeOption = ({
         '!py-4 px-4 border min-w-[300px] flex-col gap-3 items-start justify-between overflow-hidden rounded-[20px]',
         'md:px-6 md:rounded-[36px]',
         'transition duration-300',
-        option.isActive && 'cursor-pointer',
-        option.isBest && 'bg-highlighted-card',
+        'cursor-pointer',
+        'bg-highlighted-card',
         isSelected ? 'border-blue-600' : 'border-gray-700',
         className,
       )}
-      key={option.id}
     >
       {/* top section */}
       <div className="flex items-center justify-between w-full">
         <div className="flex-1">
-          {option.isBest && (
-            <p
-              className={cn(
-                'text-muted text-xs md:text-sm font-thin py-1 px-2 rounded-[10px] w-fit',
-                'bg-primary-buttons text-white',
-                !option.isActive && 'opacity-50',
-              )}
-            >
-              Best Return
-            </p>
-          )}
+          <p
+            className={cn(
+              'text-muted text-xs md:text-sm font-thin py-1 px-2 rounded-[10px] w-fit',
+              'bg-primary-buttons text-white',
+            )}
+          >
+            {option.badge}
+          </p>
         </div>
         <button
-          onClick={() => option.isActive && onExpand(option)}
+          onClick={() => onExpand(option)}
           className={cn(
             'bg-gray-400 bg-opacity-20 rounded-[10px] p-2 flex items-center ml-auto',
             isExpanded && 'rotate-180',
-            !option.isActive && 'opacity-30',
           )}
         >
           <ChevronDownIcon width={10} height={10} />
@@ -66,39 +63,35 @@ const BridgeOption = ({
         <div className="flex items-center gap-x-3">
           <div className="border-2 border-white/50 rounded-full p-2">
             <div className={cn('relative w-7 h-7', 'lg:w-10 lg:h-10')}>
-              <Image
-                src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
-                alt="btc"
-                className="object-contain"
-                fill
-              />
+              <Image src={toTokenLogo} alt="btc" className="object-contain" fill />
             </div>
           </div>
-          <p className={cn('text-base lg:text-xl', !option.isActive && 'opacity-30')}>{option.amount}</p>
-        </div>
-        <div className="flex flex-col gap-y-3 items-end">
-          <div
+          <p
             className={cn(
-              'px-4 py-1 rounded-2xl flex items-center gap-x-1',
-              'bg-white',
-              !option.isActive && 'opacity-30',
+              'text-base lg:text-xl',
+              option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-36',
             )}
           >
-            <span className={cn('text-xs lg:text-sm', option.isBest ? 'text-blue-600' : 'text-black')}>
-              via {option.via}
-            </span>
+            {option.human_readable_estimated_return}
+          </p>
+        </div>
+        <div className="flex flex-col gap-y-3 items-end">
+          <div className="px-4 py-1 rounded-2xl flex items-center gap-x-1 bg-white">
+            <span className={cn('text-xs lg:text-sm text-blue-600')}>via {option.via}</span>
             <Image src="images/logo/icp-logo.png" alt="logo" width={15} height={15} />
           </div>
         </div>
       </div>
       {/* bottom section */}
-      <div className={cn('flex items-end w-full justify-end gap-x-4', !option.isActive && 'opacity-30')}>
+      <div className="flex items-end w-full justify-end gap-x-4">
         <span className="flex items-center gap-x-1 w-max">
-          <p className="text-xs font-thin text-primary">1.24</p>
+          <p className="text-xs font-thin text-primary">
+            ${formatToSignificantFigures(option.fees.human_readable_max_network_fee)}
+          </p>
           <FireIcon width={15} height={15} className="text-primary" />
         </span>
         <span className="flex items-center gap-x-1 w-max">
-          <p className="text-primary text-xs font-thin">10 Mins</p>
+          <p className="text-primary text-xs font-thin">{option.duration}</p>
           <ClockIcon width={15} height={15} className="text-primary" />
         </span>
       </div>
@@ -113,23 +106,31 @@ const BridgeOption = ({
         )}
       >
         <div className="space-y-4">
-          <p className="text-sm font-medium">Additional Details:</p>
+          <p className="text-sm font-medium">Option Details:</p>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted">Network Fee:</span>
-              <span>0.001 ETH</span>
+              <span>
+                {formatToSignificantFigures(option.fees.human_readable_max_network_fee) +
+                  ' ' +
+                  option.fees.native_fee_token_symbol}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted">Estimated Time:</span>
-              <span>{option.time} mins</span>
+              <span>{option.duration}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted">Route:</span>
-              <span>Direct Bridge</span>
+              <span className="text-muted">Minter Fee:</span>
+              <span>{option.fees.human_readable_minter_fee + ' ' + option.fees.native_fee_token_symbol}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted">Security:</span>
-              <span>High</span>
+              <span className="text-muted">Max Fee:</span>
+              <span>
+                {formatToSignificantFigures(option.fees.human_readable_total_native_fee) +
+                  ' ' +
+                  option.fees.native_fee_token_symbol}
+              </span>
             </div>
           </div>
         </div>

@@ -6,13 +6,14 @@ import { TokenCard } from './_components/TokenCard';
 import AmountInput from './_components/AmountInput';
 import { useState } from 'react';
 import ActionButton from './_components/ActionButton';
-import BridgeOptionsList, { BridgeOptionType } from './_components/BridgeOptionsList';
+import BridgeOptionsList from './_components/BridgeOptionsList';
 import { useAppKitAccount } from '@reown/appkit/react';
-import { useIdentity } from '@nfid/identitykit/react';
 import WalletIcon from '@/common/components/icons/wallet';
 import WalletAddressInput from './_components/WalletAddressInput';
 import HistoryIcon from '@/common/components/icons/history';
 import Link from 'next/link';
+import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { useAuthenticatedAgent } from '@/common/hooks/useAuthenticatedAgent';
 
 interface SelectTokenProps {
   stepHandler: (value: 'next' | 'prev' | number) => void;
@@ -24,6 +25,9 @@ interface SelectTokenProps {
   selectedOption: BridgeOptionType | null;
   amount: string;
   setAmount: (amount: string) => void;
+  bridgeOptions: BridgeOptionType[] | undefined;
+  isPendingBridgeOptions: boolean;
+  isErrorBridgeOptions: boolean;
 }
 
 export default function BridgeSelectTokenPage({
@@ -36,6 +40,9 @@ export default function BridgeSelectTokenPage({
   selectedOption,
   amount,
   setAmount,
+  bridgeOptions,
+  isPendingBridgeOptions,
+  isErrorBridgeOptions,
 }: SelectTokenProps) {
   const [usdPrice, setUsdPrice] = useState('0');
   const [showWalletAddress, setShowWalletAddress] = useState(false);
@@ -43,7 +50,7 @@ export default function BridgeSelectTokenPage({
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
 
   const { isConnected: isEvmConnected } = useAppKitAccount();
-  const icpAgent = useIdentity();
+  const icpAgent = useAuthenticatedAgent();
 
   const disabled = () => {
     if (!selectedOption) return true;
@@ -133,13 +140,13 @@ export default function BridgeSelectTokenPage({
                 }}
                 label="From"
                 className={cn(
-                  fromToken && 'py-8 md:py-8 md:rounded-3xl',
-                  fromToken && toToken ? 'max-h-min md:max-h-min' : '',
+                  fromToken && 'py-5 md:py-5 md:rounded-3xl',
+                  fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
                 )}
               />
               <div
                 className={cn(
-                  'absolute rounded-full inset-0 w-14 h-14 m-auto z-20 cursor-pointer group',
+                  'absolute rounded-full inset-0 w-12 h-12 m-auto z-20 cursor-pointer group',
                   'flex items-center justify-center',
                   'bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white',
                   'border-2 border-white dark:border-white/30',
@@ -158,8 +165,8 @@ export default function BridgeSelectTokenPage({
                 }}
                 label="To"
                 className={cn(
-                  toToken && 'py-8 md:py-8 md:rounded-3xl',
-                  fromToken && toToken ? 'max-h-min md:max-h-min' : '',
+                  toToken && 'py-5 md:py-5 md:rounded-3xl',
+                  fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
                 )}
               />
             </div>
@@ -207,8 +214,15 @@ export default function BridgeSelectTokenPage({
         </div>
 
         {/* BRIDGE OPTIONS */}
-        {amount && Number(amount) > 0 && (
-          <BridgeOptionsList selectedOption={selectedOption} handleOptionSelect={handleOptionSelect} />
+        {toToken && Number(amount) > 0 && (
+          <BridgeOptionsList
+            bridgeOptions={bridgeOptions}
+            selectedOption={selectedOption}
+            handleOptionSelect={handleOptionSelect}
+            isError={isErrorBridgeOptions}
+            isPending={isPendingBridgeOptions}
+            toTokenLogo={toToken.logo}
+          />
         )}
       </div>
       {/* MOBILE ACTION BUTTONS */}
