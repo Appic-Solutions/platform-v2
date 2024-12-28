@@ -1,3 +1,4 @@
+"use client"
 import "../style/globals.css";
 import HeaderPage from "@/common/components/layout/header";
 import ShapesPage from "@/common/components/layout/shapes";

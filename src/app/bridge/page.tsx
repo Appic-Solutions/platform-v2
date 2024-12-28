@@ -3,10 +3,7 @@ import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import BridgeSelectTokenPage from '@/common/components/pages/bridge/select-token/select-token';
 import TokenListPage from '@/common/components/pages/bridge/chain-token-list/token-list';
 import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
-import { setStorageItem } from '@/common/helpers/localstorage';
 import { BridgeOptionType } from '@/common/components/pages/bridge/select-token/_components/BridgeOptionsList';
 import BridgeReview from '@/common/components/pages/bridge/bridge-review/BridgeReview';
 import { useGetBridgePairs } from './_api';
@@ -55,19 +52,6 @@ const BridgeHome = () => {
             setSelectedOption(option);
         }
     };
-
-    useQuery({
-        queryKey: ['IcpTokens'],
-        queryFn: async () => {
-            if (!unauthenticatedAgent) return [];
-            const res = await get_icp_tokens(unauthenticatedAgent);
-            if (!res) return [];
-            setStorageItem('icpTokens', JSON.stringify(res.result));
-
-            return res;
-        },
-        refetchInterval: 1000 * 60 * 5, // Refetch every 5 minutes
-    });
 
     const renderStep = () => {
         switch (activeStep) {

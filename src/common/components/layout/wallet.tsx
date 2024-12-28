@@ -93,11 +93,13 @@ const WalletPage = () => {
         '*:rounded-full',
       )}
     >
-      {!icpIdentity && !isEvmConnected ? (
+      {(!icpIdentity || !isEvmConnected) && (
         <>
           <div className="md:hidden">
             <Drawer>
-              <DrawerTrigger className="w-full font-medium text-sm text-white py-2 px-3">Connect Wallet</DrawerTrigger>
+              <DrawerTrigger className="w-full font-medium text-sm text-white py-2 px-3">
+                {(icpIdentity || isEvmConnected) ? "Add Wallet" : "Connect Wallet"}
+              </DrawerTrigger>
               <DrawerContent>
                 <DrawerHeader>Select Wallet</DrawerHeader>
                 <div className="flex flex-col gap-4">
@@ -123,7 +125,7 @@ const WalletPage = () => {
           <div className="hidden md:block">
             <Popover>
               <PopoverTrigger className="w-full font-medium text-sm text-white py-2 px-3">
-                Connect Wallet
+                {(icpIdentity || isEvmConnected) ? "Add Wallet" : "Connect Wallet"}
               </PopoverTrigger>
               <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
                 <div className="flex items-center justify-center font-medium text-white">
@@ -152,13 +154,9 @@ const WalletPage = () => {
             </Popover>
           </div>
         </>
-      ) : icpIdentity && isEvmConnected ? (
-        <div className="text-black dark:text-white text-sm py-2 px-3">
-          <span className="hidden md:inline-block">Connected</span> <span>Wallets</span>
-        </div>
-      ) : (
-        <div className="text-black dark:text-white text-sm py-2 px-3">Add Wallet</div>
       )}
+
+      {(icpIdentity && isEvmConnected) && <span className='w-full font-medium text-sm text-white py-2 px-3'>Connected Wallets</span>}
 
       {icpBalance && (
         <WalletPop
