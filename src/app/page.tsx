@@ -1,9 +1,6 @@
 'use client';
-
 import { redirect } from 'next/navigation';
 
-const Home = () => {
+export default function Home() {
   redirect('bridge');
-};
-
-export default Home;
+}

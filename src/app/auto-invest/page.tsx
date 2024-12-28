@@ -1,8 +1,8 @@
 "use client";
 
 import { IcpToken } from "@/blockchain_api/types/tokens";
-import AutoInvestTokenListPage from "@/components/pages/auto-invest/_components/chain-token-list/AutoInvestTokenListPage";
-import AutoInvestSelectToken from "@/components/pages/auto-invest/AutoInvestSelectToken";
+import AutoInvestTokenListPage from "@/common/components/pages/auto-invest/_components/chain-token-list/AutoInvestTokenListPage";
+import AutoInvestSelectToken from "@/common/components/pages/auto-invest/AutoInvestSelectToken";
 import { useState } from "react";
 
 type SelectionType = "buy" | "sell";
