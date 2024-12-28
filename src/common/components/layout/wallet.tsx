@@ -68,7 +68,7 @@ const WalletPage = () => {
   };
 
   useEffect(() => {
-    if (authenticatedAgent && icpIdentity && evmAddress) {
+    if (unauthenticatedAgent && icpIdentity && evmAddress) {
       fetchEvmBalances();
       fetchIcpBalances();
     }
