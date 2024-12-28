@@ -5,7 +5,7 @@ import { useAppKit, useAppKitAccount, useDisconnect, useAppKitNetwork } from '@r
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '../ui/popover';
 import { CloseIcon } from '../icons';
-import { useAuthenticatedAgent } from '@/common/hooks/useAuthenticatedAgent';
+import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { EvmTokensBalances, get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { IcpToken } from '@/blockchain_api/types/tokens';
@@ -25,7 +25,7 @@ const WalletPage = () => {
   const [icpLoading, setIcpLoading] = useState(false);
   const [evmLoading, setEvmLoading] = useState(false);
 
-  const authenticatedAgent = useAuthenticatedAgent();
+  const unauthenticatedAgent = useUnAuthenticatedAgent();
 
   // ICP Wallet Hooks
   const icpIdentity = useIdentity();
@@ -40,12 +40,12 @@ const WalletPage = () => {
   const fetchIcpBalances = async () => {
     try {
       setIcpLoading(true);
-      if (authenticatedAgent && icpIdentity) {
+      if (unauthenticatedAgent && icpIdentity) {
         const all_tokens = getStorageItem('icpTokens');
         const icp_balance = await get_icp_wallet_tokens_balances(
           icpIdentity.getPrincipal().toString(),
           JSON.parse(all_tokens || '[]'),
-          authenticatedAgent,
+          unauthenticatedAgent,
         );
         setIcpBalance(icp_balance.result);
       }
@@ -73,7 +73,7 @@ const WalletPage = () => {
       fetchIcpBalances();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authenticatedAgent, icpIdentity, evmAddress]);
+  }, [unauthenticatedAgent, icpIdentity, evmAddress]);
 
   const handleDisconnectIcp = () => {
     disconnectIcp();

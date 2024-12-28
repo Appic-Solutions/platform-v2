@@ -4,7 +4,7 @@ import { idlFactory as icrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.d
 import { idlFactory as dip20IdleFactory } from '@/blockchain_api/did/ledger/dip20.did';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Response } from '@/blockchain_api/types/response';
-import { Actor, Agent } from '@dfinity/agent';
+import { Actor, HttpAgent } from '@dfinity/agent';
 
 const waitWithTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -16,12 +16,12 @@ interface IcpTokensBalances {
 export async function get_icp_wallet_tokens_balances(
   principal_id: string,
   all_tokens: IcpToken[],
-  authenticated_agent: Agent,
+  unAuthenticated_agent: HttpAgent,
 ): Promise<Response<IcpTokensBalances>> {
   let totalBalanceUsd = new BigNumber(0);
 
   try {
-    const tokens_balances = await get_tokens_balances(all_tokens, principal_id, authenticated_agent);
+    const tokens_balances = await get_tokens_balances(all_tokens, principal_id, unAuthenticated_agent);
     const non_zero_balances = tokens_balances.filter((token) => {
       if (token.balance != '0') {
         totalBalanceUsd = totalBalanceUsd.plus(token.usdBalance as unknown as number);
@@ -51,7 +51,7 @@ export async function get_icp_wallet_tokens_balances(
 export const get_tokens_balances = async (
   all_token: IcpToken[],
   userPrincipal: string,
-  agent: Agent,
+  agent: HttpAgent,
 ): Promise<IcpToken[]> => {
   const tokens = await Promise.all(
     all_token.map(async (token) => {
@@ -86,7 +86,7 @@ const get_single_token_balance = async (
   canisterId: string,
   tokenType: string,
   userPrincipal: string,
-  agent: Agent,
+  agent: HttpAgent,
 ): Promise<bigint> => {
   let tokenBalance: bigint = BigInt(0);
   const idleFactory = tokenType === 'DIP20' || tokenType === 'YC' ? dip20IdleFactory : icrcIdlFactory;

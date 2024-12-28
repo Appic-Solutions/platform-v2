@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avat
 import { Skeleton } from '@/common/components/ui/skeleton';
 import { cn } from '@/common/helpers/utils';
 import Link from 'next/link';
-
+import { Skeleton } from '@/common/components/ui/skeleton';
 const TokenCard = ({
   token,
   onClick,
