@@ -33,6 +33,7 @@ const BridgeHome = () => {
         from_token: fromToken,
         to_token: toToken,
       };
+      console.log('d');
       try {
         getBridgeOptions(getBridgeOptionsParams).then((res) => {
           if (res.success) {
