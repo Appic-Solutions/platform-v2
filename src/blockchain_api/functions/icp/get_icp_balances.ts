@@ -8,7 +8,7 @@ import { Actor, HttpAgent } from '@dfinity/agent';
 
 const waitWithTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-interface IcpTokensBalances {
+export interface IcpTokensBalances {
   tokens: IcpToken[];
   totalBalanceUsd: string;
 }

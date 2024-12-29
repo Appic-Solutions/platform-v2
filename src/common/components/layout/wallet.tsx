@@ -1,79 +1,49 @@
 'use client';
 import { cn, getChainLogo } from '@/common/helpers/utils';
-import { useAuth, useIdentity } from '@nfid/identitykit/react';
-import { useAppKit, useAppKitAccount, useDisconnect, useAppKitNetwork } from '@reown/appkit/react';
+import { useAuth } from '@nfid/identitykit/react';
+import { useAppKit, useDisconnect } from '@reown/appkit/react';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '../ui/popover';
 import { CloseIcon } from '../icons';
-import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
-import { EvmTokensBalances, get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
-import { IcpToken } from '@/blockchain_api/types/tokens';
 import WalletCard from './wallet/wallet-card';
 import { WalletPop } from './wallet/wallet-pop';
-import { getStorageItem } from '@/common/helpers/localstorage';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer';
+import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
+import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 
 const WalletPage = () => {
-  // States Management
-  const [icpBalance, setIcpBalance] = useState<{
-    tokens: IcpToken[];
-    totalBalanceUsd: string;
-  }>();
-  const [evmBalance, setEvmBalance] = useState<EvmTokensBalances>();
+  const { unAuthenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
+    useSharedStore((state) => state);
+  const { setIcpBalance, setEvmBalance } = useSharedStoreActions();
 
   const [icpLoading, setIcpLoading] = useState(false);
   const [evmLoading, setEvmLoading] = useState(false);
 
-  const unauthenticatedAgent = useUnAuthenticatedAgent();
-
   // ICP Wallet Hooks
-  const icpIdentity = useIdentity();
   const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
 
   // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
-  const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
-  const { chainId } = useAppKitNetwork();
   const { disconnect: disconnectEvm } = useDisconnect();
 
-  const fetchIcpBalances = async () => {
-    try {
-      setIcpLoading(true);
-      if (unauthenticatedAgent && icpIdentity) {
-        const all_tokens = getStorageItem('icpTokens');
-        const icp_balance = await get_icp_wallet_tokens_balances(
-          icpIdentity.getPrincipal().toString(),
-          JSON.parse(all_tokens || '[]'),
-          unauthenticatedAgent,
-        );
-        setIcpBalance(icp_balance.result);
-      }
-      setIcpLoading(false);
-    } catch (error) {
-      console.log('Get Balance Error => ', error);
-    }
-  };
-  const fetchEvmBalances = async () => {
-    try {
-      setEvmLoading(true);
-      if (evmAddress) {
-        const evm_balance = await get_evm_wallet_tokens_balances(evmAddress);
-        setEvmBalance(evm_balance.result);
-      }
-      setEvmLoading(false);
-    } catch (error) {
-      console.log('Line 85 Get Balance Error => ', error);
-    }
-  };
-
   useEffect(() => {
-    if (unauthenticatedAgent && icpIdentity && evmAddress) {
-      fetchEvmBalances();
-      fetchIcpBalances();
+    if (unAuthenticatedAgent && icpIdentity && evmAddress) {
+      fetchEvmBalances({
+        evmAddress,
+      }).then((res) => {
+        setEvmBalance(res);
+        setEvmLoading(false);
+      });
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        icpIdentity,
+      }).then((res) => {
+        setIcpBalance(res);
+        setIcpLoading(false);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unauthenticatedAgent, icpIdentity, evmAddress]);
+  }, [unAuthenticatedAgent, icpIdentity, evmAddress]);
 
   const handleDisconnectIcp = () => {
     disconnectIcp();
