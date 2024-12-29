@@ -19,7 +19,6 @@ export const UserWalletProvider = () => {
   // EVM Wallet Hooks
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
-  const authenticatedAgent = useAppKitAccount();
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   setUnAuthenticatedAgent(unAuthenticatedAgent);
@@ -35,18 +34,8 @@ export const UserWalletProvider = () => {
       setIsEvmConnected(isEvmConnected);
       setEvmAddress(evmAddress);
       setChainId(chainId);
-      setAuthenticatedAgent(authenticatedAgent);
     }
-  }, [
-    isEvmConnected,
-    evmAddress,
-    chainId,
-    authenticatedAgent,
-    setIsEvmConnected,
-    setEvmAddress,
-    setChainId,
-    setAuthenticatedAgent,
-  ]);
+  }, [isEvmConnected, evmAddress, chainId, setIsEvmConnected, setEvmAddress, setChainId, setAuthenticatedAgent]);
 
   return null;
 };
