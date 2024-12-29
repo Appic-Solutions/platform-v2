@@ -1,13 +1,12 @@
-import { IcpToken } from '@/blockchain_api/types/tokens';
-import { EvmToken } from '@/blockchain_api/types/tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
 import React from 'react';
 import { isValidEvmAddress, isValidIcpAddress } from '@/common/helpers/validation';
+import { TokenType } from '@/app/bridge/_store';
 
 interface WalletAddressInputProps {
-  token: EvmToken | IcpToken | null;
+  token: TokenType | undefined;
   address: string;
   setAddress: (address: string) => void;
   validationError: string | null;

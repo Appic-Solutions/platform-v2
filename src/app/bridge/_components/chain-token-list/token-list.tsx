@@ -1,7 +1,6 @@
 'use client';
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
-import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import Box from '@/common/components/ui/box';
 import { cn } from '@/common/helpers/utils';
 import { useMemo, useState, useEffect } from 'react';
@@ -10,54 +9,41 @@ import TokenCard from './token-card';
 import BoxHeader from '@/common/components/ui/box-header';
 import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import TokenSkeleton from './token-skeleton';
+import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
+import { useTokenSelector } from '../../_logic/hooks';
 
 interface TokenListProps {
-  prevStepHandler: () => void;
-  setTokenHandler: (token: EvmToken | IcpToken) => void;
-  selectedType: 'from' | 'to';
-  fromToken: EvmToken | IcpToken | null;
-  toToken: EvmToken | IcpToken | null;
-  tokens?: (EvmToken | IcpToken)[];
   isPending: boolean;
   isError: boolean;
 }
 
-export default function TokenListPage({
-  prevStepHandler,
-  setTokenHandler,
-  selectedType,
-  fromToken,
-  toToken,
-  tokens,
-  isPending,
-  isError,
-}: TokenListProps) {
+export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const [query, setQuery] = useState('');
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
-
-  // here we should check if user wallet connected show balance of every token
-  // so we should check both EVM and ICP wallets
-  // we should put evm and icp wallet state into the shared store
+  // store
+  const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore((state) => state);
+  const { setActiveStep } = useBridgeActions();
+  const setTokenHandler = useTokenSelector();
 
   useEffect(() => {
-    const tokenToCheck = selectedType === 'from' ? fromToken : toToken;
+    const tokenToCheck = selectedTokenType === 'from' ? fromToken : toToken;
     if (tokenToCheck) {
       setSelectedChainId(tokenToCheck.chainId);
     } else {
       setSelectedChainId(chains[0].chainId);
     }
-  }, [selectedType, fromToken, toToken]);
+  }, [selectedTokenType, fromToken, toToken]);
 
   const filteredTokens = useMemo(() => {
     const searchQuery = query.toLowerCase();
-    if (!fromToken && toToken && tokens && selectedType === 'from') {
+    if (!fromToken && toToken && tokens && selectedTokenType === 'from') {
       return get_bridge_pairs_for_token(
         tokens,
         toToken.canisterId || toToken.contractAddress || '',
         selectedChainId || 0,
       );
     }
-    if (fromToken && !toToken && tokens && selectedType === 'to') {
+    if (fromToken && !toToken && tokens && selectedTokenType === 'to') {
       return get_bridge_pairs_for_token(
         tokens,
         fromToken.canisterId || fromToken.contractAddress || '',
@@ -74,16 +60,16 @@ export default function TokenListPage({
             token.canisterId?.toLowerCase().includes(searchQuery),
         );
     }
-  }, [query, selectedChainId, tokens, fromToken, selectedType, toToken]);
+  }, [query, selectedChainId, tokens, fromToken, selectedTokenType, toToken]);
 
-  const isTokenSelected = (token: EvmToken | IcpToken) => {
-    if (selectedType === 'from' && fromToken) {
+  const isTokenSelected = (token: TokenType) => {
+    if (selectedTokenType === 'from' && fromToken) {
       if (fromToken?.canisterId) {
         return fromToken.canisterId === token.canisterId;
       }
       console.log('here');
       return fromToken?.contractAddress === token.contractAddress;
-    } else if (selectedType === 'to' && toToken) {
+    } else if (selectedTokenType === 'to' && toToken) {
       if (toToken?.contractAddress) {
         return toToken.contractAddress === token.contractAddress;
       }
@@ -94,7 +80,7 @@ export default function TokenListPage({
 
   return (
     <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
-      <BoxHeader title={selectedType === 'from' ? 'Bridge From' : 'Bridge To'} onBack={prevStepHandler} />
+      <BoxHeader title={selectedTokenType === 'from' ? 'Bridge From' : 'Bridge To'} onBack={() => setActiveStep(1)} />
       <ChainBoxPage selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
       <hr className="bg-white dark:bg-[#636363]/25 w-[calc(100%-52px)] max-md:hidden" />
       <input
@@ -127,7 +113,7 @@ export default function TokenListPage({
               token={token}
               onClick={() => {
                 setTokenHandler(token);
-                prevStepHandler();
+                setActiveStep(1);
               }}
               isSelected={isTokenSelected(token)}
             />

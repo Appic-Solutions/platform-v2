@@ -10,11 +10,12 @@ import { WalletPop } from './wallet/wallet-pop';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer';
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
+import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 
 const WalletPage = () => {
-  const { unAuthenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
+  const { authenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
     useSharedStore((state) => state);
-  const { setIcpBalance, setEvmBalance } = useSharedStoreActions();
+  const { setIcpBalance, setEvmBalance, setUnAuthenticatedAgent } = useSharedStoreActions();
 
   const [icpLoading, setIcpLoading] = useState(false);
   const [evmLoading, setEvmLoading] = useState(false);
@@ -26,8 +27,11 @@ const WalletPage = () => {
   const { open: openEvmModal } = useAppKit();
   const { disconnect: disconnectEvm } = useDisconnect();
 
+  const unAuthenticatedAgent = useUnAuthenticatedAgent();
+
   useEffect(() => {
-    if (unAuthenticatedAgent && icpIdentity && evmAddress) {
+    if (authenticatedAgent && unAuthenticatedAgent && icpIdentity && evmAddress) {
+      setUnAuthenticatedAgent(unAuthenticatedAgent);
       fetchEvmBalances({
         evmAddress,
       }).then((res) => {

@@ -1,6 +1,7 @@
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { HttpAgent, Identity } from '@dfinity/agent';
+import { UseAppKitAccountReturn } from '@reown/appkit';
 import { create } from 'zustand';
 
 interface SharedState {
@@ -11,7 +12,7 @@ interface SharedState {
       }
     | undefined;
   evmBalance: EvmTokensBalances | undefined;
-  authenticatedAgent: HttpAgent | undefined;
+  authenticatedAgent: UseAppKitAccountReturn | undefined;
   unAuthenticatedAgent: HttpAgent | undefined;
   icpIdentity: Identity | undefined;
   isEvmConnected: boolean;

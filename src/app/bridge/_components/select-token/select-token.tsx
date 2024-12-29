@@ -1,4 +1,3 @@
-import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { ArrowsUpDownIcon } from '@/common/components/icons';
 import Box from '@/common/components/ui/box';
 import { cn, getChainLogo } from '@/common/helpers/utils';
@@ -7,50 +6,32 @@ import AmountInput from './_components/AmountInput';
 import { useState } from 'react';
 import ActionButton from './_components/ActionButton';
 import BridgeOptionsList from './_components/BridgeOptionsList';
-import { useAppKitAccount } from '@reown/appkit/react';
 import WalletIcon from '@/common/components/icons/wallet';
 import WalletAddressInput from './_components/WalletAddressInput';
 import HistoryIcon from '@/common/components/icons/history';
 import Link from 'next/link';
-import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
-import { useAuthenticatedAgent } from '@/common/hooks/useAuthenticatedAgent';
+import { useBridgeActions, useBridgeStore } from '../../_store';
+import { useStepChange, useSwapTokens } from '../../_logic/hooks';
+import { useSharedStore } from '@/common/state/store';
 
 interface SelectTokenProps {
-  stepHandler: (value: 'next' | 'prev' | number) => void;
-  setSelectedType: (type: 'from' | 'to') => void;
-  fromToken: EvmToken | IcpToken | null;
-  toToken: EvmToken | IcpToken | null;
-  swapTokensHandler: () => void;
-  handleOptionSelect: (option: BridgeOptionType) => void;
-  selectedOption: BridgeOptionType | null;
-  amount: string;
-  setAmount: (amount: string) => void;
-  bridgeOptions: BridgeOptionType[] | undefined;
   isPendingBridgeOptions: boolean;
   isErrorBridgeOptions: boolean;
 }
 
-export default function BridgeSelectTokenPage({
-  stepHandler,
-  setSelectedType,
-  fromToken,
-  toToken,
-  swapTokensHandler,
-  handleOptionSelect,
-  selectedOption,
-  amount,
-  setAmount,
-  bridgeOptions,
-  isPendingBridgeOptions,
-  isErrorBridgeOptions,
-}: SelectTokenProps) {
+export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorBridgeOptions }: SelectTokenProps) {
   const [usdPrice, setUsdPrice] = useState('0');
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [toWalletAddress, setToWalletAddress] = useState('');
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
 
-  const { isConnected: isEvmConnected } = useAppKitAccount();
-  const icpAgent = useAuthenticatedAgent();
+  // store
+  const { fromToken, toToken, selectedOption, amount, bridgeOptions } = useBridgeStore();
+  const { setSelectedOption, setAmount, setSelectedTokenType } = useBridgeActions();
+  const { isEvmConnected, authenticatedAgent } = useSharedStore();
+
+  const handleStepChange = useStepChange();
+  const swapTokensHandler = useSwapTokens();
 
   const disabled = () => {
     if (!selectedOption) return true;
@@ -59,10 +40,10 @@ export default function BridgeSelectTokenPage({
 
     if (!selectedOption || !Number(amount)) return true;
 
-    const isSourceWalletConnected = fromToken.chain_type === 'EVM' ? isEvmConnected : icpAgent;
+    const isSourceWalletConnected = fromToken.chain_type === 'EVM' ? isEvmConnected : authenticatedAgent;
 
     const isDestWalletValid = toWalletAddress && !toWalletValidationError;
-    const isDestWalletConnected = toToken.chain_type === 'EVM' ? isEvmConnected : icpAgent;
+    const isDestWalletConnected = toToken.chain_type === 'EVM' ? isEvmConnected : authenticatedAgent;
 
     if (!isSourceWalletConnected || !(isDestWalletConnected || isDestWalletValid)) return true;
 
@@ -85,7 +66,7 @@ export default function BridgeSelectTokenPage({
     }
 
     const isSourceWalletDisconnected =
-      (fromToken?.chain_type === 'EVM' && !isEvmConnected) || (fromToken?.chain_type === 'ICP' && !icpAgent);
+      (fromToken?.chain_type === 'EVM' && !isEvmConnected) || (fromToken?.chain_type === 'ICP' && !authenticatedAgent);
     if (isSourceWalletDisconnected) {
       return 'Connect Source Wallet';
     }
@@ -100,7 +81,7 @@ export default function BridgeSelectTokenPage({
     }
 
     const isDestWalletDisconnected =
-      (toToken?.chain_type === 'EVM' && !isEvmConnected) || (toToken?.chain_type === 'ICP' && !icpAgent);
+      (toToken?.chain_type === 'EVM' && !isEvmConnected) || (toToken?.chain_type === 'ICP' && !authenticatedAgent);
     return isDestWalletDisconnected ? 'Connect Destination Wallet' : 'Confirm';
   };
 
@@ -136,8 +117,8 @@ export default function BridgeSelectTokenPage({
               <TokenCard
                 token={fromToken}
                 customOnClick={() => {
-                  setSelectedType('from');
-                  stepHandler('next');
+                  setSelectedTokenType('from');
+                  handleStepChange('next');
                 }}
                 label="From"
                 className={cn(
@@ -161,8 +142,8 @@ export default function BridgeSelectTokenPage({
               <TokenCard
                 token={toToken}
                 customOnClick={() => {
-                  setSelectedType('to');
-                  stepHandler('next');
+                  setSelectedTokenType('to');
+                  handleStepChange('next');
                 }}
                 label="To"
                 className={cn(
@@ -181,7 +162,7 @@ export default function BridgeSelectTokenPage({
                 setUsdPrice={setUsdPrice}
                 isWalletConnected={(() => {
                   if (fromToken.chain_type === 'EVM' && isEvmConnected) return true;
-                  if (fromToken.chain_type === 'ICP' && icpAgent) return true;
+                  if (fromToken.chain_type === 'ICP' && authenticatedAgent) return true;
                   return false;
                 })()}
               />
@@ -199,7 +180,7 @@ export default function BridgeSelectTokenPage({
           </div>
           {/* DESKTOP ACTION BUTTONS */}
           <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
-            <ActionButton onClick={() => stepHandler(3)} isDisabled={disabled()}>
+            <ActionButton onClick={() => handleStepChange(3)} isDisabled={disabled()}>
               {getButtonText()}
             </ActionButton>
             <div
@@ -219,7 +200,7 @@ export default function BridgeSelectTokenPage({
           <BridgeOptionsList
             bridgeOptions={bridgeOptions}
             selectedOption={selectedOption}
-            handleOptionSelect={handleOptionSelect}
+            handleOptionSelect={setSelectedOption}
             isError={isErrorBridgeOptions}
             isPending={isPendingBridgeOptions}
             toTokenLogo={toToken.logo}
@@ -228,7 +209,7 @@ export default function BridgeSelectTokenPage({
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
-        <ActionButton onClick={() => stepHandler(3)} isDisabled={disabled()}>
+        <ActionButton onClick={() => handleStepChange(3)} isDisabled={disabled()}>
           {getButtonText()}
         </ActionButton>
         <div

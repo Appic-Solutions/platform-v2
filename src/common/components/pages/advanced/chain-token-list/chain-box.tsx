@@ -1,6 +1,7 @@
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
+import { Skeleton } from '@/common/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
 import { cn } from '@/common/helpers/utils';
 

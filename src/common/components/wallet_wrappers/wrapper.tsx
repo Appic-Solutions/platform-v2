@@ -1,16 +1,14 @@
 'use client';
 import { IdentityKitAuthType } from '@nfid/identitykit';
-import { IdentityKitProvider, useIdentity } from '@nfid/identitykit/react';
+import { IdentityKitProvider } from '@nfid/identitykit/react';
 import { wagmiAdapter, projectId } from '@/common/configs/wagmi';
-import { createAppKit, useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
+import { createAppKit } from '@reown/appkit/react';
 import { mainnet, arbitrum, avalanche, base, optimism, polygon } from '@reown/appkit/networks';
 import { WagmiProvider, type Config } from 'wagmi';
-import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 import { useQuery } from '@tanstack/react-query';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
 import { setStorageItem } from '@/common/helpers/localstorage';
-import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
-import { useEffect } from 'react';
+import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 
 if (!projectId) {
   throw new Error('Project ID is not defined');
@@ -38,66 +36,27 @@ createAppKit({
   },
 });
 
-const UserWalletProvider = () => {
-  const { setUnAuthenticatedAgent, setIcpIdentity, setIsEvmConnected, setEvmAddress, setChainId } =
-    useSharedStoreActions();
-  // ICP Wallet Hooks
-  const icpIdentity = useIdentity();
-
-  // EVM Wallet Hooks
-  const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
-  const { chainId } = useAppKitNetwork();
-
-  const unAuthenticatedAgent = useUnAuthenticatedAgent();
-
-  useEffect(() => {
-    console.log('Setting shared store', {
-      unAuthenticatedAgent,
-      icpIdentity,
-      isEvmConnected,
-      evmAddress,
-      chainId,
-    });
-    setUnAuthenticatedAgent(unAuthenticatedAgent);
-    setIcpIdentity(icpIdentity);
-    setIsEvmConnected(isEvmConnected);
-    setEvmAddress(evmAddress);
-    setChainId(chainId);
-  }, [
-    unAuthenticatedAgent,
-    icpIdentity,
-    isEvmConnected,
-    evmAddress,
-    chainId,
-    setUnAuthenticatedAgent,
-    setIcpIdentity,
-    setIsEvmConnected,
-    setEvmAddress,
-    setChainId,
-  ]);
-
-  return null;
-};
-
 export const WalletWrapper = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { unAuthenticatedAgent } = useSharedStore((state) => state);
+  const unAuthenticatedAgent = useUnAuthenticatedAgent();
+
   useQuery({
     queryKey: ['IcpTokens'],
     queryFn: async () => {
-      if (!unAuthenticatedAgent) return;
-      const res = await get_icp_tokens(unAuthenticatedAgent);
+      if (!unAuthenticatedAgent) return [];
 
-      if (res.result) {
-        setStorageItem('icpTokens', JSON.stringify(res.result));
-      }
+      await get_icp_tokens(unAuthenticatedAgent).then((res) => {
+        if (res.result) {
+          setStorageItem('icpTokens', JSON.stringify(res.result));
+        }
+      });
 
-      return res.result;
+      return [];
     },
-    enabled: true,
+    enabled: !!unAuthenticatedAgent,
     refetchInterval: 1000 * 30,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -111,7 +70,6 @@ export const WalletWrapper = ({
         authType={IdentityKitAuthType.DELEGATION}
         signerClientOptions={{ targets: ['zjydy-zyaaa-aaaaj-qnfka-cai'] }}
       >
-        <UserWalletProvider />
         {children}
       </IdentityKitProvider>
     </WagmiProvider>

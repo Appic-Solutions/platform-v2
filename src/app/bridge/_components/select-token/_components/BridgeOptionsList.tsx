@@ -6,7 +6,7 @@ import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp
 
 interface BridgeOptionsListProps {
   handleOptionSelect: (option: BridgeOptionType) => void;
-  selectedOption: BridgeOptionType | null;
+  selectedOption: BridgeOptionType | undefined;
   bridgeOptions: BridgeOptionType[] | undefined;
   isPending: boolean;
   isError: boolean;
@@ -50,18 +50,16 @@ const BridgeOptionsList = ({
           </>
         ) : !isPending && bridgeOptions ? (
           bridgeOptions.map((item, idx) => (
-            <>
-              <div key={idx} className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : '')}>
-                <BridgeOption
-                  option={item}
-                  isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                  isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                  handleOptionSelect={(option) => handleOptionSelect(option)}
-                  onExpand={handleExpand}
-                  toTokenLogo={toTokenLogo}
-                />
-              </div>
-            </>
+            <div key={idx} className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : '')}>
+              <BridgeOption
+                option={item}
+                isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
+                isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
+                handleOptionSelect={(option) => handleOptionSelect(option)}
+                onExpand={handleExpand}
+                toTokenLogo={toTokenLogo}
+              />
+            </div>
           ))
         ) : (
           <></>
