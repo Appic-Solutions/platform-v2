@@ -1,10 +1,10 @@
 'use client';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import BridgeSelectTokenPage from '@/common/components/pages/bridge/select-token/select-token';
-import TokenListPage from '@/common/components/pages/bridge/chain-token-list/token-list';
+import BridgeSelectTokenPage from './_components/select-token/select-token';
+import TokenListPage from './_components/chain-token-list/token-list';
 import { useEffect, useState } from 'react';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import BridgeReview from '@/common/components/pages/bridge/bridge-review/BridgeReview';
+import BridgeReview from './_components/bridge-review/BridgeReview';
 import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
 import { BridgeOptionsListRequest } from './_api/types/request';
 import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';

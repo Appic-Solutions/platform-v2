@@ -35,6 +35,10 @@ export default function TokenListPage({
   const [query, setQuery] = useState('');
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
 
+  // here we should check if user wallet connected show balance of every token
+  // so we should check both EVM and ICP wallets
+  // we should put evm and icp wallet state into the shared store
+
   useEffect(() => {
     const tokenToCheck = selectedType === 'from' ? fromToken : toToken;
     if (tokenToCheck) {
