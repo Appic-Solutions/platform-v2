@@ -15,7 +15,15 @@ import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent'
 const WalletPage = () => {
   const { authenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
     useSharedStore((state) => state);
-  const { setIcpBalance, setEvmBalance, setUnAuthenticatedAgent } = useSharedStoreActions();
+  const {
+    setIcpBalance,
+    setEvmBalance,
+    setUnAuthenticatedAgent,
+    setIsEvmConnected,
+    setChainId,
+    setIcpIdentity,
+    setEvmAddress,
+  } = useSharedStoreActions();
 
   const [icpLoading, setIcpLoading] = useState(false);
   const [evmLoading, setEvmLoading] = useState(false);
@@ -30,14 +38,7 @@ const WalletPage = () => {
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   useEffect(() => {
-    if (authenticatedAgent && unAuthenticatedAgent && icpIdentity && evmAddress) {
-      setUnAuthenticatedAgent(unAuthenticatedAgent);
-      fetchEvmBalances({
-        evmAddress,
-      }).then((res) => {
-        setEvmBalance(res);
-        setEvmLoading(false);
-      });
+    if (unAuthenticatedAgent && icpIdentity) {
       fetchIcpBalances({
         unAuthenticatedAgent,
         icpIdentity,
@@ -46,17 +47,37 @@ const WalletPage = () => {
         setIcpLoading(false);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unAuthenticatedAgent, icpIdentity, evmAddress]);
+    if (evmAddress && unAuthenticatedAgent) {
+      setUnAuthenticatedAgent(unAuthenticatedAgent);
+      fetchEvmBalances({
+        evmAddress,
+      }).then((res) => {
+        setEvmBalance(res);
+        setEvmLoading(false);
+      });
+    }
+  }, [
+    unAuthenticatedAgent,
+    icpIdentity,
+    evmAddress,
+    authenticatedAgent,
+    setUnAuthenticatedAgent,
+    setIcpBalance,
+    setEvmBalance,
+  ]);
 
   const handleDisconnectIcp = () => {
     disconnectIcp();
     setIcpBalance(undefined);
+    setIcpIdentity(undefined);
   };
 
   const handleDisconnectEvm = () => {
     disconnectEvm();
     setEvmBalance(undefined);
+    setIsEvmConnected(false);
+    setChainId(undefined);
+    setEvmAddress(undefined);
   };
 
   return (

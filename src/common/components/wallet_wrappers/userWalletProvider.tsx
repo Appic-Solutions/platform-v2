@@ -37,7 +37,16 @@ export const UserWalletProvider = () => {
       setChainId(chainId);
       setAuthenticatedAgent(authenticatedAgent);
     }
-  }, [isEvmConnected, evmAddress, chainId]);
+  }, [
+    isEvmConnected,
+    evmAddress,
+    chainId,
+    authenticatedAgent,
+    setIsEvmConnected,
+    setEvmAddress,
+    setChainId,
+    setAuthenticatedAgent,
+  ]);
 
   return null;
 };
