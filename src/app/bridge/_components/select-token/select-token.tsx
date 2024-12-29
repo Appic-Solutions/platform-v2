@@ -98,7 +98,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
     >
       <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
         <h1 className="text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold">Bridge</h1>
-        <Link href="/transactions#bridge" className="flex items-center gap-x-2 text-sm">
+        <Link href="/transactions-history#bridge" className="flex items-center gap-x-2 text-sm">
           <HistoryIcon width={20} height={20} />
           History
         </Link>
