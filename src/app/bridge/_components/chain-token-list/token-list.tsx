@@ -11,6 +11,7 @@ import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_b
 import TokenSkeleton from './token-skeleton';
 import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
 import { useTokenSelector } from '../../_logic/hooks';
+import { useSharedStore } from '@/common/state/store';
 
 interface TokenListProps {
   isPending: boolean;
@@ -22,9 +23,11 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
   // store
   const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore((state) => state);
+  const { authenticatedAgent, icpIdentity, icpBalance, evmBalance } = useSharedStore((state) => state);
   const { setActiveStep } = useBridgeActions();
   const setTokenHandler = useTokenSelector();
 
+  // set selected chain id
   useEffect(() => {
     const tokenToCheck = selectedTokenType === 'from' ? fromToken : toToken;
     if (tokenToCheck) {
@@ -34,6 +37,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
     }
   }, [selectedTokenType, fromToken, toToken]);
 
+  // filter tokens
   const filteredTokens = useMemo(() => {
     const searchQuery = query.toLowerCase();
     if (!fromToken && toToken && tokens && selectedTokenType === 'from') {
@@ -62,12 +66,12 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
     }
   }, [query, selectedChainId, tokens, fromToken, selectedTokenType, toToken]);
 
+  // check if token is selected
   const isTokenSelected = (token: TokenType) => {
     if (selectedTokenType === 'from' && fromToken) {
       if (fromToken?.canisterId) {
         return fromToken.canisterId === token.canisterId;
       }
-      console.log('here');
       return fromToken?.contractAddress === token.contractAddress;
     } else if (selectedTokenType === 'to' && toToken) {
       if (toToken?.contractAddress) {
@@ -77,6 +81,17 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
     }
     return false;
   };
+
+  useEffect(() => {
+    if (authenticatedAgent) {
+      if (evmBalance?.tokens.length && evmBalance?.tokens.length > 0) {
+        //TODO ===> write a logic for finding user tokens in the list and update the balance and usd value
+      }
+    }
+    if (icpIdentity) {
+      console.log(icpBalance);
+    }
+  }, [authenticatedAgent, icpIdentity, icpBalance, evmBalance]);
 
   return (
     <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
