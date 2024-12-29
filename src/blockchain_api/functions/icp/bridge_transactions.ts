@@ -549,7 +549,7 @@ export const approve_erc20 = async (
   }
 };
 
-type TxHash = `0x${string}`;
+export type TxHash = `0x${string}`;
 // Step 3
 // Submit deposit request through deposit helpers
 export const request_deposit = async (
