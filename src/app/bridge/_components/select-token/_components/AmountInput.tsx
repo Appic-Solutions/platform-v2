@@ -1,22 +1,43 @@
 import { getChainLogo } from '@/common/helpers/utils';
-import { IcpToken } from '@/blockchain_api/types/tokens';
-import { EvmToken } from '@/blockchain_api/types/tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
 import React, { useEffect, useState } from 'react';
+import { useSharedStore } from '@/common/state/store';
+import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 
-interface AmountInputProps {
-  token: EvmToken | IcpToken | null;
-  amount: string;
-  setAmount: (amount: string) => void;
-  setUsdPrice: (usdPrice: string) => void;
-  usdPrice: string;
-  isWalletConnected: boolean;
-}
-
-const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnected }: AmountInputProps) => {
+const AmountInput = () => {
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [inputAmount, setInputAmount] = useState('');
+  const [userTokenBalance, setUserTokenBalance] = useState('');
+
+  const { toToken: token, fromToken, usdPrice, amount } = useBridgeStore();
+  const { setAmount, setUsdPrice } = useBridgeActions();
+  const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
+
+  const checkWalletConnectStatus = () => {
+    if (fromToken?.chain_type === 'EVM' && isEvmConnected) {
+      setIsWalletConnected(true);
+      return;
+    }
+    if (fromToken?.chain_type === 'ICP' && icpIdentity) {
+      setIsWalletConnected(true);
+      return;
+    }
+    setIsWalletConnected(false);
+  };
+
+  useEffect(() => {
+    checkWalletConnectStatus();
+    if (fromToken?.chain_type === 'EVM' && evmBalance) {
+      const mainToken = evmBalance.tokens.find((t) => t.contractAddress === token?.contractAddress);
+      setUserTokenBalance(mainToken?.balance || '');
+    }
+    if (fromToken?.chain_type === 'ICP' && icpBalance) {
+      const mainToken = icpBalance.tokens.find((t) => t.canisterId === token?.canisterId);
+      setUserTokenBalance(mainToken?.balance || '');
+    }
+  }, [isEvmConnected, icpIdentity, fromToken, token]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -57,6 +78,7 @@ const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnecte
               type="number"
               maxLength={10}
               placeholder="0"
+              value={inputAmount}
               onChange={(e) => setInputAmount(e.target.value)}
               className={cn(
                 'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
@@ -73,6 +95,12 @@ const AmountInput = ({ token, setAmount, setUsdPrice, usdPrice, isWalletConnecte
                   'bg-gradient-to-r from-white to-white/35',
                   'hover:bg-white/35 transition-all duration-300',
                 )}
+                onClick={() => {
+                  if (userTokenBalance) {
+                    setAmount(userTokenBalance);
+                    setInputAmount(userTokenBalance);
+                  }
+                }}
               >
                 max
               </span>

@@ -1,3 +1,4 @@
+import { TxHash } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { Agent, HttpAgent } from '@dfinity/agent';
@@ -66,8 +67,8 @@ interface NotifyAppicHelperDepositRequest {
 // STEP 5
 interface CheckDepositStatusRequest {
   bridge_option: BridgeOption;
-  tx_hash: string;
-  authenticated_agent: Agent | HttpAgent;
+  tx_hash: TxHash;
+  unauthenticated_agent: Agent | HttpAgent;
 }
 
 export type {
