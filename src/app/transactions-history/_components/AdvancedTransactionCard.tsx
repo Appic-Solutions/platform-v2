@@ -2,9 +2,9 @@ import { ChevronDownIcon, CopyIcon } from "@/common/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Card } from "@/common/components/ui/card";
 import { cn, copyToClipboard, getChainLogo, getChainName } from "@/common/helpers/utils";
-import { Transaction } from "../sampleTransactions";
 import { useState } from "react";
 import TwinTokenIcon from "@/common/components/icons/twin-token";
+import { Transaction } from "../_constants";
 
 const AdvancedTransactionCard = ({
   date,

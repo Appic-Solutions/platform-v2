@@ -48,7 +48,7 @@ export default function Step1({
             <InfoCircleIcon className="w-4 h-4 md:w-5 md:h-5" />
           </div>
           <Link
-            href="/transactions#advanced"
+            href="/transactions-history/advanced"
             className="flex items-center gap-x-2 text-sm"
           >
             <HistoryIcon className="w-5 h-5 md:w-6 md:h-6" />

@@ -1,3 +1,30 @@
+import { ArrowsUpDownIcon, BlockchainIcon, LockIcon, ParkOutlineBridgeIcon } from "@/common/components/icons";
+import { ReactNode } from "react";
+
+export interface PageParamsItem {
+  name: string
+  icon: ReactNode
+}
+
+export const PAGE_PARAMS_DATA: PageParamsItem[] = [
+  {
+    name: 'bridge',
+    icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-w-5 min-h-5" />
+  },
+  {
+    name: 'auto-invest',
+    icon: <BlockchainIcon width={24} height={24} className="min-w-5 min-h-5" />
+  },
+  {
+    name: 'swap',
+    icon: <ArrowsUpDownIcon width={24} height={24} className="min-w-5 min-h-5" />
+  },
+  {
+    name: 'advanced',
+    icon: <LockIcon width={24} height={24} className="min-w-5 min-h-5" />
+  }
+]
+
 interface TransactionStep {
   status?: "completed" | "pending" | "failed";
   amount?: string;
