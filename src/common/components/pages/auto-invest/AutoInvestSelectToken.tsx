@@ -83,7 +83,7 @@ const AutoInvestSelectToken = ({
           <h1 className="w-full">Auto Invest</h1>
           {showDetails && <h2 className="w-full hidden lg:block">Details</h2>}
         </div>
-        <Link href="/transactions#auto-invest" className="flex items-center gap-x-2 text-sm">
+        <Link href="/transactions-history/auto-invest" className="flex items-center gap-x-2 text-sm">
           <HistoryIcon width={20} height={20} />
           History
         </Link>

@@ -1,46 +1,17 @@
 "use client";
-
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import { ExpandLeftIcon } from "../icons";
-import { cn } from "@/common/helpers/utils";
-import { PreviousPathnameContext } from "@/app/providers";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-const BackButton = ({
-  iconWidth = 18,
-  iconHeight = 18,
-}: {
-  href?: string;
-  iconWidth?: number;
-  iconHeight?: number;
-}) => {
-  const [previousPathname, setPreviousPathname] = useState<string>("/");
-  const prevRoute = useContext(PreviousPathnameContext);
-  const currentPathname = usePathname();
+export default function BackButton() {
+  const router = useRouter()
 
-  useEffect(() => {
-    if (prevRoute) {
-      if (prevRoute !== currentPathname) {
-        setPreviousPathname(prevRoute);
-      }
-    }
-  }, [prevRoute, currentPathname]);
-
-  if (previousPathname) {
-    return (
-      <Link
-        href={previousPathname}
-        className={cn(
-          "flex items-center justify-center gap-x-1",
-          "absolute left-0 font-semibold md:left-8"
-        )}
-      >
-        <ExpandLeftIcon width={iconWidth} height={iconHeight} />
-        Back
-      </Link>
-    );
-  }
+  return (
+    <button
+      onClick={() => router.back()}
+      className="flex items-center justify-center gap-x-1 absolute left-4 font-semibold md:left-8">
+      <ExpandLeftIcon width={18} height={18} className="min-w-[18px] min-h-[18px]" />
+      Back
+    </button >
+  );
 };
-
-export default BackButton;

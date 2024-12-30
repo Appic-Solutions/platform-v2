@@ -1,9 +1,9 @@
 import { TabsContent } from "@/common/components/ui/tabs";
 import BridgeTransactionCard from "./BridgeTransactionCard";
-import { Transaction } from "../sampleTransactions";
 import AdvancedTransactionCard from "./AdvancedTransactionCard";
 import AutoInvestTransactionCard from "./AutoInvestTransactionCard";
 import NoteRemoveIcon from "@/common/components/icons/note-remove";
+import { Transaction } from "../_constants";
 
 interface TransactionTabsContentProps {
   value: "bridge" | "auto-invest" | "advanced" | "swap";
