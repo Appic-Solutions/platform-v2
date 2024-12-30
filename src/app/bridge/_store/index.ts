@@ -8,6 +8,7 @@ type SelectionType = 'from' | 'to';
 interface BridgeState {
   activeStep: number;
   selectedTokenType: SelectionType;
+  usdPrice: string;
   fromToken: TokenType | undefined;
   toToken: TokenType | undefined;
   amount: string;
@@ -26,6 +27,7 @@ type Action = {
     setSelectedOption: (option: BridgeOption) => void;
     setBridgePairs: (bridgePairs: (EvmToken | IcpToken)[]) => void;
     setBridgeOptions: (bridgeOptions: BridgeOption[]) => void;
+    setUsdPrice: (usdPrice: string) => void;
   };
 };
 
@@ -36,8 +38,9 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   bridgePairs: undefined,
   fromToken: undefined,
   selectedOption: undefined,
-  selectedTokenType: 'from',
+  selectedTokenType: 'from' as SelectionType,
   toToken: undefined,
+  usdPrice: '0',
   actions: {
     setActiveStep: (activeStep) => set((state) => ({ ...state, activeStep })),
     setSelectedTokenType: (selectedTokenType) => set((state) => ({ ...state, selectedTokenType })),
@@ -47,6 +50,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setSelectedOption: (selectedOption) => set((state) => ({ ...state, selectedOption })),
     setBridgePairs: (bridgePairs) => set((state) => ({ ...state, bridgePairs })),
     setBridgeOptions: (bridgeOptions) => set((state) => ({ ...state, bridgeOptions })),
+    setUsdPrice: (usdPrice) => set((state) => ({ ...state, usdPrice })),
   },
 }));
 

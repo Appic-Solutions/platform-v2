@@ -28,7 +28,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
   // store
   const { fromToken, toToken, selectedOption, amount, bridgeOptions } = useBridgeStore();
   const { setSelectedOption, setAmount, setSelectedTokenType } = useBridgeActions();
-  const { isEvmConnected, authenticatedAgent } = useSharedStore();
+  const { isEvmConnected, authenticatedAgent, icpIdentity } = useSharedStore();
 
   const handleStepChange = useStepChange();
   const swapTokensHandler = useSwapTokens();
@@ -66,7 +66,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
     }
 
     const isSourceWalletDisconnected =
-      (fromToken?.chain_type === 'EVM' && !isEvmConnected) || (fromToken?.chain_type === 'ICP' && !authenticatedAgent);
+      (fromToken?.chain_type === 'EVM' && !isEvmConnected) || (fromToken?.chain_type === 'ICP' && !icpIdentity);
     if (isSourceWalletDisconnected) {
       return 'Connect Source Wallet';
     }
@@ -153,20 +153,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
               />
             </div>
             {/* AMOUNT INPUT */}
-            {fromToken && toToken && (
-              <AmountInput
-                token={fromToken}
-                amount={amount}
-                setAmount={setAmount}
-                usdPrice={usdPrice}
-                setUsdPrice={setUsdPrice}
-                isWalletConnected={(() => {
-                  if (fromToken.chain_type === 'EVM' && isEvmConnected) return true;
-                  if (fromToken.chain_type === 'ICP' && authenticatedAgent) return true;
-                  return false;
-                })()}
-              />
-            )}
+            {fromToken && toToken && <AmountInput />}
             {/* WALLET ADDRESS INPUT */}
             <WalletAddressInput
               token={toToken}
@@ -225,3 +212,5 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
     </Box>
   );
 }
+
+// TODO: move logics into separate file, change bridge review page details, connect api s
