@@ -6,8 +6,8 @@ import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Response } from '@/blockchain_api/types/response';
 import { Actor, HttpAgent } from '@dfinity/agent';
 
-const waitWithTimeout = (ms: number) =>
-  new Promise<bigint>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
+// const waitWithTimeout = (ms: number) =>
+//   new Promise<bigint>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
 export interface IcpTokensBalances {
   tokens: IcpToken[];
@@ -75,7 +75,7 @@ export const get_tokens_balances = async (
       try {
         // Fetch token balance
         const tokenBalance = await get_single_token_balance(canisterId, tokenType, userPrincipal, agent);
-        console.log(tokenBalance);
+
         if (tokenBalance) {
           // Calculate USD balance
           const balance = new BigNumber(tokenBalance.toString()).dividedBy(new BigNumber(10).pow(decimals || 0));
@@ -115,18 +115,12 @@ const get_single_token_balance = async (
     });
 
     if (tokenType === 'DIP20' || tokenType === 'YC') {
-      tokenBalance = (await Promise.race([
-        tokenActor.balanceOf(Principal.fromText(userPrincipal)),
-        waitWithTimeout(15000),
-      ])) as bigint;
+      tokenBalance = (await tokenActor.balanceOf(Principal.fromText(userPrincipal))) as bigint;
     } else if (tokenType === 'ICRC1' || tokenType === 'ICRC2') {
-      tokenBalance = (await Promise.race([
-        tokenActor.icrc1_balance_of({
-          owner: Principal.fromText(userPrincipal),
-          subaccount: [],
-        }),
-        waitWithTimeout(15000),
-      ])) as bigint;
+      tokenBalance = (await tokenActor.icrc1_balance_of({
+        owner: Principal.fromText(userPrincipal),
+        subaccount: [],
+      })) as bigint;
     }
   } catch (error) {
     console.error(error);
