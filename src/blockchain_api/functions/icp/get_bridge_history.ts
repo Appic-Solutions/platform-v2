@@ -1,14 +1,7 @@
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import {
-  AddEvmToIcpTx,
-  AddIcpToEvmTx,
-  NewEvmToIcpResult,
-  NewIcpToEvmResult,
-  Operator as AppicHelperOperator,
-  GetTxParams,
-  Transaction,
-  TransactionSearchParam,
-} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+
+import { idlFactory as AppicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
+import { Transaction } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
 import { appic_helper_canister_id } from '@/canister_ids.json';
 import { parse_evm_to_icp_tx_status, parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
@@ -17,6 +10,8 @@ import { Principal } from '@dfinity/principal';
 import { NATIVE_TOKEN_ADDRESS } from './get_bridge_options';
 import { chains } from '@/blockchain_api/lists/chains';
 import { DepositTxStatus, WithdrawalTxStatus } from './bridge_transactions';
+import { Response } from '@/blockchain_api/types/response';
+import { Actor, HttpAgent } from '@dfinity/agent';
 export type Status = 'Pending' | 'Successful' | 'Failed';
 export interface BridgeStep {
   status: Status;
@@ -34,7 +29,7 @@ export interface BridgeHistory {
   fee: string;
   human_readable_fee: string;
   fee_token_symbol: string;
-  bridge_steps: [];
+  bridge_steps: BridgeStep[];
   status: Status;
   base_value: string;
   human_readable_base_value: string;
@@ -42,7 +37,44 @@ export interface BridgeHistory {
   human_readable_final_value: string;
 }
 
-// export const get_transaction_history(g)
+export const get_transaction_history = async (
+  evm_wallet_address: string | undefined,
+  principal_id: Principal | undefined,
+  unauthenticated_agent: HttpAgent,
+  bridge_tokens: (EvmToken | IcpToken)[],
+): Promise<Response<BridgeHistory[]>> => {
+  const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+    canisterId: Principal.fromText(appic_helper_canister_id),
+    agent: unauthenticated_agent,
+  });
+  try {
+    if (evm_wallet_address && principal_id) {
+      const txs = (await appic_helper_actor.get_txs_by_address_principal_combination(
+        evm_wallet_address,
+        principal_id,
+      )) as Transaction[];
+      return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
+    } else if (evm_wallet_address) {
+      const txs = (await appic_helper_actor.get_txs_by_address(evm_wallet_address)) as Transaction[];
+      return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
+    } else if (principal_id) {
+      const txs = (await appic_helper_actor.get_txs_by_principal(principal_id)) as Transaction[];
+      return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
+    } else {
+      return {
+        result: [],
+        message: 'At least one principal id or evm address should be provided',
+        success: false,
+      };
+    }
+  } catch (error) {
+    return {
+      result: [],
+      message: `Failed to get user transaction history ${error}`,
+      success: false,
+    };
+  }
+};
 
 // convert Transaction into BridgeHistory
 const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpToken)[]): BridgeHistory[] => {
@@ -161,7 +193,7 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         human_readable_final_value,
       };
     } else {
-      return [];
+      throw 'Wrong Transaction type';
     }
   });
 };

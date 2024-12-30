@@ -195,6 +195,7 @@ export interface _SERVICE {
   get_icp_tokens: ActorMethod<[], Array<CandidIcpToken>>;
   get_transaction: ActorMethod<[GetTxParams], [] | [Transaction]>;
   get_txs_by_address: ActorMethod<[string], Array<Transaction>>;
+  get_txs_by_address_principal_combination: ActorMethod<[string, Principal], Array<Transaction>>;
   get_txs_by_principal: ActorMethod<[Principal], Array<Transaction>>;
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
   new_evm_to_icp_tx: ActorMethod<[AddEvmToIcpTx], NewEvmToIcpResult>;

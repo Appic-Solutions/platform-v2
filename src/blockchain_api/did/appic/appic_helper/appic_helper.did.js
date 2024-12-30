@@ -193,6 +193,7 @@ export const idlFactory = ({ IDL }) => {
     get_icp_tokens: IDL.Func([], [IDL.Vec(CandidIcpToken)], ['query']),
     get_transaction: IDL.Func([GetTxParams], [IDL.Opt(Transaction)], ['query']),
     get_txs_by_address: IDL.Func([IDL.Text], [IDL.Vec(Transaction)], ['query']),
+    get_txs_by_address_principal_combination: IDL.Func([IDL.Text, IDL.Principal], [IDL.Vec(Transaction)], ['query']),
     get_txs_by_principal: IDL.Func([IDL.Principal], [IDL.Vec(Transaction)], ['query']),
     icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOriginsResponse], []),
     new_evm_to_icp_tx: IDL.Func([AddEvmToIcpTx], [Result], []),
