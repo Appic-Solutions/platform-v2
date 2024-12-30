@@ -87,6 +87,7 @@ export interface BridgeOption {
   amount: string;
   estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
   human_readable_estimated_return: string; // estimated return in human_readable format
+  usd_estimated_return: string;
   via: string;
   duration: string;
   is_best: boolean;
@@ -153,6 +154,7 @@ export const get_bridge_options = async (
       const bridge_options = await calculate_bridge_options(
         from_token.contractAddress!,
         to_token.canisterId!,
+        from_token.usdPrice,
         to_token.decimals.toFixed(),
         agent,
         bridge_metadata,
@@ -179,6 +181,7 @@ export const get_bridge_options = async (
       const bridge_options = await calculate_bridge_options(
         from_token.canisterId!,
         to_token.contractAddress!,
+        to_token.usdPrice,
         to_token.decimals.toFixed(),
         agent,
         bridge_metadata,
@@ -483,6 +486,7 @@ export const encode_approval_function_data = (
 const calculate_bridge_options = async (
   from_token_id: string,
   to_token_id: string,
+  token_price: string,
   decimals: string,
   agent: HttpAgent,
   bridge_metadata: BridgeMetadata,
@@ -508,6 +512,10 @@ const calculate_bridge_options = async (
     const estimated_return = bridge_metadata.is_native
       ? new BigNumber(amount).minus(total_native_fee).toFixed()
       : new BigNumber(amount).minus(approve_erc20_fee).toFixed();
+    const human_readable_estimated_return = BigNumber(estimated_return)
+      .dividedBy(BigNumber(10).pow(decimals))
+      .toFixed();
+    const usd_estimated_return = BigNumber(human_readable_estimated_return).multipliedBy(token_price).toFixed();
     const duration = bridge_metadata.operator === 'Appic' ? '1 - 2 min' : '15 - 20 min';
     const native_fee_token_id =
       bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
@@ -523,7 +531,8 @@ const calculate_bridge_options = async (
         viem_chain: bridge_metadata.viem_chain,
         amount,
         estimated_return,
-        human_readable_estimated_return: BigNumber(estimated_return).dividedBy(BigNumber(10).pow(decimals)).toFixed(),
+        human_readable_estimated_return,
+        usd_estimated_return,
         fees: {
           max_network_fee: estimated_network_fee,
           human_readable_max_network_fee: BigNumber(estimated_network_fee)

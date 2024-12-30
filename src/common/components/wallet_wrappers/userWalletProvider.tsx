@@ -1,3 +1,4 @@
+import { useAuthenticatedAgent } from '@/common/hooks/useAuthenticatedAgent';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 import { useSharedStoreActions } from '@/common/state/store';
 import { useIdentity } from '@nfid/identitykit/react';
@@ -19,7 +20,7 @@ export const UserWalletProvider = () => {
   // EVM Wallet Hooks
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
-  const authenticatedAgent = useAppKitAccount();
+  const authenticatedAgent = useAuthenticatedAgent();
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   setUnAuthenticatedAgent(unAuthenticatedAgent);
