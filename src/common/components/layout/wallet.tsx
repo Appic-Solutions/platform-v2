@@ -11,7 +11,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import { Skeleton } from '../ui/skeleton';
+import WalletPopSkeleton from './wallet/wallet-pop-skeleton';
 
 const WalletPage = () => {
   const { authenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
@@ -161,7 +161,9 @@ const WalletPage = () => {
       )}
 
       <div className="flex items-center gap-x-2">
-        {icpBalance && !icpLoading ? (
+        {icpLoading ? (
+          <WalletPopSkeleton />
+        ) : icpBalance && !icpLoading ? (
           <WalletPop
             logo="/images/logo/wallet_logos/icp.svg"
             title="Your ICP Wallet"
@@ -170,11 +172,12 @@ const WalletPage = () => {
             isLoading={icpLoading}
             address={icpIdentity?.getPrincipal().toString() || ''}
           />
-        ) : icpLoading ? (
-          <Skeleton className="w-6 h-6" />
         ) : null}
+        {/* <WalletPopSkeleton /> */}
 
-        {evmBalance && !evmLoading ? (
+        {evmLoading ? (
+          <WalletPopSkeleton />
+        ) : evmBalance && !evmLoading ? (
           <WalletPop
             logo={getChainLogo(chainId)}
             title="Your EVM Wallet"
@@ -183,8 +186,6 @@ const WalletPage = () => {
             isLoading={evmLoading}
             address={evmAddress || ''}
           />
-        ) : evmLoading ? (
-          <Skeleton className="w-6 h-6" />
         ) : null}
       </div>
     </div>

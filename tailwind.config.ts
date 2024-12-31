@@ -93,6 +93,10 @@ const config: Config = {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
       },
 
       /* Animation */
@@ -103,6 +107,7 @@ const config: Config = {
         'slide-in-from-top': 'slideInFromTop 0.2s ease-out',
         'slide-in-with-height': 'slideInFromTopWithHeight 0.3s ease-out forwards',
         'border-spin': 'border-spin 2s linear infinite',
+        fade: 'fadeIn .5s ease-in-out',
       },
     },
   },
