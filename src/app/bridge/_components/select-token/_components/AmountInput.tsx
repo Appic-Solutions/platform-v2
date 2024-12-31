@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useSharedStore } from '@/common/state/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import { useCheckWalletConnectStatus } from '@/app/bridge/_logic/hooks';
+import BigNumber from 'bignumber.js';
 
 const AmountInput = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -46,7 +47,7 @@ const AmountInput = () => {
   }, []);
 
   const handleAmountChange = (value: string) => {
-    const usdPrice = Number(value) * Number(token?.usdPrice ?? 0);
+    const usdPrice = BigNumber(value == '' ? '0' : value).multipliedBy(fromToken?.usdPrice || 0);
     setUsdPrice(usdPrice.toFixed(2));
     setAmount(value);
   };
