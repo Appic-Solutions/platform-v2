@@ -6,7 +6,8 @@ import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Response } from '@/blockchain_api/types/response';
 import { Actor, HttpAgent } from '@dfinity/agent';
 
-const waitWithTimeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// const waitWithTimeout = (ms: number) =>
+//   new Promise<bigint>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
 export interface IcpTokensBalances {
   tokens: IcpToken[];
@@ -18,16 +19,29 @@ export async function get_icp_wallet_tokens_balances(
   all_tokens: IcpToken[],
   unAuthenticated_agent: HttpAgent,
 ): Promise<Response<IcpTokensBalances>> {
+  if (all_tokens.length == 0) {
+    return {
+      result: {
+        tokens: [],
+        totalBalanceUsd: '',
+      },
+      message: `No icp tokens passed`,
+      success: false,
+    };
+  }
   let totalBalanceUsd = new BigNumber(0);
 
   try {
     const tokens_balances = await get_tokens_balances(all_tokens, principal_id, unAuthenticated_agent);
+
     const non_zero_balances = tokens_balances.filter((token) => {
-      if (token.balance != '0') {
-        totalBalanceUsd = totalBalanceUsd.plus(token.usdBalance as unknown as number);
+      if (token.balance !== undefined && token.balance !== '0') {
+        totalBalanceUsd = totalBalanceUsd.plus(token.usdBalance as string); // Ensure `usdBalance` matches expected type
         return true;
       }
+      return false;
     });
+
     return {
       result: {
         tokens: non_zero_balances,
@@ -37,6 +51,7 @@ export async function get_icp_wallet_tokens_balances(
       success: true,
     };
   } catch (error) {
+    console.error(error);
     return {
       result: {
         tokens: [],
@@ -60,6 +75,7 @@ export const get_tokens_balances = async (
       try {
         // Fetch token balance
         const tokenBalance = await get_single_token_balance(canisterId, tokenType, userPrincipal, agent);
+
         if (tokenBalance) {
           // Calculate USD balance
           const balance = new BigNumber(tokenBalance.toString()).dividedBy(new BigNumber(10).pow(decimals || 0));
@@ -74,6 +90,7 @@ export const get_tokens_balances = async (
         }
         return { ...token, balance: '0', usdBalance: '0' };
       } catch (error) {
+        console.error(error);
         return { ...token, balance: '0', usdBalance: '0' }; // Default values in case of error
       }
     }),
@@ -98,20 +115,15 @@ const get_single_token_balance = async (
     });
 
     if (tokenType === 'DIP20' || tokenType === 'YC') {
-      tokenBalance = (await Promise.race([
-        tokenActor.balanceOf(Principal.fromText(userPrincipal)),
-        waitWithTimeout(5000),
-      ])) as bigint;
+      tokenBalance = (await tokenActor.balanceOf(Principal.fromText(userPrincipal))) as bigint;
     } else if (tokenType === 'ICRC1' || tokenType === 'ICRC2') {
-      tokenBalance = (await Promise.race([
-        tokenActor.icrc1_balance_of({
-          owner: Principal.fromText(userPrincipal),
-          subaccount: [],
-        }),
-        waitWithTimeout(5000),
-      ])) as bigint;
+      tokenBalance = (await tokenActor.icrc1_balance_of({
+        owner: Principal.fromText(userPrincipal),
+        subaccount: [],
+      })) as bigint;
     }
   } catch (error) {
+    console.error(error);
     tokenBalance = BigInt(0);
   }
   return tokenBalance;

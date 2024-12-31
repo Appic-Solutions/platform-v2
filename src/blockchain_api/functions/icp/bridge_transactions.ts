@@ -81,7 +81,7 @@ import { principal_to_bytes32 } from './utils/principal_to_hex';
 // Approval
 export const icrc2_approve = async (
   bridge_option: BridgeOption,
-  authenticated_agent: Agent,
+  authenticated_agent: Agent, // HttpAgent , Agent
 ): Promise<Response<string>> => {
   const native_actor = Actor.createActor(IcrcIdlFactory, {
     agent: authenticated_agent,
@@ -608,7 +608,7 @@ export const notify_appic_helper_deposit = async (
   tx_hash: string,
   user_wallet_address: string,
   recipient_principal: string,
-  unauthenticated_agent: HttpAgent | Agent,
+  unauthenticated_agent: HttpAgent,
 ): Promise<Response<string>> => {
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
@@ -661,7 +661,7 @@ export type DepositTxStatus = 'Invalid' | 'PendingVerification' | 'Minted' | 'Ac
 export const check_deposit_status = async (
   tx_hash: TxHash,
   bridge_option: BridgeOption,
-  unauthenticated_agent: Agent | HttpAgent,
+  unauthenticated_agent: Agent,
 ): Promise<Response<DepositTxStatus>> => {
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),

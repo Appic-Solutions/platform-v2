@@ -1,6 +1,6 @@
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { IcpToken } from '@/blockchain_api/types/tokens';
-import { Agent, HttpAgent, Identity } from '@dfinity/agent';
+import { HttpAgent, Identity, Agent } from '@dfinity/agent';
 import { create } from 'zustand';
 
 interface SharedState {

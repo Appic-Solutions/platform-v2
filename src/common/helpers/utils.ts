@@ -1,6 +1,7 @@
 import { chains } from '@/blockchain_api/lists/chains';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { BigNumber } from 'bignumber.js';
 
 /** Combines and merges Tailwind CSS classes */
 export function cn(...inputs: ClassValue[]) {
@@ -41,10 +42,28 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
   }
 };
 
-// Format crypto values to show only 4 significative digits
-export function formatToSignificantFigures(num: string | number) {
-  if (typeof num === 'string') {
-    num = Number(num);
+// Format crypto values to show only 4 significant decimals digits
+export const formatToSignificantFigures = (number: string, significantDecimals: number = 4): string => {
+  /**
+   * Formats a number such that integers remain unchanged, and decimal numbers
+   * are trimmed to the specified number of significant decimals without rounding.
+   *
+   * @param number - The number to format.
+   * @param significantDecimals - The number of significant decimals to retain.
+   * @returns The formatted number as a string.
+   */
+
+  if (BigNumber(number).isInteger()) {
+    return number.toString();
   }
-  return num.toPrecision(4);
-}
+
+  const bigNum = new BigNumber(number);
+  const [integerPart, decimalPart] = bigNum.toFixed().split('.');
+
+  if (!decimalPart) {
+    return bigNum.toString();
+  }
+
+  const trimmedDecimal = decimalPart.slice(0, significantDecimals);
+  return `${integerPart}.${trimmedDecimal}`;
+};
