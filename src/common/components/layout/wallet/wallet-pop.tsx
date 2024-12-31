@@ -16,8 +16,9 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '
 import { Pie, PieChart } from 'recharts';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/common/components/ui/drawer';
 import { useState } from 'react';
+import WalletChart from './wallet-chart';
 
-type WalletBalance =
+export type WalletBalance =
   | {
       tokens: IcpToken[];
       totalBalanceUsd: string;
@@ -86,16 +87,7 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
           <DrawerContent>
             <DrawerHeader>{title}</DrawerHeader>
 
-            {balance && balance.tokens.length > 0 ? (
-              <div>
-                <ChartContainer config={chartConfig} className="relative mx-auto aspect-square max-h-56">
-                  <PieChart>
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="bg-white" />} />
-                    <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} />
-                  </PieChart>
-                </ChartContainer>
-              </div>
-            ) : null}
+            {balance && balance.tokens.length > 0 ? <WalletChart balance={balance} /> : null}
 
             <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
               <span>{getFormattedWalletAddress(address)}</span>

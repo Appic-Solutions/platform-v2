@@ -12,7 +12,7 @@ import {
   useNotifyAppicHelperWithdrawal,
 } from '../_api';
 import { useSharedStore } from '@/common/state/store';
-import { DepositTxStatus } from '@/blockchain_api/functions/icp/bridge_transactions';
+import { DepositTxStatus, WithdrawalTxStatus } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { Response } from '@/blockchain_api/types/response';
 
 export const useTokenSelector = () => {
@@ -98,7 +98,7 @@ export const useActionButtonText = () => {
     toWalletValidationError: string | null;
     toWalletAddress: string;
   }) => {
-    if (!fromToken || !toToken) return 'Select Tokens';
+    if (!fromToken || !toToken) return 'Select token to bridge';
 
     if (
       fromToken &&
@@ -109,7 +109,7 @@ export const useActionButtonText = () => {
       return 'Please select different tokens';
     }
 
-    if (!Number(amount)) return 'Fill Amount Field';
+    if (!Number(amount)) return 'Set token amount to continue';
     if (!selectedOption) return 'Select Bridge Option';
 
     const isSourceWalletDisconnected =
@@ -119,7 +119,7 @@ export const useActionButtonText = () => {
     }
 
     if (showWalletAddress) {
-      return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Confirm';
+      return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Review Bridge';
     }
 
     if (!checkIsWalletConnected('to')) {
@@ -128,7 +128,7 @@ export const useActionButtonText = () => {
 
     const isDestWalletValid = toWalletAddress && !toWalletValidationError;
     if (isDestWalletValid) {
-      return 'Confirm';
+      return 'Review Bridge';
     }
   };
   return textHandler;
@@ -138,13 +138,13 @@ export const useIsTokenSelected = () => {
   const { fromToken, toToken, selectedTokenType } = useBridgeStore();
   const checker = (token: TokenType) => {
     if (selectedTokenType === 'from' && fromToken) {
-      if (fromToken?.canisterId) {
+      if (fromToken?.chain_type === 'ICP') {
         return fromToken.canisterId === token.canisterId;
       }
       return fromToken?.contractAddress === token.contractAddress;
     } else if (selectedTokenType === 'to' && toToken) {
-      if (toToken?.contractAddress) {
-        return toToken.contractAddress === token.contractAddress;
+      if (toToken?.chain_type === 'ICP') {
+        return toToken.canisterId === token.canisterId;
       }
       return toToken?.contractAddress === token.contractAddress;
     }
@@ -153,7 +153,7 @@ export const useIsTokenSelected = () => {
   return checker;
 };
 
-// Approval Tx Logic
+// Withdrawal Tx Logic
 export const useWithdrawalTx = () => {
   const { selectedOption, toWalletAddress } = useBridgeStore();
   const { authenticatedAgent, icpIdentity, evmAddress } = useSharedStore();
@@ -188,14 +188,21 @@ export const useWithdrawalTx = () => {
         });
 
         // Step 4: Check Withdrawal Status
-        // call every 1 minute for both of withdrawal and deposit
-        const statusResult = await checkStatus({
-          withdrawal_id: withdrawResult.result,
-          bridge_option: selectedOption,
-          authenticated_agent: authenticatedAgent,
-        });
+        let status: Response<WithdrawalTxStatus>;
+        do {
+          status = await checkStatus({
+            withdrawal_id: withdrawResult.result,
+            bridge_option: selectedOption,
+            authenticated_agent: authenticatedAgent,
+          });
+          if (status.result === 'Accepted') {
+            return status;
+          }
+          // Wait for 1 minute before checking again
+          await new Promise((resolve) => setTimeout(resolve, 60000));
+        } while (status.result !== 'Failed');
 
-        return statusResult;
+        return status;
       } catch (error) {
         throw error; // Bubble up error for handling in components
       }
