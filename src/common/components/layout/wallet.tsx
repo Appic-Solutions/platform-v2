@@ -39,16 +39,6 @@ const WalletPage = () => {
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   useEffect(() => {
-    if (unAuthenticatedAgent && icpIdentity) {
-      setIcpLoading(true);
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        icpIdentity,
-      }).then((res) => {
-        setIcpBalance(res);
-        setIcpLoading(false);
-      });
-    }
     if (evmAddress && unAuthenticatedAgent) {
       setEvmLoading(true);
       setUnAuthenticatedAgent(unAuthenticatedAgent);
@@ -59,15 +49,20 @@ const WalletPage = () => {
         setEvmLoading(false);
       });
     }
-  }, [
-    unAuthenticatedAgent,
-    icpIdentity,
-    evmAddress,
-    authenticatedAgent,
-    setUnAuthenticatedAgent,
-    setIcpBalance,
-    setEvmBalance,
-  ]);
+  }, [unAuthenticatedAgent, evmAddress, setUnAuthenticatedAgent, setEvmBalance]);
+
+  useEffect(() => {
+    if (unAuthenticatedAgent && icpIdentity) {
+      setIcpLoading(true);
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        icpIdentity,
+      }).then((res) => {
+        setIcpBalance(res);
+        setIcpLoading(false);
+      });
+    }
+  }, [icpIdentity, authenticatedAgent, setIcpBalance, unAuthenticatedAgent]);
 
   const handleDisconnectIcp = () => {
     disconnectIcp();
@@ -173,7 +168,6 @@ const WalletPage = () => {
             address={icpIdentity?.getPrincipal().toString() || ''}
           />
         ) : null}
-        {/* <WalletPopSkeleton /> */}
 
         {evmLoading ? (
           <WalletPopSkeleton />

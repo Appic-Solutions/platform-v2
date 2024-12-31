@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avat
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/common/components/ui/chart';
 import { Pie, PieChart } from 'recharts';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/common/components/ui/drawer';
+import { useState } from 'react';
 
 type WalletBalance =
   | {
@@ -36,6 +37,8 @@ interface WalletCardProps {
 }
 
 export function WalletPop({ logo, title, balance, disconnect, isLoading, address }: WalletCardProps) {
+  const [showCopyPopover, setShowCopyPopover] = useState(false);
+
   const chartData =
     balance?.tokens.map((token) => ({
       name: token.symbol,
@@ -59,6 +62,16 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
       },
     ) as ChartConfig) || {};
 
+  const copyToClipboardHandler = (address: string) => {
+    copyToClipboard(address).then((res) => {
+      if (res) {
+        setShowCopyPopover(true);
+        setTimeout(() => {
+          setShowCopyPopover(false);
+        }, 2000);
+      }
+    });
+  };
   return (
     <>
       <div className="md:hidden flex items-center justify-center">
@@ -86,8 +99,9 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
 
             <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
               <span>{getFormattedWalletAddress(address)}</span>
-              <button onClick={() => copyToClipboard(address)}>
+              <button className="relative" onClick={() => copyToClipboardHandler(address)}>
                 <CopyIcon width={20} height={20} />
+                {showCopyPopover && <div className="bg-[#1A1B1F] absolute top-0 animate-fade">Copied!</div>}
               </button>
             </div>
             {balance && balance.tokens.length > 0 ? (
@@ -97,22 +111,7 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
               </div>
             ) : null}
             <div className="flex flex-col gap-y-5">
-              {isLoading ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                </>
-              ) : balance && balance.tokens.length > 0 ? (
+              {balance && balance.tokens.length > 0 ? (
                 balance.tokens.map((token, idx) => (
                   <div
                     key={idx}
@@ -137,12 +136,7 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
               )}
             </div>
             {balance && balance.tokens.length > 0 ? <hr className="bg-[#494949]" /> : null}
-            {isLoading ? (
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-20" />
-              </div>
-            ) : balance && balance.tokens.length > 0 ? (
+            {balance && balance.tokens.length > 0 ? (
               <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
                 <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
               </div>
@@ -159,11 +153,7 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
       <div className="hidden md:flex items-center justify-center">
         <Popover>
           <PopoverTrigger>
-            {isLoading ? (
-              <Skeleton className="w-6 h-6 rounded-full" />
-            ) : (
-              <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
-            )}
+            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
           </PopoverTrigger>
           <PopoverContent className="w-[360px] translate-y-4 flex flex-col gap-y-4 px-10" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
@@ -186,8 +176,13 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
 
             <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
               <span>{getFormattedWalletAddress(address)}</span>
-              <button onClick={() => copyToClipboard(address)}>
+              <button className="relative" onClick={() => copyToClipboardHandler(address)}>
                 <CopyIcon width={20} height={20} />
+                {showCopyPopover && (
+                  <div className="absolute py-1 px-2 rounded-lg bg-[#1C1D1F] border border-white/20 -left-5 -top-8 animate-fade">
+                    Copied!
+                  </div>
+                )}
               </button>
             </div>
             {balance && balance.tokens.length > 0 ? (
@@ -197,22 +192,7 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
               </div>
             ) : null}
             <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
-              {isLoading ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-4 w-16" />
-                    <Skeleton className="h-4 w-16" />
-                  </div>
-                </>
-              ) : balance && balance.tokens.length > 0 ? (
+              {balance && balance.tokens.length > 0 ? (
                 balance.tokens.map((token, idx) => (
                   <div
                     key={idx}
@@ -237,12 +217,7 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
               )}
             </div>
             {balance && balance.tokens.length > 0 ? <hr className="bg-[#494949]" /> : null}
-            {isLoading ? (
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-20" />
-              </div>
-            ) : balance && balance.tokens.length > 0 ? (
+            {balance && balance.tokens.length > 0 ? (
               <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
                 <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
               </div>

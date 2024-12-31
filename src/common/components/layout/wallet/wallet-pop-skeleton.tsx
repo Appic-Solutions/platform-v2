@@ -54,7 +54,7 @@ const WalletPopSkeleton = () => {
           <Skeleton className="h-4 w-16" />
           <Skeleton className="h-4 w-20" />
         </div>
-        <Skeleton className="h-4 w-20" />
+        <p className="text-center text-primary text-sm">Connecting Your Wallet...</p>
       </div>
 
       {/* MOBILE SKELETON */}
