@@ -1,12 +1,19 @@
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
 import {
+  useCheckDepositStatus,
   useCheckWithdrawalStatus,
+  useCreateWalletClient,
+  useDepositToken,
+  useDepositTokenWithApproval,
   useGetRequestWithdraw,
   useGetTokenApproval,
+  useNotifyAppicHelperDeposit,
   useNotifyAppicHelperWithdrawal,
 } from '../_api';
 import { useSharedStore } from '@/common/state/store';
+import { DepositTxStatus } from '@/blockchain_api/functions/icp/bridge_transactions';
+import { Response } from '@/blockchain_api/types/response';
 
 export const useTokenSelector = () => {
   const { selectedTokenType, fromToken, toToken } = useBridgeStore();
@@ -127,17 +134,36 @@ export const useActionButtonText = () => {
   return textHandler;
 };
 
+export const useIsTokenSelected = () => {
+  const { fromToken, toToken, selectedTokenType } = useBridgeStore();
+  const checker = (token: TokenType) => {
+    if (selectedTokenType === 'from' && fromToken) {
+      if (fromToken?.canisterId) {
+        return fromToken.canisterId === token.canisterId;
+      }
+      return fromToken?.contractAddress === token.contractAddress;
+    } else if (selectedTokenType === 'to' && toToken) {
+      if (toToken?.contractAddress) {
+        return toToken.contractAddress === token.contractAddress;
+      }
+      return toToken?.contractAddress === token.contractAddress;
+    }
+    return false;
+  };
+  return checker;
+};
+
 // Approval Tx Logic
-const useApprovalTx = () => {
-  const { selectedOption } = useBridgeStore();
-  const { authenticatedAgent } = useSharedStore();
+export const useWithdrawalTx = () => {
+  const { selectedOption, toWalletAddress } = useBridgeStore();
+  const { authenticatedAgent, icpIdentity, evmAddress } = useSharedStore();
   const { mutateAsync: approveToken } = useGetTokenApproval();
   const { mutateAsync: requestWithdraw } = useGetRequestWithdraw();
   const { mutateAsync: notifyWithdrawal } = useNotifyAppicHelperWithdrawal();
   const { mutateAsync: checkStatus } = useCheckWithdrawalStatus();
 
-  const executeApprovalTx = async () => {
-    if (selectedOption && authenticatedAgent) {
+  const executeWithdrawalTx = async () => {
+    if (selectedOption && authenticatedAgent && icpIdentity && (evmAddress || toWalletAddress)) {
       try {
         // Step 1: Approve Token
         const approvalResult = await approveToken({
@@ -147,26 +173,26 @@ const useApprovalTx = () => {
 
         // Step 2: Request Withdraw
         const withdrawResult = await requestWithdraw({
-          bridge_option: bridge_option,
-          recipient: recipient,
-          authenticated_agent: authenticated_agent,
+          bridge_option: selectedOption,
+          recipient: evmAddress || toWalletAddress,
+          authenticated_agent: authenticatedAgent,
         });
 
         // Step 3: Notify Appic Helper Withdrawal
         const notifyResult = await notifyWithdrawal({
-          bridge_option: bridge_option,
-          withdrawal_id: withdrawResult.withdrawal_id,
-          recipient: recipient,
-          user_wallet_principal: user_wallet_principal,
-          authenticated_agent: authenticated_agent,
+          bridge_option: selectedOption,
+          withdrawal_id: withdrawResult.result,
+          recipient: evmAddress || toWalletAddress,
+          user_wallet_principal: icpIdentity?.getPrincipal().toString(),
+          authenticated_agent: authenticatedAgent,
         });
 
         // Step 4: Check Withdrawal Status
         // call every 1 minute for both of withdrawal and deposit
         const statusResult = await checkStatus({
-          withdrawal_id: withdrawResult.withdrawal_id,
-          bridge_option: bridge_option,
-          authenticated_agent: authenticated_agent,
+          withdrawal_id: withdrawResult.result,
+          bridge_option: selectedOption,
+          authenticated_agent: authenticatedAgent,
         });
 
         return statusResult;
@@ -177,9 +203,80 @@ const useApprovalTx = () => {
   };
 
   return {
-    executeApprovalTx,
+    executeWithdrawalTx,
   };
 };
 
 // Deposit Tx Logic
-export const useDepositTx = () => {};
+export const useDepositTx = () => {
+  const { selectedOption, fromToken, toWalletAddress } = useBridgeStore();
+  const { icpIdentity, evmAddress, unAuthenticatedAgent } = useSharedStore();
+  const { mutateAsync: createWalletClient } = useCreateWalletClient();
+  const { mutateAsync: approveDeposit } = useDepositTokenWithApproval();
+  const { mutateAsync: requestDeposit } = useDepositToken();
+  const { mutateAsync: notifyDeposit } = useNotifyAppicHelperDeposit();
+  const { mutateAsync: checkDepositStatus } = useCheckDepositStatus();
+
+  const executeDepositTx = async () => {
+    if (
+      selectedOption &&
+      fromToken &&
+      icpIdentity &&
+      (icpIdentity.getPrincipal() || toWalletAddress) &&
+      evmAddress &&
+      unAuthenticatedAgent
+    ) {
+      try {
+        // Step 1: Create Wallet Client
+        const walletClient = await createWalletClient(selectedOption);
+
+        // Step 2: Token Approval (only for ERC20 tokens)
+        if (fromToken.tokenType === 'erc20') {
+          await approveDeposit({
+            wallet_client: walletClient,
+            bridge_option: selectedOption,
+          });
+        }
+
+        // Step 3: Submit Deposit Request
+        const depositResult = await requestDeposit({
+          wallet_client: walletClient,
+          bridge_option: selectedOption,
+          recipient: icpIdentity.getPrincipal() || toWalletAddress,
+        });
+
+        // Step 4: Notify Appic Helper
+        await notifyDeposit({
+          bridge_option: selectedOption,
+          tx_hash: depositResult.result,
+          user_wallet_address: evmAddress,
+          recipient_principal: icpIdentity.getPrincipal().toString() || toWalletAddress,
+          unauthenticated_agent: unAuthenticatedAgent,
+        });
+
+        // Step 5: Monitor Transaction Status
+        let status: Response<DepositTxStatus>;
+        do {
+          status = await checkDepositStatus({
+            tx_hash: depositResult.result,
+            bridge_option: selectedOption,
+            unauthenticated_agent: unAuthenticatedAgent,
+          });
+          if (status.result === 'Accepted') {
+            return status; // Transaction successful
+          }
+          // Wait for 1 minute before checking again
+          await new Promise((resolve) => setTimeout(resolve, 60000));
+        } while (status.result !== 'Minted');
+
+        return status;
+      } catch (error) {
+        throw error; // Bubble up error for handling
+      }
+    }
+  };
+
+  return {
+    executeDepositTx,
+  };
+};

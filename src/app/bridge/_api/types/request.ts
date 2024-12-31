@@ -13,7 +13,7 @@ interface BridgeOptionsListRequest {
   bridge_pairs: (EvmToken | IcpToken)[];
 }
 
-// WITHDRAWAL TX
+// WITHDRAWAL TX ====================>
 // STEP 1
 interface TokenApprovalRequest {
   bridge_option: BridgeOption;
@@ -45,13 +45,11 @@ interface CheckWithdrawalStatusRequest {
 type CreateWalletClientRequest = BridgeOption;
 // STEP 2
 interface DepositTokenWithApprovalRequest {
-  // TODO - define type of the wallet client
   wallet_client: WalletClient<any>;
   bridge_option: BridgeOption;
 }
 // STEP 3
 interface DepositTokenRequest {
-  // TODO - define type of the wallet client
   wallet_client: WalletClient<any>;
   bridge_option: BridgeOption;
   recipient: Principal;
@@ -62,7 +60,7 @@ interface NotifyAppicHelperDepositRequest {
   tx_hash: string;
   user_wallet_address: string;
   recipient_principal: string;
-  unauthenticated_agent: HttpAgent | Agent;
+  unauthenticated_agent: HttpAgent;
 }
 // STEP 5
 interface CheckDepositStatusRequest {

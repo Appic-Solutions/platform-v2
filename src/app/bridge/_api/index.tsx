@@ -34,7 +34,7 @@ const useGetBridgePairs = (agent: HttpAgent | undefined) => {
     const currentTime = new Date().getTime();
     const timeDiff = lastFetchTime ? currentTime - lastFetchTime : Infinity;
 
-    if (data && timeDiff < refetchTime) {
+    if (data && data.length > 0 && timeDiff < refetchTime) {
       return data;
     } else {
       if (!agent) throw new Error('Agent is not available!');
@@ -61,7 +61,7 @@ const useGetBridgeOptions = () => {
   });
 };
 
-// Approval
+// WITHDRAWAL TX ====================>
 // Step 1
 const useGetTokenApproval = () => {
   return useMutation({
