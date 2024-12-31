@@ -12,7 +12,12 @@ const BridgeReview = () => {
   const { setActiveStep } = useBridgeActions();
   if (option && toToken) {
     return (
-      <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
+      <Box
+        className={cn(
+          'justify-normal animate-slide-in opacity-0 h-full',
+          'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8',
+        )}
+      >
         <BoxHeader title="Bridge Review" onBack={() => setActiveStep(1)} />
         <div className="w-full flex flex-col justify-between gap-y-4 h-full">
           <Card
@@ -49,14 +54,14 @@ const BridgeReview = () => {
                 <p
                   className={cn(
                     'text-base lg:text-xl',
-                    option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-36',
+                    option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-min',
                   )}
                 >
-                  {formatToSignificantFigures(option.human_readable_estimated_return)}
+                  ~ {formatToSignificantFigures(option.human_readable_estimated_return) + ' ' + toToken.symbol}
                 </p>
               </div>
               <div className="flex flex-col gap-y-3 items-end">
-                <div className="px-4 py-1 rounded-2xl flex items-center gap-x-1 bg-white">
+                <div className="px-2 md:px-4 py-1 rounded-2xl flex items-center gap-x-1 bg-white">
                   <span className={cn('text-xs lg:text-sm text-blue-600')}>via {option.via}</span>
                   <Image src="images/logo/icp-logo.png" alt="logo" width={15} height={15} />
                 </div>
@@ -89,6 +94,7 @@ const BridgeReview = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Network Fee:</span>
                     <span>
+                      ~{' '}
                       {formatToSignificantFigures(option.fees.human_readable_max_network_fee) +
                         ' ' +
                         option.fees.native_fee_token_symbol}
@@ -105,6 +111,7 @@ const BridgeReview = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Max Fee:</span>
                     <span>
+                      ~{' '}
                       {formatToSignificantFigures(option.fees.human_readable_total_native_fee) +
                         ' ' +
                         option.fees.native_fee_token_symbol}

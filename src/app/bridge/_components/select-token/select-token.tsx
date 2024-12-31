@@ -89,6 +89,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
           History
         </Link>
       </div>
+
       <div className="flex flex-col gap-x-4 flex-1 justify-between lg:flex-row lg:overflow-hidden w-full">
         {/* TOKENS AND AMOUNT INPUT */}
         <div className="flex flex-col justify-between h-full items-center gap-y-4 w-full lg:max-w-[482px] md:overflow-hidden">

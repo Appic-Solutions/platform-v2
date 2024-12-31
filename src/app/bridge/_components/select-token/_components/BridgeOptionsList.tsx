@@ -39,7 +39,7 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
           'flex lg:flex-col gap-4 w-full',
           'lg:h-full',
           'overflow-x-auto lg:overflow-y-auto',
-          'pr-4 hide-scrollbar',
+          'md:pr-2 hide-scrollbar',
         )}
       >
         {typeof bridgeOptions === 'undefined' || isPending ? (
