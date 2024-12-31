@@ -56,7 +56,7 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
                 isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
                 handleOptionSelect={(option) => setSelectedOption(option)}
                 onExpand={handleExpand}
-                toTokenLogo={toToken?.logo}
+                toToken={toToken}
               />
             </div>
           ))

@@ -21,14 +21,13 @@ interface SelectTokenProps {
 
 export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
-  const [toWalletAddress, setToWalletAddress] = useState('');
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
 
   // store
-  const { fromToken, toToken, selectedOption, amount } = useBridgeStore();
-  const { setSelectedTokenType } = useBridgeActions();
+  const { fromToken, toToken, selectedOption, amount, toWalletAddress } = useBridgeStore();
+  const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
 
   const handleStepChange = useStepChange();
   const swapTokensHandler = useSwapTokens();
@@ -37,6 +36,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
 
   const isActionButtonDisable = () => {
     if (!selectedOption || !fromToken || !toToken) return true;
+    if (showWalletAddress && (toWalletValidationError || !toWalletAddress)) return true;
     if (fromToken.contractAddress === toToken.contractAddress && fromToken.chainId === toToken.chainId) return true;
 
     if (!Number(amount)) return true;
@@ -54,11 +54,13 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   };
 
   const actionButtonHandler = () => {
-    if (!checkIsWalletConnected('from') && fromToken) {
+    if (!checkIsWalletConnected('from') && fromToken && !showWalletAddress) {
       openConnectWalletModalHandler(fromToken);
+      return;
     }
-    if (!checkIsWalletConnected('to') && toToken) {
+    if (!checkIsWalletConnected('to') && toToken && !showWalletAddress) {
       openConnectWalletModalHandler(toToken);
+      return;
     }
 
     if (
@@ -161,8 +163,10 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
             <div
               onClick={() => setShowWalletAddress(!showWalletAddress)}
               className={cn(
-                'rounded-full bg-primary-buttons bg-opacity-20 flex items-center justify-center px-4 h-full',
+                'rounded-full flex items-center justify-center px-4 h-full',
                 'transition-colors duration-300 cursor-pointer',
+                'bg-primary-buttons hover:opacity-85',
+                'transition-all ease-in-out',
               )}
             >
               <WalletIcon className="text-white" />
@@ -185,8 +189,10 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         <div
           onClick={() => setShowWalletAddress(!showWalletAddress)}
           className={cn(
-            'rounded-full bg-primary-buttons bg-opacity-20 flex items-center justify-center px-4 h-full',
+            'rounded-full flex items-center justify-center px-4 h-full',
             'transition-colors duration-300 cursor-pointer',
+            'bg-primary-buttons hover:opacity-90',
+            'transition-all ease-out',
           )}
         >
           <WalletIcon className="text-white" />

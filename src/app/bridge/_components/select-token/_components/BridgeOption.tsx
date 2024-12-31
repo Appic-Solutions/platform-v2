@@ -3,6 +3,7 @@ import { cn, formatToSignificantFigures } from '@/common/helpers/utils';
 import Image from 'next/image';
 import { ChevronDownIcon, ClockIcon, FireIcon } from '@/common/components/icons';
 import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { TokenType } from '@/app/bridge/_store';
 
 interface BridgeOptionProps {
   option: BridgeOptionType;
@@ -11,7 +12,7 @@ interface BridgeOptionProps {
   handleOptionSelect: (option: BridgeOptionType) => void;
   onExpand: (option: BridgeOptionType) => void;
   className?: string;
-  toTokenLogo: string;
+  toToken: TokenType;
 }
 
 const BridgeOption = ({
@@ -21,7 +22,7 @@ const BridgeOption = ({
   onExpand,
   option,
   className,
-  toTokenLogo,
+  toToken,
 }: BridgeOptionProps) => {
   return (
     <Card
@@ -63,7 +64,7 @@ const BridgeOption = ({
         <div className="flex items-center gap-x-3">
           <div className="border-2 border-white/50 rounded-full p-2">
             <div className={cn('relative w-7 h-7', 'lg:w-10 lg:h-10')}>
-              <Image src={toTokenLogo} alt="btc" className="object-contain" fill />
+              <Image src={toToken.logo} alt="btc" className="object-contain" fill />
             </div>
           </div>
           <p
@@ -72,7 +73,7 @@ const BridgeOption = ({
               option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-36',
             )}
           >
-            {formatToSignificantFigures(option.human_readable_estimated_return)}
+            ~ {formatToSignificantFigures(option.human_readable_estimated_return) + ' ' + toToken.symbol}
           </p>
         </div>
         <div className="flex flex-col gap-y-3 items-end">
@@ -109,6 +110,7 @@ const BridgeOption = ({
             <div className="flex justify-between text-sm">
               <span className="text-muted">Network Fee:</span>
               <span>
+                ~{' '}
                 {formatToSignificantFigures(option.fees.human_readable_max_network_fee) +
                   ' ' +
                   option.fees.native_fee_token_symbol}
@@ -120,11 +122,12 @@ const BridgeOption = ({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted">Minter Fee:</span>
-              <span>{option.fees.human_readable_minter_fee + ' ' + option.fees.native_fee_token_symbol}</span>
+              <span>~ {option.fees.human_readable_minter_fee + ' ' + option.fees.native_fee_token_symbol}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted">Max Fee:</span>
               <span>
+                ~{' '}
                 {formatToSignificantFigures(option.fees.human_readable_total_native_fee) +
                   ' ' +
                   option.fees.native_fee_token_symbol}

@@ -12,8 +12,10 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(({ isDisab
     <button
       ref={ref}
       className={cn(
-        'bg-primary-buttons w-full h-14 rounded-[16px] text-white',
-        isDisabled && 'opacity-50 cursor-not-allowed',
+        'w-full h-14 rounded-[16px] text-white',
+        'bg-primary-buttons',
+        'transition-all ease-in-out',
+        isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-85',
       )}
       onClick={onClick}
       disabled={isDisabled}

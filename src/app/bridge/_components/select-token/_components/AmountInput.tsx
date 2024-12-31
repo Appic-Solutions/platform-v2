@@ -13,7 +13,7 @@ const AmountInput = () => {
   const [userTokenBalance, setUserTokenBalance] = useState('');
   const checkWalletConnectStatus = useCheckWalletConnectStatus();
 
-  const { toToken: token, fromToken, usdPrice } = useBridgeStore();
+  const { toToken: token, fromToken, usdPrice, amount } = useBridgeStore();
   const { setAmount, setUsdPrice } = useBridgeActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
@@ -29,6 +29,7 @@ const AmountInput = () => {
     }
   }, [isEvmConnected, icpIdentity, fromToken, token, checkWalletConnectStatus, evmBalance, icpBalance]);
 
+  // bouncing on input change
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleAmountChange(inputAmount);
@@ -36,6 +37,13 @@ const AmountInput = () => {
 
     return () => clearTimeout(delayDebounceFn);
   }, [inputAmount]);
+
+  // set amount from store if it exist on mount
+  useEffect(() => {
+    if (amount) {
+      setInputAmount(amount);
+    }
+  }, []);
 
   const handleAmountChange = (value: string) => {
     const usdPrice = Number(value) * Number(token?.usdPrice ?? 0);
