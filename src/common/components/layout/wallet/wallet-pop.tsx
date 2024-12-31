@@ -1,14 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
-import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/common/components/ui/popover";
-import Image from "next/image";
-import { CloseIcon, CopyIcon } from "@/common/components/icons";
-import { Skeleton } from "@/common/components/ui/skeleton";
-import { copyToClipboard, getChainLogo, getChainName, getCountedNumber, getFormattedWalletAddress } from "@/common/helpers/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/common/components/ui/chart";
-import { Pie, PieChart } from "recharts";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from "@/common/components/ui/drawer";
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/common/components/ui/popover';
+import Image from 'next/image';
+import { CloseIcon, CopyIcon } from '@/common/components/icons';
+import { Skeleton } from '@/common/components/ui/skeleton';
+import {
+  copyToClipboard,
+  getChainLogo,
+  getChainName,
+  getCountedNumber,
+  getFormattedWalletAddress,
+} from '@/common/helpers/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/common/components/ui/chart';
+import { Pie, PieChart } from 'recharts';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/common/components/ui/drawer';
 
 type WalletBalance =
   | {
@@ -41,23 +47,29 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
     (balance?.tokens.reduce(
       (acc, token) => ({
         ...acc,
-        [token.symbol || ""]: {
+        [token.symbol || '']: {
           label: token.name,
           color: `hsl(${Math.random() * 360}, 70%, 50%)`,
         },
       }),
       {
         value: {
-          label: "Value",
+          label: 'Value',
         },
-      }
+      },
     ) as ChartConfig) || {};
 
   return (
     <>
       <div className="md:hidden flex items-center justify-center">
         <Drawer>
-          <DrawerTrigger>{isLoading ? <Skeleton className="w-6 h-6 rounded-full" /> : <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />}</DrawerTrigger>
+          <DrawerTrigger>
+            {isLoading ? (
+              <Skeleton className="w-6 h-6 rounded-full" />
+            ) : (
+              <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
+            )}
+          </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>{title}</DrawerHeader>
 
@@ -102,7 +114,10 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
                 </>
               ) : balance && balance.tokens.length > 0 ? (
                 balance.tokens.map((token, idx) => (
-                  <div key={idx} className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white">
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
+                  >
                     <div className="relative flex items-center gap-x-5">
                       <Avatar className="w-9 h-9">
                         <AvatarImage src={token.logo} alt={token.name} />
@@ -132,7 +147,10 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
                 <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
               </div>
             ) : null}
-            <button onClick={disconnect} className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white">
+            <button
+              onClick={disconnect}
+              className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
+            >
               Disconnect
             </button>
           </DrawerContent>
@@ -140,7 +158,13 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
       </div>
       <div className="hidden md:flex items-center justify-center">
         <Popover>
-          <PopoverTrigger>{isLoading ? <Skeleton className="w-6 h-6 rounded-full" /> : <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />}</PopoverTrigger>
+          <PopoverTrigger>
+            {isLoading ? (
+              <Skeleton className="w-6 h-6 rounded-full" />
+            ) : (
+              <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
+            )}
+          </PopoverTrigger>
           <PopoverContent className="w-[360px] translate-y-4 flex flex-col gap-y-4 px-10" align="end">
             <div className="flex items-center justify-center text-black font-medium dark:text-white">
               <PopoverClose className="absolute top-4 right-4">
@@ -190,7 +214,10 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
                 </>
               ) : balance && balance.tokens.length > 0 ? (
                 balance.tokens.map((token, idx) => (
-                  <div key={idx} className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white">
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
+                  >
                     <div className="relative flex items-center gap-x-5">
                       <Avatar className="w-9 h-9">
                         <AvatarImage src={token.logo} alt={token.name} />
@@ -220,7 +247,10 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
                 <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
               </div>
             ) : null}
-            <button onClick={disconnect} className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white">
+            <button
+              onClick={disconnect}
+              className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
+            >
               Disconnect
             </button>
           </PopoverContent>

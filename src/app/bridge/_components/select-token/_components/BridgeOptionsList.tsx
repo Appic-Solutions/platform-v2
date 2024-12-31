@@ -1,26 +1,25 @@
 import { cn } from '@/common/helpers/utils';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BridgeOption from './BridgeOption';
 import BridgeOptionSkeleton from './BridgeOptionSkeleton';
 import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 
 interface BridgeOptionsListProps {
-  handleOptionSelect: (option: BridgeOptionType) => void;
-  selectedOption: BridgeOptionType | undefined;
-  bridgeOptions: BridgeOptionType[] | undefined;
   isPending: boolean;
-  isError: boolean;
-  toTokenLogo: string;
 }
 
-const BridgeOptionsList = ({
-  selectedOption,
-  handleOptionSelect,
-  bridgeOptions,
-  isPending,
-  toTokenLogo,
-}: BridgeOptionsListProps) => {
+const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
+  const { selectedOption, bridgeOptions, toToken } = useBridgeStore();
+  const { setSelectedOption } = useBridgeActions();
+
   const [expandedOption, setExpandedOption] = useState<BridgeOptionType | undefined>(bridgeOptions && bridgeOptions[0]);
+
+  useEffect(() => {
+    if (bridgeOptions) {
+      setSelectedOption(bridgeOptions[0]);
+    }
+  }, [bridgeOptions, setSelectedOption]);
 
   const handleExpand = (option: BridgeOptionType) => {
     if (expandedOption?.deposit_helper_contract === option.deposit_helper_contract) {
@@ -48,16 +47,16 @@ const BridgeOptionsList = ({
             <BridgeOptionSkeleton />
             <BridgeOptionSkeleton />
           </>
-        ) : !isPending && bridgeOptions ? (
+        ) : !isPending && bridgeOptions && toToken ? (
           bridgeOptions.map((item, idx) => (
             <div key={idx} className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : '')}>
               <BridgeOption
                 option={item}
                 isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
                 isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                handleOptionSelect={(option) => handleOptionSelect(option)}
+                handleOptionSelect={(option) => setSelectedOption(option)}
                 onExpand={handleExpand}
-                toTokenLogo={toTokenLogo}
+                toTokenLogo={toToken?.logo}
               />
             </div>
           ))

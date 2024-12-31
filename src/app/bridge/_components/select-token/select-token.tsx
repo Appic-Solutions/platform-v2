@@ -10,79 +10,63 @@ import WalletIcon from '@/common/components/icons/wallet';
 import WalletAddressInput from './_components/WalletAddressInput';
 import HistoryIcon from '@/common/components/icons/history';
 import Link from 'next/link';
-import { useBridgeActions, useBridgeStore } from '../../_store';
-import { useStepChange, useSwapTokens } from '../../_logic/hooks';
-import { useSharedStore } from '@/common/state/store';
+import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
+import { useActionButtonText, useCheckWalletConnectStatus, useStepChange, useSwapTokens } from '../../_logic/hooks';
+import { useAuth } from '@nfid/identitykit/react';
+import { useAppKit } from '@reown/appkit/react';
 
 interface SelectTokenProps {
   isPendingBridgeOptions: boolean;
-  isErrorBridgeOptions: boolean;
 }
 
-export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorBridgeOptions }: SelectTokenProps) {
-  const [usdPrice, setUsdPrice] = useState('0');
+export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [toWalletAddress, setToWalletAddress] = useState('');
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
+  const { connect: openIcpModal } = useAuth();
+  const { open: openEvmModal } = useAppKit();
 
   // store
-  const { fromToken, toToken, selectedOption, amount, bridgeOptions } = useBridgeStore();
-  const { setSelectedOption, setAmount, setSelectedTokenType } = useBridgeActions();
-  const { isEvmConnected, authenticatedAgent, icpIdentity } = useSharedStore();
+  const { fromToken, toToken, selectedOption, amount } = useBridgeStore();
+  const { setSelectedTokenType } = useBridgeActions();
 
   const handleStepChange = useStepChange();
   const swapTokensHandler = useSwapTokens();
+  const checkIsWalletConnected = useCheckWalletConnectStatus();
+  const actionButtonTextHandler = useActionButtonText();
 
-  const disabled = () => {
-    if (!selectedOption) return true;
-    if (!fromToken || !toToken) return true;
+  const isActionButtonDisable = () => {
+    if (!selectedOption || !fromToken || !toToken) return true;
     if (fromToken.contractAddress === toToken.contractAddress && fromToken.chainId === toToken.chainId) return true;
 
-    if (!selectedOption || !Number(amount)) return true;
-
-    const isSourceWalletConnected = fromToken.chain_type === 'EVM' ? isEvmConnected : authenticatedAgent;
-
-    const isDestWalletValid = toWalletAddress && !toWalletValidationError;
-    const isDestWalletConnected = toToken.chain_type === 'EVM' ? isEvmConnected : authenticatedAgent;
-
-    if (!isSourceWalletConnected || !(isDestWalletConnected || isDestWalletValid)) return true;
+    if (!Number(amount)) return true;
 
     return false;
   };
 
-  const getButtonText = () => {
+  const openConnectWalletModalHandler = (token: TokenType) => {
+    if (token?.chain_type === 'ICP') {
+      return openIcpModal();
+    }
+    if (token?.chain_type === 'EVM') {
+      return openEvmModal();
+    }
+  };
+
+  const actionButtonHandler = () => {
+    if (!checkIsWalletConnected('from') && fromToken) {
+      openConnectWalletModalHandler(fromToken);
+    }
+    if (!checkIsWalletConnected('to') && toToken) {
+      openConnectWalletModalHandler(toToken);
+    }
+
     if (
-      fromToken &&
-      toToken &&
-      fromToken.contractAddress === toToken.contractAddress &&
-      fromToken.chainId === toToken.chainId
+      checkIsWalletConnected('from') &&
+      (checkIsWalletConnected('to') || (toWalletAddress && !toWalletValidationError))
     ) {
-      return 'Please select different tokens';
+      handleStepChange(3);
     }
-
-    if (!selectedOption || !Number(amount)) {
-      if (!selectedOption) return 'Select Bridge Option';
-      return 'Fill Amount Field';
-    }
-
-    const isSourceWalletDisconnected =
-      (fromToken?.chain_type === 'EVM' && !isEvmConnected) || (fromToken?.chain_type === 'ICP' && !icpIdentity);
-    if (isSourceWalletDisconnected) {
-      return 'Connect Source Wallet';
-    }
-
-    if (showWalletAddress) {
-      return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Confirm';
-    }
-
-    const isDestWalletValid = toWalletAddress && !toWalletValidationError;
-    if (isDestWalletValid) {
-      return 'Confirm';
-    }
-
-    const isDestWalletDisconnected =
-      (toToken?.chain_type === 'EVM' && !isEvmConnected) || (toToken?.chain_type === 'ICP' && !authenticatedAgent);
-    return isDestWalletDisconnected ? 'Connect Destination Wallet' : 'Confirm';
   };
 
   return (
@@ -167,8 +151,12 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
           </div>
           {/* DESKTOP ACTION BUTTONS */}
           <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
-            <ActionButton onClick={() => handleStepChange(3)} isDisabled={disabled()}>
-              {getButtonText()}
+            <ActionButton onClick={actionButtonHandler} isDisabled={isActionButtonDisable()}>
+              {actionButtonTextHandler({
+                showWalletAddress,
+                toWalletAddress,
+                toWalletValidationError,
+              })}
             </ActionButton>
             <div
               onClick={() => setShowWalletAddress(!showWalletAddress)}
@@ -183,21 +171,16 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions, isErrorB
         </div>
 
         {/* BRIDGE OPTIONS */}
-        {toToken && Number(amount) > 0 && (
-          <BridgeOptionsList
-            bridgeOptions={bridgeOptions}
-            selectedOption={selectedOption}
-            handleOptionSelect={setSelectedOption}
-            isError={isErrorBridgeOptions}
-            isPending={isPendingBridgeOptions}
-            toTokenLogo={toToken.logo}
-          />
-        )}
+        {toToken && Number(amount) > 0 && <BridgeOptionsList isPending={isPendingBridgeOptions} />}
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
-        <ActionButton onClick={() => handleStepChange(3)} isDisabled={disabled()}>
-          {getButtonText()}
+        <ActionButton onClick={actionButtonHandler} isDisabled={isActionButtonDisable()}>
+          {actionButtonTextHandler({
+            showWalletAddress,
+            toWalletAddress,
+            toWalletValidationError,
+          })}
         </ActionButton>
         <div
           onClick={() => setShowWalletAddress(!showWalletAddress)}

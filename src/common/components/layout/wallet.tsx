@@ -11,6 +11,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
+import { Skeleton } from '../ui/skeleton';
 
 const WalletPage = () => {
   const { authenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
@@ -39,6 +40,7 @@ const WalletPage = () => {
 
   useEffect(() => {
     if (unAuthenticatedAgent && icpIdentity) {
+      setIcpLoading(true);
       fetchIcpBalances({
         unAuthenticatedAgent,
         icpIdentity,
@@ -48,6 +50,7 @@ const WalletPage = () => {
       });
     }
     if (evmAddress && unAuthenticatedAgent) {
+      setEvmLoading(true);
       setUnAuthenticatedAgent(unAuthenticatedAgent);
       fetchEvmBalances({
         evmAddress,
@@ -157,27 +160,33 @@ const WalletPage = () => {
         <span className="w-full font-medium text-sm text-white py-2 px-3">Connected Wallets</span>
       )}
 
-      {icpBalance && (
-        <WalletPop
-          logo="/images/logo/wallet_logos/icp.svg"
-          title="Your ICP Wallet"
-          balance={icpBalance}
-          disconnect={handleDisconnectIcp}
-          isLoading={icpLoading}
-          address={icpIdentity?.getPrincipal().toString() || ''}
-        />
-      )}
+      <div className="flex items-center gap-x-2">
+        {icpBalance && !icpLoading ? (
+          <WalletPop
+            logo="/images/logo/wallet_logos/icp.svg"
+            title="Your ICP Wallet"
+            balance={icpBalance}
+            disconnect={handleDisconnectIcp}
+            isLoading={icpLoading}
+            address={icpIdentity?.getPrincipal().toString() || ''}
+          />
+        ) : icpLoading ? (
+          <Skeleton className="w-6 h-6" />
+        ) : null}
 
-      {evmBalance && (
-        <WalletPop
-          logo={getChainLogo(chainId)}
-          title="Your EVM Wallet"
-          balance={evmBalance}
-          disconnect={handleDisconnectEvm}
-          isLoading={evmLoading}
-          address={evmAddress || ''}
-        />
-      )}
+        {evmBalance && !evmLoading ? (
+          <WalletPop
+            logo={getChainLogo(chainId)}
+            title="Your EVM Wallet"
+            balance={evmBalance}
+            disconnect={handleDisconnectEvm}
+            isLoading={evmLoading}
+            address={evmAddress || ''}
+          />
+        ) : evmLoading ? (
+          <Skeleton className="w-6 h-6" />
+        ) : null}
+      </div>
     </div>
   );
 };

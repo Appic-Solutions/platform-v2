@@ -5,39 +5,29 @@ import { cn } from '@/common/helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useSharedStore } from '@/common/state/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
+import { useCheckWalletConnectStatus } from '@/app/bridge/_logic/hooks';
 
 const AmountInput = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [inputAmount, setInputAmount] = useState('');
   const [userTokenBalance, setUserTokenBalance] = useState('');
+  const checkWalletConnectStatus = useCheckWalletConnectStatus();
 
-  const { toToken: token, fromToken, usdPrice, amount } = useBridgeStore();
+  const { toToken: token, fromToken, usdPrice } = useBridgeStore();
   const { setAmount, setUsdPrice } = useBridgeActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
-  const checkWalletConnectStatus = () => {
-    if (fromToken?.chain_type === 'EVM' && isEvmConnected) {
-      setIsWalletConnected(true);
-      return;
-    }
-    if (fromToken?.chain_type === 'ICP' && icpIdentity) {
-      setIsWalletConnected(true);
-      return;
-    }
-    setIsWalletConnected(false);
-  };
-
   useEffect(() => {
-    checkWalletConnectStatus();
+    setIsWalletConnected(checkWalletConnectStatus('from'));
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find((t) => t.contractAddress === token?.contractAddress);
       setUserTokenBalance(mainToken?.balance || '');
     }
     if (fromToken?.chain_type === 'ICP' && icpBalance) {
       const mainToken = icpBalance.tokens.find((t) => t.canisterId === token?.canisterId);
-      setUserTokenBalance(mainToken?.balance || '');
+      setUserTokenBalance(mainToken?.balance || '0');
     }
-  }, [isEvmConnected, icpIdentity, fromToken, token]);
+  }, [isEvmConnected, icpIdentity, fromToken, token, checkWalletConnectStatus, evmBalance, icpBalance]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -59,8 +49,8 @@ const AmountInput = () => {
       <div className="flex items-center gap-4">
         <div className="relative">
           <Avatar className=" w-11 h-11 rounded-full">
-            <AvatarImage src={token?.logo || 'images/logo/placeholder.png'} />
-            <AvatarFallback>{token?.symbol}</AvatarFallback>
+            <AvatarImage src={fromToken?.logo || 'images/logo/placeholder.png'} />
+            <AvatarFallback>{fromToken?.symbol}</AvatarFallback>
           </Avatar>
           <Avatar
             className={cn(
@@ -68,8 +58,8 @@ const AmountInput = () => {
               'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
             )}
           >
-            <AvatarImage src={getChainLogo(token?.chainId)} />
-            <AvatarFallback>{token?.symbol}</AvatarFallback>
+            <AvatarImage src={getChainLogo(fromToken?.chainId)} />
+            <AvatarFallback>{fromToken?.symbol}</AvatarFallback>
           </Avatar>
         </div>
         <div className="flex flex-col gap-1 w-full">

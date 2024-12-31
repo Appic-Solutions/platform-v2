@@ -1,8 +1,10 @@
+import { useAuthenticatedAgent } from '@/common/hooks/useAuthenticatedAgent';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 import { useSharedStoreActions } from '@/common/state/store';
+import { Principal } from '@dfinity/principal';
 import { useIdentity } from '@nfid/identitykit/react';
 import { useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
 export const UserWalletProvider = () => {
   const {
@@ -19,34 +21,28 @@ export const UserWalletProvider = () => {
   // EVM Wallet Hooks
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
-  const authenticatedAgent = useAppKitAccount();
+  const authenticatedAgent = useAuthenticatedAgent();
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   setUnAuthenticatedAgent(unAuthenticatedAgent);
 
-  useEffect(() => {
-    if (icpIdentity) {
+  useMemo(() => {
+    if (icpIdentity && authenticatedAgent) {
+      if (icpIdentity?.getPrincipal() === Principal.anonymous()) return;
       setIcpIdentity(icpIdentity);
-    }
-  }, [icpIdentity, setIcpIdentity]);
-
-  useEffect(() => {
-    if (isEvmConnected && evmAddress && chainId) {
-      setIsEvmConnected(isEvmConnected);
-      setEvmAddress(evmAddress);
-      setChainId(chainId);
       setAuthenticatedAgent(authenticatedAgent);
     }
-  }, [
-    isEvmConnected,
-    evmAddress,
-    chainId,
-    authenticatedAgent,
-    setIsEvmConnected,
-    setEvmAddress,
-    setChainId,
-    setAuthenticatedAgent,
-  ]);
+  }, [icpIdentity, setIcpIdentity, authenticatedAgent, setAuthenticatedAgent]);
+
+  useMemo(() => {
+    if (chainId) {
+      setChainId(chainId);
+    }
+    if (isEvmConnected && evmAddress) {
+      setIsEvmConnected(isEvmConnected);
+      setEvmAddress(evmAddress);
+    }
+  }, [isEvmConnected, evmAddress, chainId, setIsEvmConnected, setEvmAddress, setChainId]);
 
   return null;
 };
