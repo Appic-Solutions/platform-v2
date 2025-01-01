@@ -45,6 +45,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
       return get_bridge_pairs_for_token(
         tokens,
         toToken.canisterId || toToken.contractAddress || '',
+        toToken.chainId,
         selectedChainId || 0,
       );
     }
@@ -52,6 +53,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
       return get_bridge_pairs_for_token(
         tokens,
         fromToken.canisterId || fromToken.contractAddress || '',
+        fromToken.chainId,
         selectedChainId || 0,
       );
     } else {

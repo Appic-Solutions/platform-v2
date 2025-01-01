@@ -109,6 +109,7 @@ export const get_bridge_options = async (
   bridge_pairs: (EvmToken | IcpToken)[],
 ): Promise<Response<BridgeOption[]>> => {
   const bridge_metadata = get_bridge_metadata(from_token, to_token);
+
   const native_currency = get_native_currency(
     bridge_metadata.operator,
     bridge_metadata.chain_id,
@@ -117,10 +118,14 @@ export const get_bridge_options = async (
   );
 
   amount = BigNumber(amount).multipliedBy(BigNumber(10).pow(from_token.decimals)).toFixed();
+
   try {
-    const value = bridge_metadata.is_native ? amount : '0';
+    // const value = bridge_metadata.is_native ? amount : '0';
+    const value = bridge_metadata.is_native ? '1' : '0';
+
     if (bridge_metadata.tx_type == TxType.Deposit) {
-      const principal_bytes = principal_to_bytes32('6b5ll-mteg5-kmyav-a6l7g-lpwje-jc4ln-moggr-wrfvu-n54bz-gh3nr-wae');
+      const principal_bytes = principal_to_bytes32('6gplx-n62xg-ky6br-utvsz-l3vfe-jggch-hhico-7tydb-qtwu6-yiyhn-gqe');
+
       const encoded_function_data = encode_deposit_function_data(
         from_token.contractAddress!,
         bridge_metadata.operator,
@@ -245,14 +250,18 @@ const estimate_withdrawal_gas = async (
     if (operator === 'Appic') {
       // Cast actor to Appic Minter Type
       const actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address }) as {
-        eip_1559_transaction_price: (arg?: AppicEip1559TransactionPriceArg) => Promise<AppicEip1559TransactionPrice>;
+        eip_1559_transaction_price: (
+          arg: [AppicEip1559TransactionPriceArg] | [],
+        ) => Promise<AppicEip1559TransactionPrice>;
       };
 
       const price = is_native_token
-        ? await actor.eip_1559_transaction_price()
-        : await actor.eip_1559_transaction_price({
-            erc20_ledger_id: Principal.fromText(token_canister_id),
-          });
+        ? await actor.eip_1559_transaction_price([])
+        : await actor.eip_1559_transaction_price([
+            {
+              erc20_ledger_id: Principal.fromText(token_canister_id),
+            },
+          ]);
 
       return {
         max_transaction_fee: price.max_transaction_fee.toString(),
@@ -516,7 +525,7 @@ const calculate_bridge_options = async (
       .dividedBy(BigNumber(10).pow(decimals))
       .toFixed();
     const usd_estimated_return = BigNumber(human_readable_estimated_return).multipliedBy(token_price).toFixed();
-    const duration = bridge_metadata.operator === 'Appic' ? '1 - 2 min' : '15 - 20 min';
+    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 2 min' : '15 - 20 min';
     const native_fee_token_id =
       bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
     return [
@@ -595,7 +604,10 @@ const get_native_currency = (
 
   if (tx_type === TxType.Deposit) {
     return (
-      bridge_pairs.find((token) => token.chain_type === 'EVM' && token.contractAddress === NATIVE_TOKEN_ADDRESS) ??
+      bridge_pairs.find(
+        (token) =>
+          token.chainId == chain_id && token.chain_type === 'EVM' && token.contractAddress === NATIVE_TOKEN_ADDRESS,
+      ) ??
       (() => {
         throw new Error('Native currency for deposit transaction not found in bridge pairs.');
       })()

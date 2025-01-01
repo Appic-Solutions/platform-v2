@@ -37,28 +37,33 @@ export const get_bridge_pairs = async (agent: HttpAgent): Promise<Response<Array
 export const get_bridge_pairs_for_token = (
   bridge_tokens: (EvmToken | IcpToken)[],
   token_id: string,
-  chain_id: number,
+  base_chain_id: number,
+  selected_chain_id: number,
 ): (EvmToken | IcpToken)[] => {
   // Find the base token by matching `token_id` with `canisterId` or `contractAddress`
-  const base_token = bridge_tokens.find((token) => token.canisterId === token_id || token.contractAddress === token_id);
+  const base_token = bridge_tokens.find(
+    (token) => token.chainId == base_chain_id && (token.canisterId === token_id || token.contractAddress === token_id),
+  );
 
   if (!base_token?.bridgePairs) {
     return []; // Early exit if no base token or bridge pairs exist
   }
 
-  // Filter bridge pairs for the specified chain_id
-  const pairs = base_token.bridgePairs.filter((pair) => pair.chain_id === chain_id);
+  console.log(base_token);
 
-  console.log(pairs);
-  console.log(chain_id);
+  // Filter bridge pairs for the specified chain_id
+  const pairs = base_token.bridgePairs.filter((pair) => pair.chain_id === selected_chain_id);
 
   // Map over pairs and gather matching tokens efficiently
   const filtered_token_pairs = pairs.flatMap((pair) =>
     bridge_tokens.filter(
       (token) =>
-        token.canisterId === pair.contract_or_canister_id || token.contractAddress === pair.contract_or_canister_id,
+        token.chainId == selected_chain_id &&
+        (token.canisterId === pair.contract_or_canister_id || token.contractAddress === pair.contract_or_canister_id),
     ),
   );
+
+  console.log(filtered_token_pairs);
 
   return filtered_token_pairs;
 };
@@ -82,15 +87,16 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
 
     const parsedOperator = parseOperator(operator);
 
-    const evmKey = evm_token.erc20_contract_address;
+    const evmKey = `${evm_token.erc20_contract_address}-${evm_token.chain_id}`;
     const icpKey = icp_token.ledger_id.toString();
 
     const parsed_chain_id: number = BigNumber(evm_token.chain_id.toString()).toNumber();
+    try {
+      const usd_price = await get_evm_token_price(evm_token.erc20_contract_address, parsed_chain_id);
 
-    // Parse EVM token
-    if (!tokensMap.has(evmKey)) {
-      try {
-        const usd_price = await get_evm_token_price(evm_token.erc20_contract_address, parsed_chain_id);
+      // Parse EVM token
+
+      if (!tokensMap.has(evmKey)) {
         tokensMap.set(evmKey, {
           name: evm_token.name,
           symbol: evm_token.symbol,
@@ -103,39 +109,27 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
           bridgePairs: [],
           usdPrice: usd_price.result,
         });
-      } catch (error) {
-        tokensMap.set(evmKey, {
-          name: evm_token.name,
-          symbol: evm_token.symbol,
-          logo: evm_token.logo,
-          decimals: evm_token.decimals,
-          chainId: parsed_chain_id,
-          contractAddress: evm_token.erc20_contract_address,
-          chain_type: 'EVM',
+      }
+
+      // Parse ICP token
+      if (!tokensMap.has(icpKey)) {
+        tokensMap.set(icpKey, {
+          name: icp_token.name,
+          symbol: icp_token.symbol,
+          logo: icp_token.logo, // Use the same logo for both
+          decimals: icp_token.decimals,
+          chainId: 0, // ICP chain ID is considered 0
+          canisterId: icp_token.ledger_id.toString(),
+          fee: icp_token.fee.toString(),
+          tokenType: '',
+          chain_type: 'ICP',
           operator: parsedOperator,
           bridgePairs: [],
-          usdPrice: '0',
+          usdPrice: usd_price.result || '0',
         });
-        return [];
       }
-    }
-
-    // Parse ICP token
-    if (!tokensMap.has(icpKey)) {
-      tokensMap.set(icpKey, {
-        name: icp_token.name,
-        symbol: icp_token.symbol,
-        logo: icp_token.logo, // Use the same logo for both
-        decimals: icp_token.decimals,
-        chainId: 0, // ICP chain ID is considered 0
-        canisterId: icp_token.ledger_id.toString(),
-        fee: icp_token.fee.toString(),
-        tokenType: '',
-        chain_type: 'ICP',
-        operator: parsedOperator,
-        bridgePairs: [],
-        usdPrice: icp_token.usd_price || '0',
-      });
+    } catch (error) {
+      return [];
     }
 
     // Add bridge pair information
