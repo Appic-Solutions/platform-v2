@@ -28,7 +28,7 @@ const BridgeOption = ({
     <Card
       onClick={() => handleOptionSelect(option)}
       className={cn(
-        '!py-4 px-4 border min-w-[300px] flex-col gap-3 items-start justify-between overflow-hidden rounded-[20px]',
+        '!py-4 px-4 border w-full flex-col gap-3 items-start justify-between overflow-hidden rounded-[20px]',
         'md:px-6 md:rounded-[36px]',
         'transition duration-300',
         'cursor-pointer',
@@ -70,14 +70,14 @@ const BridgeOption = ({
           <p
             className={cn(
               'text-base lg:text-xl',
-              option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-32 md:w-48',
+              option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-[100px] md:w-48',
             )}
           >
             ~ {formatToSignificantFigures(option.human_readable_estimated_return) + ' ' + toToken.symbol}
           </p>
         </div>
         <div className="flex flex-col gap-y-3 items-end">
-          <div className="px-2 md:px-4 py-1 rounded-2xl flex items-center gap-x-1 bg-white">
+          <div className="px-2 md:px-4 py-1 rounded-xl md:rounded-2xl flex items-center gap-x-1 bg-white">
             <span className={cn('text-xs lg:text-sm text-blue-600')}>via {option.via}</span>
             <Image src="images/logo/icp-logo.png" alt="logo" width={15} height={15} />
           </div>
@@ -101,7 +101,7 @@ const BridgeOption = ({
         className={cn(
           'w-full border-t border-gray-200 dark:border-gray-700',
           'transition-all duration-300 transform',
-          isExpanded ? 'opacity-100 mb-4 translate-y-0 pt-4 mt-4' : 'opacity-0 h-0 overflow-hidden -translate-y-2',
+          isExpanded ? 'opacity-100 mb-2 translate-y-0 pt-4 mt-4' : 'opacity-0 h-0 overflow-hidden -translate-y-2',
         )}
       >
         <div className="space-y-4">

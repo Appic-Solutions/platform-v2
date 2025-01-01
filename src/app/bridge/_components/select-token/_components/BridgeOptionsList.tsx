@@ -39,7 +39,7 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
           'flex lg:flex-col gap-4 w-full',
           'lg:h-full',
           'overflow-x-auto lg:overflow-y-auto',
-          'md:pr-2 hide-scrollbar',
+          'hide-scrollbar',
         )}
       >
         {typeof bridgeOptions === 'undefined' || isPending ? (
@@ -49,7 +49,10 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
           </>
         ) : !isPending && bridgeOptions && toToken ? (
           bridgeOptions.map((item, idx) => (
-            <div key={idx} className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : '')}>
+            <div
+              key={idx}
+              className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : 'md:w-full w-[280px]')}
+            >
               <BridgeOption
                 option={item}
                 isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}

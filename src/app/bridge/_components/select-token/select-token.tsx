@@ -76,9 +76,9 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
       className={cn(
         'flex flex-col gap-4 h-full md:h-fit',
         'md:px-[65px] md:py-[55px] md:max-w-[617px]',
-        'overflow-x-hidden',
+        'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        amount && Number(amount) > 0 && 'lg:max-w-[1060px]',
+        amount && Number(amount) > 0 && 'lg:max-w-[1060px] lg:w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >

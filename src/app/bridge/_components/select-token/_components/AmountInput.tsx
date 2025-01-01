@@ -22,7 +22,7 @@ const AmountInput = () => {
     setIsWalletConnected(checkWalletConnectStatus('from'));
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find((t) => t.contractAddress === fromToken?.contractAddress);
-      setUserTokenBalance(mainToken?.balance || '');
+      setUserTokenBalance(mainToken?.balance || '0');
     }
     if (fromToken?.chain_type === 'ICP' && icpBalance) {
       const mainToken = icpBalance.tokens.find((t) => t.canisterId === fromToken?.canisterId);
@@ -107,7 +107,7 @@ const AmountInput = () => {
           </div>
           <div className="flex justify-between items-center w-full">
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
-            {isWalletConnected && (
+            {isWalletConnected && Number(userTokenBalance) > 0 && (
               <p className="text-muted text-xs md:text-sm font-semibold text-nowrap">{userTokenBalance}</p>
             )}
           </div>

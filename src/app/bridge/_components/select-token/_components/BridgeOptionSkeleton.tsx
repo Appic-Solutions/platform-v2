@@ -3,7 +3,7 @@ import { Card } from '@/common/components/ui/card';
 
 const BridgeOptionSkeleton = () => {
   return (
-    <Card className="py-2 px-6 flex-col gap-3 items-start justify-center h-[165px] w-full flex-shrink-1">
+    <Card className="py-2 px-6 w-full flex-col gap-4 items-start justify-center h-[165px]">
       {/* top section */}
       <div className="flex items-center justify-between w-full">
         <div className="flex-1">
