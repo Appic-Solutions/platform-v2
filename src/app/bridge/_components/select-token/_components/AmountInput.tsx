@@ -14,21 +14,21 @@ const AmountInput = () => {
   const [userTokenBalance, setUserTokenBalance] = useState('');
   const checkWalletConnectStatus = useCheckWalletConnectStatus();
 
-  const { toToken: token, fromToken, usdPrice, amount } = useBridgeStore();
+  const { fromToken, usdPrice, amount } = useBridgeStore();
   const { setAmount, setUsdPrice } = useBridgeActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
   useEffect(() => {
     setIsWalletConnected(checkWalletConnectStatus('from'));
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
-      const mainToken = evmBalance.tokens.find((t) => t.contractAddress === token?.contractAddress);
+      const mainToken = evmBalance.tokens.find((t) => t.contractAddress === fromToken?.contractAddress);
       setUserTokenBalance(mainToken?.balance || '');
     }
     if (fromToken?.chain_type === 'ICP' && icpBalance) {
-      const mainToken = icpBalance.tokens.find((t) => t.canisterId === token?.canisterId);
+      const mainToken = icpBalance.tokens.find((t) => t.canisterId === fromToken?.canisterId);
       setUserTokenBalance(mainToken?.balance || '0');
     }
-  }, [isEvmConnected, icpIdentity, fromToken, token, checkWalletConnectStatus, evmBalance, icpBalance]);
+  }, [isEvmConnected, icpIdentity, fromToken, checkWalletConnectStatus, evmBalance, icpBalance]);
 
   // bouncing on input change
   useEffect(() => {
@@ -87,7 +87,7 @@ const AmountInput = () => {
                 '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
               )}
             />
-            {isWalletConnected && (
+            {isWalletConnected && Number(userTokenBalance) > 0 && (
               <span
                 className={cn(
                   'px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md',
@@ -108,9 +108,7 @@ const AmountInput = () => {
           <div className="flex justify-between items-center w-full">
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
             {isWalletConnected && (
-              <p className="text-muted text-xs md:text-sm font-semibold text-nowrap">
-                {Number(token?.balance || 0).toFixed(2)}
-              </p>
+              <p className="text-muted text-xs md:text-sm font-semibold text-nowrap">{userTokenBalance}</p>
             )}
           </div>
         </div>
