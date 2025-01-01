@@ -3,7 +3,6 @@ import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/common/components/ui/popover';
 import Image from 'next/image';
 import { CloseIcon, CopyIcon } from '@/common/components/icons';
-import { Skeleton } from '@/common/components/ui/skeleton';
 import {
   copyToClipboard,
   getChainLogo,
@@ -12,11 +11,11 @@ import {
   getFormattedWalletAddress,
 } from '@/common/helpers/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/common/components/ui/chart';
-import { Pie, PieChart } from 'recharts';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/common/components/ui/drawer';
 import { useState } from 'react';
 import WalletChart from './wallet-chart';
+import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
+import WalletPopSkeletonDesktop from './wallet-pop-skeleton-dektop';
 
 export type WalletBalance =
   | {
@@ -31,37 +30,14 @@ export type WalletBalance =
 interface WalletCardProps {
   logo: string;
   title: string;
-  balance: WalletBalance;
+  balance: WalletBalance | undefined;
   disconnect: () => void;
   isLoading: boolean;
   address: string;
 }
 
-export function WalletPop({ logo, title, balance, disconnect, isLoading, address }: WalletCardProps) {
+export function WalletPop({ logo, title, balance, disconnect, address }: WalletCardProps) {
   const [showCopyPopover, setShowCopyPopover] = useState(false);
-
-  const chartData =
-    balance?.tokens.map((token) => ({
-      name: token.symbol,
-      value: Number(token.usdBalance),
-      fill: `hsl(${Math.random() * 360}, 70%, 50%)`,
-    })) || [];
-
-  const chartConfig =
-    (balance?.tokens.reduce(
-      (acc, token) => ({
-        ...acc,
-        [token.symbol || '']: {
-          label: token.name,
-          color: `hsl(${Math.random() * 360}, 70%, 50%)`,
-        },
-      }),
-      {
-        value: {
-          label: 'Value',
-        },
-      },
-    ) as ChartConfig) || {};
 
   const copyToClipboardHandler = (address: string) => {
     copyToClipboard(address).then((res) => {
@@ -73,75 +49,84 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
       }
     });
   };
+
   return (
     <>
+      {/* mobile size */}
       <div className="md:hidden flex items-center justify-center">
         <Drawer>
           <DrawerTrigger>
-            {isLoading ? (
-              <Skeleton className="w-6 h-6 rounded-full" />
-            ) : (
-              <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
-            )}
+            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>{title}</DrawerHeader>
 
-            {balance && balance.tokens.length > 0 ? <WalletChart balance={balance} /> : null}
-
-            <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
-              <span>{getFormattedWalletAddress(address)}</span>
-              <button className="relative" onClick={() => copyToClipboardHandler(address)}>
-                <CopyIcon width={20} height={20} />
-                {showCopyPopover && <div className="bg-[#1A1B1F] absolute top-0 animate-fade">Copied!</div>}
-              </button>
-            </div>
-            {balance && balance.tokens.length > 0 ? (
-              <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-                <span>Token</span>
-                Value
-              </div>
-            ) : null}
-            <div className="flex flex-col gap-y-5">
-              {balance && balance.tokens.length > 0 ? (
-                balance.tokens.map((token, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
-                  >
-                    <div className="relative flex items-center gap-x-5">
-                      <Avatar className="w-9 h-9">
-                        <AvatarImage src={token.logo} alt={token.name} />
-                        <AvatarFallback>{token.symbol}</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="w-4 h-4 absolute top-5 left-7">
-                        <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
-                        <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
-                      </Avatar>
-                      <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
+            {!balance ? (
+              <WalletPopSkeletonMobile />
+            ) : (
+              <>
+                {balance.tokens.length > 0 && <WalletChart balance={balance} />}
+                <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
+                  <span>{getFormattedWalletAddress(address)}</span>
+                  <button className="relative" onClick={() => copyToClipboardHandler(address)}>
+                    <CopyIcon width={20} height={20} />
+                    {showCopyPopover && (
+                      <div className="absolute py-1 px-2 rounded-lg bg-[#1C1D1F] border border-white/20 -left-5 -top-8 animate-fade">
+                        Copied!
+                      </div>
+                    )}
+                  </button>
+                </div>
+                {balance.tokens.length > 0 ? (
+                  <>
+                    <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+                      <span>Token</span>
+                      Value
                     </div>
-                    <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
+                    <div className="flex flex-col gap-y-5">
+                      {balance.tokens.map((token, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
+                        >
+                          <div className="relative flex items-center gap-x-5">
+                            <Avatar className="w-9 h-9">
+                              <AvatarImage src={token.logo} alt={token.name} />
+                              <AvatarFallback>{token.symbol}</AvatarFallback>
+                            </Avatar>
+                            <Avatar className="w-4 h-4 absolute top-5 left-7">
+                              <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
+                              <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
+                            </Avatar>
+                            <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
+                          </div>
+                          <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <hr className="bg-[#494949]" />
+                    <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
+                      <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center text-sm font-semibold text-white">
+                    No tokens found
                   </div>
-                ))
-              ) : (
-                <div className="flex items-center justify-center text-sm font-semibold text-white">No tokens found</div>
-              )}
-            </div>
-            {balance && balance.tokens.length > 0 ? <hr className="bg-[#494949]" /> : null}
-            {balance && balance.tokens.length > 0 ? (
-              <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
-                <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
-              </div>
-            ) : null}
-            <button
-              onClick={disconnect}
-              className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
-            >
-              Disconnect
-            </button>
+                )}
+                <button
+                  onClick={disconnect}
+                  className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
+                >
+                  Disconnect
+                </button>
+              </>
+            )}
           </DrawerContent>
         </Drawer>
       </div>
+
+      {/* desktop size */}
       <div className="hidden md:flex items-center justify-center">
         <Popover>
           <PopoverTrigger>
@@ -155,71 +140,67 @@ export function WalletPop({ logo, title, balance, disconnect, isLoading, address
               {title}
             </div>
 
-            {balance && balance.tokens.length > 0 ? (
-              <div>
-                <ChartContainer config={chartConfig} className="relative mx-auto aspect-square max-h-56">
-                  <PieChart>
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="bg-white" />} />
-                    <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} />
-                  </PieChart>
-                </ChartContainer>
-              </div>
-            ) : null}
-
-            <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
-              <span>{getFormattedWalletAddress(address)}</span>
-              <button className="relative" onClick={() => copyToClipboardHandler(address)}>
-                <CopyIcon width={20} height={20} />
-                {showCopyPopover && (
-                  <div className="absolute py-1 px-2 rounded-lg bg-[#1C1D1F] border border-white/20 -left-5 -top-8 animate-fade">
-                    Copied!
+            {!balance ? (
+              <WalletPopSkeletonDesktop />
+            ) : balance ? (
+              <>
+                {balance && balance.tokens.length > 0 && <WalletChart balance={balance} />}
+                <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
+                  <span>{getFormattedWalletAddress(address)}</span>
+                  <button className="relative" onClick={() => copyToClipboardHandler(address)}>
+                    <CopyIcon width={20} height={20} />
+                    {showCopyPopover && (
+                      <div className="absolute py-1 px-2 rounded-lg bg-[#1C1D1F] border border-white/20 -left-5 -top-8 animate-fade">
+                        Copied!
+                      </div>
+                    )}
+                  </button>
+                </div>
+                {balance.tokens.length > 0 ? (
+                  <>
+                    <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+                      <span>Token</span>
+                      Value
+                    </div>
+                    <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
+                      {balance.tokens.map((token, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
+                        >
+                          <div className="relative flex items-center gap-x-5">
+                            <Avatar className="w-9 h-9">
+                              <AvatarImage src={token.logo} alt={token.name} />
+                              <AvatarFallback>{token.symbol}</AvatarFallback>
+                            </Avatar>
+                            <Avatar className="w-4 h-4 absolute top-5 left-7">
+                              <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
+                              <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
+                            </Avatar>
+                            <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
+                          </div>
+                          <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <hr className="bg-[#494949]" />
+                    <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
+                      <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center text-sm font-semibold text-white">
+                    No tokens found
                   </div>
                 )}
-              </button>
-            </div>
-            {balance && balance.tokens.length > 0 ? (
-              <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-                <span>Token</span>
-                Value
-              </div>
+                <button
+                  onClick={disconnect}
+                  className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
+                >
+                  Disconnect
+                </button>
+              </>
             ) : null}
-            <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
-              {balance && balance.tokens.length > 0 ? (
-                balance.tokens.map((token, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
-                  >
-                    <div className="relative flex items-center gap-x-5">
-                      <Avatar className="w-9 h-9">
-                        <AvatarImage src={token.logo} alt={token.name} />
-                        <AvatarFallback>{token.symbol}</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="w-4 h-4 absolute top-5 left-7">
-                        <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
-                        <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
-                      </Avatar>
-                      <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
-                    </div>
-                    <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
-                  </div>
-                ))
-              ) : (
-                <div className="flex items-center justify-center text-sm font-semibold text-white">No tokens found</div>
-              )}
-            </div>
-            {balance && balance.tokens.length > 0 ? <hr className="bg-[#494949]" /> : null}
-            {balance && balance.tokens.length > 0 ? (
-              <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
-                <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
-              </div>
-            ) : null}
-            <button
-              onClick={disconnect}
-              className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
-            >
-              Disconnect
-            </button>
           </PopoverContent>
         </Popover>
       </div>

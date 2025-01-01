@@ -11,7 +11,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import WalletPopSkeleton from './wallet/wallet-pop-skeleton';
 
 const WalletPage = () => {
   const { authenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
@@ -38,6 +37,7 @@ const WalletPage = () => {
 
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
+  // fetch evm balance
   useEffect(() => {
     if (evmAddress && unAuthenticatedAgent) {
       setEvmLoading(true);
@@ -47,10 +47,12 @@ const WalletPage = () => {
       }).then((res) => {
         setEvmBalance(res);
         setEvmLoading(false);
+        console.log(res);
       });
     }
   }, [unAuthenticatedAgent, evmAddress, setUnAuthenticatedAgent, setEvmBalance]);
 
+  // fetch icp balance
   useEffect(() => {
     if (unAuthenticatedAgent && icpIdentity) {
       setIcpLoading(true);
@@ -90,6 +92,7 @@ const WalletPage = () => {
     >
       {(!icpIdentity || !isEvmConnected) && (
         <>
+          {/* mobile wallet connection buttons */}
           <div className="md:hidden">
             <Drawer>
               <DrawerTrigger className="w-full font-medium text-sm text-white py-2 px-3">
@@ -117,6 +120,7 @@ const WalletPage = () => {
             </Drawer>
           </div>
 
+          {/* desktop wallet connection buttons */}
           <div className="hidden md:block">
             <Popover>
               <PopoverTrigger className="w-full font-medium text-sm text-white py-2 px-3">
@@ -155,10 +159,9 @@ const WalletPage = () => {
         <span className="w-full font-medium text-sm text-white py-2 px-3">Connected Wallets</span>
       )}
 
+      {/* wallet content */}
       <div className="flex items-center gap-x-2">
-        {icpLoading ? (
-          <WalletPopSkeleton />
-        ) : icpBalance && !icpLoading ? (
+        {icpLoading || icpBalance ? (
           <WalletPop
             logo="/images/logo/wallet_logos/icp.svg"
             title="Your ICP Wallet"
@@ -169,9 +172,7 @@ const WalletPage = () => {
           />
         ) : null}
 
-        {evmLoading ? (
-          <WalletPopSkeleton />
-        ) : evmBalance && !evmLoading ? (
+        {evmLoading || evmBalance ? (
           <WalletPop
             logo={getChainLogo(chainId)}
             title="Your EVM Wallet"
