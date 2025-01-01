@@ -11,7 +11,6 @@ import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_b
 import TokenSkeleton from './token-skeleton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { useIsTokenSelected, useTokenSelector } from '../../_logic/hooks';
-import { useSharedStore } from '@/common/state/store';
 
 interface TokenListProps {
   isPending: boolean;
@@ -23,7 +22,6 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
   // store
   const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore((state) => state);
-  const { authenticatedAgent, icpIdentity, icpBalance, evmBalance, isEvmConnected } = useSharedStore((state) => state);
   const { setActiveStep } = useBridgeActions();
   const setTokenHandler = useTokenSelector();
   // check if token is selected

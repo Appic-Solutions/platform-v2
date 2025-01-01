@@ -36,15 +36,14 @@ const TokenCard = ({
   }, [icpBalance, evmBalance, token]);
 
   return (
-    <div className="flex justify-between items-center w-full">
-      <div
-        className={cn(
-          'flex items-center gap-x-5 cursor-pointer group duration-200 rounded-md p-2 flex-grow',
-          'hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]',
-          isSelected && 'bg-[#F5F5F5] dark:bg-[#2A2A2A]',
-        )}
-        onClick={onClick}
-      >
+    <div
+      className={cn(
+        'flex justify-between items-center w-full rounded-md p-2',
+        isSelected && 'bg-[#F5F5F5] dark:bg-[#2A2A2A]',
+        'hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]',
+      )}
+    >
+      <div className={cn('flex items-center gap-x-5 cursor-pointer group duration-200 flex-grow')} onClick={onClick}>
         <Avatar className="w-[50px] h-[50px] rounded-full">
           <AvatarImage src={token.logo} alt={token.name} />
           <AvatarFallback>
