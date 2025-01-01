@@ -148,5 +148,14 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
   }
 
   // Return unique tokens as an array
-  return Array.from(tokensMap.values());
+  return Array.from(tokensMap.values()).sort((a, b) => {
+    // Compare operator properties
+    if (a.operator === 'Appic' && b.operator !== 'Appic') {
+      return -1; // a should come before b
+    }
+    if (a.operator !== 'Appic' && b.operator === 'Appic') {
+      return 1; // b should come before a
+    }
+    return 0; // No change in order
+  });
 }
