@@ -62,7 +62,7 @@ const BridgeOption = ({
       {/* middle section */}
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-x-2">
-          <div className="border-2 border-white/50 rounded-full p-2">
+          <div className="border-2 border-white/50 rounded-full p-1 md:p-2">
             <div className={cn('relative w-7 h-7', 'lg:w-10 lg:h-10')}>
               <Image src={toToken.logo} alt="btc" className="object-contain" fill />
             </div>
@@ -70,7 +70,7 @@ const BridgeOption = ({
           <p
             className={cn(
               'text-base lg:text-xl',
-              option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-[100px] md:w-48',
+              option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-fit md:w-48',
             )}
           >
             ~ {formatToSignificantFigures(option.human_readable_estimated_return) + ' ' + toToken.symbol}
