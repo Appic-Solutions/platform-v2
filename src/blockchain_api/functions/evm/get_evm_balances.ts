@@ -66,7 +66,7 @@ export async function get_evm_wallet_tokens_balances(wallet_address: string): Pr
       requestParams,
     );
     if (response.data.error) {
-      let error_response: Response<EvmTokensBalances> = {
+      const error_response: Response<EvmTokensBalances> = {
         message: `Error fetching account balance ${response.data.error}`,
         result: { tokens: [], totalBalanceUsd: '0' },
         success: false,
@@ -82,7 +82,7 @@ export async function get_evm_wallet_tokens_balances(wallet_address: string): Pr
       message: '',
     };
   } catch (error) {
-    let error_response: Response<EvmTokensBalances> = {
+    const error_response: Response<EvmTokensBalances> = {
       message: `Error fetching account balance ${error}`,
       result: { tokens: [], totalBalanceUsd: '0' },
       success: false,
