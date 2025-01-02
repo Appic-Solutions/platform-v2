@@ -11,9 +11,9 @@ import WalletAddressInput from './_components/WalletAddressInput';
 import HistoryIcon from '@/common/components/icons/history';
 import Link from 'next/link';
 import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
-import { useActionButtonText, useCheckWalletConnectStatus, useStepChange, useSwapTokens } from '../../_logic/hooks';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
+import { BridgeLogic } from '../../_logic';
 
 interface SelectTokenProps {
   isPendingBridgeOptions: boolean;
@@ -29,10 +29,8 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   const { fromToken, toToken, selectedOption, amount, toWalletAddress } = useBridgeStore();
   const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
 
-  const handleStepChange = useStepChange();
-  const swapTokensHandler = useSwapTokens();
-  const checkIsWalletConnected = useCheckWalletConnectStatus();
-  const actionButtonTextHandler = useActionButtonText();
+  // Logic
+  const { changeStep, swapTokens, isWalletConnected, getStatusMessage } = BridgeLogic();
 
   const isActionButtonDisable = () => {
     if (!selectedOption || !fromToken || !toToken) return true;
@@ -54,20 +52,17 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   };
 
   const actionButtonHandler = () => {
-    if (!checkIsWalletConnected('from') && fromToken && !showWalletAddress) {
+    if (!isWalletConnected('from') && fromToken && !showWalletAddress) {
       openConnectWalletModalHandler(fromToken);
       return;
     }
-    if (!checkIsWalletConnected('to') && toToken && !showWalletAddress) {
+    if (!isWalletConnected('to') && toToken && !showWalletAddress) {
       openConnectWalletModalHandler(toToken);
       return;
     }
 
-    if (
-      checkIsWalletConnected('from') &&
-      (checkIsWalletConnected('to') || (toWalletAddress && !toWalletValidationError))
-    ) {
-      handleStepChange(3);
+    if (isWalletConnected('from') && (isWalletConnected('to') || (toWalletAddress && !toWalletValidationError))) {
+      changeStep(3);
     }
   };
 
@@ -105,7 +100,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
                 token={fromToken}
                 customOnClick={() => {
                   setSelectedTokenType('from');
-                  handleStepChange('next');
+                  changeStep('next');
                 }}
                 label="From"
                 className={cn(
@@ -122,7 +117,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
                   'transition-transform duration-300',
                   fromToken && toToken ? 'hover:rotate-180 sm:rotate-90 sm:hover:-rotate-90' : 'hover:rotate-180',
                 )}
-                onClick={swapTokensHandler}
+                onClick={swapTokens}
               >
                 <ArrowsUpDownIcon width={24} height={24} />
               </div>
@@ -130,7 +125,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
                 token={toToken}
                 customOnClick={() => {
                   setSelectedTokenType('to');
-                  handleStepChange('next');
+                  changeStep('next');
                 }}
                 label="To"
                 className={cn(
@@ -155,7 +150,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
           {/* DESKTOP ACTION BUTTONS */}
           <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
             <ActionButton onClick={actionButtonHandler} isDisabled={isActionButtonDisable()}>
-              {actionButtonTextHandler({
+              {getStatusMessage({
                 showWalletAddress,
                 toWalletAddress,
                 toWalletValidationError,
@@ -181,7 +176,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
         <ActionButton onClick={actionButtonHandler} isDisabled={isActionButtonDisable()}>
-          {actionButtonTextHandler({
+          {getStatusMessage({
             showWalletAddress,
             toWalletAddress,
             toWalletValidationError,

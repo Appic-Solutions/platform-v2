@@ -14,7 +14,7 @@ import {
   SubmitWithdrawRequest,
   TokenApprovalRequest,
 } from './types/request';
-import { getBridgePairsFromLocalStorage, setBridgePairsWithTime } from '../_logic';
+
 import {
   approve_erc20,
   check_deposit_status,
@@ -26,8 +26,10 @@ import {
   request_deposit,
   request_withdraw,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
+import { BridgeLogic } from '../_logic';
 
 const useGetBridgePairs = (agent: HttpAgent | undefined) => {
+  const { getBridgePairsFromLocalStorage, setBridgePairsWithTime } = BridgeLogic();
   const refetchTime = 1000 * 60 * 10;
   const fetchBridgePairs = async () => {
     const { data, lastFetchTime } = getBridgePairsFromLocalStorage();

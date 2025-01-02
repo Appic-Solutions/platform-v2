@@ -10,7 +10,7 @@ import BoxHeader from '@/common/components/ui/box-header';
 import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import TokenSkeleton from './token-skeleton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
-import { useIsTokenSelected, useTokenSelector } from '../../_logic/hooks';
+import { BridgeLogic } from '../../_logic';
 
 interface TokenListProps {
   isPending: boolean;
@@ -21,11 +21,11 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const [query, setQuery] = useState('');
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
   // store
-  const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore((state) => state);
+  const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore();
+  // Logic
+  const { isTokenSelected, selectToken } = BridgeLogic();
   const { setActiveStep } = useBridgeActions();
-  const setTokenHandler = useTokenSelector();
-  // check if token is selected
-  const isTokenSelected = useIsTokenSelected();
+
   // set selected chain id
   useEffect(() => {
     const tokenToCheck = selectedTokenType === 'from' ? fromToken : toToken;
@@ -101,7 +101,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
               key={idx}
               token={token}
               onClick={() => {
-                setTokenHandler(token);
+                selectToken(token);
                 setActiveStep(1);
               }}
               isSelected={isTokenSelected(token)}

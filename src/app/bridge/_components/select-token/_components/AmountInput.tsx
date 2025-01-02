@@ -5,21 +5,21 @@ import { cn } from '@/common/helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { useSharedStore } from '@/common/state/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
-import { useCheckWalletConnectStatus } from '@/app/bridge/_logic/hooks';
 import BigNumber from 'bignumber.js';
+import { BridgeLogic } from '@/app/bridge/_logic';
 
 const AmountInput = () => {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [inputAmount, setInputAmount] = useState('');
   const [userTokenBalance, setUserTokenBalance] = useState('');
-  const checkWalletConnectStatus = useCheckWalletConnectStatus();
+
+  // Logic
+  const { isWalletConnected } = BridgeLogic();
 
   const { fromToken, usdPrice, amount } = useBridgeStore();
   const { setAmount, setUsdPrice } = useBridgeActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
   useEffect(() => {
-    setIsWalletConnected(checkWalletConnectStatus('from'));
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find((t) => t.contractAddress === fromToken?.contractAddress);
       setUserTokenBalance(mainToken?.balance || '0');
@@ -28,7 +28,7 @@ const AmountInput = () => {
       const mainToken = icpBalance.tokens.find((t) => t.canisterId === fromToken?.canisterId);
       setUserTokenBalance(mainToken?.balance || '0');
     }
-  }, [isEvmConnected, icpIdentity, fromToken, checkWalletConnectStatus, evmBalance, icpBalance]);
+  }, [isEvmConnected, icpIdentity, fromToken, evmBalance, icpBalance]);
 
   // bouncing on input change
   useEffect(() => {
@@ -87,7 +87,7 @@ const AmountInput = () => {
                 '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
               )}
             />
-            {isWalletConnected && Number(userTokenBalance) > 0 && (
+            {isWalletConnected('from') && Number(userTokenBalance) > 0 && (
               <span
                 className={cn(
                   'px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md',
@@ -107,7 +107,7 @@ const AmountInput = () => {
           </div>
           <div className="flex justify-between items-center w-full">
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
-            {isWalletConnected && Number(userTokenBalance) > 0 && (
+            {isWalletConnected('from') && Number(userTokenBalance) > 0 && (
               <p className="text-muted text-xs md:text-sm font-semibold text-nowrap">{userTokenBalance}</p>
             )}
           </div>
