@@ -2,7 +2,7 @@
 import { cn, getChainLogo } from '@/common/helpers/utils';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit, useDisconnect } from '@reown/appkit/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '../ui/popover';
 import { CloseIcon } from '../icons';
 import WalletCard from './wallet/wallet-card';
@@ -13,8 +13,17 @@ import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
 
 const WalletPage = () => {
-  const { authenticatedAgent, icpIdentity, evmAddress, isEvmConnected, chainId, icpBalance, evmBalance } =
-    useSharedStore((state) => state);
+  const {
+    authenticatedAgent,
+    icpIdentity,
+    evmAddress,
+    isEvmConnected,
+    chainId,
+    icpBalance,
+    evmBalance,
+    isEvmBalanceLoading,
+    isIcpBalanceLoading,
+  } = useSharedStore();
   const {
     setIcpBalance,
     setEvmBalance,
@@ -23,10 +32,9 @@ const WalletPage = () => {
     setChainId,
     setIcpIdentity,
     setEvmAddress,
+    setIsEvmBalanceLoading,
+    setIsIcpBalanceLoading,
   } = useSharedStoreActions();
-
-  const [icpLoading, setIcpLoading] = useState(false);
-  const [evmLoading, setEvmLoading] = useState(false);
 
   // ICP Wallet Hooks
   const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
@@ -40,31 +48,31 @@ const WalletPage = () => {
   // fetch evm balance
   useEffect(() => {
     if (evmAddress && unAuthenticatedAgent) {
-      setEvmLoading(true);
+      setIsEvmBalanceLoading(true);
       setUnAuthenticatedAgent(unAuthenticatedAgent);
       fetchEvmBalances({
         evmAddress,
       }).then((res) => {
         setEvmBalance(res);
-        setEvmLoading(false);
+        setIsEvmBalanceLoading(false);
         console.log(res);
       });
     }
-  }, [unAuthenticatedAgent, evmAddress, setUnAuthenticatedAgent, setEvmBalance]);
+  }, [unAuthenticatedAgent, evmAddress, setUnAuthenticatedAgent, setEvmBalance, setIsEvmBalanceLoading]);
 
   // fetch icp balance
   useEffect(() => {
     if (unAuthenticatedAgent && icpIdentity) {
-      setIcpLoading(true);
+      setIsIcpBalanceLoading(true);
       fetchIcpBalances({
         unAuthenticatedAgent,
         icpIdentity,
       }).then((res) => {
         setIcpBalance(res);
-        setIcpLoading(false);
+        setIsIcpBalanceLoading(false);
       });
     }
-  }, [icpIdentity, authenticatedAgent, setIcpBalance, unAuthenticatedAgent]);
+  }, [icpIdentity, authenticatedAgent, setIcpBalance, unAuthenticatedAgent, setIsIcpBalanceLoading]);
 
   const handleDisconnectIcp = () => {
     disconnectIcp();
@@ -161,24 +169,24 @@ const WalletPage = () => {
 
       {/* wallet content */}
       <div className="flex items-center gap-x-2">
-        {icpLoading || icpBalance ? (
+        {isIcpBalanceLoading || icpBalance ? (
           <WalletPop
             logo="/images/logo/wallet_logos/icp.svg"
             title="Your ICP Wallet"
             balance={icpBalance}
             disconnect={handleDisconnectIcp}
-            isLoading={icpLoading}
+            isLoading={isIcpBalanceLoading}
             address={icpIdentity?.getPrincipal().toString() || ''}
           />
         ) : null}
 
-        {evmLoading || evmBalance ? (
+        {isEvmBalanceLoading || evmBalance ? (
           <WalletPop
             logo={getChainLogo(chainId)}
             title="Your EVM Wallet"
             balance={evmBalance}
             disconnect={handleDisconnectEvm}
-            isLoading={evmLoading}
+            isLoading={isEvmBalanceLoading}
             address={evmAddress || ''}
           />
         ) : null}

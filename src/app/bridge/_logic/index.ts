@@ -23,7 +23,17 @@ export const BridgeLogic = () => {
   // Bridge Actions
   const { setFromToken, setToToken, setAmount, setActiveStep } = useBridgeActions();
   // Shared Store
-  const { icpIdentity, isEvmConnected, authenticatedAgent, unAuthenticatedAgent, evmAddress } = useSharedStore();
+  const {
+    icpIdentity,
+    isEvmConnected,
+    authenticatedAgent,
+    unAuthenticatedAgent,
+    evmAddress,
+    evmBalance,
+    icpBalance,
+    isEvmBalanceLoading,
+    isIcpBalanceLoading,
+  } = useSharedStore();
   // Withdrawal Queries
   const { mutateAsync: approveToken } = useGetTokenApproval();
   const { mutateAsync: requestWithdraw } = useGetRequestWithdraw();
@@ -71,10 +81,10 @@ export const BridgeLogic = () => {
     if (type === 'to') mainToken = toToken;
 
     if (mainToken) {
-      if (mainToken?.chain_type === 'EVM' && isEvmConnected) {
+      if (mainToken?.chain_type === 'EVM' && isEvmConnected && evmBalance) {
         return true;
       }
-      if (mainToken?.chain_type === 'ICP' && icpIdentity) {
+      if (mainToken?.chain_type === 'ICP' && icpIdentity && icpBalance) {
         return true;
       }
       return false;

@@ -14,6 +14,7 @@ import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
 import { BridgeLogic } from '../../_logic';
+import { useSharedStore } from '@/common/state/store';
 
 interface SelectTokenProps {
   isPendingBridgeOptions: boolean;
@@ -24,15 +25,16 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
-
-  // store
+  // shared store
+  const { isIcpBalanceLoading, isEvmBalanceLoading } = useSharedStore();
+  // bridge store
   const { fromToken, toToken, selectedOption, amount, toWalletAddress } = useBridgeStore();
   const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
-
   // Logic
   const { changeStep, swapTokens, isWalletConnected, getStatusMessage } = BridgeLogic();
 
   const isActionButtonDisable = () => {
+    if (isIcpBalanceLoading || isEvmBalanceLoading) return true;
     if (!selectedOption || !fromToken || !toToken) return true;
     if (showWalletAddress && (toWalletValidationError || !toWalletAddress)) return true;
     if (fromToken.contractAddress === toToken.contractAddress && fromToken.chainId === toToken.chainId) return true;

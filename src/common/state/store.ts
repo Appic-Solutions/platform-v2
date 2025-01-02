@@ -15,6 +15,8 @@ interface SharedState {
   unAuthenticatedAgent: HttpAgent | undefined;
   icpIdentity: Identity | undefined;
   isEvmConnected: boolean;
+  isIcpBalanceLoading: boolean;
+  isEvmBalanceLoading: boolean;
   evmAddress: string | undefined;
   chainId: number | string | undefined;
 }
@@ -29,6 +31,8 @@ type Action = {
     setIsEvmConnected: (isConnected: SharedState['isEvmConnected']) => void;
     setEvmAddress: (address: SharedState['evmAddress']) => void;
     setChainId: (chainId: SharedState['chainId']) => void;
+    setIsIcpBalanceLoading: (isPending: SharedState['isIcpBalanceLoading']) => void;
+    setIsEvmBalanceLoading: (isPending: SharedState['isEvmBalanceLoading']) => void;
   };
 };
 
@@ -41,15 +45,19 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
   isEvmConnected: false,
   evmAddress: undefined,
   chainId: undefined,
+  isIcpBalanceLoading: false,
+  isEvmBalanceLoading: false,
   actions: {
-    setIcpBalance: (balance) => set({ icpBalance: balance }),
-    setEvmBalance: (balance) => set({ evmBalance: balance }),
-    setAuthenticatedAgent: (agent) => set({ authenticatedAgent: agent }),
-    setUnAuthenticatedAgent: (agent) => set({ unAuthenticatedAgent: agent }),
-    setIcpIdentity: (identity) => set({ icpIdentity: identity }),
-    setIsEvmConnected: (isConnected) => set({ isEvmConnected: isConnected }),
-    setEvmAddress: (address) => set({ evmAddress: address }),
-    setChainId: (chainId) => set({ chainId }),
+    setIcpBalance: (balance) => set((state) => ({ ...state, icpBalance: balance })),
+    setEvmBalance: (balance) => set((state) => ({ ...state, evmBalance: balance })),
+    setAuthenticatedAgent: (agent) => set((state) => ({ ...state, authenticatedAgent: agent })),
+    setUnAuthenticatedAgent: (agent) => set((state) => ({ ...state, unAuthenticatedAgent: agent })),
+    setIcpIdentity: (identity) => set((state) => ({ ...state, icpIdentity: identity })),
+    setIsEvmConnected: (isConnected) => set((state) => ({ ...state, isEvmConnected: isConnected })),
+    setEvmAddress: (address) => set((state) => ({ ...state, evmAddress: address })),
+    setChainId: (chainId) => set((state) => ({ ...state, chainId })),
+    setIsIcpBalanceLoading: (isIcpPending) => set((state) => ({ ...state, isIcpBalanceLoading: isIcpPending })),
+    setIsEvmBalanceLoading: (isEvmPending) => set((state) => ({ ...state, isEvmBalanceLoading: isEvmPending })),
   },
 }));
 
