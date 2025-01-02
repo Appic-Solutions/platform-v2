@@ -86,7 +86,6 @@ export const useCheckWalletConnectStatus = () => {
 
 export const useActionButtonText = () => {
   const { fromToken, toToken, amount, selectedOption } = useBridgeStore();
-  const { isEvmConnected, icpIdentity } = useSharedStore();
   const checkIsWalletConnected = useCheckWalletConnectStatus();
 
   const textHandler = ({
@@ -100,6 +99,7 @@ export const useActionButtonText = () => {
   }) => {
     if (!fromToken || !toToken) return 'Select token to bridge';
 
+    // avoid to select same tokens
     if (
       fromToken &&
       toToken &&
@@ -110,11 +110,10 @@ export const useActionButtonText = () => {
     }
 
     if (!Number(amount)) return 'Set token amount to continue';
+
     if (!selectedOption) return 'Select Bridge Option';
 
-    const isSourceWalletDisconnected =
-      (fromToken?.chain_type === 'EVM' && !isEvmConnected) || (fromToken?.chain_type === 'ICP' && !icpIdentity);
-    if (isSourceWalletDisconnected) {
+    if (!checkIsWalletConnected('from')) {
       return `Connect ${fromToken.chain_type} Wallet`;
     }
 
@@ -122,12 +121,17 @@ export const useActionButtonText = () => {
       return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Review Bridge';
     }
 
-    if (!checkIsWalletConnected('to')) {
+    if (!showWalletAddress && !checkIsWalletConnected('to')) {
       return `Connect ${toToken.chain_type} Wallet`;
     }
 
     const isDestWalletValid = toWalletAddress && !toWalletValidationError;
-    if (isDestWalletValid) {
+
+    if (isDestWalletValid && checkIsWalletConnected('from')) {
+      return 'Review Bridge';
+    }
+
+    if ((checkIsWalletConnected('from'), checkIsWalletConnected('to'))) {
       return 'Review Bridge';
     }
   };

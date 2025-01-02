@@ -20,7 +20,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(({ isDisab
       onClick={onClick}
       disabled={isDisabled}
     >
-      {children || 'Confirm'}
+      {children}
     </button>
   );
 });

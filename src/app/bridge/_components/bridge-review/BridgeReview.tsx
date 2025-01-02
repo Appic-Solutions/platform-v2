@@ -121,7 +121,7 @@ const BridgeReview = () => {
               </div>
             </div>
           </Card>
-          <ActionButton isDisabled={false}>Start bridging</ActionButton>
+          <ActionButton isDisabled={false}>Start Bridging</ActionButton>
         </div>
       </Box>
     );
