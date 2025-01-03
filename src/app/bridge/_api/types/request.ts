@@ -16,28 +16,28 @@ interface BridgeOptionsListRequest {
 // WITHDRAWAL TX ====================>
 // STEP 1
 interface TokenApprovalRequest {
-  bridge_option: BridgeOption;
-  authenticated_agent: Agent;
+  bridgeOption: BridgeOption;
+  authenticatedAgent: Agent;
 }
 // STEP 2
 interface SubmitWithdrawRequest {
-  bridge_option: BridgeOption;
+  bridgeOption: BridgeOption;
   recipient: string;
-  authenticated_agent: Agent;
+  authenticatedAgent: Agent;
 }
 // STEP 3
 interface NotifyAppicHelperWithdrawalRequest {
-  bridge_option: BridgeOption;
-  withdrawal_id: string;
+  bridgeOption: BridgeOption;
+  withdrawalId: string;
   recipient: string; // Destination EVM Address
-  user_wallet_principal: string; //from ICP Principal Address
-  authenticated_agent: Agent;
+  userWalletPrincipal: string; //from ICP Principal Address
+  authenticatedAgent: Agent;
 }
 // STEP 4
 interface CheckWithdrawalStatusRequest {
-  bridge_option: BridgeOption;
-  withdrawal_id: string;
-  authenticated_agent: Agent;
+  bridgeOption: BridgeOption;
+  withdrawalId: string;
+  authenticatedAgent: Agent;
 }
 
 // DEPOSIT TX
@@ -46,27 +46,42 @@ type CreateWalletClientRequest = BridgeOption;
 // STEP 2
 interface DepositTokenWithApprovalRequest {
   wallet_client: WalletClient<any>;
-  bridge_option: BridgeOption;
+  bridgeOption: BridgeOption;
 }
 // STEP 3
 interface DepositTokenRequest {
   wallet_client: WalletClient<any>;
-  bridge_option: BridgeOption;
+  bridgeOption: BridgeOption;
   recipient: Principal;
 }
 // STEP 4
 interface NotifyAppicHelperDepositRequest {
-  bridge_option: BridgeOption;
+  bridgeOption: BridgeOption;
   tx_hash: string;
-  user_wallet_address: string;
-  recipient_principal: string;
-  unauthenticated_agent: HttpAgent;
+  userWalletAddress: string;
+  recipientPrincipal: string;
+  unauthenticatedAgent: HttpAgent;
 }
 // STEP 5
 interface CheckDepositStatusRequest {
-  bridge_option: BridgeOption;
+  bridgeOption: BridgeOption;
   tx_hash: TxHash;
-  unauthenticated_agent: Agent | HttpAgent;
+  unauthenticatedAgent: Agent | HttpAgent;
+}
+
+interface FullDepositRequest {
+  bridgeOption: BridgeOption;
+  recipient: Principal;
+  userWalletAddress: string;
+  recipientPrincipal: string;
+  unAuthenticatedAgent: HttpAgent;
+}
+
+interface FullWithdrawalRequest {
+  bridgeOption: BridgeOption;
+  authenticatedAgent: Agent;
+  recipient: string; // Destination EVM Address
+  userWalletPrincipal: string; //from ICP Principal Address
 }
 
 export type {
@@ -80,4 +95,6 @@ export type {
   DepositTokenRequest,
   NotifyAppicHelperDepositRequest,
   CheckDepositStatusRequest,
+  FullWithdrawalRequest,
+  FullDepositRequest,
 };

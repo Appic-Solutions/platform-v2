@@ -6,10 +6,58 @@ import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
 import ActionButton from '../select-token/_components/ActionButton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
+import { useHandleDeposit, useHandleWithdrawal } from '../../_api';
+import { FullDepositRequest, FullWithdrawalRequest } from '../../_api/types/request';
+import { useSharedStore } from '@/common/state/store';
 
 const BridgeReview = () => {
+  // shared store
+  const { icpIdentity, evmAddress, unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
+  // bridge store
   const { selectedOption: option, toToken } = useBridgeStore();
   const { setActiveStep } = useBridgeActions();
+
+  const handleDeposit = useHandleDeposit();
+  const handleWithdrawal = useHandleWithdrawal();
+
+  //  1. Withdrawal Transactions (ICP -> EVM)
+  //  2. Deposit Transactions (EVM -> ICP) [not detailed here]
+
+  const initiateDeposit = async () => {
+    if (option && icpIdentity && evmAddress && unAuthenticatedAgent) {
+      try {
+        const params: FullDepositRequest = {
+          bridgeOption: option,
+          recipient: icpIdentity.getPrincipal(),
+          recipientPrincipal: icpIdentity.getPrincipal().toString(),
+          unAuthenticatedAgent,
+          userWalletAddress: evmAddress,
+        };
+        const result = await handleDeposit.mutateAsync(params);
+        console.log('Deposit successful:', result);
+      } catch (error) {
+        console.error('Deposit failed:', error);
+      }
+    }
+  };
+
+  const initiateWithdrawal = async () => {
+    if (option && icpIdentity && evmAddress && unAuthenticatedAgent && authenticatedAgent) {
+      try {
+        const params: FullWithdrawalRequest = {
+          bridgeOption: option,
+          recipient: evmAddress,
+          authenticatedAgent,
+          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+        };
+        const result = await handleWithdrawal.mutateAsync(params);
+        console.log('Withdrawal successful:', result);
+      } catch (error) {
+        console.error('Withdrawal failed:', error);
+      }
+    }
+  };
+
   if (option && toToken) {
     return (
       <Box

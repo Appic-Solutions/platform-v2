@@ -1,50 +1,15 @@
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
-import {
-  useCheckDepositStatus,
-  useCheckWithdrawalStatus,
-  useCreateWalletClient,
-  useDepositToken,
-  useDepositTokenWithApproval,
-  useGetRequestWithdraw,
-  useGetTokenApproval,
-  useNotifyAppicHelperDeposit,
-  useNotifyAppicHelperWithdrawal,
-} from '../_api';
 import { useSharedStore } from '@/common/state/store';
-import { DepositTxStatus, WithdrawalTxStatus } from '@/blockchain_api/functions/icp/bridge_transactions';
-import { Response } from '@/blockchain_api/types/response';
 
 export const BridgeLogic = () => {
   // Bridge Store
-  const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption, toWalletAddress } =
-    useBridgeStore();
+  const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption } = useBridgeStore();
   // Bridge Actions
   const { setFromToken, setToToken, setAmount, setActiveStep } = useBridgeActions();
   // Shared Store
-  const {
-    icpIdentity,
-    isEvmConnected,
-    authenticatedAgent,
-    unAuthenticatedAgent,
-    evmAddress,
-    evmBalance,
-    icpBalance,
-    isEvmBalanceLoading,
-    isIcpBalanceLoading,
-  } = useSharedStore();
-  // Withdrawal Queries
-  const { mutateAsync: approveToken } = useGetTokenApproval();
-  const { mutateAsync: requestWithdraw } = useGetRequestWithdraw();
-  const { mutateAsync: notifyWithdrawal } = useNotifyAppicHelperWithdrawal();
-  const { mutateAsync: checkStatus } = useCheckWithdrawalStatus();
-  // Deposit Queries
-  const { mutateAsync: createWalletClient } = useCreateWalletClient();
-  const { mutateAsync: approveDeposit } = useDepositTokenWithApproval();
-  const { mutateAsync: requestDeposit } = useDepositToken();
-  const { mutateAsync: notifyDeposit } = useNotifyAppicHelperDeposit();
-  const { mutateAsync: checkDepositStatus } = useCheckDepositStatus();
+  const { icpIdentity, isEvmConnected, evmBalance, icpBalance } = useSharedStore();
 
   // select token function in chain token list
   function selectToken(token: EvmToken | IcpToken) {
@@ -184,112 +149,6 @@ export const BridgeLogic = () => {
     };
   };
 
-  async function executeWithdrawal() {
-    if (selectedOption && authenticatedAgent && icpIdentity && (evmAddress || toWalletAddress)) {
-      try {
-        // Step 1: Approve Token
-        const approvalResult = await approveToken({
-          bridge_option: selectedOption,
-          authenticated_agent: authenticatedAgent,
-        });
-
-        // Step 2: Request Withdraw
-        const withdrawResult = await requestWithdraw({
-          bridge_option: selectedOption,
-          recipient: evmAddress || toWalletAddress,
-          authenticated_agent: authenticatedAgent,
-        });
-
-        // Step 3: Notify Appic Helper Withdrawal
-        const notifyResult = await notifyWithdrawal({
-          bridge_option: selectedOption,
-          withdrawal_id: withdrawResult.result,
-          recipient: evmAddress || toWalletAddress,
-          user_wallet_principal: icpIdentity?.getPrincipal().toString(),
-          authenticated_agent: authenticatedAgent,
-        });
-
-        // Step 4: Check Withdrawal Status
-        let status: Response<WithdrawalTxStatus>;
-        do {
-          status = await checkStatus({
-            withdrawal_id: withdrawResult.result,
-            bridge_option: selectedOption,
-            authenticated_agent: authenticatedAgent,
-          });
-          if (status.result === 'Accepted') {
-            return status;
-          }
-          // Wait for 1 minute before checking again
-          await new Promise((resolve) => setTimeout(resolve, 60000));
-        } while (status.result !== 'Failed');
-
-        return status;
-      } catch (error) {
-        throw error; // Bubble up error for handling in components
-      }
-    }
-  }
-
-  async function executeDeposit() {
-    if (
-      selectedOption &&
-      fromToken &&
-      icpIdentity &&
-      (icpIdentity.getPrincipal() || toWalletAddress) &&
-      evmAddress &&
-      unAuthenticatedAgent
-    ) {
-      try {
-        // Step 1: Create Wallet Client
-        const walletClient = await createWalletClient(selectedOption);
-
-        // Step 2: Token Approval (only for ERC20 tokens)
-        if (fromToken.tokenType === 'erc20') {
-          await approveDeposit({
-            wallet_client: walletClient,
-            bridge_option: selectedOption,
-          });
-        }
-
-        // Step 3: Submit Deposit Request
-        const depositResult = await requestDeposit({
-          wallet_client: walletClient,
-          bridge_option: selectedOption,
-          recipient: icpIdentity.getPrincipal() || toWalletAddress,
-        });
-
-        // Step 4: Notify Appic Helper
-        await notifyDeposit({
-          bridge_option: selectedOption,
-          tx_hash: depositResult.result,
-          user_wallet_address: evmAddress,
-          recipient_principal: icpIdentity.getPrincipal().toString() || toWalletAddress,
-          unauthenticated_agent: unAuthenticatedAgent,
-        });
-
-        // Step 5: Monitor Transaction Status
-        let status: Response<DepositTxStatus>;
-        do {
-          status = await checkDepositStatus({
-            tx_hash: depositResult.result,
-            bridge_option: selectedOption,
-            unauthenticated_agent: unAuthenticatedAgent,
-          });
-          if (status.result === 'Accepted') {
-            return status; // Transaction successful
-          }
-          // Wait for 1 minute before checking again
-          await new Promise((resolve) => setTimeout(resolve, 60000));
-        } while (status.result !== 'Minted');
-
-        return status;
-      } catch (error) {
-        throw error; // Bubble up error for handling
-      }
-    }
-  }
-
   return {
     selectToken,
     changeStep,
@@ -297,8 +156,6 @@ export const BridgeLogic = () => {
     isWalletConnected,
     getStatusMessage,
     isTokenSelected,
-    executeWithdrawal,
-    executeDeposit,
     setBridgePairsWithTime,
     getBridgePairsFromLocalStorage,
   };
