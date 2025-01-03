@@ -13,16 +13,16 @@ import { Actor, HttpAgent } from '@dfinity/agent';
 import { idlFactory as AppicIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
   MinterInfo,
-  Eip1559TransactionPrice as AppicEip1559TransactionPrice,
-  Eip1559TransactionPriceArg as AppicEip1559TransactionPriceArg,
+  // Eip1559TransactionPrice as AppicEip1559TransactionPrice,
+  // Eip1559TransactionPriceArg as AppicEip1559TransactionPriceArg,
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 
 // Dfinity minter IDL and types
-import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
-import {
-  Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
-  Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
-} from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
+// import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
+// import {
+//   Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
+//   Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
+// } from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
 
 import { is_native_token } from '../evm/utils/erc20_helpers';
 import BigNumber from 'bignumber.js';
@@ -122,6 +122,7 @@ export const get_bridge_options = async (
   try {
     // const value = bridge_metadata.is_native ? amount : '0';
     const value = bridge_metadata.is_native ? '1' : '0';
+    const { max_fee_per_gas } = await get_gas_price(bridge_metadata.viem_chain, bridge_metadata.rpc_url);
 
     if (bridge_metadata.tx_type == TxType.Deposit) {
       const principal_bytes = principal_to_bytes32('6gplx-n62xg-ky6br-utvsz-l3vfe-jggch-hhico-7tydb-qtwu6-yiyhn-gqe');
@@ -135,7 +136,7 @@ export const get_bridge_options = async (
       );
       const encoded_approval_data = encode_approval_function_data(bridge_metadata.deposit_helper_contract, amount);
 
-      const { max_fee_per_gas } = await get_gas_price(bridge_metadata.viem_chain, bridge_metadata.rpc_url);
+      // const { max_fee_per_gas } = await get_gas_price(bridge_metadata.viem_chain, bridge_metadata.rpc_url);
 
       const { approval_gas, total_approval_fee } = await estimate_deposit_approval_fee(
         encoded_approval_data,
@@ -176,12 +177,13 @@ export const get_bridge_options = async (
     } else if (bridge_metadata.tx_type == TxType.Withdrawal) {
       const estimated_approval_gas = native_currency.fee!;
       const estimated_approval_erc20_fee = bridge_metadata.is_native ? '0' : from_token.fee!;
-      const { max_transaction_fee, max_fee_per_gas } = await estimate_withdrawal_gas(
+      const { max_transaction_fee } = await estimate_withdrawal_gas(
         agent,
         bridge_metadata.operator,
         bridge_metadata.minter_address,
         bridge_metadata.is_native,
         from_token.canisterId!,
+        max_fee_per_gas,
       );
       const bridge_options = await calculate_bridge_options(
         from_token.canisterId!,
@@ -206,6 +208,7 @@ export const get_bridge_options = async (
       return { result: [], message: 'Failed to calculate bridge options, Tx type not supported', success: false };
     }
   } catch (error) {
+    console.error(error);
     throw error;
   }
 };
@@ -225,9 +228,10 @@ const fetch_minter_fee = async (
     if (operator === 'Appic') {
       const appic_minter_actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address });
       const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
+
       return tx_type === TxType.Deposit
-        ? minter_info.deposit_native_fee.toString()
-        : minter_info.withdrawal_native_fee.toString();
+        ? minter_info.deposit_native_fee[0]?.toString() || '0'
+        : minter_info.withdrawal_native_fee[0]?.toString() || '0';
     }
     return '0';
   } catch (error) {
@@ -245,61 +249,73 @@ const estimate_withdrawal_gas = async (
   minter_address: Principal,
   is_native_token: boolean,
   token_canister_id: string,
+  max_fee_per_gas: string,
 ): Promise<{ max_transaction_fee: string; max_fee_per_gas: string }> => {
-  try {
-    if (operator === 'Appic') {
-      // Cast actor to Appic Minter Type
-      const actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address }) as {
-        eip_1559_transaction_price: (
-          arg: [AppicEip1559TransactionPriceArg] | [],
-        ) => Promise<AppicEip1559TransactionPrice>;
-      };
+  const erc20_gas = '65000';
+  const native_gas = '21000';
 
-      const price = is_native_token
-        ? await actor.eip_1559_transaction_price([])
-        : await actor.eip_1559_transaction_price([
-            {
-              erc20_ledger_id: Principal.fromText(token_canister_id),
-            },
-          ]);
+  const max_transaction_fee = is_native_token
+    ? BigNumber(native_gas).multipliedBy(max_fee_per_gas).toFixed()
+    : BigNumber(erc20_gas).multipliedBy(max_fee_per_gas).toFixed();
 
-      return {
-        max_transaction_fee: price.max_transaction_fee.toString(),
-        max_fee_per_gas: price.max_fee_per_gas.toString(),
-      };
-    }
+  return {
+    max_transaction_fee,
+    max_fee_per_gas,
+  };
+  // try {
+  //   if (operator === 'Appic') {
+  //     // Cast actor to Appic Minter Type
+  //     const actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address }) as {
+  //       eip_1559_transaction_price: (
+  //         arg: [AppicEip1559TransactionPriceArg] | [],
+  //       ) => Promise<AppicEip1559TransactionPrice>;
+  //     };
 
-    if (operator === 'Dfinity') {
-      // Cast actor to Dfinity Minter Type
-      const actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address }) as {
-        eip_1559_transaction_price: (
-          arg: [] | [DfinityEip1559TransactionPriceArg],
-        ) => Promise<DfinityEip1559TransactionPrice>;
-      };
+  //     const price = is_native_token
+  //       ? await actor.eip_1559_transaction_price([])
+  //       : await actor.eip_1559_transaction_price([
+  //           {
+  //             erc20_ledger_id: Principal.fromText(token_canister_id),
+  //           },
+  //         ]);
 
-      const price = is_native_token
-        ? await actor.eip_1559_transaction_price([])
-        : await actor.eip_1559_transaction_price([
-            {
-              ckerc20_ledger_id: Principal.fromText(token_canister_id),
-            },
-          ]);
+  //     return {
+  //       max_transaction_fee: price.max_transaction_fee.toString(),
+  //       max_fee_per_gas: price.max_fee_per_gas.toString(),
+  //     };
+  //   }
 
-      return {
-        max_transaction_fee: price.max_transaction_fee.toString(),
-        max_fee_per_gas: price.max_fee_per_gas.toString(),
-      };
-    }
+  //   if (operator === 'Dfinity') {
+  //     // Cast actor to Dfinity Minter Type
+  //     const actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address }) as {
+  //       eip_1559_transaction_price: (
+  //         arg: [] | [DfinityEip1559TransactionPriceArg],
+  //       ) => Promise<DfinityEip1559TransactionPrice>;
+  //     };
 
-    // Fallback for unsupported operators
-    return {
-      max_transaction_fee: '0',
-      max_fee_per_gas: '0',
-    };
-  } catch (error) {
-    console.error('Error estimating withdrawal gas:', error);
-    throw error;
-  }
+  //     const price = is_native_token
+  //       ? await actor.eip_1559_transaction_price([])
+  //       : await actor.eip_1559_transaction_price([
+  //           {
+  //             ckerc20_ledger_id: Principal.fromText(token_canister_id),
+  //           },
+  //         ]);
+
+  //     return {
+  //       max_transaction_fee: price.max_transaction_fee.toString(),
+  //       max_fee_per_gas: price.max_fee_per_gas.toString(),
+  //     };
+  //   }
+
+  //   // Fallback for unsupported operators
+  //   return {
+  //     max_transaction_fee: '0',
+  //     max_fee_per_gas: '0',
+  //   };
+  // } catch (error) {
+  //   console.error('Error estimating withdrawal gas:', error);
+  //   throw error;
+  // }
 };
 
 const get_gas_price = async (chain: ViemChain, rpc_url: string): Promise<{ max_fee_per_gas: string }> => {
@@ -377,14 +393,21 @@ const estimate_deposit_fee = async (
 /**
  * Estimate gas for a deposit approval in case of erc20 tokens.
  */
-const estimate_deposit_approval_fee = async (
+const estimate_deposit_approval_fee: (
   encoded_function_data: `0x${string}`,
   token_contract_address: `0x${string}`,
   max_fee_per_gas: string,
   is_native: boolean,
   chain: ViemChain,
   rpc_url: string,
-): Promise<{ approval_gas: string; total_approval_fee: string }> => {
+) => Promise<{ approval_gas: string; total_approval_fee: string }> = async (
+  encoded_function_data,
+  token_contract_address,
+  max_fee_per_gas,
+  is_native,
+  chain,
+  rpc_url,
+) => {
   if (is_native) {
     return { approval_gas: '0', total_approval_fee: '0' };
   }
@@ -516,6 +539,8 @@ const calculate_bridge_options = async (
       bridge_metadata.minter_address,
       bridge_metadata.tx_type,
     );
+
+    console.log(minter_fee);
 
     const total_native_fee = new BigNumber(minter_fee).plus(estimated_network_fee).plus(approve_native_fee).toFixed();
     const estimated_return = bridge_metadata.is_native
