@@ -13,11 +13,12 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
   const { selectedOption, bridgeOptions, toToken } = useBridgeStore();
   const { setSelectedOption } = useBridgeActions();
 
-  const [expandedOption, setExpandedOption] = useState<BridgeOptionType | undefined>(bridgeOptions && bridgeOptions[0]);
+  const [expandedOption, setExpandedOption] = useState<BridgeOptionType | undefined>();
 
   useEffect(() => {
     if (bridgeOptions) {
       setSelectedOption(bridgeOptions[0]);
+      setExpandedOption(bridgeOptions[0]);
     }
   }, [bridgeOptions, setSelectedOption]);
 

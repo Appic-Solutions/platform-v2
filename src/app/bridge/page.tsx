@@ -2,11 +2,11 @@
 import BridgeSelectTokenPage from './_components/select-token/select-token';
 import TokenListPage from './_components/chain-token-list/token-list';
 import { useEffect } from 'react';
-import BridgeReview from './_components/bridge-review/BridgeReview';
 import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
 import { BridgeOptionsListRequest } from './_api/types/request';
 import { useBridgeActions, useBridgeStore } from './_store';
 import { useSharedStore } from '@/common/state/store';
+import { StepperContainer } from './_components/bridge-review';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();
@@ -15,6 +15,20 @@ const BridgeHome = () => {
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
   const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } = useGetBridgeOptions();
+
+  // NOTE: It will delete
+  // const { data: historyData } = useGetHistory({
+  //   bridge_tokens: bridgePairs,
+  //   evm_wallet_address: evmAddress,
+  //   unauthenticated_agent: unAuthenticatedAgent,
+  //   principal_id: icpIdentity?.getPrincipal(),
+  // });
+
+  // useEffect(() => {
+  //   if (bridgePairs && unAuthenticatedAgent && (evmAddress || icpIdentity?.getPrincipal())) {
+  //     console.log('history data:', historyData);
+  //   }
+  // }, [bridgePairs, unAuthenticatedAgent, evmAddress, historyData, icpIdentity]);
 
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
@@ -48,7 +62,7 @@ const BridgeHome = () => {
       case 2:
         return <TokenListPage isPending={isPending} isError={isError} />;
       case 3:
-        return <BridgeReview />;
+        return <StepperContainer />;
       default:
         return null;
     }

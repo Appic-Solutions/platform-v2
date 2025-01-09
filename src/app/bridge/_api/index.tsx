@@ -9,8 +9,6 @@ import {
   CreateWalletClientRequest,
   DepositTokenRequest,
   DepositTokenWithApprovalRequest,
-  FullDepositRequest,
-  FullWithdrawalRequest,
   NotifyAppicHelperDepositRequest,
   NotifyAppicHelperWithdrawalRequest,
   SubmitWithdrawRequest,
@@ -22,16 +20,17 @@ import {
   check_deposit_status,
   check_withdraw_status,
   create_wallet_client,
-  DepositTxStatus,
   icrc2_approve,
   notify_appic_helper_deposit,
   notify_appic_helper_withdrawal,
   request_deposit,
   request_withdraw,
-  WithdrawalTxStatus,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeLogic } from '../_logic';
-import { Response } from '@/blockchain_api/types/response';
+import { useBridgeActions } from '../_store';
+// import { Principal } from '@dfinity/principal';
+// import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+// import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
 
 const useGetBridgePairs = (agent: HttpAgent | undefined) => {
   const { getBridgePairsFromLocalStorage, setBridgePairsWithTime } = BridgeLogic();
@@ -117,16 +116,19 @@ const useNotifyAppicHelper = () => {
 };
 
 // Step 4: Check Withdrawal Status
-const useCheckWithdrawalStatus = () => {
-  return useMutation({
-    mutationFn: (params: CheckWithdrawalStatusRequest) =>
-      check_withdraw_status(params.withdrawalId, params.bridgeOption, params.authenticatedAgent),
-    onError: (error) => {
-      console.error('Check withdrawal status failed:', error);
+const useCheckWithdrawalStatus = ({ authenticatedAgent, bridgeOption, withdrawalId }: CheckWithdrawalStatusRequest) => {
+  const { setTxStatus } = useBridgeActions();
+  return useQuery({
+    queryKey: ['check-withdrawal-status'],
+    queryFn: () => {
+      if (authenticatedAgent && bridgeOption && withdrawalId) {
+        check_withdraw_status(withdrawalId, bridgeOption, authenticatedAgent).then((res) => {
+          setTxStatus(res.result);
+        });
+      }
     },
-    onSuccess: (data) => {
-      console.log('Check withdrawal status successful:', data);
-    },
+    // enabled: !!params,
+    refetchInterval: 1000 * 60,
   });
 };
 
@@ -193,118 +195,42 @@ const useNotifyAppicHelperDeposit = () => {
 
 // Step 5: Check Deposit Status
 // This function should be called internally until the transaction status is either "Minted" or "Invalid" or "Quarantined"
-const useCheckDepositStatus = () => {
-  return useMutation({
-    mutationFn: (params: CheckDepositStatusRequest) =>
-      check_deposit_status(params.tx_hash, params.bridgeOption, params.unauthenticatedAgent),
-    onError: (error) => {
-      console.error('Check deposit status failed:', error);
-    },
-    onSuccess: (data) => {
-      console.log('Check deposit status successful:', data);
-    },
+const useCheckDepositStatus = (params: CheckDepositStatusRequest) => {
+  return useQuery({
+    queryKey: ['check-deposit-status'],
+    queryFn: () => check_deposit_status(params.tx_hash, params.bridgeOption, params.unauthenticatedAgent),
+    refetchInterval: 1000 * 30,
+    enabled: !!params,
   });
 };
 
-// Main function to handle the entire withdrawal process
-const useHandleWithdrawal = () => {
-  const tokenApproval = useTokenApproval();
-  const submitWithdrawRequest = useSubmitWithdrawRequest();
-  const notifyAppicHelper = useNotifyAppicHelper();
-  const checkWithdrawalStatus = useCheckWithdrawalStatus();
-
-  return useMutation<Response<WithdrawalTxStatus>, Error, FullWithdrawalRequest>({
-    mutationFn: async (params: FullWithdrawalRequest) => {
-      // Step 1: Token Approval
-      const approvalResult = await tokenApproval.mutateAsync({
-        authenticatedAgent: params.authenticatedAgent,
-        bridgeOption: params.bridgeOption,
-      });
-      if (!approvalResult.success) throw new Error('Token approval failed');
-
-      // Step 2: Submit Withdrawal Request
-      const withdrawResponse = await submitWithdrawRequest.mutateAsync({
-        authenticatedAgent: params.authenticatedAgent,
-        bridgeOption: params.bridgeOption,
-        recipient: params.recipient,
-      });
-      if (!withdrawResponse.success) throw new Error('Withdrawal request failed');
-
-      // Step 3: Notify Appic Helper
-      const notifyResult = await notifyAppicHelper.mutateAsync({
-        authenticatedAgent: params.authenticatedAgent,
-        bridgeOption: params.bridgeOption,
-        recipient: params.recipient,
-        userWalletPrincipal: params.userWalletPrincipal,
-        withdrawalId: withdrawResponse.result,
-      });
-      if (!notifyResult.success) throw new Error('Notify Appic Helper failed');
-
-      // Step 4: Check Withdrawal Status
-      const statusResult = await checkWithdrawalStatus.mutateAsync({
-        authenticatedAgent: params.authenticatedAgent,
-        bridgeOption: params.bridgeOption,
-        withdrawalId: withdrawResponse.result,
-      });
-      if (!statusResult.success) throw new Error('Check withdrawal status failed');
-
-      return statusResult;
-    },
-  });
-};
-
-// Main function to handle the entire deposit process
-const useHandleDeposit = () => {
-  const createWalletClient = useCreateWalletClient();
-  const depositTokenWithApproval = useDepositTokenWithApproval();
-  const depositToken = useDepositToken();
-  const notifyAppicHelperDeposit = useNotifyAppicHelperDeposit();
-  const checkDepositStatus = useCheckDepositStatus();
-
-  return useMutation<Response<DepositTxStatus>, Error, FullDepositRequest>({
-    mutationFn: async (params: FullDepositRequest) => {
-      // Step 1: Create Wallet Client
-      const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
-      if (!walletClientResult) throw new Error('Create wallet client failed');
-
-      // Step 2: Token Approval
-      const approvalResult = await depositTokenWithApproval.mutateAsync({
-        bridgeOption: params.bridgeOption,
-        wallet_client: walletClientResult,
-      });
-      if (!approvalResult.success) throw new Error('Token approval failed');
-
-      // Step 3: Submit Deposit Request
-      const depositResponse = await depositToken.mutateAsync({
-        bridgeOption: params.bridgeOption,
-        recipient: params.recipient,
-        wallet_client: walletClientResult,
-      });
-      if (!depositResponse.success) throw new Error('Deposit request failed');
-
-      // Step 4: Notify Appic Helper
-      const notifyResult = await notifyAppicHelperDeposit.mutateAsync({
-        bridgeOption: params.bridgeOption,
-        recipientPrincipal: params.recipientPrincipal,
-        unauthenticatedAgent: params.unAuthenticatedAgent,
-        userWalletAddress: params.userWalletAddress,
-        tx_hash: depositResponse.result,
-      });
-      if (!notifyResult.success) throw new Error('Notify Appic Helper failed');
-
-      // Step 5: Check Deposit Status
-      const statusResult = await checkDepositStatus.mutateAsync({
-        bridgeOption: params.bridgeOption,
-        unauthenticatedAgent: params.unAuthenticatedAgent,
-        tx_hash: depositResponse.result,
-      });
-      if (!statusResult.success) throw new Error('Check deposit status failed');
-
-      return statusResult;
-    },
-  });
-};
-
+// temp
+// NOTE: It will be deleted
+// export interface GetBridgeHistory {
+//   evm_wallet_address: string | undefined;
+//   principal_id: Principal | undefined;
+//   unauthenticated_agent: HttpAgent;
+//   bridge_tokens: (EvmToken | IcpToken)[];
+// }
+// const useGetHistory = (params: GetBridgeHistory) => {
+// console.log(params);
+// return useQuery({
+//   queryKey: ['bridge-history'],
+//   queryFn: () =>
+//     get_transaction_history(
+//       params.evm_wallet_address,
+//       params.principal_id,
+//       params.unauthenticated_agent,
+//       params.bridge_tokens,
+//     ),
+//   enabled:
+//     !!params.bridge_tokens &&
+//     (!!params.evm_wallet_address || !!params.principal_id) &&
+//     !!params.unauthenticated_agent,
+//   refetchInterval: 1000 * 5,
+// });
+// };
+// temp
 export {
   useGetBridgePairs,
   useGetBridgeOptions,
@@ -314,6 +240,8 @@ export {
   useCheckDepositStatus,
   useNotifyAppicHelperDeposit,
   useDepositToken,
-  useHandleWithdrawal,
-  useHandleDeposit,
+  useTokenApproval,
+  useSubmitWithdrawRequest,
+  useNotifyAppicHelper,
+  // useGetHistory,
 };

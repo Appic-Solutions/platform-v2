@@ -35,9 +35,9 @@ interface NotifyAppicHelperWithdrawalRequest {
 }
 // STEP 4
 interface CheckWithdrawalStatusRequest {
-  bridgeOption: BridgeOption;
-  withdrawalId: string;
-  authenticatedAgent: Agent;
+  bridgeOption?: BridgeOption;
+  withdrawalId?: string;
+  authenticatedAgent?: Agent;
 }
 
 // DEPOSIT TX
@@ -71,7 +71,7 @@ interface CheckDepositStatusRequest {
 
 interface FullDepositRequest {
   bridgeOption: BridgeOption;
-  recipient: Principal;
+  recipient: Principal; // Destination Principal Address
   userWalletAddress: string;
   recipientPrincipal: string;
   unAuthenticatedAgent: HttpAgent;

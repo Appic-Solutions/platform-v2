@@ -6,56 +6,48 @@ import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
 import ActionButton from '../select-token/_components/ActionButton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
-import { useHandleDeposit, useHandleWithdrawal } from '../../_api';
-import { FullDepositRequest, FullWithdrawalRequest } from '../../_api/types/request';
+// import { useHandleDeposit, useHandleWithdrawal } from '../../_api';
+// import { FullDepositRequest, FullWithdrawalRequest } from '../../_api/types/request';
 import { useSharedStore } from '@/common/state/store';
+import { useState } from 'react';
+import { BridgeLogic } from '../../_logic';
+import { DialogTrigger } from '@/common/components/ui/dialog';
 
 const BridgeReview = () => {
+  const [showStepper, setShowStepper] = useState(false);
+  const [btnText, setBtnText] = useState('Start bridging');
+
   // shared store
   const { icpIdentity, evmAddress, unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
+
   // bridge store
-  const { selectedOption: option, toToken } = useBridgeStore();
+  const { selectedOption: option, toToken, fromToken } = useBridgeStore();
   const { setActiveStep } = useBridgeActions();
 
-  const handleDeposit = useHandleDeposit();
-  const handleWithdrawal = useHandleWithdrawal();
+  // bridge logic
+  const { executeDeposit, executeWithdrawal } = BridgeLogic();
 
-  //  1. Withdrawal Transactions (ICP -> EVM)
-  //  2. Deposit Transactions (EVM -> ICP) [not detailed here]
-
-  const initiateDeposit = async () => {
-    if (option && icpIdentity && evmAddress && unAuthenticatedAgent) {
-      try {
-        const params: FullDepositRequest = {
-          bridgeOption: option,
-          recipient: icpIdentity.getPrincipal(),
-          recipientPrincipal: icpIdentity.getPrincipal().toString(),
-          unAuthenticatedAgent,
-          userWalletAddress: evmAddress,
-        };
-        const result = await handleDeposit.mutateAsync(params);
-        console.log('Deposit successful:', result);
-      } catch (error) {
-        console.error('Deposit failed:', error);
-      }
-    }
-  };
-
-  const initiateWithdrawal = async () => {
-    if (option && icpIdentity && evmAddress && unAuthenticatedAgent && authenticatedAgent) {
-      try {
-        const params: FullWithdrawalRequest = {
-          bridgeOption: option,
-          recipient: evmAddress,
-          authenticatedAgent,
-          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-        };
-        const result = await handleWithdrawal.mutateAsync(params);
-        console.log('Withdrawal successful:', result);
-      } catch (error) {
-        console.error('Withdrawal failed:', error);
-      }
-    }
+  const onSubmit = () => {
+    setBtnText('Show Transaction Status');
+    // if (authenticatedAgent && option && evmAddress && icpIdentity && unAuthenticatedAgent && !showStepper) {
+    // if (fromToken?.chain_type === 'ICP') {
+    //   executeWithdrawal({
+    //     authenticatedAgent,
+    //     bridgeOption: option,
+    //     recipient: evmAddress,
+    //     userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+    //   });
+    // } else if (fromToken?.chain_type === 'EVM') {
+    //   executeDeposit({
+    //     bridgeOption: option,
+    //     recipient: icpIdentity.getPrincipal(),
+    //     recipientPrincipal: icpIdentity.getPrincipal().toString(),
+    //     unAuthenticatedAgent,
+    //     userWalletAddress: evmAddress,
+    //   });
+    // }
+    // }
+    setShowStepper(true);
   };
 
   if (option && toToken) {
@@ -73,7 +65,6 @@ const BridgeReview = () => {
               '!py-4 px-4 border min-w-[300px] flex-col gap-3 items-start justify-between overflow-hidden rounded-[20px]',
               'md:px-6 md:rounded-[36px]',
               'transition duration-300',
-              'cursor-pointer',
               'bg-highlighted-card',
               'border-blue-600',
             )}
@@ -169,7 +160,11 @@ const BridgeReview = () => {
               </div>
             </div>
           </Card>
-          <ActionButton isDisabled={false}>Start Bridging</ActionButton>
+          <DialogTrigger>
+            <ActionButton isDisabled={false} onClick={onSubmit}>
+              {btnText}
+            </ActionButton>
+          </DialogTrigger>
         </div>
       </Box>
     );

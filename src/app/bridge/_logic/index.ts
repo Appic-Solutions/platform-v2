@@ -2,14 +2,81 @@ import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
 import { useSharedStore } from '@/common/state/store';
+import {
+  useCreateWalletClient,
+  useDepositToken,
+  useDepositTokenWithApproval,
+  useNotifyAppicHelper,
+  useNotifyAppicHelperDeposit,
+  useSubmitWithdrawRequest,
+  useTokenApproval,
+} from '../_api';
+import { FullDepositRequest, FullWithdrawalRequest } from '../_api/types/request';
+import { useState } from 'react';
+import {
+  check_deposit_status,
+  check_withdraw_status,
+  TxHash,
+} from '@/blockchain_api/functions/icp/bridge_transactions';
+import { useQuery } from '@tanstack/react-query';
 
 export const BridgeLogic = () => {
   // Bridge Store
   const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep } = useBridgeActions();
+  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxStatus } = useBridgeActions();
   // Shared Store
-  const { icpIdentity, isEvmConnected, evmBalance, icpBalance } = useSharedStore();
+  const {
+    icpIdentity,
+    isEvmConnected,
+    evmBalance,
+    icpBalance,
+    authenticatedAgent,
+    isEvmBalanceLoading,
+    isIcpBalanceLoading,
+    unAuthenticatedAgent,
+  } = useSharedStore();
+
+  // Bridge Transaction states
+
+  const [txHash, setTxHash] = useState<TxHash | undefined>();
+  const [withdrawalId, setWithdrawalId] = useState<string | undefined>();
+  // deposit queries ====================>
+  const createWalletClient = useCreateWalletClient();
+  const depositTokenWithApproval = useDepositTokenWithApproval();
+  const depositToken = useDepositToken();
+  const notifyAppicHelperDeposit = useNotifyAppicHelperDeposit();
+  // check withdrawal tx status
+  useQuery({
+    queryKey: ['check-deposit-status'],
+    queryFn: async () => {
+      if (txHash && unAuthenticatedAgent && selectedOption) {
+        const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
+        setTxStatus(res.result);
+        return res;
+      }
+      return null;
+    },
+    refetchInterval: 1000 * 30,
+  });
+  // withdrawal queries =====================>
+  const tokenApproval = useTokenApproval();
+  const submitWithdrawRequest = useSubmitWithdrawRequest();
+  const notifyAppicHelper = useNotifyAppicHelper();
+  // check withdrawal tx status
+  useQuery({
+    queryKey: ['check-withdrawal-status'],
+    queryFn: async () => {
+      if (authenticatedAgent && selectedOption && withdrawalId) {
+        const res = await check_withdraw_status(withdrawalId, selectedOption, authenticatedAgent);
+        setTxStatus(res?.result);
+        return res || null;
+      }
+      return null;
+    },
+    // enabled: !!params,
+    refetchInterval: 1000 * 60,
+  });
 
   // select token function in chain token list
   function selectToken(token: EvmToken | IcpToken) {
@@ -67,6 +134,8 @@ export const BridgeLogic = () => {
     toWalletAddress: string;
   }) {
     if (!fromToken || !toToken) return 'Select token to bridge';
+
+    if (isEvmBalanceLoading || isIcpBalanceLoading) return 'Fetching wallet balance';
 
     // avoid to select same tokens
     if (
@@ -149,6 +218,92 @@ export const BridgeLogic = () => {
     };
   };
 
+  // * 1. Withdrawal Transactions (ICP -> EVM)
+  // * 2. Deposit Transactions (EVM -> ICP)
+
+  const executeWithdrawal = async (params: FullWithdrawalRequest) => {
+    if (selectedOption && authenticatedAgent) {
+      // Step 1: Token Approval
+      const approvalResult = await tokenApproval.mutateAsync({
+        bridgeOption: selectedOption,
+        authenticatedAgent,
+      });
+      if (!approvalResult.success) {
+        return approvalResult.message;
+      }
+      setTxStep(2);
+
+      // Step 2: Submit Withdrawal Request
+      const withdrawResponse = await submitWithdrawRequest.mutateAsync({
+        authenticatedAgent: params.authenticatedAgent,
+        bridgeOption: params.bridgeOption,
+        recipient: params.recipient,
+      });
+      if (!withdrawResponse.success) {
+        return withdrawResponse.message;
+      }
+      setWithdrawalId(withdrawResponse.result);
+      setTxStep(3);
+
+      // Step 3: Notify Appic Helper
+      const notifyResult = await notifyAppicHelper.mutateAsync({
+        authenticatedAgent: params.authenticatedAgent,
+        bridgeOption: params.bridgeOption,
+        recipient: params.recipient,
+        userWalletPrincipal: params.userWalletPrincipal,
+        withdrawalId: withdrawResponse.result,
+      });
+      if (!notifyResult.success) {
+        return notifyResult.message;
+      }
+      setTxStep(4);
+    }
+  };
+
+  const executeDeposit = async (params: FullDepositRequest) => {
+    // Step 1: Create Wallet Client
+    const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
+    if (!walletClientResult) {
+      return;
+    }
+    setTxStep(2);
+
+    // Step 2: Token Approval
+    const approvalResult = await depositTokenWithApproval.mutateAsync({
+      bridgeOption: params.bridgeOption,
+      wallet_client: walletClientResult,
+    });
+    if (!approvalResult.success) {
+      return approvalResult.message;
+    }
+    setTxStep(3);
+
+    // Step 3: Submit Deposit Request
+    const depositResponse = await depositToken.mutateAsync({
+      bridgeOption: params.bridgeOption,
+      recipient: params.recipient,
+      wallet_client: walletClientResult,
+    });
+    if (!depositResponse.success) {
+      return depositResponse.message;
+    }
+    setTxHash(depositResponse.result);
+    setTxStep(4);
+
+    // Step 4: Notify Appic Helper
+    const notifyResult = await notifyAppicHelperDeposit.mutateAsync({
+      bridgeOption: params.bridgeOption,
+      recipientPrincipal: params.recipientPrincipal,
+      unauthenticatedAgent: params.unAuthenticatedAgent,
+      userWalletAddress: params.userWalletAddress,
+      tx_hash: depositResponse.result,
+    });
+    if (!notifyResult.success) {
+      return notifyResult.message;
+    }
+    setTxStep(5);
+  };
+
   return {
     selectToken,
     changeStep,
@@ -158,5 +313,7 @@ export const BridgeLogic = () => {
     isTokenSelected,
     setBridgePairsWithTime,
     getBridgePairsFromLocalStorage,
+    executeDeposit,
+    executeWithdrawal,
   };
 };
