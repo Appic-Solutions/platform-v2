@@ -1,21 +1,19 @@
 import { cn } from '@/common/helpers/utils';
 import React from 'react';
 import Image from 'next/image';
-import { Status } from './TransactionStepper';
 import { TxStep } from '../../_api/types';
+import { TxStepType, useBridgeStore } from '../../_store';
 
 export const TransactionStep = ({
   currentStep,
   step,
   index,
-  status,
 }: {
   step: TxStep;
-  currentStep: number;
-  animationDirection: 'left' | 'right' | null;
+  currentStep: TxStepType;
   index: number;
-  status: Status;
 }) => {
+  const { txStatus } = useBridgeStore();
   return (
     <div
       className={cn(
@@ -23,12 +21,26 @@ export const TransactionStep = ({
         'duration-500 ease-in-out w-64',
         'md:animate-slide-in-from-right',
         'animate-slide-in-from-top',
-        index === currentStep - 1 ? 'opacity-100' : index === currentStep ? 'opacity-50 select-none' : 'hidden',
+        index === currentStep.count - 1
+          ? 'opacity-100'
+          : index === currentStep.count
+            ? 'opacity-50 select-none'
+            : 'hidden',
       )}
     >
       <div className="text-lg font-bold text-[#333333] dark:text-white">{step.title}</div>
-      <div className={cn('flex items-center justify-center w-[90px] h-[90px] relative rounded-full')}>
-        {currentStep === index + 1 && status === 'pending' && (
+      <div
+        className={cn(
+          'flex items-center justify-center w-[90px] h-[90px] relative rounded-full',
+          currentStep.count === index + 1 && currentStep.status === 'failed' && 'border-2 border-red-500',
+        )}
+      >
+        {currentStep.count === index + 1 && currentStep.status === 'pending' && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-[85px] h-[85px] border-2 border-t-transparent border-green-600 rounded-full animate-spin" />
+          </div>
+        )}
+        {txStatus && txStatus === 'pending' && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[85px] h-[85px] border-2 border-t-transparent border-green-600 rounded-full animate-spin" />
           </div>
@@ -42,14 +54,13 @@ export const TransactionStep = ({
         />
       </div>
       <div className="flex flex-col gap-y-4">
-        {status && (
-          <>
-            <p className="text-lg font-bold text-[#333333] dark:text-white"> {step.statuses[status].statusTitle}</p>
-            <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
-              {step.statuses[status].description}
-            </p>
-          </>
-        )}
+        <p className="text-lg font-bold text-[#333333] dark:text-white">
+          {' '}
+          {step.statuses[currentStep.status].statusTitle}
+        </p>
+        <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
+          {step.statuses[currentStep.status].description}
+        </p>
       </div>
     </div>
   );

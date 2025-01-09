@@ -52,7 +52,24 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (txHash && unAuthenticatedAgent && selectedOption) {
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
-        setTxStatus(res.result);
+        if (res.success) {
+          if (res.result === 'Minted') {
+            setTxStatus('successful');
+          } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
+            setTxStatus('failed');
+          } else {
+            setTxStatus('pending');
+          }
+          setTxStep({
+            count: 4,
+            status: 'successful',
+          });
+        } else if (!res.success) {
+          setTxStep({
+            count: 4,
+            status: 'failed',
+          });
+        }
         return res;
       }
       return null;
@@ -69,12 +86,28 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (authenticatedAgent && selectedOption && withdrawalId) {
         const res = await check_withdraw_status(withdrawalId, selectedOption, authenticatedAgent);
-        setTxStatus(res?.result);
+        if (res.success) {
+          if (res.result === 'Successful') {
+            setTxStatus('successful');
+          } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
+            setTxStatus('failed');
+          } else {
+            setTxStatus('pending');
+          }
+          setTxStep({
+            count: 5,
+            status: 'successful',
+          });
+        } else if (!res.success) {
+          setTxStep({
+            count: 5,
+            status: 'failed',
+          });
+        }
         return res || null;
       }
       return null;
     },
-    // enabled: !!params,
     refetchInterval: 1000 * 60,
   });
 
@@ -218,20 +251,30 @@ export const BridgeLogic = () => {
     };
   };
 
-  // * 1. Withdrawal Transactions (ICP -> EVM)
-  // * 2. Deposit Transactions (EVM -> ICP)
+  //  1. Withdrawal Transactions (ICP -> EVM)
+  //  2. Deposit Transactions (EVM -> ICP)
 
   const executeWithdrawal = async (params: FullWithdrawalRequest) => {
     if (selectedOption && authenticatedAgent) {
       // Step 1: Token Approval
+      // set step status pending
       const approvalResult = await tokenApproval.mutateAsync({
         bridgeOption: selectedOption,
         authenticatedAgent,
       });
       if (!approvalResult.success) {
+        // set step status failed
+        setTxStep({
+          count: 1,
+          status: 'failed',
+        });
         return approvalResult.message;
       }
-      setTxStep(2);
+      // set step status success
+      setTxStep({
+        count: 2,
+        status: 'pending',
+      });
 
       // Step 2: Submit Withdrawal Request
       const withdrawResponse = await submitWithdrawRequest.mutateAsync({
@@ -240,10 +283,17 @@ export const BridgeLogic = () => {
         recipient: params.recipient,
       });
       if (!withdrawResponse.success) {
+        setTxStep({
+          count: 2,
+          status: 'failed',
+        });
         return withdrawResponse.message;
       }
       setWithdrawalId(withdrawResponse.result);
-      setTxStep(3);
+      setTxStep({
+        count: 3,
+        status: 'pending',
+      });
 
       // Step 3: Notify Appic Helper
       const notifyResult = await notifyAppicHelper.mutateAsync({
@@ -254,19 +304,34 @@ export const BridgeLogic = () => {
         withdrawalId: withdrawResponse.result,
       });
       if (!notifyResult.success) {
+        setTxStep({
+          count: 3,
+          status: 'failed',
+        });
         return notifyResult.message;
       }
-      setTxStep(4);
+      setTxStep({
+        count: 4,
+        status: 'pending',
+      });
     }
   };
 
   const executeDeposit = async (params: FullDepositRequest) => {
     // Step 1: Create Wallet Client
+    debugger;
     const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
     if (!walletClientResult) {
+      setTxStep({
+        count: 1,
+        status: 'failed',
+      });
       return;
     }
-    setTxStep(2);
+    setTxStep({
+      count: 2,
+      status: 'pending',
+    });
 
     // Step 2: Token Approval
     const approvalResult = await depositTokenWithApproval.mutateAsync({
@@ -274,9 +339,16 @@ export const BridgeLogic = () => {
       wallet_client: walletClientResult,
     });
     if (!approvalResult.success) {
+      setTxStep({
+        count: 2,
+        status: 'failed',
+      });
       return approvalResult.message;
     }
-    setTxStep(3);
+    setTxStep({
+      count: 3,
+      status: 'pending',
+    });
 
     // Step 3: Submit Deposit Request
     const depositResponse = await depositToken.mutateAsync({
@@ -285,10 +357,17 @@ export const BridgeLogic = () => {
       wallet_client: walletClientResult,
     });
     if (!depositResponse.success) {
+      setTxStep({
+        count: 3,
+        status: 'failed',
+      });
       return depositResponse.message;
     }
     setTxHash(depositResponse.result);
-    setTxStep(4);
+    setTxStep({
+      count: 4,
+      status: 'pending',
+    });
 
     // Step 4: Notify Appic Helper
     const notifyResult = await notifyAppicHelperDeposit.mutateAsync({
@@ -299,9 +378,16 @@ export const BridgeLogic = () => {
       tx_hash: depositResponse.result,
     });
     if (!notifyResult.success) {
+      setTxStep({
+        count: 4,
+        status: 'failed',
+      });
       return notifyResult.message;
     }
-    setTxStep(5);
+    setTxStep({
+      count: 5,
+      status: 'pending',
+    });
   };
 
   return {

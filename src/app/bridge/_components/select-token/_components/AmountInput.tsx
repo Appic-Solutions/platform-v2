@@ -21,9 +21,16 @@ const AmountInput = () => {
 
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
-      const mainToken = evmBalance.tokens.find((t) => t.contractAddress === fromToken?.contractAddress);
+      const mainToken = evmBalance.tokens.find((t) => {
+        // check for native tokens
+        const isNativeToken = t.contractAddress === undefined && t.chainId === fromToken.chainId;
+        // check for smart contract tokens
+        const isSameContractToken = t.contractAddress === fromToken.contractAddress;
+        return isNativeToken || isSameContractToken;
+      });
       setUserTokenBalance(mainToken?.balance || '0');
     }
+
     if (fromToken?.chain_type === 'ICP' && icpBalance) {
       const mainToken = icpBalance.tokens.find((t) => t.canisterId === fromToken?.canisterId);
       setUserTokenBalance(mainToken?.balance || '0');

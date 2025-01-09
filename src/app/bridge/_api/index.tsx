@@ -4,8 +4,6 @@ import { HttpAgent } from '@dfinity/agent';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   BridgeOptionsListRequest,
-  CheckDepositStatusRequest,
-  CheckWithdrawalStatusRequest,
   CreateWalletClientRequest,
   DepositTokenRequest,
   DepositTokenWithApprovalRequest,
@@ -17,8 +15,6 @@ import {
 
 import {
   approve_erc20,
-  check_deposit_status,
-  check_withdraw_status,
   create_wallet_client,
   icrc2_approve,
   notify_appic_helper_deposit,
@@ -27,10 +23,6 @@ import {
   request_withdraw,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeLogic } from '../_logic';
-import { useBridgeActions } from '../_store';
-// import { Principal } from '@dfinity/principal';
-// import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-// import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
 
 const useGetBridgePairs = (agent: HttpAgent | undefined) => {
   const { getBridgePairsFromLocalStorage, setBridgePairsWithTime } = BridgeLogic();
@@ -115,23 +107,6 @@ const useNotifyAppicHelper = () => {
   });
 };
 
-// Step 4: Check Withdrawal Status
-const useCheckWithdrawalStatus = ({ authenticatedAgent, bridgeOption, withdrawalId }: CheckWithdrawalStatusRequest) => {
-  const { setTxStatus } = useBridgeActions();
-  return useQuery({
-    queryKey: ['check-withdrawal-status'],
-    queryFn: () => {
-      if (authenticatedAgent && bridgeOption && withdrawalId) {
-        check_withdraw_status(withdrawalId, bridgeOption, authenticatedAgent).then((res) => {
-          setTxStatus(res.result);
-        });
-      }
-    },
-    // enabled: !!params,
-    refetchInterval: 1000 * 60,
-  });
-};
-
 // DEPOSIT
 // Step 1: Create Wallet Client
 const useCreateWalletClient = () => {
@@ -193,55 +168,14 @@ const useNotifyAppicHelperDeposit = () => {
   });
 };
 
-// Step 5: Check Deposit Status
-// This function should be called internally until the transaction status is either "Minted" or "Invalid" or "Quarantined"
-const useCheckDepositStatus = (params: CheckDepositStatusRequest) => {
-  return useQuery({
-    queryKey: ['check-deposit-status'],
-    queryFn: () => check_deposit_status(params.tx_hash, params.bridgeOption, params.unauthenticatedAgent),
-    refetchInterval: 1000 * 30,
-    enabled: !!params,
-  });
-};
-
-// temp
-// NOTE: It will be deleted
-// export interface GetBridgeHistory {
-//   evm_wallet_address: string | undefined;
-//   principal_id: Principal | undefined;
-//   unauthenticated_agent: HttpAgent;
-//   bridge_tokens: (EvmToken | IcpToken)[];
-// }
-// const useGetHistory = (params: GetBridgeHistory) => {
-// console.log(params);
-// return useQuery({
-//   queryKey: ['bridge-history'],
-//   queryFn: () =>
-//     get_transaction_history(
-//       params.evm_wallet_address,
-//       params.principal_id,
-//       params.unauthenticated_agent,
-//       params.bridge_tokens,
-//     ),
-//   enabled:
-//     !!params.bridge_tokens &&
-//     (!!params.evm_wallet_address || !!params.principal_id) &&
-//     !!params.unauthenticated_agent,
-//   refetchInterval: 1000 * 5,
-// });
-// };
-// temp
 export {
   useGetBridgePairs,
   useGetBridgeOptions,
-  useCheckWithdrawalStatus,
   useCreateWalletClient,
   useDepositTokenWithApproval,
-  useCheckDepositStatus,
   useNotifyAppicHelperDeposit,
   useDepositToken,
   useTokenApproval,
   useSubmitWithdrawRequest,
   useNotifyAppicHelper,
-  // useGetHistory,
 };

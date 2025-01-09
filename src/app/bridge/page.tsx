@@ -16,20 +16,6 @@ const BridgeHome = () => {
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
   const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } = useGetBridgeOptions();
 
-  // NOTE: It will delete
-  // const { data: historyData } = useGetHistory({
-  //   bridge_tokens: bridgePairs,
-  //   evm_wallet_address: evmAddress,
-  //   unauthenticated_agent: unAuthenticatedAgent,
-  //   principal_id: icpIdentity?.getPrincipal(),
-  // });
-
-  // useEffect(() => {
-  //   if (bridgePairs && unAuthenticatedAgent && (evmAddress || icpIdentity?.getPrincipal())) {
-  //     console.log('history data:', historyData);
-  //   }
-  // }, [bridgePairs, unAuthenticatedAgent, evmAddress, historyData, icpIdentity]);
-
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
   }, [bridgePairsData, setBridgePairs]);

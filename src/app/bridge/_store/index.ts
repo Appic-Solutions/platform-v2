@@ -1,10 +1,15 @@
-import { DepositTxStatus, WithdrawalTxStatus } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { create } from 'zustand';
 
 export type TokenType = EvmToken | IcpToken;
 type SelectionType = 'from' | 'to';
+export type Status = 'failed' | 'successful' | 'pending' | undefined;
+
+export interface TxStepType {
+  count: number;
+  status: 'pending' | 'successful' | 'failed';
+}
 
 interface BridgeState {
   activeStep: number;
@@ -18,14 +23,14 @@ interface BridgeState {
   bridgePairs: (EvmToken | IcpToken)[] | undefined;
   toWalletAddress: string;
   // tx states
-  txStep: number;
-  txStatus: WithdrawalTxStatus | DepositTxStatus | undefined;
+  txStep: TxStepType;
+  txStatus: Status;
 }
 
 type Action = {
   actions: {
     setActiveStep: (step: number) => void;
-    setTxStep: (step: number) => void;
+    setTxStep: (step: TxStepType) => void;
     setSelectedTokenType: (type: SelectionType) => void;
     setFromToken: (token: TokenType | undefined) => void;
     setToToken: (token: TokenType | undefined) => void;
@@ -35,13 +40,16 @@ type Action = {
     setBridgeOptions: (bridgeOptions: BridgeOption[]) => void;
     setUsdPrice: (usdPrice: string) => void;
     setToWalletAddress: (walletAddress: string) => void;
-    setTxStatus: (txStatus: WithdrawalTxStatus | DepositTxStatus) => void;
+    setTxStatus: (txStatus: Status) => void;
   };
 };
 
 export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   activeStep: 1,
-  txStep: 1,
+  txStep: {
+    count: 1,
+    status: 'pending',
+  },
   amount: '',
   bridgeOptions: undefined,
   bridgePairs: undefined,

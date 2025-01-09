@@ -6,8 +6,6 @@ import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
 import ActionButton from '../select-token/_components/ActionButton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
-// import { useHandleDeposit, useHandleWithdrawal } from '../../_api';
-// import { FullDepositRequest, FullWithdrawalRequest } from '../../_api/types/request';
 import { useSharedStore } from '@/common/state/store';
 import { useState } from 'react';
 import { BridgeLogic } from '../../_logic';
@@ -29,24 +27,24 @@ const BridgeReview = () => {
 
   const onSubmit = () => {
     setBtnText('Show Transaction Status');
-    // if (authenticatedAgent && option && evmAddress && icpIdentity && unAuthenticatedAgent && !showStepper) {
-    // if (fromToken?.chain_type === 'ICP') {
-    //   executeWithdrawal({
-    //     authenticatedAgent,
-    //     bridgeOption: option,
-    //     recipient: evmAddress,
-    //     userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-    //   });
-    // } else if (fromToken?.chain_type === 'EVM') {
-    //   executeDeposit({
-    //     bridgeOption: option,
-    //     recipient: icpIdentity.getPrincipal(),
-    //     recipientPrincipal: icpIdentity.getPrincipal().toString(),
-    //     unAuthenticatedAgent,
-    //     userWalletAddress: evmAddress,
-    //   });
-    // }
-    // }
+    if (authenticatedAgent && option && evmAddress && icpIdentity && unAuthenticatedAgent && !showStepper) {
+      if (fromToken?.chain_type === 'ICP') {
+        executeWithdrawal({
+          authenticatedAgent,
+          bridgeOption: option,
+          recipient: evmAddress,
+          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+        });
+      } else if (fromToken?.chain_type === 'EVM') {
+        executeDeposit({
+          bridgeOption: option,
+          recipient: icpIdentity.getPrincipal(),
+          recipientPrincipal: icpIdentity.getPrincipal().toString(),
+          unAuthenticatedAgent,
+          userWalletAddress: evmAddress,
+        });
+      }
+    }
     setShowStepper(true);
   };
 
