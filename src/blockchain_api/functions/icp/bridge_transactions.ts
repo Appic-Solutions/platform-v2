@@ -494,7 +494,7 @@ export const create_wallet_client = async (bridge_option: BridgeOption): Promise
   const walletClient = createWalletClient({
     transport: custom(ethereum!),
   });
-
+  await walletClient.addChain({ chain: bridge_option.viem_chain });
   await walletClient.switchChain({ id: bridge_option.chain_id });
   return walletClient;
 };
