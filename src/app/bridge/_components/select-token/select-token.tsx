@@ -28,18 +28,23 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   // shared store
   const { isIcpBalanceLoading, isEvmBalanceLoading } = useSharedStore();
   // bridge store
-  const { fromToken, toToken, selectedOption, amount, toWalletAddress } = useBridgeStore();
+  const { fromToken, toToken, selectedOption, amount, toWalletAddress, selectedTokenBalance } = useBridgeStore();
   const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
   // Logic
   const { changeStep, swapTokens, isWalletConnected, getStatusMessage } = BridgeLogic();
 
   const isActionButtonDisable = () => {
     if (isIcpBalanceLoading || isEvmBalanceLoading) return true;
+
     if (!selectedOption || !fromToken || !toToken) return true;
+
     if (showWalletAddress && (toWalletValidationError || !toWalletAddress)) return true;
+
     if (fromToken.contractAddress === toToken.contractAddress && fromToken.chainId === toToken.chainId) return true;
 
     if (!Number(amount)) return true;
+
+    if (Number(amount) > Number(selectedTokenBalance)) return true;
 
     return false;
   };
@@ -199,5 +204,3 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
     </Box>
   );
 }
-
-// TODO: move logics into separate file, change bridge review page details, connect api s

@@ -8,7 +8,7 @@ export type Status = 'failed' | 'successful' | 'pending' | undefined;
 
 export interface TxStepType {
   count: number;
-  status: 'pending' | 'successful' | 'failed';
+  status: 'pending' | 'successful' | 'failed' | undefined;
 }
 
 interface BridgeState {
@@ -22,15 +22,16 @@ interface BridgeState {
   selectedOption: BridgeOption | undefined;
   bridgePairs: (EvmToken | IcpToken)[] | undefined;
   toWalletAddress: string;
+  selectedTokenBalance: string;
   // tx states
   txStep: TxStepType;
   txStatus: Status;
+  txErrorMessage: string | undefined;
 }
 
 type Action = {
   actions: {
     setActiveStep: (step: number) => void;
-    setTxStep: (step: TxStepType) => void;
     setSelectedTokenType: (type: SelectionType) => void;
     setFromToken: (token: TokenType | undefined) => void;
     setToToken: (token: TokenType | undefined) => void;
@@ -40,7 +41,10 @@ type Action = {
     setBridgeOptions: (bridgeOptions: BridgeOption[]) => void;
     setUsdPrice: (usdPrice: string) => void;
     setToWalletAddress: (walletAddress: string) => void;
+    setSelectedTokenBalance: (tokenBalance: string) => void;
+    setTxStep: (step: TxStepType) => void;
     setTxStatus: (txStatus: Status) => void;
+    setTxErrorMessage: (err: string | undefined) => void;
   };
 };
 
@@ -48,7 +52,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   activeStep: 1,
   txStep: {
     count: 1,
-    status: 'pending',
+    status: 'pending' as Status,
   },
   amount: '',
   bridgeOptions: undefined,
@@ -59,20 +63,24 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   toToken: undefined,
   usdPrice: '0',
   toWalletAddress: '',
+  selectedTokenBalance: '',
   txStatus: undefined,
+  txErrorMessage: undefined,
   actions: {
-    setActiveStep: (activeStep) => set((state) => ({ ...state, activeStep })),
-    setTxStep: (txStep) => set((state) => ({ ...state, txStep })),
-    setSelectedTokenType: (selectedTokenType) => set((state) => ({ ...state, selectedTokenType })),
-    setFromToken: (fromToken) => set((state) => ({ ...state, fromToken })),
-    setToToken: (toToken) => set((state) => ({ ...state, toToken })),
-    setAmount: (amount) => set((state) => ({ ...state, amount })),
-    setSelectedOption: (selectedOption) => set((state) => ({ ...state, selectedOption })),
-    setBridgePairs: (bridgePairs) => set((state) => ({ ...state, bridgePairs })),
-    setBridgeOptions: (bridgeOptions) => set((state) => ({ ...state, bridgeOptions })),
-    setUsdPrice: (usdPrice) => set((state) => ({ ...state, usdPrice })),
-    setToWalletAddress: (toWalletAddress) => set((state) => ({ ...state, toWalletAddress })),
-    setTxStatus: (txStatus) => set((state) => ({ ...state, txStatus })),
+    setActiveStep: (activeStep) => set({ activeStep }),
+    setSelectedTokenType: (selectedTokenType) => set({ selectedTokenType }),
+    setFromToken: (fromToken) => set({ fromToken }),
+    setToToken: (toToken) => set({ toToken }),
+    setAmount: (amount) => set({ amount }),
+    setSelectedOption: (selectedOption) => set({ selectedOption }),
+    setBridgePairs: (bridgePairs) => set({ bridgePairs }),
+    setBridgeOptions: (bridgeOptions) => set({ bridgeOptions }),
+    setUsdPrice: (usdPrice) => set({ usdPrice }),
+    setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),
+    setSelectedTokenBalance: (selectedTokenBalance) => set({ selectedTokenBalance }),
+    setTxStep: (txStep) => set({ txStep }),
+    setTxStatus: (txStatus) => set({ txStatus }),
+    setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
   },
 }));
 

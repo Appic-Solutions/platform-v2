@@ -15,7 +15,7 @@ export const withdrawalStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to approve transaction + reason',
+        description: 'Failed to approve transaction',
       },
     },
   },
@@ -33,7 +33,7 @@ export const withdrawalStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to send transaction + reason',
+        description: 'Failed to send transaction',
       },
     },
   },
@@ -51,7 +51,7 @@ export const withdrawalStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to notify minter + reason',
+        description: 'Failed to notify minter',
       },
     },
   },
@@ -69,7 +69,7 @@ export const withdrawalStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to mint + reason',
+        description: 'Failed to mint',
       },
     },
   },
@@ -90,7 +90,7 @@ export const depositStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to prepare bridge transaction + reason',
+        description: 'Failed to prepare bridge transaction',
       },
     },
   },
@@ -108,7 +108,7 @@ export const depositStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to approve transaction + reason',
+        description: 'Failed to approve transaction',
       },
     },
   },
@@ -126,7 +126,7 @@ export const depositStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to send transaction + reason',
+        description: 'Failed to send transaction',
       },
     },
   },
@@ -144,7 +144,7 @@ export const depositStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to notify minter + reason',
+        description: 'Failed to notify minter',
       },
     },
   },
@@ -162,7 +162,7 @@ export const depositStepsDetails: TxStep[] = [
       },
       failed: {
         statusTitle: 'failed',
-        description: 'Failed to mint + reason',
+        description: 'Failed to mint',
       },
     },
   },

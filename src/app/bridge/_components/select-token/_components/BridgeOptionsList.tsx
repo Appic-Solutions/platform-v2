@@ -17,7 +17,7 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
 
   useEffect(() => {
     if (bridgeOptions) {
-      setSelectedOption(bridgeOptions[0]);
+      handleSelectOption(bridgeOptions[0]);
       setExpandedOption(bridgeOptions[0]);
     }
   }, [bridgeOptions, setSelectedOption]);
@@ -27,6 +27,12 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
       setExpandedOption(undefined);
     } else {
       setExpandedOption(option);
+    }
+  };
+
+  const handleSelectOption = (option: BridgeOptionType) => {
+    if (bridgeOptions) {
+      setSelectedOption(option);
     }
   };
 
@@ -58,7 +64,7 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
                 option={item}
                 isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
                 isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                handleOptionSelect={(option) => setSelectedOption(option)}
+                handleOptionSelect={(option) => handleSelectOption(option)}
                 onExpand={handleExpand}
                 toToken={toToken}
               />

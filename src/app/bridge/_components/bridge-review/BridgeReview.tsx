@@ -6,7 +6,6 @@ import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
 import ActionButton from '../select-token/_components/ActionButton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
-import { useSharedStore } from '@/common/state/store';
 import { useState } from 'react';
 import { BridgeLogic } from '../../_logic';
 import { DialogTrigger } from '@/common/components/ui/dialog';
@@ -15,37 +14,19 @@ const BridgeReview = () => {
   const [showStepper, setShowStepper] = useState(false);
   const [btnText, setBtnText] = useState('Start bridging');
 
-  // shared store
-  const { icpIdentity, evmAddress, unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
-
   // bridge store
-  const { selectedOption: option, toToken, fromToken } = useBridgeStore();
+  const { selectedOption: option, toToken } = useBridgeStore();
   const { setActiveStep } = useBridgeActions();
 
   // bridge logic
-  const { executeDeposit, executeWithdrawal } = BridgeLogic();
+  const { executeTransaction } = BridgeLogic();
 
   const onSubmit = () => {
     setBtnText('Show Transaction Status');
-    if (authenticatedAgent && option && evmAddress && icpIdentity && unAuthenticatedAgent && !showStepper) {
-      if (fromToken?.chain_type === 'ICP') {
-        executeWithdrawal({
-          authenticatedAgent,
-          bridgeOption: option,
-          recipient: evmAddress,
-          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-        });
-      } else if (fromToken?.chain_type === 'EVM') {
-        executeDeposit({
-          bridgeOption: option,
-          recipient: icpIdentity.getPrincipal(),
-          recipientPrincipal: icpIdentity.getPrincipal().toString(),
-          unAuthenticatedAgent,
-          userWalletAddress: evmAddress,
-        });
-      }
+    if (!showStepper) {
+      executeTransaction();
+      setShowStepper(true);
     }
-    setShowStepper(true);
   };
 
   if (option && toToken) {

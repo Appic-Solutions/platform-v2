@@ -22,9 +22,11 @@ import { useQuery } from '@tanstack/react-query';
 
 export const BridgeLogic = () => {
   // Bridge Store
-  const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption } = useBridgeStore();
+  const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption, selectedTokenBalance } =
+    useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxStatus } = useBridgeActions();
+  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxStatus, setTxErrorMessage } =
+    useBridgeActions();
   // Shared Store
   const {
     icpIdentity,
@@ -35,6 +37,7 @@ export const BridgeLogic = () => {
     isEvmBalanceLoading,
     isIcpBalanceLoading,
     unAuthenticatedAgent,
+    evmAddress,
   } = useSharedStore();
 
   // Bridge Transaction states
@@ -140,7 +143,7 @@ export const BridgeLogic = () => {
     setToToken(temp);
   }
 
-  const isWalletConnected = (type: 'from' | 'to') => {
+  function isWalletConnected(type: 'from' | 'to') {
     let mainToken: TokenType | undefined;
     if (type === 'from') mainToken = fromToken;
     if (type === 'to') mainToken = toToken;
@@ -155,7 +158,7 @@ export const BridgeLogic = () => {
       return false;
     }
     return false;
-  };
+  }
 
   function getStatusMessage({
     showWalletAddress,
@@ -184,27 +187,19 @@ export const BridgeLogic = () => {
 
     if (!selectedOption) return 'Select Bridge Option';
 
-    if (!isWalletConnected('from')) {
-      return `Connect ${fromToken.chain_type} Wallet`;
-    }
+    if (!isWalletConnected('from')) return `Connect ${fromToken.chain_type} Wallet`;
 
-    if (showWalletAddress) {
-      return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Review Bridge';
-    }
+    if (Number(amount) > Number(selectedTokenBalance)) return 'Amount exceeds your wallet balance';
 
-    if (!showWalletAddress && !isWalletConnected('to')) {
-      return `Connect ${toToken.chain_type} Wallet`;
-    }
+    if (showWalletAddress) return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Review Bridge';
+
+    if (!showWalletAddress && !isWalletConnected('to')) return `Connect ${toToken.chain_type} Wallet`;
 
     const isDestWalletValid = toWalletAddress && !toWalletValidationError;
 
-    if (isDestWalletValid && isWalletConnected('from')) {
-      return 'Review Bridge';
-    }
+    if (isDestWalletValid && isWalletConnected('from')) return 'Review Bridge';
 
-    if ((isWalletConnected('from'), isWalletConnected('to'))) {
-      return 'Review Bridge';
-    }
+    if ((isWalletConnected('from'), isWalletConnected('to'))) return 'Review Bridge';
   }
 
   function isTokenSelected(token: TokenType) {
@@ -223,14 +218,14 @@ export const BridgeLogic = () => {
   }
 
   // set data and last fetch time in localstorage
-  const setBridgePairsWithTime = (data: (EvmToken | IcpToken)[]) => {
+  function setBridgePairsWithTime(data: (EvmToken | IcpToken)[]) {
     const currentTime = new Date().getTime();
     setStorageItem('bridge-pairs', JSON.stringify(data));
     setStorageItem('bridge-pairs-last-fetch-time', currentTime.toString());
-  };
+  }
 
   // get data and last fetch time from localstorage
-  const getBridgePairsFromLocalStorage = () => {
+  function getBridgePairsFromLocalStorage() {
     const rawData = getStorageItem('bridge-pairs');
     const lastFetchTime = getStorageItem('bridge-pairs-last-fetch-time');
     let parsedData: (EvmToken | IcpToken)[] | null = null;
@@ -249,12 +244,12 @@ export const BridgeLogic = () => {
       data: parsedData,
       lastFetchTime: lastFetchTime ? parseInt(lastFetchTime) : null,
     };
-  };
+  }
 
   //  1. Withdrawal Transactions (ICP -> EVM)
   //  2. Deposit Transactions (EVM -> ICP)
 
-  const executeWithdrawal = async (params: FullWithdrawalRequest) => {
+  async function executeWithdrawal(params: FullWithdrawalRequest) {
     if (selectedOption && authenticatedAgent) {
       // Step 1: Token Approval
       // set step status pending
@@ -264,6 +259,7 @@ export const BridgeLogic = () => {
       });
       if (!approvalResult.success) {
         // set step status failed
+        setTxErrorMessage(approvalResult.message);
         setTxStep({
           count: 1,
           status: 'failed',
@@ -283,6 +279,7 @@ export const BridgeLogic = () => {
         recipient: params.recipient,
       });
       if (!withdrawResponse.success) {
+        setTxErrorMessage(withdrawResponse.message);
         setTxStep({
           count: 2,
           status: 'failed',
@@ -304,6 +301,7 @@ export const BridgeLogic = () => {
         withdrawalId: withdrawResponse.result,
       });
       if (!notifyResult.success) {
+        setTxErrorMessage(notifyResult.message);
         setTxStep({
           count: 3,
           status: 'failed',
@@ -315,12 +313,12 @@ export const BridgeLogic = () => {
         status: 'pending',
       });
     }
-  };
+  }
 
-  const executeDeposit = async (params: FullDepositRequest) => {
+  async function executeDeposit(params: FullDepositRequest) {
     // Step 1: Create Wallet Client
-    debugger;
     const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
+    setTxErrorMessage('');
     if (!walletClientResult) {
       setTxStep({
         count: 1,
@@ -339,6 +337,7 @@ export const BridgeLogic = () => {
       wallet_client: walletClientResult,
     });
     if (!approvalResult.success) {
+      setTxErrorMessage(approvalResult.message);
       setTxStep({
         count: 2,
         status: 'failed',
@@ -357,6 +356,7 @@ export const BridgeLogic = () => {
       wallet_client: walletClientResult,
     });
     if (!depositResponse.success) {
+      setTxErrorMessage(depositResponse.message);
       setTxStep({
         count: 3,
         status: 'failed',
@@ -378,6 +378,7 @@ export const BridgeLogic = () => {
       tx_hash: depositResponse.result,
     });
     if (!notifyResult.success) {
+      setTxErrorMessage(notifyResult.message);
       setTxStep({
         count: 4,
         status: 'failed',
@@ -388,7 +389,46 @@ export const BridgeLogic = () => {
       count: 5,
       status: 'pending',
     });
-  };
+  }
+
+  function executeTransaction() {
+    if (authenticatedAgent && selectedOption && evmAddress && icpIdentity && unAuthenticatedAgent && amount) {
+      setTxStep({
+        count: 1,
+        status: 'pending',
+      });
+      setTxErrorMessage('');
+      setTxStatus(undefined);
+      setTxHash(undefined);
+      if (fromToken?.chain_type === 'ICP') {
+        executeWithdrawal({
+          authenticatedAgent,
+          bridgeOption: selectedOption,
+          recipient: evmAddress,
+          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+        });
+      } else if (fromToken?.chain_type === 'EVM') {
+        executeDeposit({
+          bridgeOption: selectedOption,
+          recipient: icpIdentity.getPrincipal(),
+          recipientPrincipal: icpIdentity.getPrincipal().toString(),
+          unAuthenticatedAgent,
+          userWalletAddress: evmAddress,
+        });
+      }
+    }
+  }
+
+  function resetTransaction() {
+    setTxStep({
+      count: 1,
+      status: 'pending',
+    });
+    setTxStatus(undefined);
+    setTxErrorMessage(undefined);
+    setActiveStep(1);
+    setAmount('');
+  }
 
   return {
     selectToken,
@@ -401,5 +441,7 @@ export const BridgeLogic = () => {
     getBridgePairsFromLocalStorage,
     executeDeposit,
     executeWithdrawal,
+    executeTransaction,
+    resetTransaction,
   };
 };

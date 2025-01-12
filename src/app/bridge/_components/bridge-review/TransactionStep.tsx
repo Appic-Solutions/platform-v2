@@ -13,7 +13,8 @@ export const TransactionStep = ({
   currentStep: TxStepType;
   index: number;
 }) => {
-  const { txStatus } = useBridgeStore();
+  const { txStatus, txErrorMessage } = useBridgeStore();
+
   return (
     <div
       className={cn(
@@ -23,7 +24,7 @@ export const TransactionStep = ({
         'animate-slide-in-from-top',
         index === currentStep.count - 1
           ? 'opacity-100'
-          : index === currentStep.count
+          : index === currentStep.count && currentStep.status === 'pending'
             ? 'opacity-50 select-none'
             : 'hidden',
       )}
@@ -53,15 +54,18 @@ export const TransactionStep = ({
           className="object-contain"
         />
       </div>
-      <div className="flex flex-col gap-y-4">
-        <p className="text-lg font-bold text-[#333333] dark:text-white">
-          {' '}
-          {step.statuses[currentStep.status].statusTitle}
-        </p>
-        <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
-          {step.statuses[currentStep.status].description}
-        </p>
-      </div>
+      {currentStep.status && (
+        <div className="flex flex-col gap-y-4">
+          <p className="text-lg font-bold text-[#333333] dark:text-white">
+            {' '}
+            {step.statuses[currentStep.status].statusTitle}
+          </p>
+          <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
+            {step.statuses[currentStep.status].description}
+          </p>
+          <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">{txErrorMessage}</p>
+        </div>
+      )}
     </div>
   );
 };
