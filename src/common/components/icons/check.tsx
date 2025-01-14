@@ -3,15 +3,19 @@ const CheckIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      viewBox="0 0 21 15"
-      strokeWidth={1.8}
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
       stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
       {...props}
     >
-      <path d="M1.75781 8.76174L6.76173 13.7657L19.2715 1.25586" />
-    </svg>
+      <path strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m4.5 12.75 6 6 9-13.5"
+      />
+    </svg >
+
   );
 };
 

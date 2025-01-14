@@ -9,11 +9,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Card } from "@/common/components/ui/card";
 import { cn, copyToClipboard, getChainLogo, getChainName } from "@/common/helpers/utils";
-import { Transaction } from "../sampleTransactions";
 import { useState } from "react";
 import CheckIcon from "@/common/components/icons/check";
 import Spinner from "@/common/components/ui/spinner";
 import Link from "next/link";
+import { Transaction } from "../_constants";
 
 const BridgeTransactionCard = ({
   bridgeProvider,
@@ -86,7 +86,7 @@ const BridgeTransactionCard = ({
                 "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
                 status === "failed" && "border-2 border-solid border-red-500",
                 status === "pending" &&
-                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
+                "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
               )}
             >
               <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
@@ -181,7 +181,7 @@ const BridgeTransactionCard = ({
                       step.status === "pending" && "bg-[#12B76A33]",
                       step.status === "failed" && "bg-[#31201a73]",
                       index < steps.length - 1 &&
-                        "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
+                      "after:content-[''] after:absolute after:w-[2px] after:h-[24px] after:-bottom-6 after:bg-[#12B76A33] after:bg-opacity-20"
                     )}
                   >
                     {step.status === "completed" && (
