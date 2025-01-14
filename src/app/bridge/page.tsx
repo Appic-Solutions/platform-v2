@@ -14,7 +14,11 @@ const BridgeHome = () => {
   const { setBridgePairs, setBridgeOptions } = useBridgeActions();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
-  const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } = useGetBridgeOptions();
+  const {
+    mutateAsync: getBridgeOptions,
+    isPending: isPendingBridgeOptions,
+    isError: isErrorBridgeOptions,
+  } = useGetBridgeOptions();
 
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
@@ -44,7 +48,12 @@ const BridgeHome = () => {
   const renderStep = () => {
     switch (activeStep) {
       case 1:
-        return <BridgeSelectTokenPage isPendingBridgeOptions={isPendingBridgeOptions} />;
+        return (
+          <BridgeSelectTokenPage
+            isErrorBridgeOptions={isErrorBridgeOptions}
+            isPendingBridgeOptions={isPendingBridgeOptions}
+          />
+        );
       case 2:
         return <TokenListPage isPending={isPending} isError={isError} />;
       case 3:

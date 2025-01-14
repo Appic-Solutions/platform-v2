@@ -63,7 +63,7 @@ export interface BridgeFees {
   total_fee_usd_price: string; // Total fee converted to usd
   native_fee_token_symbol: string;
   max_fee_per_gas: string;
-
+  max_priority_fee_per_gas: string;
   // Only used for withdrawal, in other cases will be set to 0
   approval_fee_in_erc20_tokens: string; // Fee required for approval of erc20 tokens in erc20 tokens not native tokens, can be 0 if transaction is_native
 
@@ -122,7 +122,10 @@ export const get_bridge_options = async (
   try {
     // const value = bridge_metadata.is_native ? amount : '0';
     const value = bridge_metadata.is_native ? '1' : '0';
-    const { max_fee_per_gas } = await get_gas_price(bridge_metadata.viem_chain, bridge_metadata.rpc_url);
+    const { max_fee_per_gas, max_priority_fee_per_gas } = await get_gas_price(
+      bridge_metadata.viem_chain,
+      bridge_metadata.rpc_url,
+    );
 
     if (bridge_metadata.tx_type == TxType.Deposit) {
       const principal_bytes = principal_to_bytes32('6gplx-n62xg-ky6br-utvsz-l3vfe-jggch-hhico-7tydb-qtwu6-yiyhn-gqe');
@@ -170,6 +173,7 @@ export const get_bridge_options = async (
         amount,
         native_currency,
         max_fee_per_gas,
+        max_priority_fee_per_gas,
         approval_gas,
         deposit_gas,
       );
@@ -198,6 +202,7 @@ export const get_bridge_options = async (
         amount,
         native_currency,
         max_fee_per_gas,
+        max_priority_fee_per_gas,
         // All zero (only for deposit)
         '0',
         '0',
@@ -318,7 +323,10 @@ const estimate_withdrawal_gas = async (
   // }
 };
 
-const get_gas_price = async (chain: ViemChain, rpc_url: string): Promise<{ max_fee_per_gas: string }> => {
+const get_gas_price = async (
+  chain: ViemChain,
+  rpc_url: string,
+): Promise<{ max_fee_per_gas: string; max_priority_fee_per_gas: string }> => {
   try {
     const client = createPublicClient({
       transport: http(rpc_url),
@@ -348,6 +356,7 @@ const get_gas_price = async (chain: ViemChain, rpc_url: string): Promise<{ max_f
 
     return {
       max_fee_per_gas: maxFeePerGas,
+      max_priority_fee_per_gas: averagePriorityFee.decimalPlaces(0, BigNumber.ROUND_DOWN).toFixed(),
     };
   } catch (error) {
     console.error('Error fetching gas price:', error);
@@ -528,6 +537,7 @@ const calculate_bridge_options = async (
   amount: string,
   native_currency: EvmToken | IcpToken,
   max_fee_per_gas: string,
+  max_priority_fee_per_gas: string,
   // Advanced deposit params
   approve_erc20_gas: string,
   deposit_gas: string,
@@ -594,6 +604,7 @@ const calculate_bridge_options = async (
           approve_erc20_gas,
           deposit_gas,
           max_fee_per_gas,
+          max_priority_fee_per_gas,
         },
 
         via: bridge_metadata.operator,
