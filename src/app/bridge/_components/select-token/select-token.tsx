@@ -14,7 +14,6 @@ import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
 import { BridgeLogic } from '../../_logic';
-import { useSharedStore } from '@/common/state/store';
 
 interface SelectTokenProps {
   isPendingBridgeOptions: boolean;
@@ -25,29 +24,17 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
-  // shared store
-  const { isIcpBalanceLoading, isEvmBalanceLoading } = useSharedStore();
   // bridge store
-  const { fromToken, toToken, selectedOption, amount, toWalletAddress, selectedTokenBalance } = useBridgeStore();
+  const { fromToken, toToken, amount, toWalletAddress } = useBridgeStore();
   const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
   // Logic
-  const { changeStep, swapTokens, isWalletConnected, getStatusMessage } = BridgeLogic();
+  const { changeStep, swapTokens, isWalletConnected, getActionButtonStatus } = BridgeLogic();
 
-  const isActionButtonDisable = () => {
-    if (isIcpBalanceLoading || isEvmBalanceLoading) return true;
-
-    if (!selectedOption || !fromToken || !toToken) return true;
-
-    if (showWalletAddress && (toWalletValidationError || !toWalletAddress)) return true;
-
-    if (fromToken.contractAddress === toToken.contractAddress && fromToken.chainId === toToken.chainId) return true;
-
-    if (!Number(amount)) return true;
-
-    if (Number(amount) > Number(selectedTokenBalance)) return true;
-
-    return false;
-  };
+  const actionButtonStatus = getActionButtonStatus({
+    showWalletAddress,
+    toWalletAddress,
+    toWalletValidationError,
+  });
 
   const openConnectWalletModalHandler = (token: TokenType) => {
     if (token?.chain_type === 'ICP') {
@@ -156,12 +143,8 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
           </div>
           {/* DESKTOP ACTION BUTTONS */}
           <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
-            <ActionButton onClick={actionButtonHandler} isDisabled={isActionButtonDisable()}>
-              {getStatusMessage({
-                showWalletAddress,
-                toWalletAddress,
-                toWalletValidationError,
-              })}
+            <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
+              {actionButtonStatus.text}
             </ActionButton>
             <div
               onClick={() => setShowWalletAddress(!showWalletAddress)}
@@ -182,12 +165,8 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
-        <ActionButton onClick={actionButtonHandler} isDisabled={isActionButtonDisable()}>
-          {getStatusMessage({
-            showWalletAddress,
-            toWalletAddress,
-            toWalletValidationError,
-          })}
+        <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
+          {actionButtonStatus.text}
         </ActionButton>
         <div
           onClick={() => setShowWalletAddress(!showWalletAddress)}

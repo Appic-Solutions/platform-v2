@@ -27,12 +27,12 @@ const AmountInput = () => {
         const isSameContractToken = t.contractAddress === fromToken.contractAddress;
         return isNativeToken || isSameContractToken;
       });
-      setSelectedTokenBalance(mainToken?.balance || '0');
+      setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
 
     if (fromToken?.chain_type === 'ICP' && icpBalance) {
       const mainToken = icpBalance.tokens.find((t) => t.canisterId === fromToken?.canisterId);
-      setSelectedTokenBalance(mainToken?.balance || '0');
+      setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
   }, [isEvmConnected, icpIdentity, fromToken, evmBalance, icpBalance, setSelectedTokenBalance]);
 
@@ -93,7 +93,7 @@ const AmountInput = () => {
                 '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
               )}
             />
-            {isWalletConnected('from') && Number(selectedTokenBalance) > 0 && (
+            {isWalletConnected('from') && (
               <span
                 className={cn(
                   'px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md',
@@ -113,8 +113,10 @@ const AmountInput = () => {
           </div>
           <div className="flex justify-between items-center w-full">
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
-            {isWalletConnected('from') && Number(selectedTokenBalance) > 0 && (
-              <p className="text-muted text-xs md:text-sm font-semibold text-nowrap">{selectedTokenBalance}</p>
+            {isWalletConnected('from') && (
+              <p className="text-muted text-center text-xs md:text-sm font-semibold text-nowrap">
+                {selectedTokenBalance}
+              </p>
             )}
           </div>
         </div>

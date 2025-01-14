@@ -19,6 +19,7 @@ import {
   TxHash,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery } from '@tanstack/react-query';
+import { chains } from '@/blockchain_api/lists/chains';
 
 export const BridgeLogic = () => {
   // Bridge Store
@@ -160,7 +161,7 @@ export const BridgeLogic = () => {
     return false;
   }
 
-  function getStatusMessage({
+  function getActionButtonStatus({
     showWalletAddress,
     toWalletValidationError,
     toWalletAddress,
@@ -168,38 +169,137 @@ export const BridgeLogic = () => {
     showWalletAddress: boolean;
     toWalletValidationError: string | null;
     toWalletAddress: string;
-  }) {
-    if (!fromToken || !toToken) return 'Select token to bridge';
+  }): {
+    isDisable: boolean;
+    text: string;
+  } {
+    if (isEvmBalanceLoading || isIcpBalanceLoading) {
+      return {
+        isDisable: true,
+        text: 'Fetching wallet balance',
+      };
+    }
 
-    if (isEvmBalanceLoading || isIcpBalanceLoading) return 'Fetching wallet balance';
+    if (!fromToken || !toToken) {
+      return {
+        isDisable: true,
+        text: 'Select token to bridge',
+      };
+    }
 
-    // avoid to select same tokens
+    if (showWalletAddress) {
+      if (!toWalletAddress || toWalletValidationError) {
+        return {
+          isDisable: true,
+          text: 'Enter Valid Address',
+        };
+      } else {
+        return {
+          isDisable: false,
+          text: 'Review Bridge',
+        };
+      }
+    }
+
     if (
       fromToken &&
       toToken &&
       fromToken.contractAddress === toToken.contractAddress &&
       fromToken.chainId === toToken.chainId
     ) {
-      return 'Please select different tokens';
+      return {
+        isDisable: true,
+        text: 'Please select different tokens',
+      };
     }
 
-    if (!Number(amount)) return 'Set token amount to continue';
+    if (!Number(amount)) {
+      return {
+        isDisable: true,
+        text: 'Set token amount to continue',
+      };
+    }
 
-    if (!selectedOption) return 'Select Bridge Option';
+    if (!selectedOption) {
+      return {
+        isDisable: true,
+        text: 'Select Bridge Option',
+      };
+    }
 
-    if (!isWalletConnected('from')) return `Connect ${fromToken.chain_type} Wallet`;
+    if (!isWalletConnected('from')) {
+      return {
+        isDisable: false,
+        text: `Connect ${fromToken.chain_type} Wallet`,
+      };
+    }
 
-    if (Number(amount) > Number(selectedTokenBalance)) return 'Amount exceeds your wallet balance';
+    if (!showWalletAddress && !isWalletConnected('to')) {
+      return {
+        isDisable: false,
+        text: `Connect ${toToken.chain_type} Wallet`,
+      };
+    }
 
-    if (showWalletAddress) return !toWalletAddress || toWalletValidationError ? 'Enter Valid Address' : 'Review Bridge';
+    if ((isWalletConnected('from'), isWalletConnected('to'))) {
+      const isTokenNative = selectedOption.native_fee_token_id === selectedOption.from_token_id;
+      const mainChain = chains.find((chain) => chain.chainId === fromToken.chainId);
 
-    if (!showWalletAddress && !isWalletConnected('to')) return `Connect ${toToken.chain_type} Wallet`;
+      if (isTokenNative) {
+        if (Number(amount) > Number(selectedTokenBalance))
+          return {
+            isDisable: true,
+            text: 'INSUFFICIENT Funds',
+          };
+      } else {
+        if (fromToken.chain_type === 'EVM') {
+          const userNativeToken = evmBalance?.tokens.find(
+            (token) => token.contractAddress === selectedOption.native_fee_token_id,
+          );
+          if (
+            !userNativeToken ||
+            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
+          ) {
+            return {
+              isDisable: true,
+              text: `INSUFFICIENT ${mainChain?.nativeTokenSymbol} Token Balance`,
+            };
+          }
+        } else if (fromToken.chain_type === 'ICP') {
+          const userNativeToken = icpBalance?.tokens.find(
+            (token) => token.canisterId === selectedOption.native_fee_token_id,
+          );
+          if (
+            !userNativeToken ||
+            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
+          ) {
+            return {
+              isDisable: true,
+              text: `INSUFFICIENT ${mainChain?.nativeTokenSymbol} Token Balance`,
+            };
+          }
+        }
+      }
+    }
 
-    const isDestWalletValid = toWalletAddress && !toWalletValidationError;
+    if (toWalletAddress && !toWalletValidationError && isWalletConnected('from')) {
+      return {
+        isDisable: false,
+        text: 'Review Bridge',
+      };
+    }
 
-    if (isDestWalletValid && isWalletConnected('from')) return 'Review Bridge';
+    if (isWalletConnected('from') && isWalletConnected('to')) {
+      return {
+        isDisable: false,
+        text: 'Review Bridge',
+      };
+    }
 
-    if ((isWalletConnected('from'), isWalletConnected('to'))) return 'Review Bridge';
+    return {
+      isDisable: true,
+      text: 'Error',
+    };
   }
 
   function isTokenSelected(token: TokenType) {
@@ -435,7 +535,6 @@ export const BridgeLogic = () => {
     changeStep,
     swapTokens,
     isWalletConnected,
-    getStatusMessage,
     isTokenSelected,
     setBridgePairsWithTime,
     getBridgePairsFromLocalStorage,
@@ -443,5 +542,6 @@ export const BridgeLogic = () => {
     executeWithdrawal,
     executeTransaction,
     resetTransaction,
+    getActionButtonStatus,
   };
 };
