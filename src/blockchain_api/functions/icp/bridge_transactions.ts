@@ -490,12 +490,15 @@ export const create_wallet_client = async (bridge_option: BridgeOption): Promise
   if (!ethereum) {
     throw new Error('MetaMask is not installed or ethereum object is not available');
   }
-
   const walletClient = createWalletClient({
     transport: custom(ethereum!),
   });
+
   await walletClient.addChain({ chain: bridge_option.viem_chain });
   await walletClient.switchChain({ id: bridge_option.chain_id });
+  const addresses = await walletClient.requestAddresses();
+  console.log(addresses);
+
   return walletClient;
 };
 
@@ -514,16 +517,19 @@ export const approve_erc20 = async (
   } else {
     try {
       const [account] = await wallet_client.getAddresses();
+      console.log('account', account);
       const encoded_function_data = encode_approval_function_data(
         bridge_option.deposit_helper_contract as `0x${string}`,
         bridge_option.amount,
       );
+
       const prepared_transaction = await wallet_client.prepareTransactionRequest({
         chain: bridge_option.viem_chain as ViemChain,
         account: account as `0x${string}`,
         to: bridge_option.from_token_id as `0x${string}`,
         data: encoded_function_data as `0x${string}`,
         maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
+        maxPriorityFeePerGas: BigInt(bridge_option.fees.max_priority_fee_per_gas),
         gas: BigInt(bridge_option.fees.approve_erc20_gas),
         type: 'eip1559',
       });
@@ -571,22 +577,35 @@ export const request_deposit = async (
   try {
     const [account] = await wallet_client.getAddresses();
 
+    const value = bridge_option.is_native
+      ? BigInt(
+          BigNumber(bridge_option.amount)
+            .minus(BigNumber(bridge_option.fees.deposit_gas).multipliedBy(bridge_option.fees.max_fee_per_gas))
+            .decimalPlaces(0, BigNumber.ROUND_DOWN)
+            .toFixed(),
+        )
+      : undefined;
+
     const prepared_transaction = await wallet_client.prepareTransactionRequest({
       chain: bridge_option.viem_chain as ViemChain,
       account: account as `0x${string}`,
       to: bridge_option.deposit_helper_contract as `0x${string}`,
       data: encoded_deposit_function_data as `0x${string}`,
-      type: 'eip1559',
+      // maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
+      // maxPriorityFeePerGas:BigInt(bridge_option.fees.max)
       maxFeePerGas: BigInt(bridge_option.fees.max_fee_per_gas),
+      maxPriorityFeePerGas: BigInt(bridge_option.fees.max_priority_fee_per_gas),
       gas: BigInt(bridge_option.fees.deposit_gas),
+      value,
+      type: 'eip1559',
     });
 
-    const signed_transaction = await wallet_client.signTransaction({
+    console.log(prepared_transaction);
+    const hash = await wallet_client.sendTransaction({
       account: account,
       ...prepared_transaction,
     });
 
-    const hash = await wallet_client.sendRawTransaction({ serializedTransaction: signed_transaction });
     return {
       result: hash,
       message: '',
@@ -631,7 +650,7 @@ export const notify_appic_helper_deposit = async (
       icrc_ledger_id: Principal.fromText(bridge_option.to_token_id),
       operator: parsed_operator,
       time: BigInt(Date.now()) * BigInt(1_000_000),
-    } as AddEvmToIcpTx)) as NewEvmToIcpResult;
+  } as AddEvmToIcpTx)) as NewEvmToIcpResult;
     if ('Ok' in notify_withdrawal_result) {
       return {
         result: '',

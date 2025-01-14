@@ -319,7 +319,7 @@ export const BridgeLogic = () => {
 
   const executeDeposit = async (params: FullDepositRequest) => {
     // Step 1: Create Wallet Client
-    debugger;
+    // debugger;
     const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
     if (!walletClientResult) {
       setTxStep({
