@@ -14,6 +14,7 @@ import {
   WithdrawErc20Arg as AppicWithdrawErc20Arg,
   WithdrawalNativeResult as AppicWithdrawalNativeResult,
   WithdrawalErc20Result as AppicWithdrawalErc20Result,
+  LogScrapingResult,
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 
 import { idlFactory as DfinityMinterIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
@@ -534,12 +535,11 @@ export const approve_erc20 = async (
         type: 'eip1559',
       });
 
-      const signed_transaction = await wallet_client.signTransaction({
+      const hash = await wallet_client.sendTransaction({
         account: account,
         ...prepared_transaction,
       });
 
-      const hash = await wallet_client.sendRawTransaction({ serializedTransaction: signed_transaction });
       return {
         result: hash,
         message: '',
@@ -600,7 +600,6 @@ export const request_deposit = async (
       type: 'eip1559',
     });
 
-    console.log(prepared_transaction);
     const hash = await wallet_client.sendTransaction({
       account: account,
       ...prepared_transaction,
@@ -629,6 +628,26 @@ export const notify_appic_helper_deposit = async (
   recipient_principal: string,
   unauthenticated_agent: HttpAgent,
 ): Promise<Response<string>> => {
+  // If the minter is of type of appic minter
+  // Request minter to start log scraping
+  if (bridge_option.operator === 'Appic') {
+    // Create an actor for the Appic minter
+    const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+      canisterId: bridge_option.minter_id,
+      agent: unauthenticated_agent,
+    });
+
+    const log_scraping_request_result = (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+
+    if ('Err' in log_scraping_request_result) {
+      if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
+        setTimeout(async () => {
+          await appic_minter_actor.request_scraping_logs();
+        }, 1000);
+      }
+    }
+  }
+
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
@@ -650,7 +669,7 @@ export const notify_appic_helper_deposit = async (
       icrc_ledger_id: Principal.fromText(bridge_option.to_token_id),
       operator: parsed_operator,
       time: BigInt(Date.now()) * BigInt(1_000_000),
-  } as AddEvmToIcpTx)) as NewEvmToIcpResult;
+    } as AddEvmToIcpTx)) as NewEvmToIcpResult;
     if ('Ok' in notify_withdrawal_result) {
       return {
         result: '',

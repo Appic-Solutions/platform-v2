@@ -441,8 +441,8 @@ export interface _SERVICE {
   get_minter_info: ActorMethod<[], MinterInfo>;
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
   minter_address: ActorMethod<[], string>;
-  request_scraping_logs: ActorMethod<[bigint], LogScrapingResult>;
-  retrieve_witdrawal_status: ActorMethod<[bigint], RetrieveWithdrawalStatus>;
+  request_scraping_logs: ActorMethod<[], LogScrapingResult>;
+  retrieve_withdrawal_status: ActorMethod<[bigint], RetrieveWithdrawalStatus>;
   smart_contract_address: ActorMethod<[], string>;
   withdraw_erc20: ActorMethod<[WithdrawErc20Arg], WithdrawalErc20Result>;
   withdraw_native_token: ActorMethod<[WithdrawalArg], WithdrawalNativeResult>;

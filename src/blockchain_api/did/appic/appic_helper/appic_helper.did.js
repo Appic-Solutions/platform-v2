@@ -58,6 +58,15 @@ export const idlFactory = ({ IDL }) => {
     address: IDL.Text,
   });
   const GetIcpTokenArgs = IDL.Record({ ledger_id: IDL.Principal });
+  const MinterArgs = IDL.Record({
+    last_observed_event: IDL.Nat,
+    last_scraped_event: IDL.Nat,
+    operator: Operator,
+    chain_id: IDL.Nat,
+    icp_to_evm_fee: IDL.Nat,
+    evm_to_icp_fee: IDL.Nat,
+    minter_id: IDL.Principal,
+  });
   const TransactionSearchParam = IDL.Variant({
     TxWithdrawalId: IDL.Nat,
     TxMintId: IDL.Nat,
@@ -191,6 +200,7 @@ export const idlFactory = ({ IDL }) => {
     get_evm_token: IDL.Func([GetEvmTokenArgs], [IDL.Opt(CandidEvmToken)], ['query']),
     get_icp_token: IDL.Func([GetIcpTokenArgs], [IDL.Opt(CandidIcpToken)], ['query']),
     get_icp_tokens: IDL.Func([], [IDL.Vec(CandidIcpToken)], ['query']),
+    get_minters: IDL.Func([], [IDL.Vec(MinterArgs)], ['query']),
     get_transaction: IDL.Func([GetTxParams], [IDL.Opt(Transaction)], ['query']),
     get_txs_by_address: IDL.Func([IDL.Text], [IDL.Vec(Transaction)], ['query']),
     get_txs_by_address_principal_combination: IDL.Func([IDL.Text, IDL.Principal], [IDL.Vec(Transaction)], ['query']),

@@ -193,6 +193,7 @@ export interface _SERVICE {
   get_evm_token: ActorMethod<[GetEvmTokenArgs], [] | [CandidEvmToken]>;
   get_icp_token: ActorMethod<[GetIcpTokenArgs], [] | [CandidIcpToken]>;
   get_icp_tokens: ActorMethod<[], Array<CandidIcpToken>>;
+  get_minters: ActorMethod<[], Array<MinterArgs>>;
   get_transaction: ActorMethod<[GetTxParams], [] | [Transaction]>;
   get_txs_by_address: ActorMethod<[string], Array<Transaction>>;
   get_txs_by_address_principal_combination: ActorMethod<[string, Principal], Array<Transaction>>;

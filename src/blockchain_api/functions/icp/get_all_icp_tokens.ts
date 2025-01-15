@@ -46,7 +46,7 @@ export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToke
 // transform response into icp response
 export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] => {
   return icp_tokens
-    .filter((token) => BigNumber(token.usd_price).isGreaterThan(0)) // Match by canisterId/address
+    .filter((token) => BigNumber(token.usd_price).isGreaterThan(0) || token.rank.length == 1) // Match by canisterId/address
     .map((token) => {
       return {
         name: token.name,

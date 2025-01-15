@@ -1,54 +1,4 @@
 export const idlFactory = ({ IDL }) => {
-  const CandidBlockTag = IDL.Variant({
-    Safe: IDL.Null,
-    Finalized: IDL.Null,
-    Latest: IDL.Null,
-  });
-  const UpgradeArg = IDL.Record({
-    last_scraped_block_number: IDL.Opt(IDL.Nat),
-    next_transaction_nonce: IDL.Opt(IDL.Nat),
-    evm_rpc_id: IDL.Opt(IDL.Principal),
-    native_minimum_withdrawal_amount: IDL.Opt(IDL.Nat),
-    helper_contract_address: IDL.Opt(IDL.Text),
-    deposit_native_fee: IDL.Opt(IDL.Nat),
-    native_ledger_transfer_fee: IDL.Opt(IDL.Nat),
-    withdrawal_native_fee: IDL.Opt(IDL.Nat),
-    block_height: IDL.Opt(CandidBlockTag),
-    min_max_priority_fee_per_gas: IDL.Opt(IDL.Nat),
-  });
-  const EvmNetwork = IDL.Variant({
-    BSC: IDL.Null,
-    Fantom: IDL.Null,
-    Base: IDL.Null,
-    Ethereum: IDL.Null,
-    BSCTestnet: IDL.Null,
-    ArbitrumOne: IDL.Null,
-    Sepolia: IDL.Null,
-    Polygon: IDL.Null,
-    Optimism: IDL.Null,
-    Avalanche: IDL.Null,
-  });
-  const InitArg = IDL.Record({
-    last_scraped_block_number: IDL.Nat,
-    ecdsa_key_name: IDL.Text,
-    next_transaction_nonce: IDL.Nat,
-    native_minimum_withdrawal_amount: IDL.Nat,
-    native_symbol: IDL.Text,
-    helper_contract_address: IDL.Opt(IDL.Text),
-    deposit_native_fee: IDL.Nat,
-    native_ledger_transfer_fee: IDL.Nat,
-    native_index_id: IDL.Principal,
-    withdrawal_native_fee: IDL.Nat,
-    native_ledger_id: IDL.Principal,
-    block_height: CandidBlockTag,
-    evm_network: EvmNetwork,
-    min_max_priority_fee_per_gas: IDL.Nat,
-    ledger_suite_manager_id: IDL.Principal,
-  });
-  const MinterArg = IDL.Variant({
-    UpgradeArg: UpgradeArg,
-    InitArg: InitArg,
-  });
   const AddErc20Token = IDL.Record({
     erc20_ledger_id: IDL.Principal,
     erc20_token_symbol: IDL.Text,
@@ -102,6 +52,52 @@ export const idlFactory = ({ IDL }) => {
   const GetEventsArg = IDL.Record({
     start: IDL.Nat64,
     length: IDL.Nat64,
+  });
+  const CandidBlockTag = IDL.Variant({
+    Safe: IDL.Null,
+    Finalized: IDL.Null,
+    Latest: IDL.Null,
+  });
+  const UpgradeArg = IDL.Record({
+    last_scraped_block_number: IDL.Opt(IDL.Nat),
+    next_transaction_nonce: IDL.Opt(IDL.Nat),
+    evm_rpc_id: IDL.Opt(IDL.Principal),
+    native_minimum_withdrawal_amount: IDL.Opt(IDL.Nat),
+    helper_contract_address: IDL.Opt(IDL.Text),
+    deposit_native_fee: IDL.Opt(IDL.Nat),
+    native_ledger_transfer_fee: IDL.Opt(IDL.Nat),
+    withdrawal_native_fee: IDL.Opt(IDL.Nat),
+    block_height: IDL.Opt(CandidBlockTag),
+    min_max_priority_fee_per_gas: IDL.Opt(IDL.Nat),
+  });
+  const EvmNetwork = IDL.Variant({
+    BSC: IDL.Null,
+    Fantom: IDL.Null,
+    Base: IDL.Null,
+    Ethereum: IDL.Null,
+    BSCTestnet: IDL.Null,
+    ArbitrumOne: IDL.Null,
+    Sepolia: IDL.Null,
+    Polygon: IDL.Null,
+    Optimism: IDL.Null,
+    Avalanche: IDL.Null,
+  });
+  const InitArg = IDL.Record({
+    last_scraped_block_number: IDL.Nat,
+    ecdsa_key_name: IDL.Text,
+    next_transaction_nonce: IDL.Nat,
+    native_minimum_withdrawal_amount: IDL.Nat,
+    native_symbol: IDL.Text,
+    helper_contract_address: IDL.Opt(IDL.Text),
+    deposit_native_fee: IDL.Nat,
+    native_ledger_transfer_fee: IDL.Nat,
+    native_index_id: IDL.Principal,
+    withdrawal_native_fee: IDL.Nat,
+    native_ledger_id: IDL.Principal,
+    block_height: CandidBlockTag,
+    evm_network: EvmNetwork,
+    min_max_priority_fee_per_gas: IDL.Nat,
+    ledger_suite_manager_id: IDL.Principal,
   });
   const EventSource = IDL.Record({
     transaction_hash: IDL.Text,
@@ -420,70 +416,20 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     add_erc20_token: IDL.Func([AddErc20Token], [], []),
     check_new_deposits: IDL.Func([], [], []),
-    eip_1559_transaction_price: IDL.Func([IDL.Opt(Eip1559TransactionPriceArg)], [Eip1559TransactionPrice], ["query"]),
+    eip_1559_transaction_price: IDL.Func([IDL.Opt(Eip1559TransactionPriceArg)], [Eip1559TransactionPrice], ['query']),
     get_canister_status: IDL.Func([], [CanisterStatusResponse], []),
-    get_events: IDL.Func([GetEventsArg], [GetEventsResult], ["query"]),
-    get_minter_info: IDL.Func([], [MinterInfo], ["query"]),
+    get_events: IDL.Func([GetEventsArg], [GetEventsResult], ['query']),
+    get_minter_info: IDL.Func([], [MinterInfo], ['query']),
     icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOriginsResponse], []),
     minter_address: IDL.Func([], [IDL.Text], []),
-    request_scraping_logs: IDL.Func([IDL.Nat], [Result], []),
-    retrieve_witdrawal_status: IDL.Func([IDL.Nat64], [RetrieveWithdrawalStatus], []),
-    smart_contract_address: IDL.Func([], [IDL.Text], ["query"]),
+    request_scraping_logs: IDL.Func([], [Result], []),
+    retrieve_withdrawal_status: IDL.Func([IDL.Nat64], [RetrieveWithdrawalStatus], []),
+    smart_contract_address: IDL.Func([], [IDL.Text], ['query']),
     withdraw_erc20: IDL.Func([WithdrawErc20Arg], [Result_1], []),
     withdraw_native_token: IDL.Func([WithdrawalArg], [Result_2], []),
-    withdrawal_status: IDL.Func([WithdrawalSearchParameter], [IDL.Vec(WithdrawalDetail)], ["query"]),
+    withdrawal_status: IDL.Func([WithdrawalSearchParameter], [IDL.Vec(WithdrawalDetail)], ['query']),
   });
 };
 export const init = ({ IDL }) => {
-  const CandidBlockTag = IDL.Variant({
-    Safe: IDL.Null,
-    Finalized: IDL.Null,
-    Latest: IDL.Null,
-  });
-  const UpgradeArg = IDL.Record({
-    last_scraped_block_number: IDL.Opt(IDL.Nat),
-    next_transaction_nonce: IDL.Opt(IDL.Nat),
-    evm_rpc_id: IDL.Opt(IDL.Principal),
-    native_minimum_withdrawal_amount: IDL.Opt(IDL.Nat),
-    helper_contract_address: IDL.Opt(IDL.Text),
-    deposit_native_fee: IDL.Opt(IDL.Nat),
-    native_ledger_transfer_fee: IDL.Opt(IDL.Nat),
-    withdrawal_native_fee: IDL.Opt(IDL.Nat),
-    block_height: IDL.Opt(CandidBlockTag),
-    min_max_priority_fee_per_gas: IDL.Opt(IDL.Nat),
-  });
-  const EvmNetwork = IDL.Variant({
-    BSC: IDL.Null,
-    Fantom: IDL.Null,
-    Base: IDL.Null,
-    Ethereum: IDL.Null,
-    BSCTestnet: IDL.Null,
-    ArbitrumOne: IDL.Null,
-    Sepolia: IDL.Null,
-    Polygon: IDL.Null,
-    Optimism: IDL.Null,
-    Avalanche: IDL.Null,
-  });
-  const InitArg = IDL.Record({
-    last_scraped_block_number: IDL.Nat,
-    ecdsa_key_name: IDL.Text,
-    next_transaction_nonce: IDL.Nat,
-    native_minimum_withdrawal_amount: IDL.Nat,
-    native_symbol: IDL.Text,
-    helper_contract_address: IDL.Opt(IDL.Text),
-    deposit_native_fee: IDL.Nat,
-    native_ledger_transfer_fee: IDL.Nat,
-    native_index_id: IDL.Principal,
-    withdrawal_native_fee: IDL.Nat,
-    native_ledger_id: IDL.Principal,
-    block_height: CandidBlockTag,
-    evm_network: EvmNetwork,
-    min_max_priority_fee_per_gas: IDL.Nat,
-    ledger_suite_manager_id: IDL.Principal,
-  });
-  const MinterArg = IDL.Variant({
-    UpgradeArg: UpgradeArg,
-    InitArg: InitArg,
-  });
-  return [MinterArg];
+  return [];
 };
