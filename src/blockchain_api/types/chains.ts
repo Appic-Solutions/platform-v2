@@ -19,4 +19,5 @@ export interface Chain {
   appic_minter_address?: string;
   ankr_handle?: string;
   viem_config?: ViemChain;
+  twin_handle?: string;
 }

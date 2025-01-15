@@ -26,19 +26,9 @@ export const chains: Chain[] = [
     dfinity_ck_native_ledger_canister_id: 'ss2fx-dyaaa-aaaar-qacoq-cai',
     ankr_handle: 'eth',
     viem_config: mainnet,
+    twin_handle: 'eth',
   },
-  {
-    chainId: 42161,
-    name: 'Arbitrum One',
-    nativeTokenSymbol: 'ETH',
-    scannerAddress: 'https://arbiscan.io',
-    type: 'EVM',
-    rpc_url: 'https://arbitrum-one-rpc.publicnode.com',
-    disabled: false,
-    logo: '/images/logo/chains-logos/arbitrum.svg',
-    ankr_handle: 'arbitrum',
-    viem_config: arbitrum,
-  },
+
   {
     chainId: 56,
     name: 'BSC',
@@ -53,8 +43,21 @@ export const chains: Chain[] = [
     appic_twin_native_ledger_canister_id: 'n44gr-qyaaa-aaaam-qbuha-cai',
     ankr_handle: 'bsc',
     viem_config: bsc,
+    twin_handle: 'bsc',
   },
-
+  {
+    chainId: 42161,
+    name: 'Arbitrum One',
+    nativeTokenSymbol: 'ETH',
+    scannerAddress: 'https://arbiscan.io',
+    type: 'EVM',
+    rpc_url: 'https://arbitrum-one-rpc.publicnode.com',
+    disabled: true,
+    logo: '/images/logo/chains-logos/arbitrum.svg',
+    ankr_handle: 'arbitrum',
+    viem_config: arbitrum,
+    twin_handle: 'arb',
+  },
   {
     chainId: 137,
     name: 'Polygon',
@@ -62,11 +65,12 @@ export const chains: Chain[] = [
     scannerAddress: 'https://polygonscan.com',
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
-    disabled: false,
+    disabled: true,
     logo: '/images/logo/chains-logos/polygon.svg',
 
     ankr_handle: 'polygon',
     viem_config: polygon,
+    twin_handle: 'pol',
   },
   {
     chainId: 10,
@@ -75,11 +79,12 @@ export const chains: Chain[] = [
     scannerAddress: 'https://optimistic.etherscan.io',
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
-    disabled: false,
+    disabled: true,
     logo: '/images/logo/chains-logos/optimism.svg',
 
     ankr_handle: 'optimism',
     viem_config: optimism,
+    twin_handle: 'op',
   },
   {
     chainId: 8453,
@@ -88,11 +93,12 @@ export const chains: Chain[] = [
     scannerAddress: 'https://basescan.org',
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
-    disabled: false,
+    disabled: true,
     logo: '/images/logo/chains-logos/base.svg',
 
     ankr_handle: 'base',
     viem_config: base,
+    twin_handle: 'base',
   },
   {
     chainId: 43114,
@@ -101,7 +107,7 @@ export const chains: Chain[] = [
     scannerAddress: 'https://snowtrace.io',
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
-    disabled: false,
+    disabled: true,
     logo: '/images/logo/chains-logos/avalanche.svg',
 
     ankr_handle: 'avalanchec',
@@ -114,7 +120,7 @@ export const chains: Chain[] = [
     scannerAddress: 'https://ftmscan.com',
     type: 'EVM',
     rpc_url: 'https://fantom-rpc.publicnode.com',
-    disabled: false,
+    disabled: true,
     logo: '/images/logo/chains-logos/fantom.svg',
 
     ankr_handle: 'fantom',
