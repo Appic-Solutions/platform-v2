@@ -35,6 +35,7 @@ export interface BridgeHistory {
   human_readable_base_value: string;
   final_value: string;
   human_readable_final_value: string;
+  verified: boolean;
 }
 
 export const get_transaction_history = async (
@@ -68,6 +69,8 @@ export const get_transaction_history = async (
       };
     }
   } catch (error) {
+    console.log(error);
+    console.error(error);
     return {
       result: [],
       message: `Failed to get user transaction history ${error}`,
@@ -82,7 +85,7 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
     if ('EvmToIcp' in tx) {
       const transaction = tx.EvmToIcp;
       const id = `${transaction.transaction_hash}-${transaction.chain_id}`;
-      const epoch = BigNumber(transaction.time.toString()).dividedBy(1_000_000).decimalPlaces(0).toFixed();
+      const epoch = Math.floor(BigNumber(transaction.time.toString()).dividedBy(1_000_000).toNumber());
       const date_object = new Date(epoch);
       const date = date_object.toLocaleDateString();
       const time = date_object.toLocaleTimeString();
@@ -91,7 +94,9 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
       )!;
 
       const to_token = bridge_tokens.find(
-        (token) => token.chain_type == 'ICP' && Principal.fromText(token.canisterId!) == transaction.icrc_ledger_id[0],
+        (token) =>
+          token.chain_type == 'ICP' &&
+          token.canisterId!.toLocaleLowerCase() == transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
       )!;
 
       const native_currency = bridge_tokens.find(
@@ -133,21 +138,25 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         human_readable_base_value,
         final_value,
         human_readable_final_value,
+        verified: tx.EvmToIcp.verified,
       };
     } else if ('IcpToEvm' in tx) {
       const transaction = tx.IcpToEvm;
       const id = `${transaction.native_ledger_burn_index}-${transaction.chain_id}`;
-      const epoch = BigNumber(transaction.time.toString()).dividedBy(1_000_000).decimalPlaces(0).toFixed();
+      const epoch = Math.floor(BigNumber(transaction.time.toString()).dividedBy(1_000_000).toNumber());
       const date_object = new Date(epoch);
       const date = date_object.toLocaleDateString();
       const time = date_object.toLocaleTimeString();
       const from_token = bridge_tokens.find(
-        (token) => token.chain_type == 'ICP' && Principal.fromText(token.canisterId!) == transaction.icrc_ledger_id[0],
+        (token) =>
+          token.chain_type == 'ICP' &&
+          token.canisterId!.toLocaleLowerCase() == transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
       )!;
 
       const to_token = bridge_tokens.find(
         (token) => token.chain_type == 'EVM' && token.contractAddress == transaction.erc20_contract_address,
       )!;
+
       const chain = chains.find((chain) => chain.chainId.toString() == transaction.chain_id.toString())!;
       const native_ledger_principal =
         'AppicMinter' in transaction.operator
@@ -191,6 +200,7 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         human_readable_base_value,
         final_value,
         human_readable_final_value,
+        verified: tx.IcpToEvm.verified,
       };
     } else {
       throw 'Wrong Transaction type';
