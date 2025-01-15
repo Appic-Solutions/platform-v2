@@ -145,7 +145,6 @@ export const idlFactory = ({ IDL }) => {
     transaction_hash: IDL.Text,
     value: IDL.Nat,
     operator: Operator,
-    time: IDL.Nat,
     subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     erc20_contract_address: IDL.Text,
     chain_id: IDL.Nat,
@@ -155,7 +154,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const AddEvmToIcpTxError = IDL.Variant({
     InvalidAddress: IDL.Null,
-    ChinNotSupported: IDL.Null,
+    ChainNotSupported: IDL.Null,
     InvalidTokenPairs: IDL.Null,
     InvalidTokenContract: IDL.Null,
     TxAlreadyExists: IDL.Null,
@@ -166,7 +165,6 @@ export const idlFactory = ({ IDL }) => {
     withdrawal_amount: IDL.Nat,
     from: IDL.Principal,
     operator: Operator,
-    time: IDL.Nat,
     from_subaccount: IDL.Opt(IDL.Vec(IDL.Nat8)),
     erc20_contract_address: IDL.Text,
     chain_id: IDL.Nat,
@@ -176,7 +174,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const AddIcpToEvmTxError = IDL.Variant({
     InvalidDestination: IDL.Null,
-    ChinNotSupported: IDL.Null,
+    ChainNotSupported: IDL.Null,
     InvalidTokenPairs: IDL.Null,
     InvalidTokenContract: IDL.Null,
     TxAlreadyExists: IDL.Null,

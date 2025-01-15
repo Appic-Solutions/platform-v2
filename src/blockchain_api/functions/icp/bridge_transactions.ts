@@ -370,7 +370,6 @@ export const notify_appic_helper_withdrawal = async (
       max_transaction_fee: BigInt(bridge_option.fees.max_network_fee),
       native_ledger_burn_index: BigInt(withdrawal_id),
       operator: parsed_operator,
-      time: BigInt(Date.now()) * BigInt(1_000_000),
       withdrawal_amount: BigInt(bridge_option.amount),
     } as AddIcpToEvmTx)) as NewIcpToEvmResult;
     if ('Ok' in notify_withdrawal_result) {
@@ -486,6 +485,7 @@ export const check_withdraw_status = async (
 // Step 1
 // create wallet client and switch chain
 export const create_wallet_client = async (bridge_option: BridgeOption): Promise<WalletClient<any>> => {
+  console.log(bridge_option);
   const ethereum = (window as any).ethereum;
 
   if (!ethereum) {
@@ -628,26 +628,6 @@ export const notify_appic_helper_deposit = async (
   recipient_principal: string,
   unauthenticated_agent: HttpAgent,
 ): Promise<Response<string>> => {
-  // If the minter is of type of appic minter
-  // Request minter to start log scraping
-  if (bridge_option.operator === 'Appic') {
-    // Create an actor for the Appic minter
-    const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
-      canisterId: bridge_option.minter_id,
-      agent: unauthenticated_agent,
-    });
-
-    const log_scraping_request_result = (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
-
-    if ('Err' in log_scraping_request_result) {
-      if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
-        setTimeout(async () => {
-          await appic_minter_actor.request_scraping_logs();
-        }, 1000);
-      }
-    }
-  }
-
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
@@ -657,7 +637,7 @@ export const notify_appic_helper_deposit = async (
     bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
   ) as AppicHelperOperator;
   try {
-    const notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
+    const notify_withdrawal_result = (await appic_helper_actor.new_evm_to_icp_tx({
       chain_id: BigInt(bridge_option.chain_id),
       from_address: user_wallet_address,
       principal: Principal.fromText(recipient_principal),
@@ -668,8 +648,31 @@ export const notify_appic_helper_deposit = async (
       erc20_contract_address: bridge_option.from_token_id,
       icrc_ledger_id: Principal.fromText(bridge_option.to_token_id),
       operator: parsed_operator,
-      time: BigInt(Date.now()) * BigInt(1_000_000),
     } as AddEvmToIcpTx)) as NewEvmToIcpResult;
+
+    console.log(notify_withdrawal_result);
+
+    // If the minter is of type of appic minter
+    // Request minter to start log scraping
+    //  Wait for 60 seconds and then request a log scraping
+    if (bridge_option.operator === 'Appic') {
+      // Create an actor for the Appic minter
+      const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+        canisterId: bridge_option.minter_id,
+        agent: unauthenticated_agent,
+      });
+      setTimeout(async () => {
+        const log_scraping_request_result = (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+        if ('Err' in log_scraping_request_result) {
+          if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
+            setTimeout(async () => {
+              await appic_minter_actor.request_scraping_logs();
+            }, 600000);
+          }
+        }
+      }, 60000); // 60 seconds
+    }
+
     if ('Ok' in notify_withdrawal_result) {
       return {
         result: '',
@@ -677,17 +680,19 @@ export const notify_appic_helper_deposit = async (
         message: '',
       };
     } else {
+      console.error(notify_withdrawal_result.Err);
       return {
         result: '',
         success: false,
-        message: `Failed to notify minter ${notify_withdrawal_result.Err}`,
+        message: `Failed to notify appic helper ${notify_withdrawal_result.Err}`,
       };
     }
   } catch (error) {
+    console.error(error);
     return {
       result: '',
       success: false,
-      message: `Failed to notify minter ${error}`,
+      message: `Failed to notify appic helper ${error}`,
     };
   }
 };

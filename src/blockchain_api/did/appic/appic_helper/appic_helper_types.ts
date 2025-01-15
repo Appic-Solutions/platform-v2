@@ -7,7 +7,6 @@ export interface AddEvmToIcpTx {
   transaction_hash: string;
   value: bigint;
   operator: Operator;
-  time: bigint;
   subaccount: [] | [Uint8Array | number[]];
   erc20_contract_address: string;
   chain_id: bigint;
@@ -17,7 +16,7 @@ export interface AddEvmToIcpTx {
 }
 export type AddEvmToIcpTxError =
   | { InvalidAddress: null }
-  | { ChinNotSupported: null }
+  | { ChainNotSupported: null }
   | { InvalidTokenPairs: null }
   | { InvalidTokenContract: null }
   | { TxAlreadyExists: null };
@@ -26,7 +25,6 @@ export interface AddIcpToEvmTx {
   withdrawal_amount: bigint;
   from: Principal;
   operator: Operator;
-  time: bigint;
   from_subaccount: [] | [Uint8Array | number[]];
   erc20_contract_address: string;
   chain_id: bigint;
@@ -36,7 +34,7 @@ export interface AddIcpToEvmTx {
 }
 export type AddIcpToEvmTxError =
   | { InvalidDestination: null }
-  | { ChinNotSupported: null }
+  | { ChainNotSupported: null }
   | { InvalidTokenPairs: null }
   | { InvalidTokenContract: null }
   | { TxAlreadyExists: null };

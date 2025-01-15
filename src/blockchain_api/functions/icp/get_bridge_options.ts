@@ -335,7 +335,7 @@ const get_gas_price = async (
 
     const fee_history = await client.getFeeHistory({
       blockCount: 5,
-      rewardPercentiles: [20, 50, 70],
+      rewardPercentiles: [60, 90],
       blockTag: 'latest',
     });
 
