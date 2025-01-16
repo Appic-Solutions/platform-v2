@@ -667,10 +667,10 @@ export const notify_appic_helper_deposit = async (
           if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
             setTimeout(async () => {
               await appic_minter_actor.request_scraping_logs();
-            }, 600000);
+            }, 60000);
           }
         }
-      }, 60000); // 60 seconds
+      }, 70000); // 70 seconds
     }
 
     if ('Ok' in notify_withdrawal_result) {

@@ -56,6 +56,7 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (txHash && unAuthenticatedAgent && selectedOption) {
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
+
         if (res.success) {
           if (res.result === 'Minted') {
             setTxStatus('successful');
@@ -74,6 +75,7 @@ export const BridgeLogic = () => {
             status: 'failed',
           });
         }
+
         return res;
       }
       return null;
