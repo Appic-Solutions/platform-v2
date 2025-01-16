@@ -491,16 +491,20 @@ export const create_wallet_client = async (bridge_option: BridgeOption): Promise
   if (!ethereum) {
     throw new Error('MetaMask is not installed or ethereum object is not available');
   }
-  const walletClient = createWalletClient({
-    transport: custom(ethereum!),
-  });
+  try {
+    const walletClient = createWalletClient({
+      transport: custom(ethereum!),
+    });
 
-  await walletClient.addChain({ chain: bridge_option.viem_chain });
-  await walletClient.switchChain({ id: bridge_option.chain_id });
-  const addresses = await walletClient.requestAddresses();
-  console.log(addresses);
+    // await walletClient.addChain({ chain: bridge_option.viem_chain });
+    await walletClient.switchChain({ id: bridge_option.chain_id });
+    const addresses = await walletClient.requestAddresses();
+    console.log(addresses);
 
-  return walletClient;
+    return walletClient;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Step 2
@@ -667,10 +671,10 @@ export const notify_appic_helper_deposit = async (
           if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
             setTimeout(async () => {
               await appic_minter_actor.request_scraping_logs();
-            }, 600000);
+            }, 60000);
           }
         }
-      }, 60000); // 60 seconds
+      }, 70000); // 70 seconds
     }
 
     if ('Ok' in notify_withdrawal_result) {

@@ -7,6 +7,8 @@ import { BridgeOptionsListRequest } from './_api/types/request';
 import { useBridgeActions, useBridgeStore } from './_store';
 import { useSharedStore } from '@/common/state/store';
 import { StepperContainer } from './_components/bridge-review';
+import { convert_png_to_data_uri } from '@/blockchain_api/utils/png_to_data_uri';
+import { generate_twin_token_symbol } from '@/blockchain_api/functions/icp/generate_new_twin_token_symbol';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();

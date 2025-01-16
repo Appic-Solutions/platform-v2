@@ -18,11 +18,12 @@ import {
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 
 // Dfinity minter IDL and types
-// import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
-// import {
-//   Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
-//   Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
-// } from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
+import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
+import {
+  MinterInfo as DfinityMinterInfo,
+  // Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
+  // Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
+} from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
 
 import { is_native_token } from '../evm/utils/erc20_helpers';
 import BigNumber from 'bignumber.js';
@@ -179,6 +180,25 @@ export const get_bridge_options = async (
       );
       return { result: bridge_options, message: '', success: true };
     } else if (bridge_metadata.tx_type == TxType.Withdrawal) {
+      const minimum_native_withdrawal_amount = await fetch_minimum_native_withdrawal_amount(
+        agent,
+        bridge_metadata.operator,
+        bridge_metadata.minter_address,
+      );
+      if (bridge_metadata.is_native) {
+        console.log(
+          minimum_native_withdrawal_amount,
+          amount,
+          BigNumber(minimum_native_withdrawal_amount).isGreaterThan(BigNumber(amount)),
+        );
+        if (BigNumber(minimum_native_withdrawal_amount).isGreaterThan(BigNumber(amount))) {
+          return {
+            message: 'Amount is less than minimum amount',
+            result: [],
+            success: false,
+          };
+        }
+      }
       const estimated_approval_gas = native_currency.fee!;
       const estimated_approval_erc20_fee = bridge_metadata.is_native ? '0' : from_token.fee!;
       const { max_transaction_fee } = await estimate_withdrawal_gas(
@@ -241,6 +261,32 @@ const fetch_minter_fee = async (
     return '0';
   } catch (error) {
     console.error('Error fetching minter fee:', error);
+    throw new Error('Failed to fetch minter fee');
+  }
+};
+
+/**
+ * Fetch the minter fee for a transaction.
+ */
+const fetch_minimum_native_withdrawal_amount = async (
+  agent: HttpAgent,
+  operator: string,
+  minter_address: Principal,
+): Promise<string> => {
+  try {
+    if (operator === 'Appic') {
+      const appic_minter_actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address });
+      const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
+
+      return minter_info.minimum_withdrawal_amount[0]?.toString() || '0';
+    } else {
+      const dfinity_minter_actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address });
+      const minter_info = (await dfinity_minter_actor.get_minter_info()) as DfinityMinterInfo;
+
+      return minter_info.minimum_withdrawal_amount[0]?.toString() || '0';
+    }
+  } catch (error) {
+    console.error('Error fetching native minimum withdrawal amount:', error);
     throw new Error('Failed to fetch minter fee');
   }
 };
@@ -386,12 +432,12 @@ const estimate_deposit_fee = async (
       data: encoded_function_data,
     });
 
-    const estimated_gas_plus_10_percent = BigNumber(estimated_gas.toString())
-      .plus(BigNumber(estimated_gas.toString()).multipliedBy(10).dividedBy(100).decimalPlaces(0))
-      .toFixed(); // plus 10 percent in case gas consumption is higher
+    const estimated_gas_plus_5_percent = BigNumber(estimated_gas.toString())
+      .plus(BigNumber(estimated_gas.toString()).multipliedBy(5).dividedBy(100).decimalPlaces(0))
+      .toFixed(); // plus 5 percent in case gas consumption is higher
     return {
-      total_deposit_fee: BigNumber(estimated_gas_plus_10_percent).multipliedBy(max_fee_per_gas).toFixed(),
-      deposit_gas: estimated_gas_plus_10_percent,
+      total_deposit_fee: BigNumber(estimated_gas_plus_5_percent).multipliedBy(max_fee_per_gas).toFixed(),
+      deposit_gas: estimated_gas_plus_5_percent,
     };
   } catch (error) {
     console.error('Error estimating deposit gas:', error);

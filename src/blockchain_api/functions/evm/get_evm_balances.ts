@@ -3,6 +3,7 @@ import { chains } from '../../lists/chains';
 import { Chain } from '../../types/chains';
 import { EvmToken } from '../../types/tokens';
 import { Response } from '../../types/response';
+import { NATIVE_TOKEN_ADDRESS } from '../icp/get_bridge_options';
 interface AnkrGetBalanceRequestParams {
   id: number;
   jsonrpc: string;
@@ -115,7 +116,7 @@ function transform_ankr_asset_to_token_format(allAssets: UserAsset[]): EvmToken[
       balanceRawInteger: asset.balanceRawInteger,
       chain_type: 'EVM',
       disabled: false, // Optional: Whether the token is disabled
-      contractAddress: asset.contractAddress,
+      contractAddress: asset.contractAddress || NATIVE_TOKEN_ADDRESS,
     };
   });
 }
