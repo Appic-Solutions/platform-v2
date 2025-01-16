@@ -9,7 +9,7 @@ import TokenCard from './token-card';
 import BoxHeader from '@/common/components/ui/box-header';
 import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import TokenSkeleton from './token-skeleton';
-import { useBridgeActions, useBridgeStore } from '../../_store';
+import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
 import { BridgeLogic } from '../../_logic';
 import { useSharedStore } from '@/common/state/store';
 
@@ -20,10 +20,8 @@ interface TokenListProps {
 
 export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const [query, setQuery] = useState('');
-  // we should take bridge pairs, find user tokens in the list and set a balance for them
-  // then we should set new list in our state to show
-  // and absolutely we do all these for sorting them based on balance
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
+  const [updatedBridgePairs, setUpdatedBridgePairs] = useState<TokenType[]>();
   // shared store
   const { evmBalance, icpBalance } = useSharedStore();
   // store
@@ -32,15 +30,22 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const { isTokenSelected, selectToken } = BridgeLogic();
   const { setActiveStep } = useBridgeActions();
 
-  // to find user tokens in all tokens list
-  // useEffect(() => {
-  //   console.log('ahhhh');
-  //   if (evmBalance || icpBalance) {
-  //     const allTokens = [...(evmBalance?.tokens || []), ...(icpBalance?.tokens || [])];
-  //     const allTokensHasBalance = allTokens.find((token) => token.balance && Number(token.balance) > 0);
-  //     console.log(allTokensHasBalance);
-  //   }
-  // }, [evmBalance, icpBalance]);
+  // to find user tokens in all tokens list and sort them
+  useEffect(() => {
+    if ((evmBalance || icpBalance) && tokens) {
+      const allBalances = [...(evmBalance?.tokens || []), ...(icpBalance?.tokens || [])];
+      setUpdatedBridgePairs(() =>
+        tokens.map((token) => {
+          const foundToken = allBalances.find((item) => {
+            if (item.chain_type === 'EVM')
+              return item.contractAddress === token.contractAddress && item.chainId === token.chainId;
+            else if (item.chain_type === 'ICP') return item.canisterId === token.canisterId;
+          });
+          return foundToken ? { ...token, balance: foundToken.balance } : token;
+        }),
+      );
+    }
+  }, [evmBalance, icpBalance, tokens]);
 
   // set selected chain id
   useEffect(() => {
@@ -55,23 +60,32 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   // filter tokens
   const filteredTokens = useMemo(() => {
     const searchQuery = query.toLowerCase();
-    if (!fromToken && toToken && tokens && selectedTokenType === 'from') {
+    if (!fromToken && toToken && updatedBridgePairs && selectedTokenType === 'from') {
       return get_bridge_pairs_for_token(
-        tokens,
+        updatedBridgePairs,
         toToken.canisterId || toToken.contractAddress || '',
         toToken.chainId,
         selectedChainId || 0,
       );
     }
-    if (fromToken && !toToken && tokens && selectedTokenType === 'to') {
+    if (fromToken && !toToken && updatedBridgePairs && selectedTokenType === 'to') {
+      console.log(
+        get_bridge_pairs_for_token(
+          updatedBridgePairs,
+          fromToken.canisterId || fromToken.contractAddress || '',
+          fromToken.chainId,
+          selectedChainId || 0,
+        ),
+      );
+
       return get_bridge_pairs_for_token(
-        tokens,
+        updatedBridgePairs,
         fromToken.canisterId || fromToken.contractAddress || '',
         fromToken.chainId,
         selectedChainId || 0,
       );
     } else {
-      return tokens
+      return updatedBridgePairs
         ?.filter((token) => token.chainId === selectedChainId)
         .filter(
           (token) =>
@@ -81,7 +95,16 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
             token.canisterId?.toLowerCase().includes(searchQuery),
         );
     }
-  }, [query, selectedChainId, tokens, fromToken, selectedTokenType, toToken]);
+  }, [query, selectedChainId, updatedBridgePairs, fromToken, selectedTokenType, toToken]);
+
+  // sort items based on balance
+  const sortTokens = (tokens: TokenType[]) => {
+    return tokens.sort((a, b) => {
+      const balanceA = parseFloat(a.balance || '0');
+      const balanceB = parseFloat(b.balance || '0');
+      return balanceB - balanceA;
+    });
+  };
 
   return (
     <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
@@ -112,7 +135,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
         ) : isError ? (
           <div>Error While loading. Please try again</div>
         ) : tokens && filteredTokens && filteredTokens.length > 0 ? (
-          filteredTokens?.map((token, idx) => (
+          sortTokens(filteredTokens)?.map((token, idx) => (
             <TokenCard
               key={idx}
               token={token}

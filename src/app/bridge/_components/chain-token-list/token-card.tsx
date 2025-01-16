@@ -37,7 +37,6 @@ const TokenCard = ({
 
     if (token.chain_type === 'ICP' && icpBalance) {
       mainToken = icpBalance.tokens.find((t) => t.canisterId === token.canisterId);
-      console.log(mainToken);
       if (mainToken?.balance && mainToken?.usdBalance) {
         setTokenBalance({ balance: mainToken?.balance, usdBalance: mainToken?.usdBalance });
       } else {
