@@ -21,18 +21,30 @@ const TokenCard = ({
   const [tokenBalance, setTokenBalance] = useState<{ balance: string; usdBalance: string }>();
 
   useEffect(() => {
+    let mainToken;
+
     if (token.chain_type === 'EVM' && evmBalance) {
-      const balance = evmBalance.tokens.find((t) => t.contractAddress === token.contractAddress)?.balance;
-      const usdBalance = evmBalance.tokens.find((t) => t.contractAddress === token.contractAddress)?.usdBalance;
-      if (balance && usdBalance) setTokenBalance({ balance, usdBalance });
-    }
-    if (token.chain_type === 'ICP' && icpBalance) {
-      const balance = icpBalance.tokens.find((t) => t.canisterId === token.canisterId)?.balance;
-      const usdBalance = icpBalance.tokens.find((t) => t.canisterId === token.canisterId)?.usdBalance;
-      if (balance && usdBalance) setTokenBalance({ balance, usdBalance });
+      mainToken = evmBalance.tokens.find(
+        (t) => t.contractAddress === token.contractAddress && t.chainId === token.chainId,
+      );
+      if (mainToken?.balance && mainToken?.usdBalance) {
+        setTokenBalance({ balance: mainToken.balance, usdBalance: mainToken.usdBalance });
+      } else {
+        setTokenBalance(undefined);
+      }
       return;
     }
-    setTokenBalance(undefined);
+
+    if (token.chain_type === 'ICP' && icpBalance) {
+      mainToken = icpBalance.tokens.find((t) => t.canisterId === token.canisterId);
+      console.log(mainToken);
+      if (mainToken?.balance && mainToken?.usdBalance) {
+        setTokenBalance({ balance: mainToken?.balance, usdBalance: mainToken?.usdBalance });
+      } else {
+        setTokenBalance(undefined);
+      }
+      return;
+    }
   }, [icpBalance, evmBalance, token]);
 
   return (
