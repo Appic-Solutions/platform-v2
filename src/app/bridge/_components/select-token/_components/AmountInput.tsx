@@ -1,4 +1,4 @@
-import { getChainLogo } from '@/common/helpers/utils';
+import { formatToSignificantFigures, getChainLogo } from '@/common/helpers/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
@@ -23,8 +23,6 @@ const AmountInput = () => {
       const mainToken = evmBalance.tokens.find(
         (t) => t.contractAddress === fromToken.contractAddress && t.chainId === fromToken.chainId,
       );
-      console.log(fromToken.contractAddress);
-      console.log(evmBalance.tokens);
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
 
@@ -81,7 +79,7 @@ const AmountInput = () => {
               type="number"
               maxLength={10}
               placeholder="0"
-              value={inputAmount}
+              value={formatToSignificantFigures(inputAmount)}
               onChange={(e) => setInputAmount(e.target.value)}
               className={cn(
                 'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
@@ -116,7 +114,7 @@ const AmountInput = () => {
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
             {isWalletConnected('from') && (
               <p className="text-muted text-center text-xs md:text-sm font-semibold text-nowrap">
-                {selectedTokenBalance}
+                {formatToSignificantFigures(selectedTokenBalance)}
               </p>
             )}
           </div>
