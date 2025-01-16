@@ -53,7 +53,6 @@ const WalletPage = () => {
       fetchEvmBalances({
         evmAddress,
       }).then((res) => {
-        console.log(res);
         setEvmBalance(res);
         setIsEvmBalanceLoading(false);
       });
