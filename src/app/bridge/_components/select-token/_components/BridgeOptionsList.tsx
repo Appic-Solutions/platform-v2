@@ -16,9 +16,9 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
   const [expandedOption, setExpandedOption] = useState<BridgeOptionType | undefined>();
 
   useEffect(() => {
-    if (bridgeOptions) {
-      handleSelectOption(bridgeOptions[0]);
-      setExpandedOption(bridgeOptions[0]);
+    if (bridgeOptions.options && bridgeOptions.options.length > 0) {
+      handleSelectOption(bridgeOptions.options[0]);
+      setExpandedOption(bridgeOptions.options[0]);
     }
   }, [bridgeOptions, setSelectedOption]);
 
@@ -54,11 +54,14 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
             <BridgeOptionSkeleton />
             <BridgeOptionSkeleton />
           </>
-        ) : !isPending && bridgeOptions && toToken ? (
-          bridgeOptions.map((item, idx) => (
+        ) : !isPending && bridgeOptions.options && toToken ? (
+          bridgeOptions.options.map((item, idx) => (
             <div
               key={idx}
-              className={cn('flex-shrink-1 h-fit', bridgeOptions.length < 2 ? 'w-full' : 'md:w-full w-[280px]')}
+              className={cn(
+                'flex-shrink-1 h-fit',
+                bridgeOptions.options && bridgeOptions.options.length < 2 ? 'w-full' : 'md:w-full w-[280px]',
+              )}
             >
               <BridgeOption
                 option={item}

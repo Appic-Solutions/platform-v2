@@ -14,7 +14,7 @@ const AmountInput = () => {
   // Logic
   const { isWalletConnected } = BridgeLogic();
 
-  const { fromToken, usdPrice, amount, selectedTokenBalance } = useBridgeStore();
+  const { fromToken, usdPrice, amount, selectedTokenBalance, bridgeOptions } = useBridgeStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useBridgeActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
@@ -118,6 +118,10 @@ const AmountInput = () => {
               </p>
             )}
           </div>
+          {!bridgeOptions.options ||
+            (bridgeOptions.options?.length === 0 && bridgeOptions.message && (
+              <p className="text-sm text-red-500">{bridgeOptions.message}</p>
+            ))}
         </div>
       </div>
     </Card>
