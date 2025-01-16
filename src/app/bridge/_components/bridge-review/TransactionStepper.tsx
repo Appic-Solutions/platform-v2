@@ -5,6 +5,7 @@ import { TxStepType } from '../../_store';
 import { DialogClose } from '@/common/components/ui/dialog';
 import { CloseIcon } from '@/common/components/icons';
 import { BridgeLogic } from '../../_logic';
+import ProgressBar from './ProgressBar';
 
 export default function BridgeTransactionStepper({ steps, currentStep }: { steps: TxStep[]; currentStep: TxStepType }) {
   const { resetTransaction } = BridgeLogic();
@@ -19,6 +20,9 @@ export default function BridgeTransactionStepper({ steps, currentStep }: { steps
           <TransactionStep key={index} currentStep={currentStep} index={index} step={step} />
         ))}
       </div>
+      {/* <div className="bg-pink-50"> */}
+      <ProgressBar steps={steps} currentStep={currentStep} />
+      {/* </div> */}
     </div>
   );
 }

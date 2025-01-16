@@ -50,7 +50,7 @@ export const BridgeLogic = () => {
   const depositTokenWithApproval = useDepositTokenWithApproval();
   const depositToken = useDepositToken();
   const notifyAppicHelperDeposit = useNotifyAppicHelperDeposit();
-  // check withdrawal tx status
+  // check deposit tx status
   useQuery({
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
@@ -66,12 +66,12 @@ export const BridgeLogic = () => {
             setTxStatus('pending');
           }
           setTxStep({
-            count: 4,
+            count: 5,
             status: 'successful',
           });
         } else if (!res.success) {
           setTxStep({
-            count: 4,
+            count: 5,
             status: 'failed',
           });
         }
@@ -101,12 +101,12 @@ export const BridgeLogic = () => {
             setTxStatus('pending');
           }
           setTxStep({
-            count: 5,
+            count: 4,
             status: 'successful',
           });
         } else if (!res.success) {
           setTxStep({
-            count: 5,
+            count: 4,
             status: 'failed',
           });
         }
@@ -247,6 +247,7 @@ export const BridgeLogic = () => {
       const isTokenNative = selectedOption.native_fee_token_id === selectedOption.from_token_id;
       const mainChain = chains.find((chain) => chain.chainId === fromToken.chainId);
 
+      console.log('ahhhh');
       if (isTokenNative) {
         if (Number(amount) > Number(selectedTokenBalance))
           return {
@@ -258,6 +259,7 @@ export const BridgeLogic = () => {
           const userNativeToken = evmBalance?.tokens.find(
             (token) => token.contractAddress === selectedOption.native_fee_token_id,
           );
+          console.log(userNativeToken);
           if (
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)

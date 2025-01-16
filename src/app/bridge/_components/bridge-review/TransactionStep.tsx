@@ -33,7 +33,11 @@ export const TransactionStep = ({
       <div
         className={cn(
           'flex items-center justify-center w-[90px] h-[90px] relative rounded-full',
-          currentStep.count === index + 1 && currentStep.status === 'failed' && 'border-2 border-red-500',
+          currentStep.count === index + 1 && currentStep.status === 'failed'
+            ? 'border-2 border-red-500'
+            : currentStep.count === index + 1 && currentStep.status === 'successful'
+              ? 'border-2 border-green-500'
+              : '',
         )}
       >
         {currentStep.count === index + 1 && currentStep.status === 'pending' && (

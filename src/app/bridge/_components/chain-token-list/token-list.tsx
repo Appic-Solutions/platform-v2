@@ -69,15 +69,6 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
       );
     }
     if (fromToken && !toToken && updatedBridgePairs && selectedTokenType === 'to') {
-      console.log(
-        get_bridge_pairs_for_token(
-          updatedBridgePairs,
-          fromToken.canisterId || fromToken.contractAddress || '',
-          fromToken.chainId,
-          selectedChainId || 0,
-        ),
-      );
-
       return get_bridge_pairs_for_token(
         updatedBridgePairs,
         fromToken.canisterId || fromToken.contractAddress || '',

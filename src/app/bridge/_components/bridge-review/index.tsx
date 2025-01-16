@@ -10,11 +10,8 @@ export const StepperContainer = () => {
   // all steps of transaction details like title, logo and status
   const [steps, setSteps] = useState<TxStep[]>();
   // bridge store
-  // txStatus is last step status of each transaction type
   const { fromToken, txStep } = useBridgeStore();
 
-  // if transaction type is deposit, set main steps to deposit steps details
-  // else if transaction type is withdrawal, set main steps to deposit steps details
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM') {
       setSteps(depositStepsDetails);
