@@ -21,11 +21,9 @@ const AmountInput = () => {
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find((t) => {
-        // check for native tokens
-        const isNativeToken = t.contractAddress === undefined && t.chainId === fromToken.chainId;
         // check for smart contract tokens
         const isSameContractToken = t.contractAddress === fromToken.contractAddress;
-        return isNativeToken || isSameContractToken;
+        return isSameContractToken;
       });
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }

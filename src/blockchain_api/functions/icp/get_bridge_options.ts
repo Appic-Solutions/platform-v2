@@ -432,12 +432,12 @@ const estimate_deposit_fee = async (
       data: encoded_function_data,
     });
 
-    const estimated_gas_plus_10_percent = BigNumber(estimated_gas.toString())
-      .plus(BigNumber(estimated_gas.toString()).multipliedBy(10).dividedBy(100).decimalPlaces(0))
-      .toFixed(); // plus 10 percent in case gas consumption is higher
+    const estimated_gas_plus_5_percent = BigNumber(estimated_gas.toString())
+      .plus(BigNumber(estimated_gas.toString()).multipliedBy(5).dividedBy(100).decimalPlaces(0))
+      .toFixed(); // plus 5 percent in case gas consumption is higher
     return {
-      total_deposit_fee: BigNumber(estimated_gas_plus_10_percent).multipliedBy(max_fee_per_gas).toFixed(),
-      deposit_gas: estimated_gas_plus_10_percent,
+      total_deposit_fee: BigNumber(estimated_gas_plus_5_percent).multipliedBy(max_fee_per_gas).toFixed(),
+      deposit_gas: estimated_gas_plus_5_percent,
     };
   } catch (error) {
     console.error('Error estimating deposit gas:', error);
