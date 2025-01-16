@@ -8,10 +8,12 @@ export const TransactionStep = ({
   currentStep,
   step,
   index,
+  steps,
 }: {
   step: TxStep;
   currentStep: TxStepType;
   index: number;
+  steps: TxStep[];
 }) => {
   const { txStatus, txErrorMessage } = useBridgeStore();
 
@@ -33,19 +35,23 @@ export const TransactionStep = ({
       <div
         className={cn(
           'flex items-center justify-center w-[90px] h-[90px] relative rounded-full',
-          currentStep.count === index + 1 && currentStep.status === 'failed'
+          (currentStep.count === index + 1 && currentStep.status === 'failed') ||
+            (currentStep.count === steps.length && txStatus && txStatus === 'failed')
             ? 'border-2 border-red-500'
-            : currentStep.count === index + 1 && currentStep.status === 'successful'
+            : (currentStep.count === index + 1 && currentStep.status === 'successful') ||
+                currentStep.count === steps.length
               ? 'border-2 border-green-500'
               : '',
         )}
       >
+        {/* steps status before last step */}
         {currentStep.count === index + 1 && currentStep.status === 'pending' && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[85px] h-[85px] border-2 border-t-transparent border-green-600 rounded-full animate-spin" />
           </div>
         )}
-        {txStatus && txStatus === 'pending' && (
+        {/* last step status */}
+        {currentStep.count === steps.length && txStatus && txStatus === 'pending' && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-[85px] h-[85px] border-2 border-t-transparent border-green-600 rounded-full animate-spin" />
           </div>
