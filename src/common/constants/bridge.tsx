@@ -61,7 +61,7 @@ export const withdrawalStepsDetails: TxStep[] = [
     statuses: {
       pending: {
         statusTitle: 'pending',
-        description: 'Waiting for destination chain',
+        description: 'Transaction submitted, waiting for minter verification',
       },
       successful: {
         statusTitle: 'successful',
@@ -154,7 +154,7 @@ export const depositStepsDetails: TxStep[] = [
     statuses: {
       pending: {
         statusTitle: 'pending',
-        description: 'Waiting for destination chain',
+        description: 'Transaction submitted, waiting for minter verification',
       },
       successful: {
         statusTitle: 'successful',

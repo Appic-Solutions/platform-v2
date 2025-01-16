@@ -11,6 +11,7 @@ import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_b
 import TokenSkeleton from './token-skeleton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { BridgeLogic } from '../../_logic';
+import { useSharedStore } from '@/common/state/store';
 
 interface TokenListProps {
   isPending: boolean;
@@ -19,12 +20,27 @@ interface TokenListProps {
 
 export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const [query, setQuery] = useState('');
+  // we should take bridge pairs, find user tokens in the list and set a balance for them
+  // then we should set new list in our state to show
+  // and absolutely we do all these for sorting them based on balance
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
+  // shared store
+  const { evmBalance, icpBalance } = useSharedStore();
   // store
   const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore();
   // Logic
   const { isTokenSelected, selectToken } = BridgeLogic();
   const { setActiveStep } = useBridgeActions();
+
+  // to find user tokens in all tokens list
+  // useEffect(() => {
+  //   console.log('ahhhh');
+  //   if (evmBalance || icpBalance) {
+  //     const allTokens = [...(evmBalance?.tokens || []), ...(icpBalance?.tokens || [])];
+  //     const allTokensHasBalance = allTokens.find((token) => token.balance && Number(token.balance) > 0);
+  //     console.log(allTokensHasBalance);
+  //   }
+  // }, [evmBalance, icpBalance]);
 
   // set selected chain id
   useEffect(() => {

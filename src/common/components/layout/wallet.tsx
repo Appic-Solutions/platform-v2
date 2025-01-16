@@ -56,7 +56,6 @@ const WalletPage = () => {
         console.log(res);
         setEvmBalance(res);
         setIsEvmBalanceLoading(false);
-        console.log(res);
       });
     }
   }, [unAuthenticatedAgent, evmAddress, setUnAuthenticatedAgent, setEvmBalance, setIsEvmBalanceLoading]);

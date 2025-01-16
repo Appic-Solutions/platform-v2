@@ -20,13 +20,11 @@ const AmountInput = () => {
 
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
-      const mainToken = evmBalance.tokens.find((t) => {
-        // check for native tokens
-        const isNativeToken = t.contractAddress === undefined && t.chainId === fromToken.chainId;
-        // check for smart contract tokens
-        const isSameContractToken = t.contractAddress === fromToken.contractAddress;
-        return isNativeToken || isSameContractToken;
-      });
+      const mainToken = evmBalance.tokens.find(
+        (t) => t.contractAddress === fromToken.contractAddress && t.chainId === fromToken.chainId,
+      );
+      console.log(fromToken.contractAddress);
+      console.log(evmBalance.tokens);
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
 
@@ -101,9 +99,12 @@ const AmountInput = () => {
                   'hover:bg-white/35 transition-all duration-300',
                 )}
                 onClick={() => {
-                  if (selectedTokenBalance) {
+                  if (Number(selectedTokenBalance) > 0) {
                     setAmount(selectedTokenBalance);
                     setInputAmount(selectedTokenBalance);
+                  } else {
+                    setAmount('0');
+                    setInputAmount('0');
                   }
                 }}
               >
