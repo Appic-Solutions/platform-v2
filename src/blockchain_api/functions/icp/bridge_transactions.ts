@@ -491,16 +491,20 @@ export const create_wallet_client = async (bridge_option: BridgeOption): Promise
   if (!ethereum) {
     throw new Error('MetaMask is not installed or ethereum object is not available');
   }
-  const walletClient = createWalletClient({
-    transport: custom(ethereum!),
-  });
+  try {
+    const walletClient = createWalletClient({
+      transport: custom(ethereum!),
+    });
 
-  await walletClient.addChain({ chain: bridge_option.viem_chain });
-  await walletClient.switchChain({ id: bridge_option.chain_id });
-  const addresses = await walletClient.requestAddresses();
-  console.log(addresses);
+    // await walletClient.addChain({ chain: bridge_option.viem_chain });
+    await walletClient.switchChain({ id: bridge_option.chain_id });
+    const addresses = await walletClient.requestAddresses();
+    console.log(addresses);
 
-  return walletClient;
+    return walletClient;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Step 2
