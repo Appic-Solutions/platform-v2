@@ -19,7 +19,6 @@ import {
   TxHash,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery } from '@tanstack/react-query';
-import { chains } from '@/blockchain_api/lists/chains';
 
 export const BridgeLogic = () => {
   // Bridge Store
@@ -248,14 +247,11 @@ export const BridgeLogic = () => {
       // * for regular tokens
       //  wallet balance for native token should be greater than max_network_fee
       // * for native tokens
-      // wallet balance for token should be greater than amount + max_network_fee
+      // wallet balance for token should be greater than amount
       console.log('selected option:', selectedOption);
       if (selectedOption.is_native) {
         console.log('is native:', selectedOption.is_native);
-        if (
-          Number(amount) + Number(selectedOption.fees.human_readable_max_network_fee) >
-          Number(selectedTokenBalance)
-        ) {
+        if (Number(amount) > Number(selectedTokenBalance)) {
           return {
             isDisable: true,
             text: 'INSUFFICIENT Funds',
