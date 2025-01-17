@@ -3,7 +3,6 @@ import { getStorageItem } from '@/common/helpers/localstorage';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useGetAllBridgeHistory } from '../_api';
 import { HttpAgent } from '@dfinity/agent';
-import { useEffect } from 'react';
 
 export default function useLogic() {
   const { unAuthenticatedAgent, icpIdentity, evmAddress } = useSharedStore();
@@ -32,21 +31,16 @@ export default function useLogic() {
 
   const { data: bridgePairs } = getBridgePairsFromLocalStorage();
 
-  const { data } = useGetAllBridgeHistory({
+  const { data, isLoading, isError } = useGetAllBridgeHistory({
     unauthenticated_agent: unAuthenticatedAgent as HttpAgent,
     bridge_tokens: bridgePairs,
     evm_wallet_address: evmAddress,
     principal_id: icpIdentity?.getPrincipal(),
   });
 
-  useEffect(() => {
-    if (data) console.log('useGetAllBridgeHistory Data => ', data);
-  }, [data]);
-
   return {
-    unAuthenticatedAgent,
-    icpIdentity,
-    evmAddress,
-    bridgePairs,
+    data,
+    isLoading,
+    isError,
   };
 }

@@ -8,7 +8,7 @@ import AdvancedContent from "../_components/advanced-content";
 export interface PageParamsItem {
   name: string
   icon: ReactNode
-  component: () => JSX.Element
+  component: () => ReactNode
 }
 
 export const PAGE_PARAMS_DATA: PageParamsItem[] = [
@@ -32,34 +32,6 @@ export const PAGE_PARAMS_DATA: PageParamsItem[] = [
     icon: <LockIcon width={24} height={24} className="min-w-5 min-h-5" />,
     component: AdvancedContent
   }
-]
-
-export interface SampleTransaction {
-  title: string
-  status: string
-  time: string
-  href: string
-}
-
-export const SAMPLE_TRANSACTIONS: SampleTransaction[] = [
-  {
-    title: "Middle step connected",
-    status: "Pending",
-    time: "6:32am",
-    href: "",
-  },
-  {
-    title: "Middle step connected",
-    status: "Completed",
-    time: "6:32am",
-    href: "/test",
-  },
-  {
-    title: "Middle step connected",
-    status: "Failed",
-    time: "6:32am",
-    href: "",
-  },
 ]
 
 interface TransactionStep {

@@ -12,7 +12,7 @@ export default function RHFInput({ name, label, className, ...props }: { name: s
       control={control}
       render={({ field, fieldState: { error } }) => (
         <div className={cn("flex flex-col gap-1", className)}>
-          {label && <label htmlFor={name} className="text-white md:text-black dark:text-white">{label}</label>}
+          {label && <label htmlFor={name} className="text-white md:text-black dark:text-white capitalize">{label}</label>}
           <input
             {...field}
             {...props}

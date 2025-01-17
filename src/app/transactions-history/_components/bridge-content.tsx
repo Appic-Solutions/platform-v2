@@ -1,147 +1,239 @@
 "use client"
-import { CloseIcon, CopyIcon, FireIcon } from "@/common/components/icons";
+import { CloseIcon, CopyIcon, FireIcon, LinkIcon, ParkOutlineBridgeIcon } from "@/common/components/icons";
 import CheckIcon from "@/common/components/icons/check";
 import Spinner from "@/common/components/ui/spinner";
-import { cn } from "@/common/helpers/utils";
+import { cn, copyToClipboard, getChainLogo } from "@/common/helpers/utils";
 import { ChevronDownIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { SAMPLE_TRANSACTIONS } from "../_constants";
 import useLogic from "../_logic";
+import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 
 export default function BridgeContent() {
-    const [open, setOpen] = useState(false);
+    const [itemId, setItemId] = useState<null | number>(null);
+    const { data, isLoading, isError, } = useLogic()
 
-    const { bridgePairs, evmAddress, icpIdentity, unAuthenticatedAgent } = useLogic()
+    const expandHandler = (id: number) => {
+        if (itemId === id) {
+            setItemId(null)
+        } else {
+            setItemId(id)
+        }
+    }
 
-
-    return (
-        <div className={cn(
-            "flex flex-col w-full py-4 px-8 rounded-[21px]",
-            "bg-input-fields bg-center bg-no-repeat bg-cover shadow-appic-shadow"
-        )}>
-            {/* Date & Time */}
+    if (isError) {
+        return (
             <div className={cn(
-                "flex items-center justify-between gap-x-4",
-                "text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]"
+                "flex flex-col items-center justify-center h-full gap-y-5",
+                "text-center max-w-[490px] mx-auto px-6 text-white",
             )}>
-                <p>January 11, 2024</p>
-                <p>6:32am</p>
+                <p className="text-xl">
+                    Error
+                </p>
+                <p className="text-sm leading-6 mb-24">
+                    Error
+                </p>
             </div>
-
-            {/* Transaction Detailes */}
-            <div className="flex flex-col gap-y-4 my-8">
-                <div>
-                    <div></div>
-                </div>
-                <div className={cn(
-                    "flex items-center justify-between gap-x-4 text-sm font-bold",
-                    "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]",
-                    "*:flex *:flex-col *:justify-center *:flex-1",
-                )}>
-                    <div>
-                        <p>ETH on Polygon</p>
-                        <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-2xl">0.1241235</p>
-                    </div>
-                    <div className="items-center text-center">
-                        Bridge Transaction In Progress
-                    </div>
-                    <div className="items-end">
-                        <p>ETH on Polygon</p>
-                        <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-2xl">0.1241235</p>
-                    </div>
-                </div>
+        )
+    } else if (isLoading) {
+        return (
+            <div className="flex items-center justify-center w-full h-full">
+                <Spinner />
             </div>
-            {/* Status */}
-            <div className={cn(
-                "flex flex-col gap-y-6 duration-300",
-                open ? "opacity-100 mb-8 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
-            )}>
-                {/* Transaction ID */}
-                <div className={cn(
-                    "flex items-center gap-x-1",
-                    "text-sm font-bold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]"
-                )}>
-                    {`Transaction ID: ${"QW4244532"}`}
-                    <span className="rounded-md p-0.5 cursor-pointer hover:bg-white/10">
-                        <CopyIcon width={16} height={16} />
-                    </span>
-                </div>
-                {/* Transaction Steps */}
-                <div className="flex flex-col gap-y-6">
-                    {SAMPLE_TRANSACTIONS.map(({ title, status, time, href }, idx) => (
-                        <div
-                            key={idx}
-                            className={cn(
-                                "flex items-center justify-between gap-x-4 group",
-                                "font-bold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]"
+        )
+    } else {
+        return (
+            data?.result.map((item, idx) => (
+                <div
+                    key={idx}
+                    className={cn(
+                        "flex flex-col w-full bg-input-fields bg-center bg-no-repeat bg-cover shadow-md",
+                        "rounded-2xl p-5 backdrop-blur-[30px] duration-200 hover:bg-black/75",
+                        "md:px-10 md:rounded-[36px]",
+                    )}>
+                    {/* Date & Time */}
+                    <div className={cn(
+                        "flex items-center justify-between gap-x-4",
+                        "text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]"
+                    )}>
+                        <p>{item.date}</p>
+                        <p>{item.time}</p>
+                    </div>
+                    <div className="flex items-center justify-between w-full my-5 *:relative">
+                        <div>
+                            <Avatar className={cn(
+                                "w-[58px] h-[58px] rounded-full",
+                                "md:w-[72px] md:h-[72px]"
                             )}>
-                            <div className="flex items-center gap-x-9">
-                                <div className={cn(
-                                    "relative flex items-center justify-center h-11 w-11 rounded-full",
-                                    status === "Pending" ? "bg-blue-600/35" : status === "Completed" ? "bg-[#12B76A33] text-[#12b76a]" : "bg-[#FF0000]/35 text-[#FF0000]",
-                                    idx < SAMPLE_TRANSACTIONS.length - 1 && "after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full"
-                                )}>
-                                    {status === "Pending" ? <Spinner /> : status === "Completed" ? <CheckIcon /> : <CloseIcon />}
-                                </div>
-                                <div className={href && "flex flex-col gap-y-5 h-12 overflow-y-hidden *:duration-300"}>
-                                    <span className={href && "translate-y-3 group-hover:-translate-y-6"}>
-                                        {title}
-                                    </span>
-                                    {href &&
-                                        <div className="flex items-center gap-x-1 group-hover:-translate-y-8">
-                                            Details
-                                            <Link
-                                                href={href}
-                                                rel="noopener noreferrer"
-                                                className="rounded-md p-0.5 cursor-pointer hover:bg-white/10"
-                                            >
-                                                <CopyIcon width={16} height={16} />
-                                            </Link>
-                                        </div>
-                                    }
-                                </div>
+                                <AvatarImage src={item.from_token.logo || "images/logo/placeholder.png"} />
+                                <AvatarFallback>{item.from_token.symbol}</AvatarFallback>
+                            </Avatar>
+                            <Avatar className={cn(
+                                "absolute -right-1 -bottom-1 w-6 h-6 rounded-full",
+                                "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+                            )}>
+                                <AvatarImage src={getChainLogo(item.from_token.chainId)} />
+                                <AvatarFallback>{item.from_token.symbol}</AvatarFallback>
+                            </Avatar>
+                        </div>
+                        <div className="flex items-center justify-center w-full">
+                            <div className={cn(
+                                "flex-1 border-t-[3px] border-black",
+                                item.status === "Pending" ? "border-dashed" : "border-solid",
+                                item.status === "Successful" && "border-green-500",
+                                item.status === "Failed" && "border-red-500"
+                            )} />
+                            <div className={cn(
+                                "rounded-full p-3 z-10 relative",
+                                "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
+                                item.status === "Failed" ? "border-2 border-solid border-red-500" : "before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500",
+                                item.status === "Pending" && "before:border-t-transparent before:animate-spin",
+                            )}>
+                                <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
                             </div>
-                            <div className="text-sm">
-                                {time}
+                            <div className={cn(
+                                "flex-1 border-t-[3px]  border-black",
+                                item.status === "Pending" ? "border-dashed" : "border-solid",
+                                item.status === "Successful" && "border-green-500",
+                                item.status === "Failed" && "border-red-500"
+                            )} />
+                        </div>
+                        <div>
+                            <Avatar className={cn(
+                                "w-[58px] h-[58px] rounded-full",
+                                "md:w-[72px] md:h-[72px]"
+                            )}>
+                                <AvatarImage src={item.to_token.logo || "images/logo/placeholder.png"} />
+                                <AvatarFallback>{item.to_token.symbol}</AvatarFallback>
+                            </Avatar>
+                            <Avatar className={cn(
+                                "absolute -right-1 -bottom-1 w-6 h-6 rounded-full",
+                                "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+                            )}>
+                                <AvatarImage src={getChainLogo(item.to_token.chainId)} />
+                                <AvatarFallback>{item.to_token.symbol}</AvatarFallback>
+                            </Avatar>
+                        </div>
+                    </div>
+                    {/* Transaction Detailes */}
+                    <div className="flex flex-col gap-y-4 mb-8">
+                        <div>
+                            <div></div>
+                        </div>
+                        <div className={cn(
+                            "flex items-center justify-between gap-x-4 text-xs font-bold",
+                            "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]",
+                            "*:flex *:flex-col *:justify-center *:flex-1",
+                        )}>
+                            <div>
+                                <p>ETH on Polygon</p>
+                                <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-xl">0.1241235</p>
+                            </div>
+                            <div className="items-center text-center max-md:hidden">
+                                Bridge Transaction In Progress
+                            </div>
+                            <div className="items-end">
+                                <p>ETH on Polygon</p>
+                                <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-xl">0.1241235</p>
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
-            {/* Collape Trigger */}
-            <div className={cn(
-                "flex items-center justify-between gap-x-4",
-                "*:flex *:items-center *:justify-center *:text-[13px] *:font-semibold",
-                "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]"
-            )}>
-                <div className="gap-x-1 text-[#0F0F0F] bg-white/60 rounded-full py-0.5 px-2">
-                    via Li.FI
-                    <Image
-                        src="/images/wallet.svg"
-                        alt="Li.FI"
-                        width={16}
-                        height={16}
-                        className="rounded-full min-h-4 min-w-4"
-                    />
-                </div>
-                <div className="gap-x-2 cursor-pointer select-none" onClick={() => setOpen(!open)}>
-                    {open ? "Hide Details" : "View Details"}
-                    <ChevronDownIcon
-                        width={20}
-                        height={20}
-                        className={cn(
-                            "duration-300 ease-in-out",
-                            open && "transform rotate-180"
-                        )}
-                    />
-                </div>
-                <div className="gap-x-1">
-                    $1.24
-                    <FireIcon width={20} height={20} />
-                </div>
-            </div>
-        </div >
-    )
+                    </div>
+                    {/* Status */}
+                    <div className={cn(
+                        "flex flex-col gap-y-6 duration-300",
+                        itemId === idx ? "opacity-100 mb-8 translate-y-0" : "opacity-0 h-0 overflow-hidden -translate-y-2"
+                    )}>
+                        {/* Transaction ID */}
+                        <div className={cn(
+                            "flex items-center gap-x-1",
+                            "text-sm font-bold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]"
+                        )}>
+                            {`Transaction ID: ${item.id.slice(0, 10)}`}
+                            <span className="rounded-md p-0.5 cursor-pointer hover:bg-white/10">
+                                <CopyIcon
+                                    width={16}
+                                    height={16}
+                                    onClick={() => copyToClipboard(item.id)}
+                                />
+                            </span>
+                        </div>
+                        {/* Transaction Steps */}
+                        <div className="flex flex-col gap-y-6">
+                            {item.bridge_steps.map((step, idx) => (
+                                <div
+                                    key={idx}
+                                    className={cn(
+                                        "flex items-center justify-between gap-x-4 group",
+                                        "font-bold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]"
+                                    )}>
+                                    <div className="flex items-center gap-x-9">
+                                        <div className={cn(
+                                            "relative flex items-center justify-center h-11 w-11 rounded-full",
+                                            step.status === "Pending" ? "bg-blue-600/35" : step.status === "Successful" ? "bg-[#12B76A33] text-[#12b76a]" : "bg-[#FF0000]/35 text-[#FF0000]",
+                                            idx < item.bridge_steps.length - 1 && "after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full"
+                                        )}>
+                                            {step.status === "Pending" ? <Spinner /> : step.status === "Successful" ? <CheckIcon /> : <CloseIcon />}
+                                        </div>
+                                        <div className={step.link && "flex flex-col gap-y-5 h-12 overflow-y-hidden *:duration-300"}>
+                                            <span className={step.link && "translate-y-3 group-hover:-translate-y-6"}>
+                                                {step.message}
+                                            </span>
+                                            {step.link &&
+                                                <div className="flex items-center gap-x-1 group-hover:-translate-y-8">
+                                                    Details
+                                                    <Link
+                                                        href={step.link}
+                                                        rel="noopener noreferrer"
+                                                        className="rounded-md p-0.5 cursor-pointer hover:bg-white/10"
+                                                    >
+                                                        <LinkIcon width={16} height={16} />
+                                                    </Link>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className="text-sm">
+                                        need time from api
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Collape Trigger */}
+                    <div className={cn(
+                        "flex items-center justify-between gap-x-4 text-xs",
+                        "*:flex *:items-center *:justify-center *:font-semibold",
+                        "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]"
+                    )}>
+                        <div className="gap-x-1 text-[#0F0F0F] bg-white/60 rounded-full py-0.5 px-2">
+                            via Li.FI
+                            <Image
+                                src="/images/wallet.svg"
+                                alt="Li.FI"
+                                width={16}
+                                height={16}
+                                className="rounded-full min-h-4 min-w-4"
+                            />
+                        </div>
+                        <div className="gap-x-2 cursor-pointer select-none text-sm" onClick={() => expandHandler(idx)}>
+                            {itemId === idx ? "Hide Details" : "View Details"}
+                            <ChevronDownIcon
+                                width={20}
+                                height={20}
+                                className={cn(
+                                    "duration-300 ease-in-out",
+                                    itemId === idx && "transform rotate-180"
+                                )}
+                            />
+                        </div>
+                        <div className="gap-x-1 text-white">
+                            ${item.fee}
+                            <FireIcon width={20} height={20} />
+                        </div>
+                    </div>
+                </div >
+            ))
+        )
+    }
 }
