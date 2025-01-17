@@ -55,19 +55,27 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (txHash && unAuthenticatedAgent && selectedOption) {
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
-
+        console.log('here');
         if (res.success) {
           if (res.result === 'Minted') {
             setTxStatus('successful');
+            setTxStep({
+              count: 5,
+              status: 'successful',
+            });
           } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
             setTxStatus('failed');
+            setTxStep({
+              count: 5,
+              status: 'failed',
+            });
           } else {
             setTxStatus('pending');
+            setTxStep({
+              count: 5,
+              status: 'pending',
+            });
           }
-          setTxStep({
-            count: 5,
-            status: 'successful',
-          });
         } else if (!res.success) {
           setTxStep({
             count: 5,
@@ -79,7 +87,7 @@ export const BridgeLogic = () => {
       }
       return null;
     },
-    refetchInterval: 1000 * 30,
+    refetchInterval: 1000 * 5,
   });
   // withdrawal queries =====================>
   const tokenApproval = useTokenApproval();
@@ -243,14 +251,7 @@ export const BridgeLogic = () => {
     }
 
     if ((isWalletConnected('from'), isWalletConnected('to'))) {
-      // TODO: the condition should be this way:
-      // * for regular tokens
-      //  wallet balance for native token should be greater than max_network_fee
-      // * for native tokens
-      // wallet balance for token should be greater than amount
-      console.log('selected option:', selectedOption);
       if (selectedOption.is_native) {
-        console.log('is native:', selectedOption.is_native);
         if (Number(amount) > Number(selectedTokenBalance)) {
           return {
             isDisable: true,
@@ -258,17 +259,18 @@ export const BridgeLogic = () => {
           };
         }
       } else {
-        console.log('is note native:', selectedOption.is_native);
         if (fromToken.chain_type === 'EVM') {
+          // The native token of the transaction chain that the user holds in their wallet
           const userNativeToken = evmBalance?.tokens.find(
             (token) =>
               token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
           );
-          console.log(userNativeToken);
+          console.log('user has native token:', userNativeToken);
           if (
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
+            console.log('user has not native token', userNativeToken);
             return {
               isDisable: true,
               text: `INSUFFICIENT Token Balance`,

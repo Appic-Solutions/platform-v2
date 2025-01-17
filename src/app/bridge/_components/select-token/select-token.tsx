@@ -26,10 +26,16 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
   // bridge store
-  const { fromToken, toToken, amount, toWalletAddress } = useBridgeStore();
+  const { fromToken, toToken, amount, toWalletAddress, bridgeOptions } = useBridgeStore();
   const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
   // Logic
   const { changeStep, swapTokens, isWalletConnected, getActionButtonStatus } = BridgeLogic();
+
+  const actionButtonStatus = getActionButtonStatus({
+    showWalletAddress,
+    toWalletAddress,
+    toWalletValidationError,
+  });
 
   const openConnectWalletModalHandler = (token: TokenType) => {
     if (token?.chain_type === 'ICP') {
@@ -55,12 +61,6 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
     }
   };
 
-  const actionButtonStatus = getActionButtonStatus({
-    showWalletAddress,
-    toWalletAddress,
-    toWalletValidationError,
-  });
-
   return (
     <Box
       className={cn(
@@ -68,7 +68,10 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         'md:px-[65px] md:py-[55px] md:max-w-[617px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        amount && Number(amount) > 0 && 'lg:max-w-[1060px] lg:w-[1060px]',
+        Number(amount) > 0 &&
+          bridgeOptions.options &&
+          bridgeOptions.options.length > 0 &&
+          'lg:max-w-[1060px] lg:w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
@@ -162,7 +165,9 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         </div>
 
         {/* BRIDGE OPTIONS */}
-        {toToken && Number(amount) > 0 && <BridgeOptionsList isPending={isPendingBridgeOptions} />}
+        {Number(amount) > 0 && bridgeOptions.options && bridgeOptions.options?.length > 0 && (
+          <BridgeOptionsList isPending={isPendingBridgeOptions} />
+        )}
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>

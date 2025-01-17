@@ -5,9 +5,7 @@ import { LinkIcon } from '@/common/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Skeleton } from '@/common/components/ui/skeleton';
 import { cn, formatToSignificantFigures } from '@/common/helpers/utils';
-import { useSharedStore } from '@/common/state/store';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 const TokenCard = ({
   token,
   onClick,
@@ -17,35 +15,6 @@ const TokenCard = ({
   onClick: () => void;
   isSelected: boolean;
 }) => {
-  const { icpBalance, evmBalance } = useSharedStore();
-  const [tokenBalance, setTokenBalance] = useState<{ balance: string; usdBalance: string }>();
-
-  useEffect(() => {
-    let mainToken;
-
-    if (token.chain_type === 'EVM' && evmBalance) {
-      mainToken = evmBalance.tokens.find(
-        (t) => t.contractAddress === token.contractAddress && t.chainId === token.chainId,
-      );
-      if (mainToken?.balance && mainToken?.usdBalance) {
-        setTokenBalance({ balance: mainToken.balance, usdBalance: mainToken.usdBalance });
-      } else {
-        setTokenBalance(undefined);
-      }
-      return;
-    }
-
-    if (token.chain_type === 'ICP' && icpBalance) {
-      mainToken = icpBalance.tokens.find((t) => t.canisterId === token.canisterId);
-      if (mainToken?.balance && mainToken?.usdBalance) {
-        setTokenBalance({ balance: mainToken?.balance, usdBalance: mainToken?.usdBalance });
-      } else {
-        setTokenBalance(undefined);
-      }
-      return;
-    }
-  }, [icpBalance, evmBalance, token]);
-
   return (
     <div
       className={cn(
@@ -87,13 +56,13 @@ const TokenCard = ({
           </div>
         </div>
       </div>
-      {tokenBalance && (
+      {token.balance && (
         <div className="flex flex-col">
           <p className="text-xl font-bold text-black dark:text-white truncate">
-            {formatToSignificantFigures(tokenBalance.balance)}
+            {formatToSignificantFigures(token.balance)}
           </p>
           <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate flex items-center gap-x-2">
-            ${Number(tokenBalance.usdBalance).toFixed(3)}
+            ${Number(token.usdBalance).toFixed(3)}
           </p>
         </div>
       )}

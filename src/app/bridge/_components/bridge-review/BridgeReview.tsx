@@ -24,7 +24,7 @@ const BridgeReview = () => {
   const onSubmit = () => {
     setBtnText('Show Transaction Status');
     if (!showStepper) {
-      // executeTransaction();
+      executeTransaction();
       setShowStepper(true);
     }
   };

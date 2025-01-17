@@ -39,7 +39,7 @@ export const TransactionStep = ({
             (currentStep.count === steps.length && txStatus && txStatus === 'failed')
             ? 'border-2 border-red-500'
             : (currentStep.count === index + 1 && currentStep.status === 'successful') ||
-                currentStep.count === steps.length
+                (currentStep.count === steps.length && txStatus === 'successful')
               ? 'border-2 border-green-500'
               : '',
         )}
