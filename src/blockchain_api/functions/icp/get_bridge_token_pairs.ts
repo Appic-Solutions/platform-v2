@@ -49,8 +49,6 @@ export const get_bridge_pairs_for_token = (
     return []; // Early exit if no base token or bridge pairs exist
   }
 
-  console.log(base_token);
-
   // Filter bridge pairs for the specified chain_id
   const pairs = base_token.bridgePairs.filter((pair) => pair.chain_id === selected_chain_id);
 

@@ -1,4 +1,4 @@
-import { getChainLogo } from '@/common/helpers/utils';
+import { formatToSignificantFigures, getChainLogo } from '@/common/helpers/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
@@ -14,17 +14,15 @@ const AmountInput = () => {
   // Logic
   const { isWalletConnected } = BridgeLogic();
 
-  const { fromToken, usdPrice, amount, selectedTokenBalance } = useBridgeStore();
+  const { fromToken, usdPrice, amount, selectedTokenBalance, bridgeOptions } = useBridgeStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useBridgeActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
-      const mainToken = evmBalance.tokens.find((t) => {
-        // check for smart contract tokens
-        const isSameContractToken = t.contractAddress === fromToken.contractAddress;
-        return isSameContractToken;
-      });
+      const mainToken = evmBalance.tokens.find(
+        (t) => t.contractAddress === fromToken.contractAddress && t.chainId === fromToken.chainId,
+      );
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
 
@@ -81,7 +79,7 @@ const AmountInput = () => {
               type="number"
               maxLength={10}
               placeholder="0"
-              value={inputAmount}
+              value={formatToSignificantFigures(inputAmount)}
               onChange={(e) => setInputAmount(e.target.value)}
               className={cn(
                 'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
@@ -99,9 +97,12 @@ const AmountInput = () => {
                   'hover:bg-white/35 transition-all duration-300',
                 )}
                 onClick={() => {
-                  if (selectedTokenBalance) {
+                  if (Number(selectedTokenBalance) > 0) {
                     setAmount(selectedTokenBalance);
                     setInputAmount(selectedTokenBalance);
+                  } else {
+                    setAmount('0');
+                    setInputAmount('0');
                   }
                 }}
               >
@@ -113,10 +114,14 @@ const AmountInput = () => {
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
             {isWalletConnected('from') && (
               <p className="text-muted text-center text-xs md:text-sm font-semibold text-nowrap">
-                {selectedTokenBalance}
+                {formatToSignificantFigures(selectedTokenBalance)}
               </p>
             )}
           </div>
+          {!bridgeOptions.options ||
+            (bridgeOptions.options?.length === 0 && bridgeOptions.message && (
+              <p className="text-sm text-red-500">{bridgeOptions.message}</p>
+            ))}
         </div>
       </div>
     </Card>

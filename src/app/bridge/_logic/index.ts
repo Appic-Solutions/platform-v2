@@ -50,7 +50,7 @@ export const BridgeLogic = () => {
   const depositTokenWithApproval = useDepositTokenWithApproval();
   const depositToken = useDepositToken();
   const notifyAppicHelperDeposit = useNotifyAppicHelperDeposit();
-  // check withdrawal tx status
+  // check deposit tx status
   useQuery({
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
@@ -66,12 +66,12 @@ export const BridgeLogic = () => {
             setTxStatus('pending');
           }
           setTxStep({
-            count: 4,
+            count: 5,
             status: 'successful',
           });
         } else if (!res.success) {
           setTxStep({
-            count: 4,
+            count: 5,
             status: 'failed',
           });
         }
@@ -101,12 +101,12 @@ export const BridgeLogic = () => {
             setTxStatus('pending');
           }
           setTxStep({
-            count: 5,
+            count: 4,
             status: 'successful',
           });
         } else if (!res.success) {
           setTxStep({
-            count: 5,
+            count: 4,
             status: 'failed',
           });
         }
@@ -244,27 +244,38 @@ export const BridgeLogic = () => {
     }
 
     if ((isWalletConnected('from'), isWalletConnected('to'))) {
-      const isTokenNative = selectedOption.native_fee_token_id === selectedOption.from_token_id;
-      const mainChain = chains.find((chain) => chain.chainId === fromToken.chainId);
-
-      if (isTokenNative) {
-        if (Number(amount) > Number(selectedTokenBalance))
+      // TODO: the condition should be this way:
+      // * for regular tokens
+      //  wallet balance for native token should be greater than max_network_fee
+      // * for native tokens
+      // wallet balance for token should be greater than amount + max_network_fee
+      console.log('selected option:', selectedOption);
+      if (selectedOption.is_native) {
+        console.log('is native:', selectedOption.is_native);
+        if (
+          Number(amount) + Number(selectedOption.fees.human_readable_max_network_fee) >
+          Number(selectedTokenBalance)
+        ) {
           return {
             isDisable: true,
             text: 'INSUFFICIENT Funds',
           };
+        }
       } else {
+        console.log('is note native:', selectedOption.is_native);
         if (fromToken.chain_type === 'EVM') {
           const userNativeToken = evmBalance?.tokens.find(
-            (token) => token.contractAddress === selectedOption.native_fee_token_id,
+            (token) =>
+              token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
           );
+          console.log(userNativeToken);
           if (
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
             return {
               isDisable: true,
-              text: `INSUFFICIENT ${mainChain?.nativeTokenSymbol} Token Balance`,
+              text: `INSUFFICIENT Token Balance`,
             };
           }
         } else if (fromToken.chain_type === 'ICP') {
@@ -277,7 +288,7 @@ export const BridgeLogic = () => {
           ) {
             return {
               isDisable: true,
-              text: `INSUFFICIENT ${mainChain?.nativeTokenSymbol} Token Balance`,
+              text: `INSUFFICIENT Token Balance`,
             };
           }
         }

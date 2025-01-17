@@ -22,6 +22,7 @@ interface SelectTokenProps {
 export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
+
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
   // bridge store
@@ -29,12 +30,6 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
   // Logic
   const { changeStep, swapTokens, isWalletConnected, getActionButtonStatus } = BridgeLogic();
-
-  const actionButtonStatus = getActionButtonStatus({
-    showWalletAddress,
-    toWalletAddress,
-    toWalletValidationError,
-  });
 
   const openConnectWalletModalHandler = (token: TokenType) => {
     if (token?.chain_type === 'ICP') {
@@ -59,6 +54,12 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
       changeStep(3);
     }
   };
+
+  const actionButtonStatus = getActionButtonStatus({
+    showWalletAddress,
+    toWalletAddress,
+    toWalletValidationError,
+  });
 
   return (
     <Box
