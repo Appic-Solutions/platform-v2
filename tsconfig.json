@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,9 +22,22 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/blockchain_api/did/sonic/sonic_types.ts", "src/blockchain_api/did/icpswap/icp_swap_node.did.js", "src/blockchain_api/did/icpswap/icp_swap_token_list.did.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/blockchain_api/did/sonic/sonic_types.ts",
+    "src/blockchain_api/did/icpswap/icp_swap_node.did.js",
+    "src/blockchain_api/did/icpswap/icp_swap_token_list.did.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

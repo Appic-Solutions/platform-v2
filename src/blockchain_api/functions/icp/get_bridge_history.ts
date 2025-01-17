@@ -94,7 +94,10 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         const date = date_object.toLocaleDateString('en-GB');
         const time = date_object.toLocaleTimeString();
         const from_token = bridge_tokens.find(
-          (token) => token.chain_type == 'EVM' && token.contractAddress == transaction.erc20_contract_address,
+          (token) =>
+            token.chain_type == 'EVM' &&
+            token.contractAddress == transaction.erc20_contract_address &&
+            token.chainId == Number(transaction.chain_id.toString()),
         )!;
 
         const to_token = bridge_tokens.find(
@@ -104,7 +107,10 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         )!;
 
         const native_currency = bridge_tokens.find(
-          (token) => token.chain_type == 'EVM' && token.contractAddress == NATIVE_TOKEN_ADDRESS,
+          (token) =>
+            token.chain_type == 'EVM' &&
+            token.contractAddress == NATIVE_TOKEN_ADDRESS &&
+            token.chainId == Number(transaction.chain_id.toString()),
         )!;
 
         const tx_type = 'Deposit';
@@ -160,7 +166,10 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         )!;
 
         const to_token = bridge_tokens.find(
-          (token) => token.chain_type == 'EVM' && token.contractAddress == transaction.erc20_contract_address,
+          (token) =>
+            token.chain_type == 'EVM' &&
+            token.contractAddress == transaction.erc20_contract_address &&
+            token.chainId == Number(transaction.chain_id.toString()),
         )!;
 
         const chain = chains.find((chain) => chain.chainId.toString() == transaction.chain_id.toString())!;

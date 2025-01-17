@@ -1,3 +1,7 @@
+export const dynamic = 'force-static';
+
+// TODO: Tx queries and functions should move to a separate file
+
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
@@ -19,15 +23,25 @@ import {
   TxHash,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery } from '@tanstack/react-query';
-import { chains } from '@/blockchain_api/lists/chains';
+import { Principal } from '@dfinity/principal';
 
 export const BridgeLogic = () => {
   // Bridge Store
-  const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption, selectedTokenBalance } =
-    useBridgeStore();
+  const {
+    selectedTokenType,
+    fromToken,
+    toToken,
+    activeStep,
+    amount,
+    selectedOption,
+    selectedTokenBalance,
+    bridgeOptions,
+    txStep,
+    toWalletAddress,
+    toWalletValidationError,
+  } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxStatus, setTxErrorMessage } =
-    useBridgeActions();
+  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage } = useBridgeActions();
   // Shared Store
   const {
     icpIdentity,
@@ -54,21 +68,26 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
-      if (txHash && unAuthenticatedAgent && selectedOption) {
+      if (txHash && unAuthenticatedAgent && selectedOption && txStep.count === 5) {
+        console.log('here');
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
-
         if (res.success) {
           if (res.result === 'Minted') {
-            setTxStatus('successful');
+            setTxStep({
+              count: 5,
+              status: 'successful',
+            });
           } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
-            setTxStatus('failed');
+            setTxStep({
+              count: 5,
+              status: 'failed',
+            });
           } else {
-            setTxStatus('pending');
+            setTxStep({
+              count: 5,
+              status: 'pending',
+            });
           }
-          setTxStep({
-            count: 5,
-            status: 'successful',
-          });
         } else if (!res.success) {
           setTxStep({
             count: 5,
@@ -80,7 +99,7 @@ export const BridgeLogic = () => {
       }
       return null;
     },
-    refetchInterval: 1000 * 30,
+    refetchInterval: 1000 * 5,
   });
   // withdrawal queries =====================>
   const tokenApproval = useTokenApproval();
@@ -94,16 +113,21 @@ export const BridgeLogic = () => {
         const res = await check_withdraw_status(withdrawalId, selectedOption, authenticatedAgent);
         if (res.success) {
           if (res.result === 'Successful') {
-            setTxStatus('successful');
+            setTxStep({
+              count: 4,
+              status: 'successful',
+            });
           } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
-            setTxStatus('failed');
+            setTxStep({
+              count: 4,
+              status: 'failed',
+            });
           } else {
-            setTxStatus('pending');
+            setTxStep({
+              count: 4,
+              status: 'pending',
+            });
           }
-          setTxStep({
-            count: 4,
-            status: 'successful',
-          });
         } else if (!res.success) {
           setTxStep({
             count: 4,
@@ -163,15 +187,7 @@ export const BridgeLogic = () => {
     return false;
   }
 
-  function getActionButtonStatus({
-    showWalletAddress,
-    toWalletValidationError,
-    toWalletAddress,
-  }: {
-    showWalletAddress: boolean;
-    toWalletValidationError: string | null;
-    toWalletAddress: string;
-  }): {
+  function getActionButtonStatus({ showWalletAddress }: { showWalletAddress: boolean }): {
     isDisable: boolean;
     text: string;
   } {
@@ -189,86 +205,24 @@ export const BridgeLogic = () => {
       };
     }
 
-    if (showWalletAddress) {
-      if (!toWalletAddress || toWalletValidationError) {
-        return {
-          isDisable: true,
-          text: 'Enter Valid Address',
-        };
-      } else {
-        return {
-          isDisable: false,
-          text: 'Review Bridge',
-        };
-      }
-    }
-
     if (
-      fromToken &&
-      toToken &&
-      fromToken.contractAddress === toToken.contractAddress &&
-      fromToken.chainId === toToken.chainId
+      (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
+      (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
     ) {
-      return {
-        isDisable: true,
-        text: 'Please select different tokens',
-      };
-    }
-
-    if (!Number(amount)) {
-      return {
-        isDisable: true,
-        text: 'Set token amount to continue',
-      };
-    }
-
-    if (!selectedOption) {
-      return {
-        isDisable: true,
-        text: 'Select Bridge Option',
-      };
-    }
-
-    if (!isWalletConnected('from')) {
-      return {
-        isDisable: false,
-        text: `Connect ${fromToken.chain_type} Wallet`,
-      };
-    }
-
-    if (!showWalletAddress && !isWalletConnected('to')) {
-      return {
-        isDisable: false,
-        text: `Connect ${toToken.chain_type} Wallet`,
-      };
-    }
-
-    if ((isWalletConnected('from'), isWalletConnected('to'))) {
-      // TODO: the condition should be this way:
-      // * for regular tokens
-      //  wallet balance for native token should be greater than max_network_fee
-      // * for native tokens
-      // wallet balance for token should be greater than amount + max_network_fee
-      console.log('selected option:', selectedOption);
       if (selectedOption.is_native) {
-        console.log('is native:', selectedOption.is_native);
-        if (
-          Number(amount) + Number(selectedOption.fees.human_readable_max_network_fee) >
-          Number(selectedTokenBalance)
-        ) {
+        if (Number(amount) > Number(selectedTokenBalance)) {
           return {
             isDisable: true,
             text: 'INSUFFICIENT Funds',
           };
         }
       } else {
-        console.log('is note native:', selectedOption.is_native);
         if (fromToken.chain_type === 'EVM') {
+          // The native token of the transaction chain that the user holds in their wallet
           const userNativeToken = evmBalance?.tokens.find(
             (token) =>
               token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
           );
-          console.log(userNativeToken);
           if (
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
@@ -295,14 +249,78 @@ export const BridgeLogic = () => {
       }
     }
 
-    if (toWalletAddress && !toWalletValidationError && isWalletConnected('from')) {
+    if (showWalletAddress) {
+      if (!toWalletAddress || toWalletValidationError) {
+        return {
+          isDisable: true,
+          text: 'Enter Valid Address',
+        };
+      } else if (!bridgeOptions.options?.length) {
+        return {
+          isDisable: true,
+          text: 'Set token amount to continue',
+        };
+      } else if (bridgeOptions.options?.length && toWalletAddress && !toWalletValidationError) {
+        return {
+          isDisable: false,
+          text: 'Review Bridge',
+        };
+      }
+    }
+
+    if (
+      fromToken &&
+      toToken &&
+      fromToken.contractAddress === toToken.contractAddress &&
+      fromToken.chainId === toToken.chainId
+    ) {
+      return {
+        isDisable: true,
+        text: 'Please select different tokens',
+      };
+    }
+
+    if (!Number(amount)) {
+      return {
+        isDisable: true,
+        text: 'Set token amount to continue',
+      };
+    }
+
+    if (bridgeOptions.options && bridgeOptions.options.length > 0 && !selectedOption) {
+      return {
+        isDisable: true,
+        text: 'Select Bridge Option',
+      };
+    }
+
+    if (!isWalletConnected('from')) {
+      return {
+        isDisable: false,
+        text: `Connect ${fromToken.chain_type} Wallet`,
+      };
+    }
+
+    if (!showWalletAddress && !isWalletConnected('to')) {
+      return {
+        isDisable: false,
+        text: `Connect ${toToken.chain_type} Wallet`,
+      };
+    }
+
+    if (
+      toWalletAddress &&
+      !toWalletValidationError &&
+      isWalletConnected('from') &&
+      bridgeOptions.options &&
+      bridgeOptions.options?.length > 0
+    ) {
       return {
         isDisable: false,
         text: 'Review Bridge',
       };
     }
-
-    if (isWalletConnected('from') && isWalletConnected('to')) {
+    if (isWalletConnected('from') && isWalletConnected('to') && bridgeOptions.options?.length) {
       return {
         isDisable: false,
         text: 'Review Bridge',
@@ -311,7 +329,7 @@ export const BridgeLogic = () => {
 
     return {
       isDisable: true,
-      text: 'Error',
+      text: 'Confirm',
     };
   }
 
@@ -358,9 +376,6 @@ export const BridgeLogic = () => {
       lastFetchTime: lastFetchTime ? parseInt(lastFetchTime) : null,
     };
   }
-
-  //  1. Withdrawal Transactions (ICP -> EVM)
-  //  2. Deposit Transactions (EVM -> ICP)
 
   async function executeWithdrawal(params: FullWithdrawalRequest) {
     if (selectedOption && authenticatedAgent) {
@@ -505,29 +520,46 @@ export const BridgeLogic = () => {
   }
 
   function executeTransaction() {
-    if (authenticatedAgent && selectedOption && evmAddress && icpIdentity && unAuthenticatedAgent && amount) {
-      setTxStep({
-        count: 1,
-        status: 'pending',
-      });
-      setTxErrorMessage('');
-      setTxStatus(undefined);
-      setTxHash(undefined);
+    //  1. Withdrawal Transactions (ICP -> EVM)
+    // recipient should be evmAddress or toWalletAddress
+    //  2. Deposit Transactions (EVM -> ICP)
+    // recipient should be icpIdentity.getPrincipal() or toWalletAddress
+    if (authenticatedAgent && selectedOption && icpIdentity && unAuthenticatedAgent && amount) {
+      resetTransaction();
       if (fromToken?.chain_type === 'ICP') {
-        executeWithdrawal({
-          authenticatedAgent,
-          bridgeOption: selectedOption,
-          recipient: evmAddress,
-          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-        });
+        if (toWalletAddress) {
+          executeWithdrawal({
+            authenticatedAgent,
+            bridgeOption: selectedOption,
+            recipient: toWalletAddress,
+            userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+          });
+        } else if (evmAddress) {
+          executeWithdrawal({
+            authenticatedAgent,
+            bridgeOption: selectedOption,
+            recipient: evmAddress,
+            userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+          });
+        }
       } else if (fromToken?.chain_type === 'EVM') {
-        executeDeposit({
-          bridgeOption: selectedOption,
-          recipient: icpIdentity.getPrincipal(),
-          recipientPrincipal: icpIdentity.getPrincipal().toString(),
-          unAuthenticatedAgent,
-          userWalletAddress: evmAddress,
-        });
+        if (toWalletAddress && evmAddress) {
+          executeDeposit({
+            bridgeOption: selectedOption,
+            recipient: Principal.fromText(toWalletAddress),
+            recipientPrincipal: toWalletAddress,
+            unAuthenticatedAgent,
+            userWalletAddress: evmAddress,
+          });
+        } else if (evmAddress) {
+          executeDeposit({
+            bridgeOption: selectedOption,
+            recipient: icpIdentity.getPrincipal(),
+            recipientPrincipal: icpIdentity.getPrincipal().toString(),
+            unAuthenticatedAgent,
+            userWalletAddress: evmAddress,
+          });
+        }
       }
     }
   }
@@ -537,7 +569,6 @@ export const BridgeLogic = () => {
       count: 1,
       status: 'pending',
     });
-    setTxStatus(undefined);
     setTxErrorMessage(undefined);
     setActiveStep(1);
     setAmount('');

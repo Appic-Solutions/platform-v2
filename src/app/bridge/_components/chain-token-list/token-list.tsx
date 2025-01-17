@@ -30,20 +30,48 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const { isTokenSelected, selectToken } = BridgeLogic();
   const { setActiveStep } = useBridgeActions();
 
-  // to find user tokens in all tokens list and sort them
   useEffect(() => {
-    if ((evmBalance || icpBalance) && tokens) {
-      const allBalances = [...(evmBalance?.tokens || []), ...(icpBalance?.tokens || [])];
-      setUpdatedBridgePairs(() =>
-        tokens.map((token) => {
-          const foundToken = allBalances.find((item) => {
-            if (item.chain_type === 'EVM')
-              return item.contractAddress === token.contractAddress && item.chainId === token.chainId;
-            else if (item.chain_type === 'ICP') return item.canisterId === token.canisterId;
+    if ((icpBalance || evmBalance) && tokens) {
+      setUpdatedBridgePairs((prevTokens) => {
+        let updatedTokenList = prevTokens || tokens;
+
+        if (icpBalance === undefined) {
+          updatedTokenList = updatedTokenList.map((token) =>
+            token.chain_type === 'ICP' ? { ...token, balance: undefined, usdBalance: undefined } : token,
+          );
+        }
+
+        if (evmBalance === undefined) {
+          updatedTokenList = updatedTokenList.map((token) =>
+            token.chain_type === 'EVM' ? { ...token, balance: undefined, usdBalance: undefined } : token,
+          );
+        }
+
+        if (icpBalance) {
+          updatedTokenList = updatedTokenList.map((token) => {
+            const foundToken = icpBalance.tokens.find((item) => {
+              if (token.chain_type === 'ICP' && token.chainId === item.chainId)
+                return item.canisterId === token.canisterId;
+            });
+            return foundToken ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance } : token;
           });
-          return foundToken ? { ...token, balance: foundToken.balance } : token;
-        }),
-      );
+        }
+
+        if (evmBalance) {
+          updatedTokenList = updatedTokenList.map((token) => {
+            const foundToken = evmBalance.tokens.find((item) => {
+              if (token.contractAddress === item.contractAddress && token.chainId === item.chainId) {
+                return true;
+              }
+            });
+            return foundToken ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance } : token;
+          });
+        }
+
+        return updatedTokenList;
+      });
+    } else {
+      setUpdatedBridgePairs(tokens);
     }
   }, [evmBalance, icpBalance, tokens]);
 

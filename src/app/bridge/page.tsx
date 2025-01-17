@@ -7,8 +7,6 @@ import { BridgeOptionsListRequest } from './_api/types/request';
 import { useBridgeActions, useBridgeStore } from './_store';
 import { useSharedStore } from '@/common/state/store';
 import { StepperContainer } from './_components/bridge-review';
-import { convert_png_to_data_uri } from '@/blockchain_api/utils/png_to_data_uri';
-import { generate_twin_token_symbol } from '@/blockchain_api/functions/icp/generate_new_twin_token_symbol';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();
@@ -16,11 +14,7 @@ const BridgeHome = () => {
   const { setBridgePairs, setBridgeOptions } = useBridgeActions();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
-  const {
-    mutateAsync: getBridgeOptions,
-    isPending: isPendingBridgeOptions,
-    isError: isErrorBridgeOptions,
-  } = useGetBridgeOptions();
+  const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } = useGetBridgeOptions();
 
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
@@ -37,8 +31,11 @@ const BridgeHome = () => {
       };
       try {
         getBridgeOptions(getBridgeOptionsParams).then((res) => {
-          if (res.success) {
-            setBridgeOptions(res.result);
+          if (res) {
+            setBridgeOptions({
+              message: res.message,
+              options: res.result,
+            });
           }
         });
       } catch (error) {
@@ -50,12 +47,7 @@ const BridgeHome = () => {
   const renderStep = () => {
     switch (activeStep) {
       case 1:
-        return (
-          <BridgeSelectTokenPage
-            isErrorBridgeOptions={isErrorBridgeOptions}
-            isPendingBridgeOptions={isPendingBridgeOptions}
-          />
-        );
+        return <BridgeSelectTokenPage isPendingBridgeOptions={isPendingBridgeOptions} />;
       case 2:
         return <TokenListPage isPending={isPending} isError={isError} />;
       case 3:

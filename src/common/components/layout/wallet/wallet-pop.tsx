@@ -100,13 +100,13 @@ export function WalletPop({ logo, title, balance, disconnect, address }: WalletC
                             </Avatar>
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>
-                          <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
+                          <span>$ {getCountedNumber(Number(token.usdBalance), 2)}</span>
                         </div>
                       ))}
                     </div>
                     <hr className="bg-[#494949]" />
                     <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
-                      <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
+                      <span>Total :</span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}
                     </div>
                   </>
                 ) : (
@@ -179,13 +179,13 @@ export function WalletPop({ logo, title, balance, disconnect, address }: WalletC
                             </Avatar>
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>
-                          <span>{getCountedNumber(Number(token.usdBalance), 2)}</span>
+                          <span>$ {getCountedNumber(Number(token.usdBalance), 2)}</span>
                         </div>
                       ))}
                     </div>
                     <hr className="bg-[#494949]" />
                     <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
-                      <span>Total :</span>${getCountedNumber(Number(balance.totalBalanceUsd), 2)}
+                      <span>Total :</span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}
                     </div>
                   </>
                 ) : (

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { isValidEvmAddress, isValidIcpAddress } from '@/common/helpers/validation';
 import { TokenType } from '@/app/bridge/_store';
 
@@ -9,8 +9,8 @@ interface WalletAddressInputProps {
   token: TokenType | undefined;
   address: string;
   setAddress: (address: string) => void;
-  validationError: string | null;
-  onValidationError: (error: string | null) => void;
+  validationError: string;
+  onValidationError: (error: string) => void;
   onWalletAddressChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   show: boolean;
   avatar: string;
@@ -26,6 +26,7 @@ const WalletAddressInput = ({
   show,
   avatar,
 }: WalletAddressInputProps) => {
+  const [inputValue, setInputValue] = useState<string>('');
   const validateWalletAddress = (address: string) => {
     if (!token) return false;
     if (!address) {
@@ -46,12 +47,16 @@ const WalletAddressInput = ({
         return false;
       }
     }
-    onValidationError?.(null);
+    onValidationError?.('');
     return true;
   };
 
+  useEffect(() => {
+    validateWalletAddress(inputValue);
+  }, [token, onValidationError, inputValue]);
+
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateWalletAddress(e.target.value);
+    setInputValue(e.target.value);
     setAddress(e.target.value);
     onWalletAddressChange?.(e);
   };
@@ -72,7 +77,7 @@ const WalletAddressInput = ({
               <AvatarFallback>{token?.symbol}</AvatarFallback>
             </Avatar>
           </div>
-          <div className="w-full">
+          <div className="w-full relative">
             <input
               type="text"
               maxLength={token?.chain_type === 'ICP' ? 64 : 42}
@@ -80,14 +85,16 @@ const WalletAddressInput = ({
               value={address}
               onChange={handleAddressChange}
               className={cn(
-                'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none w-full',
+                'border-[#1C68F8] dark:border-[#000000] rounded-md py-4 outline-none w-full',
                 'bg-transparent text-primary',
                 'placeholder:text-muted',
                 '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                 address.length > 30 && 'text-lg',
               )}
             />
-            {validationError && <p className="text-yellow-500 text-xs">{validationError}</p>}
+            {validationError && (
+              <p className="text-yellow-600 text-xs absolute top-[50px] animate-slide-in-from-top">{validationError}</p>
+            )}
           </div>
         </div>
       </Card>

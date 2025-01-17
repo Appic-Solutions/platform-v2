@@ -710,6 +710,7 @@ export const check_deposit_status = async (
   bridge_option: BridgeOption,
   unauthenticated_agent: Agent,
 ): Promise<Response<DepositTxStatus>> => {
+  console.log('here');
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
