@@ -17,7 +17,7 @@ export default function TokenListPage({ prevStepHandler }: TokenListProps) {
 
   return (
     <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[280px] md:px-9 md:pt-8')}>
-      <BoxHeader title="Bridge From" onBack={prevStepHandler} />
+      <BoxHeader title="Select Chain" onBack={prevStepHandler} />
       <ChainBoxPage selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
     </Box>
   );

@@ -22,9 +22,6 @@ export default function BridgeContent() {
         }
     }
 
-    console.log(data?.result);
-
-
     if (isError) {
         return (
             <div className={cn(
@@ -78,23 +75,21 @@ export default function BridgeContent() {
                         <div className="flex items-center justify-center w-full">
                             <div className={cn(
                                 "flex-1 border-t-[3px] border-black",
-                                item.status === "Pending" ? "border-dashed" : "border-solid",
-                                item.status === "Successful" && "border-green-500",
-                                item.status === "Failed" && "border-red-500"
+                                item.status === "Failed" ? "border-red-500" : "border-green-500",
                             )} />
                             <div className={cn(
                                 "rounded-full p-3 z-10 relative",
                                 "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
                                 item.status === "Failed" ? "border-2 border-solid border-red-500" : "before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500",
-                                item.status === "Pending" && "before:border-t-transparent before:animate-spin",
+                                item.status === "Pending" && "before:border-t-transparent before:animate-spin"
                             )}>
                                 <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
                             </div>
                             <div className={cn(
-                                "flex-1 border-t-[3px]  border-black",
-                                item.status === "Pending" ? "border-dashed" : "border-solid",
+                                "flex-1 border-t-[3px] border-black",
+                                item.status === "Failed" && "border-red-500",
+                                item.status === "Pending" && "border-dashed",
                                 item.status === "Successful" && "border-green-500",
-                                item.status === "Failed" && "border-red-500"
                             )} />
                         </div>
                         <div>

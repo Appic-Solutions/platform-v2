@@ -70,7 +70,6 @@ export const BridgeLogic = () => {
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
       if (txHash && unAuthenticatedAgent && selectedOption && txStep.count === 5) {
-        console.log('here');
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
         if (res.success) {
           if (res.result === 'Minted') {

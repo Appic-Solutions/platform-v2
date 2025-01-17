@@ -3,18 +3,32 @@ import React from 'react';
 import Image from 'next/image';
 import { TxStep } from '../../_api/types';
 import { TxStepType, useBridgeStore } from '../../_store';
+import { getChainLogo } from '@/common/helpers/utils';
 
 export const TransactionStep = ({
   currentStep,
   step,
   index,
+  steps,
 }: {
   step: TxStep;
   currentStep: TxStepType;
   index: number;
   steps: TxStep[];
 }) => {
-  const { txErrorMessage } = useBridgeStore();
+  const { txErrorMessage, fromToken, toToken } = useBridgeStore();
+  const getLogoHandler = () => {
+    // withdrawal tx
+    if (steps.length === 4) {
+      if (currentStep.count < 2) return getChainLogo(fromToken?.chainId);
+      return getChainLogo(toToken?.chainId);
+    }
+    // deposit tx
+    if (steps.length === 5) {
+      if (currentStep.count < 3) return getChainLogo(fromToken?.chainId);
+      return getChainLogo(toToken?.chainId);
+    }
+  };
 
   return (
     <div
@@ -48,7 +62,7 @@ export const TransactionStep = ({
           </div>
         )}
         <Image
-          src={step.logo || '/images/logo/chains-logos/ethereum.svg'}
+          src={getLogoHandler() || '/images/logo/chains-logos/ethereum.svg'}
           alt={step.title}
           height={80}
           width={80}
