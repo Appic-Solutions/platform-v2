@@ -20,9 +20,7 @@ export default function BridgeTransactionStepper({ steps, currentStep }: { steps
           <TransactionStep key={index} currentStep={currentStep} index={index} step={step} steps={steps} />
         ))}
       </div>
-      {/* <div className="bg-pink-50"> */}
       <ProgressBar steps={steps} currentStep={currentStep} />
-      {/* </div> */}
     </div>
   );
 }
