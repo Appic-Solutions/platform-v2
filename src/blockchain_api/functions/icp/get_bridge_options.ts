@@ -161,6 +161,19 @@ export const get_bridge_options = async (
         bridge_metadata.rpc_url,
       );
 
+      if (bridge_metadata.is_native) {
+        if (BigNumber(total_deposit_fee).plus(total_approval_fee).isGreaterThan(amount)) {
+          return {
+            message: `Minimum amount: ${BigNumber(total_deposit_fee)
+              .plus(total_approval_fee)
+              .dividedBy(10 ** 18)
+              .toFixed()}`,
+            result: [],
+            success: false,
+          };
+        }
+      }
+
       const bridge_options = await calculate_bridge_options(
         from_token.contractAddress!,
         to_token.canisterId!,
@@ -191,9 +204,13 @@ export const get_bridge_options = async (
           amount,
           BigNumber(minimum_native_withdrawal_amount).isGreaterThan(BigNumber(amount)),
         );
+
+        // if the amount of native token to be withdrawn is greater than minimum
         if (BigNumber(minimum_native_withdrawal_amount).isGreaterThan(BigNumber(amount))) {
           return {
-            message: 'Amount is less than minimum amount',
+            message: `Minimum amount: ${BigNumber(minimum_native_withdrawal_amount)
+              .dividedBy(10 ** 18)
+              .toFixed()}`,
             result: [],
             success: false,
           };

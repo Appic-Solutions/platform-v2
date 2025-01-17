@@ -166,7 +166,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
             />
           ))
         ) : (
-          <div className="w-full h-full flex justify-center items-center text-primary">There is no any coin.</div>
+          <div className="w-full h-full flex justify-center items-center text-primary">No coins were found.</div>
         )}
       </div>
     </Box>
