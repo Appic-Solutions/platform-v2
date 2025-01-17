@@ -1,3 +1,4 @@
+import Spinner from '@/common/components/ui/spinner';
 import { cn } from '@/common/helpers/utils';
 import { forwardRef } from 'react';
 
@@ -20,7 +21,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(({ isDisab
       onClick={onClick}
       disabled={isDisabled}
     >
-      {children}
+      {children || <Spinner className="text-white dark:text-white" />}
     </button>
   );
 });

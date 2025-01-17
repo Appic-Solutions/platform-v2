@@ -330,7 +330,7 @@ export const BridgeLogic = () => {
 
     return {
       isDisable: true,
-      text: 'Confirm',
+      text: '',
     };
   }
 
