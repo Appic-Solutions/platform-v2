@@ -196,13 +196,6 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
-    if (showWalletAddress && toWalletAddress && !toWalletValidationError && !bridgeOptions.options?.length) {
-      return {
-        isDisable: true,
-        text: 'Set token amount to continue',
-      };
-    }
-
     if (isEvmBalanceLoading || isIcpBalanceLoading) {
       return {
         isDisable: true,
@@ -217,13 +210,62 @@ export const BridgeLogic = () => {
       };
     }
 
+    if (
+      (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
+      (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
+    ) {
+      if (selectedOption.is_native) {
+        if (Number(amount) > Number(selectedTokenBalance)) {
+          return {
+            isDisable: true,
+            text: 'INSUFFICIENT Funds',
+          };
+        }
+      } else {
+        if (fromToken.chain_type === 'EVM') {
+          // The native token of the transaction chain that the user holds in their wallet
+          const userNativeToken = evmBalance?.tokens.find(
+            (token) =>
+              token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
+          );
+          if (
+            !userNativeToken ||
+            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
+          ) {
+            return {
+              isDisable: true,
+              text: `INSUFFICIENT Token Balance`,
+            };
+          }
+        } else if (fromToken.chain_type === 'ICP') {
+          const userNativeToken = icpBalance?.tokens.find(
+            (token) => token.canisterId === selectedOption.native_fee_token_id,
+          );
+          if (
+            !userNativeToken ||
+            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
+          ) {
+            return {
+              isDisable: true,
+              text: `INSUFFICIENT Token Balance`,
+            };
+          }
+        }
+      }
+    }
+
     if (showWalletAddress) {
       if (!toWalletAddress || toWalletValidationError) {
         return {
           isDisable: true,
           text: 'Enter Valid Address',
         };
-      } else {
+      } else if (!bridgeOptions.options?.length) {
+        return {
+          isDisable: true,
+          text: 'Set token amount to continue',
+        };
+      } else if (bridgeOptions.options?.length && toWalletAddress && !toWalletValidationError) {
         return {
           isDisable: false,
           text: 'Review Bridge',
@@ -271,47 +313,6 @@ export const BridgeLogic = () => {
       };
     }
 
-    if (isWalletConnected('from') && isWalletConnected('to') && selectedOption) {
-      if (selectedOption.is_native) {
-        if (Number(amount) > Number(selectedTokenBalance)) {
-          return {
-            isDisable: true,
-            text: 'INSUFFICIENT Funds',
-          };
-        }
-      } else {
-        if (fromToken.chain_type === 'EVM') {
-          // The native token of the transaction chain that the user holds in their wallet
-          const userNativeToken = evmBalance?.tokens.find(
-            (token) =>
-              token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
-          );
-          if (
-            !userNativeToken ||
-            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
-          ) {
-            return {
-              isDisable: true,
-              text: `INSUFFICIENT Token Balance`,
-            };
-          }
-        } else if (fromToken.chain_type === 'ICP') {
-          const userNativeToken = icpBalance?.tokens.find(
-            (token) => token.canisterId === selectedOption.native_fee_token_id,
-          );
-          if (
-            !userNativeToken ||
-            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
-          ) {
-            return {
-              isDisable: true,
-              text: `INSUFFICIENT Token Balance`,
-            };
-          }
-        }
-      }
-    }
-
     if (
       toWalletAddress &&
       !toWalletValidationError &&
@@ -324,7 +325,7 @@ export const BridgeLogic = () => {
         text: 'Review Bridge',
       };
     }
-    if (isWalletConnected('from') && isWalletConnected('to')) {
+    if (isWalletConnected('from') && isWalletConnected('to') && bridgeOptions.options?.length) {
       return {
         isDisable: false,
         text: 'Review Bridge',
