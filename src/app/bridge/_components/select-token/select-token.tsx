@@ -21,20 +21,17 @@ interface SelectTokenProps {
 
 export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
-  const [toWalletValidationError, setToWalletValidationError] = useState<string | null>(null);
 
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
   // bridge store
-  const { fromToken, toToken, amount, toWalletAddress, bridgeOptions } = useBridgeStore();
-  const { setSelectedTokenType, setToWalletAddress } = useBridgeActions();
+  const { fromToken, toToken, amount, toWalletAddress, bridgeOptions, toWalletValidationError } = useBridgeStore();
+  const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } = useBridgeActions();
   // Logic
   const { changeStep, swapTokens, isWalletConnected, getActionButtonStatus } = BridgeLogic();
 
   const actionButtonStatus = getActionButtonStatus({
     showWalletAddress,
-    toWalletAddress,
-    toWalletValidationError,
   });
 
   const openConnectWalletModalHandler = (token: TokenType) => {

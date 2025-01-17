@@ -1,6 +1,6 @@
-'use client';
+export const dynamic = 'force-static';
 
-export const dynamic = 'force-dynamic';
+// TODO: Tx queries and functions should move to a separate file
 
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
@@ -23,6 +23,7 @@ import {
   TxHash,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery } from '@tanstack/react-query';
+import { Principal } from '@dfinity/principal';
 
 export const BridgeLogic = () => {
   // Bridge Store
@@ -36,6 +37,8 @@ export const BridgeLogic = () => {
     selectedTokenBalance,
     bridgeOptions,
     txStep,
+    toWalletAddress,
+    toWalletValidationError,
   } = useBridgeStore();
   // Bridge Actions
   const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage } = useBridgeActions();
@@ -184,15 +187,7 @@ export const BridgeLogic = () => {
     return false;
   }
 
-  function getActionButtonStatus({
-    showWalletAddress,
-    toWalletValidationError,
-    toWalletAddress,
-  }: {
-    showWalletAddress: boolean;
-    toWalletValidationError: string | null;
-    toWalletAddress: string;
-  }): {
+  function getActionButtonStatus({ showWalletAddress }: { showWalletAddress: boolean }): {
     isDisable: boolean;
     text: string;
   } {
@@ -382,9 +377,6 @@ export const BridgeLogic = () => {
     };
   }
 
-  //  1. Withdrawal Transactions (ICP -> EVM)
-  //  2. Deposit Transactions (EVM -> ICP)
-
   async function executeWithdrawal(params: FullWithdrawalRequest) {
     if (selectedOption && authenticatedAgent) {
       // Step 1: Token Approval
@@ -528,23 +520,46 @@ export const BridgeLogic = () => {
   }
 
   function executeTransaction() {
-    if (authenticatedAgent && selectedOption && evmAddress && icpIdentity && unAuthenticatedAgent && amount) {
+    //  1. Withdrawal Transactions (ICP -> EVM)
+    // recipient should be evmAddress or toWalletAddress
+    //  2. Deposit Transactions (EVM -> ICP)
+    // recipient should be icpIdentity.getPrincipal() or toWalletAddress
+    if (authenticatedAgent && selectedOption && icpIdentity && unAuthenticatedAgent && amount) {
       resetTransaction();
       if (fromToken?.chain_type === 'ICP') {
-        executeWithdrawal({
-          authenticatedAgent,
-          bridgeOption: selectedOption,
-          recipient: evmAddress,
-          userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-        });
+        if (toWalletAddress) {
+          executeWithdrawal({
+            authenticatedAgent,
+            bridgeOption: selectedOption,
+            recipient: toWalletAddress,
+            userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+          });
+        } else if (evmAddress) {
+          executeWithdrawal({
+            authenticatedAgent,
+            bridgeOption: selectedOption,
+            recipient: evmAddress,
+            userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+          });
+        }
       } else if (fromToken?.chain_type === 'EVM') {
-        executeDeposit({
-          bridgeOption: selectedOption,
-          recipient: icpIdentity.getPrincipal(),
-          recipientPrincipal: icpIdentity.getPrincipal().toString(),
-          unAuthenticatedAgent,
-          userWalletAddress: evmAddress,
-        });
+        if (toWalletAddress && evmAddress) {
+          executeDeposit({
+            bridgeOption: selectedOption,
+            recipient: Principal.fromText(toWalletAddress),
+            recipientPrincipal: toWalletAddress,
+            unAuthenticatedAgent,
+            userWalletAddress: evmAddress,
+          });
+        } else if (evmAddress) {
+          executeDeposit({
+            bridgeOption: selectedOption,
+            recipient: icpIdentity.getPrincipal(),
+            recipientPrincipal: icpIdentity.getPrincipal().toString(),
+            unAuthenticatedAgent,
+            userWalletAddress: evmAddress,
+          });
+        }
       }
     }
   }

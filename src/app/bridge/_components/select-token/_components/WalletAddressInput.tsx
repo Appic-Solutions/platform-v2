@@ -9,8 +9,8 @@ interface WalletAddressInputProps {
   token: TokenType | undefined;
   address: string;
   setAddress: (address: string) => void;
-  validationError: string | null;
-  onValidationError: (error: string | null) => void;
+  validationError: string;
+  onValidationError: (error: string) => void;
   onWalletAddressChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   show: boolean;
   avatar: string;
@@ -47,7 +47,7 @@ const WalletAddressInput = ({
         return false;
       }
     }
-    onValidationError?.(null);
+    onValidationError?.('');
     return true;
   };
 

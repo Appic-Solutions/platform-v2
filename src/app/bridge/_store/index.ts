@@ -24,8 +24,9 @@ interface BridgeState {
   };
   selectedOption: BridgeOption | undefined;
   bridgePairs: (EvmToken | IcpToken)[] | undefined;
-  toWalletAddress: string;
   selectedTokenBalance: string;
+  toWalletAddress: string;
+  toWalletValidationError: string;
   // tx states
   txStep: TxStepType;
   txErrorMessage: string | undefined;
@@ -43,6 +44,7 @@ type Action = {
     setBridgeOptions: (params: { options: BridgeOption[] | undefined; message: string }) => void;
     setUsdPrice: (usdPrice: string) => void;
     setToWalletAddress: (walletAddress: string) => void;
+    setToWalletValidationError: (toWalletValidationError: string) => void;
     setSelectedTokenBalance: (tokenBalance: string) => void;
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
@@ -67,6 +69,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   toToken: undefined,
   usdPrice: '0',
   toWalletAddress: '',
+  toWalletValidationError: '',
   selectedTokenBalance: '',
   txErrorMessage: undefined,
   actions: {
@@ -80,6 +83,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setBridgeOptions: (bridgeOptions) => set({ bridgeOptions }),
     setUsdPrice: (usdPrice) => set({ usdPrice }),
     setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),
+    setToWalletValidationError: (toWalletValidationError) => set({ toWalletValidationError }),
     setSelectedTokenBalance: (selectedTokenBalance) => set({ selectedTokenBalance }),
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
