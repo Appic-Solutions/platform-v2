@@ -7,6 +7,7 @@ import Step1 from "./_components/step-1";
 const AdvancedPage = () => {
   const {
     step,
+    isLoading,
     methods,
     onSubmit,
     chainIdWatch,
@@ -19,7 +20,9 @@ const AdvancedPage = () => {
         className="w-full h-full md:flex md:justify-center md:items-center overflow-y-auto"
       >
         {step === 1 && <Step1
+          methods={methods}
           chainIdWatch={chainIdWatch}
+          isLoading={isLoading}
         />}
         {/* {step === 2 && <Step2 stepHandler={stepHandler} />} */}
       </form>

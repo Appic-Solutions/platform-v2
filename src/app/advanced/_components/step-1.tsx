@@ -7,8 +7,9 @@ import RHFInput from "@/common/components/rhf/rhf-input";
 import Link from "next/link";
 import HistoryIcon from "@/common/components/icons/history";
 import { Step1Props } from "../_types";
+import Spinner from "@/common/components/ui/spinner";
 
-export default function Step1({ chainIdWatch }: Step1Props) {
+export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) {
   const [selectTokenBox, setSelectTokenBox] = useState(false);
 
   if (selectTokenBox) {
@@ -34,7 +35,7 @@ export default function Step1({ chainIdWatch }: Step1Props) {
             <span className="hidden xs:block">History</span>
           </Link>
         </div>
-        <div className="w-full flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="w-full flex flex-col justify-between gap-y-1">
           <div className="flex flex-col gap-y-1 min-w-fit w-full cursor-pointer">
             <label className="text-white md:text-black dark:text-white">
               Select Chain
@@ -48,6 +49,7 @@ export default function Step1({ chainIdWatch }: Step1Props) {
               {chainIdWatch !== "" ? `${getChainName(chainIdWatch)} (${getChainSymbol(chainIdWatch)})` : "Select Chain"}
             </div>
           </div>
+          {methods.formState.errors.chain_id && <span className="text-sm text-red-500">{methods.formState.errors.chain_id.message}</span>}
         </div>
         <RHFInput
           name="contract_address"
@@ -62,8 +64,11 @@ export default function Step1({ chainIdWatch }: Step1Props) {
           placeholder="Enter Transfer Fee"
           type="number"
         />
-        <button className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white mt-auto md:mt-0">
-          Continue
+        <button
+          className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
+          disabled={isLoading}
+        >
+          {isLoading ? <Spinner /> : "Continue"}
         </button>
       </Box >
     );
