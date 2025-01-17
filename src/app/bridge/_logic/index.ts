@@ -22,10 +22,11 @@ import {
   check_withdraw_status,
   TxHash,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Principal } from '@dfinity/principal';
 
 export const BridgeLogic = () => {
+  const queryClient = useQueryClient();
   // Bridge Store
   const {
     selectedTokenType,
@@ -94,7 +95,7 @@ export const BridgeLogic = () => {
             status: 'failed',
           });
         }
-
+        queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
         return res;
       }
       return null;
@@ -134,6 +135,7 @@ export const BridgeLogic = () => {
             status: 'failed',
           });
         }
+        queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
         return res || null;
       }
       return null;
