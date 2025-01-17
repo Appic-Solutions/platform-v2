@@ -55,7 +55,7 @@ export default function Step1({
         <div className="w-full flex flex-col items-center justify-between gap-6 md:flex-row">
           <div className="flex flex-col gap-y-1 min-w-fit w-full cursor-pointer">
             <label className="text-white md:text-black dark:text-white">
-              Select Token
+              Select Chain
             </label>
             <div
               onClick={() => setSelectTokenBox(true)}
@@ -65,7 +65,7 @@ export default function Step1({
                 "text-[#0A0A0B] dark:text-[#333333]",
                 "px-3.5 py-2.5"
               )}>
-              {selectedToken ? `${getChainName(selectedToken.chainId)} (${selectedToken.symbol})` : "Select Token"}
+              {selectedToken ? `${getChainName(selectedToken.chainId)} (${selectedToken.symbol})` : "Select Chain"}
             </div>
           </div>
         </div>
@@ -76,10 +76,10 @@ export default function Step1({
           placeholder="Enter Contract Address"
         />
         <RHFInput
-          name="amount"
-          label="amount"
+          name="transfer-fee"
+          label="Transfer fee"
           className="w-full"
-          placeholder="Enter Amount"
+          placeholder="Enter Transfer Fee"
         />
         <button
           type="button"
