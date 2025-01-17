@@ -1,3 +1,7 @@
+'use client';
+
+export const dynamic = 'force-dynamic';
+
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
@@ -22,8 +26,16 @@ import { useQuery } from '@tanstack/react-query';
 
 export const BridgeLogic = () => {
   // Bridge Store
-  const { selectedTokenType, fromToken, toToken, activeStep, amount, selectedOption, selectedTokenBalance } =
-    useBridgeStore();
+  const {
+    selectedTokenType,
+    fromToken,
+    toToken,
+    activeStep,
+    amount,
+    selectedOption,
+    selectedTokenBalance,
+    bridgeOptions,
+  } = useBridgeStore();
   // Bridge Actions
   const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxStatus, setTxErrorMessage } =
     useBridgeActions();
@@ -55,7 +67,6 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (txHash && unAuthenticatedAgent && selectedOption) {
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
-        console.log('here');
         if (res.success) {
           if (res.result === 'Minted') {
             setTxStatus('successful');
@@ -182,6 +193,13 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
+    if (showWalletAddress && toWalletAddress && !toWalletValidationError && !bridgeOptions.options?.length) {
+      return {
+        isDisable: true,
+        text: 'Set token amount to continue',
+      };
+    }
+
     if (isEvmBalanceLoading || isIcpBalanceLoading) {
       return {
         isDisable: true,
@@ -229,7 +247,7 @@ export const BridgeLogic = () => {
       };
     }
 
-    if (!selectedOption) {
+    if (bridgeOptions.options && bridgeOptions.options.length > 0 && !selectedOption) {
       return {
         isDisable: true,
         text: 'Select Bridge Option',
@@ -250,7 +268,7 @@ export const BridgeLogic = () => {
       };
     }
 
-    if ((isWalletConnected('from'), isWalletConnected('to'))) {
+    if (isWalletConnected('from') && isWalletConnected('to') && selectedOption) {
       if (selectedOption.is_native) {
         if (Number(amount) > Number(selectedTokenBalance)) {
           return {
@@ -265,12 +283,10 @@ export const BridgeLogic = () => {
             (token) =>
               token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
           );
-          console.log('user has native token:', userNativeToken);
           if (
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
-            console.log('user has not native token', userNativeToken);
             return {
               isDisable: true,
               text: `INSUFFICIENT Token Balance`,
@@ -293,13 +309,18 @@ export const BridgeLogic = () => {
       }
     }
 
-    if (toWalletAddress && !toWalletValidationError && isWalletConnected('from')) {
+    if (
+      toWalletAddress &&
+      !toWalletValidationError &&
+      isWalletConnected('from') &&
+      bridgeOptions.options &&
+      bridgeOptions.options?.length > 0
+    ) {
       return {
         isDisable: false,
         text: 'Review Bridge',
       };
     }
-
     if (isWalletConnected('from') && isWalletConnected('to')) {
       return {
         isDisable: false,
@@ -309,7 +330,7 @@ export const BridgeLogic = () => {
 
     return {
       isDisable: true,
-      text: 'Error',
+      text: 'Confirm',
     };
   }
 

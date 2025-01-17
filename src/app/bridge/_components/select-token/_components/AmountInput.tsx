@@ -73,7 +73,7 @@ const AmountInput = () => {
             <AvatarFallback>{fromToken?.symbol}</AvatarFallback>
           </Avatar>
         </div>
-        <div className="flex flex-col gap-1 w-full">
+        <div className="flex flex-col w-full relative">
           <div className="w-full flex items-center">
             <input
               type="number"
@@ -120,7 +120,9 @@ const AmountInput = () => {
           </div>
           {!bridgeOptions.options ||
             (bridgeOptions.options?.length === 0 && bridgeOptions.message && (
-              <p className="text-sm text-red-500">{bridgeOptions.message}</p>
+              <p className="text-xs text-yellow-600 absolute -bottom-5 animate-slide-in-from-top">
+                {bridgeOptions.message}
+              </p>
             ))}
         </div>
       </div>

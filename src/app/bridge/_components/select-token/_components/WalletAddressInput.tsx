@@ -72,7 +72,7 @@ const WalletAddressInput = ({
               <AvatarFallback>{token?.symbol}</AvatarFallback>
             </Avatar>
           </div>
-          <div className="w-full">
+          <div className="w-full relative">
             <input
               type="text"
               maxLength={token?.chain_type === 'ICP' ? 64 : 42}
@@ -80,14 +80,16 @@ const WalletAddressInput = ({
               value={address}
               onChange={handleAddressChange}
               className={cn(
-                'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none w-full',
+                'border-[#1C68F8] dark:border-[#000000] rounded-md py-4 outline-none w-full',
                 'bg-transparent text-primary',
                 'placeholder:text-muted',
                 '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                 address.length > 30 && 'text-lg',
               )}
             />
-            {validationError && <p className="text-yellow-500 text-xs">{validationError}</p>}
+            {validationError && (
+              <p className="text-yellow-600 text-xs absolute top-[50px] animate-slide-in-from-top">{validationError}</p>
+            )}
           </div>
         </div>
       </Card>
