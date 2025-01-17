@@ -1,36 +1,34 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import { DefaultValuesType } from "../_types";
+import { useForm, useWatch } from "react-hook-form";
+import { DefaultValuesType, UseLogicReturn } from "../_types";
 
-export default function LogicHelper() {
+export default function LogicHelper(): UseLogicReturn {
     const [step, setStep] = useState(1);
-    const [selectedToken, setSelectedToken] = useState<EvmToken | IcpToken | null>(null)
 
-    const stepHandler = (mode: "next" | "prev") => {
-        if (mode === "next") setStep(step + 1);
-        if (mode === "prev") setStep(step - 1);
-    }
-
-    const methods = useForm({
+    const methods = useForm<DefaultValuesType>({
         defaultValues: {
-            name: "",
-            symbol: "",
-            test: "",
-            file: ""
+            chain_id: "",
+            contract_address: "",
+            transfer_fee: "",
         },
     });
+
+    const chainIdWatch = useWatch({
+        control: methods.control,
+        name: "chain_id"
+    })
 
     const onSubmit = (data: DefaultValuesType) => {
         console.log(data);
     }
 
     return {
+        // State
         step,
+
+        // Form
         methods,
         onSubmit,
-        selectedToken,
-        setSelectedToken,
-        stepHandler
+        chainIdWatch,
     }
 }

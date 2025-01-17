@@ -1,11 +1,16 @@
 "use client"
-import Step1 from "@/common/components/pages/advanced/step-1";
-import Step2 from "@/common/components/pages/advanced/step-2";
 import { FormProvider } from "react-hook-form";
 import LogicHelper from "./_logic";
+import Step1 from "./_components/step-1";
+// import Step2 from "./_components/step-2";
 
 const AdvancedPage = () => {
-  const { step, methods, onSubmit, selectedToken, setSelectedToken, stepHandler } = LogicHelper()
+  const {
+    step,
+    methods,
+    onSubmit,
+    chainIdWatch,
+  } = LogicHelper()
 
   return (
     <FormProvider {...methods}>
@@ -13,8 +18,10 @@ const AdvancedPage = () => {
         onSubmit={methods.handleSubmit(onSubmit)}
         className="w-full h-full md:flex md:justify-center md:items-center overflow-y-auto"
       >
-        {step === 1 && <Step1 stepHandler={stepHandler} selectedToken={selectedToken} setSelectedToken={setSelectedToken} />}
-        {step === 2 && <Step2 stepHandler={stepHandler} selectedToken={selectedToken} setSelectedToken={setSelectedToken} />}
+        {step === 1 && <Step1
+          chainIdWatch={chainIdWatch}
+        />}
+        {/* {step === 2 && <Step2 stepHandler={stepHandler} />} */}
       </form>
     </FormProvider>
   );
