@@ -28,7 +28,6 @@ interface BridgeState {
   selectedTokenBalance: string;
   // tx states
   txStep: TxStepType;
-  txStatus: Status;
   txErrorMessage: string | undefined;
 }
 
@@ -46,7 +45,6 @@ type Action = {
     setToWalletAddress: (walletAddress: string) => void;
     setSelectedTokenBalance: (tokenBalance: string) => void;
     setTxStep: (step: TxStepType) => void;
-    setTxStatus: (txStatus: Status) => void;
     setTxErrorMessage: (err: string | undefined) => void;
   };
 };
@@ -70,7 +68,6 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   usdPrice: '0',
   toWalletAddress: '',
   selectedTokenBalance: '',
-  txStatus: undefined,
   txErrorMessage: undefined,
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
@@ -85,7 +82,6 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),
     setSelectedTokenBalance: (selectedTokenBalance) => set({ selectedTokenBalance }),
     setTxStep: (txStep) => set({ txStep }),
-    setTxStatus: (txStatus) => set({ txStatus }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
   },
 }));

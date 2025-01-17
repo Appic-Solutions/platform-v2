@@ -35,10 +35,10 @@ export const BridgeLogic = () => {
     selectedOption,
     selectedTokenBalance,
     bridgeOptions,
+    txStep,
   } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxStatus, setTxErrorMessage } =
-    useBridgeActions();
+  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage } = useBridgeActions();
   // Shared Store
   const {
     icpIdentity,
@@ -65,23 +65,21 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
-      if (txHash && unAuthenticatedAgent && selectedOption) {
+      if (txHash && unAuthenticatedAgent && selectedOption && txStep.count === 5) {
+        console.log('here');
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
         if (res.success) {
           if (res.result === 'Minted') {
-            setTxStatus('successful');
             setTxStep({
               count: 5,
               status: 'successful',
             });
           } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
-            setTxStatus('failed');
             setTxStep({
               count: 5,
               status: 'failed',
             });
           } else {
-            setTxStatus('pending');
             setTxStep({
               count: 5,
               status: 'pending',
@@ -112,16 +110,21 @@ export const BridgeLogic = () => {
         const res = await check_withdraw_status(withdrawalId, selectedOption, authenticatedAgent);
         if (res.success) {
           if (res.result === 'Successful') {
-            setTxStatus('successful');
+            setTxStep({
+              count: 4,
+              status: 'successful',
+            });
           } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
-            setTxStatus('failed');
+            setTxStep({
+              count: 4,
+              status: 'failed',
+            });
           } else {
-            setTxStatus('pending');
+            setTxStep({
+              count: 4,
+              status: 'pending',
+            });
           }
-          setTxStep({
-            count: 4,
-            status: 'successful',
-          });
         } else if (!res.success) {
           setTxStep({
             count: 4,
@@ -525,13 +528,7 @@ export const BridgeLogic = () => {
 
   function executeTransaction() {
     if (authenticatedAgent && selectedOption && evmAddress && icpIdentity && unAuthenticatedAgent && amount) {
-      setTxStep({
-        count: 1,
-        status: 'pending',
-      });
-      setTxErrorMessage('');
-      setTxStatus(undefined);
-      setTxHash(undefined);
+      resetTransaction();
       if (fromToken?.chain_type === 'ICP') {
         executeWithdrawal({
           authenticatedAgent,
@@ -556,7 +553,6 @@ export const BridgeLogic = () => {
       count: 1,
       status: 'pending',
     });
-    setTxStatus(undefined);
     setTxErrorMessage(undefined);
     setActiveStep(1);
     setAmount('');
