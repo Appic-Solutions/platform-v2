@@ -50,7 +50,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
                 </div>
             ) : (PAGE_PARAMS_DATA.map((item, idx) => (
                 <TabsContent key={idx} value={item.name}>
-                    <div className="w-full flex flex-col gap-y-4 max-md:p-4">
+                    <div className="w-full flex flex-col gap-y-4 max-md:p-4 md:px-4">
                         <item.component />
                     </div>
                 </TabsContent>

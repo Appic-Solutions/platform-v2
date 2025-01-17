@@ -2,7 +2,7 @@
 import { CloseIcon, CopyIcon, FireIcon, LinkIcon, ParkOutlineBridgeIcon } from "@/common/components/icons";
 import CheckIcon from "@/common/components/icons/check";
 import Spinner from "@/common/components/ui/spinner";
-import { cn, copyToClipboard, getChainLogo } from "@/common/helpers/utils";
+import { cn, copyToClipboard, formatToSignificantFigures, getChainLogo, getChainName } from "@/common/helpers/utils";
 import { ChevronDownIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,18 +22,16 @@ export default function BridgeContent() {
         }
     }
 
+    console.log(data?.result);
+
+
     if (isError) {
         return (
             <div className={cn(
-                "flex flex-col items-center justify-center h-full gap-y-5",
+                "flex items-center justify-center h-full text-xl",
                 "text-center max-w-[490px] mx-auto px-6 text-white",
             )}>
-                <p className="text-xl">
-                    Error
-                </p>
-                <p className="text-sm leading-6 mb-24">
-                    Error
-                </p>
+                Failed To Get Transaction History
             </div>
         )
     } else if (isLoading) {
@@ -117,25 +115,33 @@ export default function BridgeContent() {
                         </div>
                     </div>
                     {/* Transaction Detailes */}
-                    <div className="flex flex-col gap-y-4 mb-8">
+                    <div className="flex flex-col gap-y-4 mb-5">
                         <div>
                             <div></div>
                         </div>
                         <div className={cn(
                             "flex items-center justify-between gap-x-4 text-xs font-bold",
-                            "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]",
+                            "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989] md:text-sm",
                             "*:flex *:flex-col *:justify-center *:flex-1",
                         )}>
                             <div>
-                                <p>ETH on Polygon</p>
-                                <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-xl">0.1241235</p>
+                                <p>{item.from_token.symbol} on {getChainName(item.from_token.chainId)}</p>
+                                <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-2xl">
+                                    {item.human_readable_base_value ? formatToSignificantFigures(item.human_readable_base_value) : "Calculating"}
+                                </p>
                             </div>
                             <div className="items-center text-center max-md:hidden">
-                                Bridge Transaction In Progress
+                                {
+                                    item.status === "Successful" ? "Successful Bridge Transaction" :
+                                        item.status === "Pending" ? "Bridge Transaction In Progress" :
+                                            "Bridge Transaction Failed"
+                                }
                             </div>
                             <div className="items-end">
-                                <p>ETH on Polygon</p>
-                                <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-xl">0.1241235</p>
+                                <p>{item.to_token.symbol} on {getChainName(item.to_token.chainId)}</p>
+                                <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-2xl">
+                                    {item.human_readable_final_value ? formatToSignificantFigures(item.human_readable_final_value) : "Calculating"}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -193,9 +199,6 @@ export default function BridgeContent() {
                                             }
                                         </div>
                                     </div>
-                                    <div className="text-sm">
-                                        need time from api
-                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -206,10 +209,10 @@ export default function BridgeContent() {
                         "*:flex *:items-center *:justify-center *:font-semibold",
                         "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]"
                     )}>
-                        <div className="gap-x-1 text-[#0F0F0F] bg-white/60 rounded-full py-0.5 px-2">
-                            via Li.FI
+                        <div className="gap-x-1 text-[#0F0F0F] bg-white/60 rounded-full py-1 px-2">
+                            via {item.operator}
                             <Image
-                                src="/images/wallet.svg"
+                                src="/images/logo/icp-logo.png"
                                 alt="Li.FI"
                                 width={16}
                                 height={16}
@@ -228,7 +231,7 @@ export default function BridgeContent() {
                             />
                         </div>
                         <div className="gap-x-1 text-white">
-                            ${item.fee}
+                            {formatToSignificantFigures(item.human_readable_fee)} {item.fee_token_symbol}
                             <FireIcon width={20} height={20} />
                         </div>
                     </div>
