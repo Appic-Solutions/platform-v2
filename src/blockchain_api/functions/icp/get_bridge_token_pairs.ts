@@ -66,7 +66,7 @@ export const get_bridge_pairs_for_token = (
   return filtered_token_pairs;
 };
 
-function parseOperator(operator: BackendOperator): Operator {
+export function parseOperator(operator: BackendOperator): Operator {
   if ('AppicMinter' in operator) {
     return 'Appic';
   } else if ('DfinityCkEthMinter' in operator) {
