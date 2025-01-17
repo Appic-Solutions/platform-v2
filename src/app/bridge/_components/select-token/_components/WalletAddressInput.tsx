@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { isValidEvmAddress, isValidIcpAddress } from '@/common/helpers/validation';
 import { TokenType } from '@/app/bridge/_store';
 
@@ -26,6 +26,7 @@ const WalletAddressInput = ({
   show,
   avatar,
 }: WalletAddressInputProps) => {
+  const [inputValue, setInputValue] = useState<string>('');
   const validateWalletAddress = (address: string) => {
     if (!token) return false;
     if (!address) {
@@ -50,8 +51,12 @@ const WalletAddressInput = ({
     return true;
   };
 
+  useEffect(() => {
+    validateWalletAddress(inputValue);
+  }, [token, onValidationError, inputValue]);
+
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateWalletAddress(e.target.value);
+    setInputValue(e.target.value);
     setAddress(e.target.value);
     onWalletAddressChange?.(e);
   };
