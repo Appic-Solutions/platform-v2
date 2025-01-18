@@ -4,7 +4,6 @@ export interface TxStatus {
 }
 
 export interface TxStep {
-  logo: string;
   title: string;
   statuses: {
     [key in 'pending' | 'successful' | 'failed']: TxStatus;

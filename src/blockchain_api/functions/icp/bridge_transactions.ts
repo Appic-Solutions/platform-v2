@@ -724,6 +724,8 @@ export const check_deposit_status = async (
     } as GetTxParams)) as [] | Transaction;
     if ('EvmToIcp' in tx_status) {
       const parsed_status = parse_evm_to_icp_tx_status(tx_status.EvmToIcp.status);
+      console.log('parsed status =>>>>>', parsed_status);
+      console.log('parse param =>>>>>', tx_status.EvmToIcp.status);
       return {
         result: parsed_status,
         message: '',
