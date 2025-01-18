@@ -10,6 +10,8 @@ export const chains: Chain[] = [
     type: 'ICP',
     rpc_url: '',
     disabled: false,
+    is_advance_supported: false,
+
     logo: '/images/logo/chains-logos/icp.svg',
   },
   {
@@ -25,6 +27,7 @@ export const chains: Chain[] = [
     dfinity_ck_deposit_helper_contract: '0x18901044688D3756C35Ed2b36D93e6a5B8e00E68',
     dfinity_ck_native_ledger_canister_id: 'ss2fx-dyaaa-aaaar-qacoq-cai',
     ankr_handle: 'eth',
+    is_advance_supported: false,
     viem_config: mainnet,
     twin_handle: 'eth',
   },
@@ -42,6 +45,7 @@ export const chains: Chain[] = [
     appic_minter_address: '2ztvj-yaaaa-aaaap-ahiza-cai',
     appic_twin_native_ledger_canister_id: 'n44gr-qyaaa-aaaam-qbuha-cai',
     ankr_handle: 'bsc',
+    is_advance_supported: true,
     viem_config: bsc,
     twin_handle: 'bsc',
   },
@@ -53,6 +57,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://mainnet.bitfinity.network/',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/bitfinity.png',
   },
   {
@@ -63,6 +68,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://arbitrum-one-rpc.publicnode.com',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/arbitrum.svg',
     ankr_handle: 'arbitrum',
     viem_config: arbitrum,
@@ -76,6 +82,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/polygon.svg',
 
     ankr_handle: 'polygon',
@@ -90,6 +97,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/optimism.svg',
 
     ankr_handle: 'optimism',
@@ -104,6 +112,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/base.svg',
 
     ankr_handle: 'base',
@@ -118,6 +127,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://base-rpc.publicnode.com',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/avalanche.svg',
 
     ankr_handle: 'avalanchec',
@@ -131,6 +141,7 @@ export const chains: Chain[] = [
     type: 'EVM',
     rpc_url: 'https://fantom-rpc.publicnode.com',
     disabled: true,
+    is_advance_supported: false,
     logo: '/images/logo/chains-logos/fantom.svg',
 
     ankr_handle: 'fantom',

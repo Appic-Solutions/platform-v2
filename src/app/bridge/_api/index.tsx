@@ -63,7 +63,8 @@ const useGetBridgeOptions = () => {
 // Step 1: Token Approval
 const useTokenApproval = () => {
   return useMutation({
-    mutationFn: (params: TokenApprovalRequest) => icrc2_approve(params.bridgeOption, params.authenticatedAgent),
+    mutationFn: (params: TokenApprovalRequest) =>
+      icrc2_approve(params.bridgeOption, params.authenticatedAgent, params.unAuthenticatedAgent),
     onError: (error) => {
       console.error('Token approval failed:', error);
     },
@@ -96,7 +97,7 @@ const useNotifyAppicHelper = () => {
         params.withdrawalId,
         params.recipient,
         params.userWalletPrincipal,
-        params.authenticatedAgent,
+        params.unAuthenticatedAgent,
       ),
     onError: (error) => {
       console.error('Notify Appic Helper failed:', error);

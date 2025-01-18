@@ -18,6 +18,7 @@ interface BridgeOptionsListRequest {
 interface TokenApprovalRequest {
   bridgeOption: BridgeOption;
   authenticatedAgent: Agent;
+  unAuthenticatedAgent: HttpAgent;
 }
 // STEP 2
 interface SubmitWithdrawRequest {
@@ -31,7 +32,7 @@ interface NotifyAppicHelperWithdrawalRequest {
   withdrawalId: string;
   recipient: string; // Destination EVM Address
   userWalletPrincipal: string; //from ICP Principal Address
-  authenticatedAgent: Agent;
+  unAuthenticatedAgent: HttpAgent;
 }
 // STEP 4
 interface CheckWithdrawalStatusRequest {
@@ -82,6 +83,7 @@ interface FullWithdrawalRequest {
   authenticatedAgent: Agent;
   recipient: string; // Destination EVM Address
   userWalletPrincipal: string; //from ICP Principal Address
+  unAuthenticatedAgent: HttpAgent;
 }
 
 export type {

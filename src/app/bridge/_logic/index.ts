@@ -110,8 +110,8 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-withdrawal-status'],
     queryFn: async () => {
-      if (authenticatedAgent && selectedOption && withdrawalId) {
-        const res = await check_withdraw_status(withdrawalId, selectedOption, authenticatedAgent);
+      if (unAuthenticatedAgent && selectedOption && withdrawalId) {
+        const res = await check_withdraw_status(withdrawalId, selectedOption, unAuthenticatedAgent);
         console.log('withdrawal tx res:', res);
         if (res.success) {
           if (res.result === 'Successful') {
@@ -381,12 +381,13 @@ export const BridgeLogic = () => {
   }
 
   async function executeWithdrawal(params: FullWithdrawalRequest) {
-    if (selectedOption && authenticatedAgent) {
+    if (selectedOption && authenticatedAgent && unAuthenticatedAgent) {
       // Step 1: Token Approval
       // set step status pending
       const approvalResult = await tokenApproval.mutateAsync({
         bridgeOption: selectedOption,
         authenticatedAgent,
+        unAuthenticatedAgent: unAuthenticatedAgent,
       });
       if (!approvalResult.success) {
         // set step status failed
@@ -425,7 +426,7 @@ export const BridgeLogic = () => {
 
       // Step 3: Notify Appic Helper
       const notifyResult = await notifyAppicHelper.mutateAsync({
-        authenticatedAgent: params.authenticatedAgent,
+        unAuthenticatedAgent: params.unAuthenticatedAgent,
         bridgeOption: params.bridgeOption,
         recipient: params.recipient,
         userWalletPrincipal: params.userWalletPrincipal,
@@ -538,6 +539,7 @@ export const BridgeLogic = () => {
             bridgeOption: selectedOption,
             recipient: toWalletAddress,
             userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+            unAuthenticatedAgent,
           });
         } else if (evmAddress) {
           executeWithdrawal({
@@ -545,6 +547,7 @@ export const BridgeLogic = () => {
             bridgeOption: selectedOption,
             recipient: evmAddress,
             userWalletPrincipal: icpIdentity.getPrincipal().toString(),
+            unAuthenticatedAgent,
           });
         }
       } else if (fromToken?.chain_type === 'EVM') {

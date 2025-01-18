@@ -14,6 +14,7 @@ export interface Chain {
   rpc_url: string;
   type: ChainType;
   disabled: boolean;
+  is_advance_supported: boolean;
   logo: string;
   dfinity_ck_minter_address?: string;
   appic_minter_address?: string;

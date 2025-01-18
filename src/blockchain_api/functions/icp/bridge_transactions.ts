@@ -83,9 +83,15 @@ import { principal_to_bytes32 } from './utils/principal_to_hex';
 export const icrc2_approve = async (
   bridge_option: BridgeOption,
   authenticated_agent: Agent, // HttpAgent , Agent
+  unauthenticated_agent: HttpAgent,
 ): Promise<Response<string>> => {
   const native_actor = Actor.createActor(IcrcIdlFactory, {
     agent: authenticated_agent,
+    canisterId: bridge_option.is_native ? bridge_option.native_fee_token_id : bridge_option.from_token_id,
+  });
+
+  const native_actor_unauthenticated = Actor.createActor(IcrcIdlFactory, {
+    agent: unauthenticated_agent,
     canisterId: bridge_option.is_native ? bridge_option.native_fee_token_id : bridge_option.from_token_id,
   });
 
@@ -93,7 +99,7 @@ export const icrc2_approve = async (
     const sender_principal = await authenticated_agent.getPrincipal();
     if (bridge_option.is_native) {
       // Check the allowance
-      const allowance = (await native_actor.icrc2_allowance({
+      const allowance = (await native_actor_unauthenticated.icrc2_allowance({
         account: {
           owner: sender_principal,
           subaccount: [],
@@ -136,8 +142,14 @@ export const icrc2_approve = async (
         canisterId: bridge_option.from_token_id,
       });
 
+      // In case of Erc20
+      const erc20_actor_unauthenticated = Actor.createActor(IcrcIdlFactory, {
+        agent: unauthenticated_agent,
+        canisterId: bridge_option.from_token_id,
+      });
+
       // Check native allowance
-      const native_allowance = (await native_actor.icrc2_allowance({
+      const native_allowance = (await native_actor_unauthenticated.icrc2_allowance({
         account: {
           owner: sender_principal,
           subaccount: [],
@@ -174,7 +186,7 @@ export const icrc2_approve = async (
       }
 
       // Check erc-20 allowance
-      const erc20_allowance = (await erc20_actor.icrc2_allowance({
+      const erc20_allowance = (await erc20_actor_unauthenticated.icrc2_allowance({
         account: {
           owner: sender_principal,
           subaccount: [],
@@ -403,16 +415,19 @@ export const notify_appic_helper_withdrawal = async (
   withdrawal_id: string,
   recipient: string, // Destination EVM Address
   user_wallet_principal: string, //from ICP Principal Address
-  authenticated_agent: Agent,
+  unauthenticated_agent: HttpAgent,
 ): Promise<Response<string>> => {
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
-    agent: authenticated_agent,
+    agent: unauthenticated_agent,
   });
+
+  console.log('Actor =>', appic_helper_actor);
 
   const parsed_operator = (
     bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
   ) as AppicHelperOperator;
+  console.log('OP=>', parsed_operator);
   try {
     const notify_withdrawal_result = (await appic_helper_actor.new_icp_to_evm_tx({
       chain_id: BigInt(bridge_option.chain_id),
@@ -426,6 +441,9 @@ export const notify_appic_helper_withdrawal = async (
       operator: parsed_operator,
       withdrawal_amount: BigInt(bridge_option.amount),
     } as AddIcpToEvmTx)) as NewIcpToEvmResult;
+
+    console.log(notify_withdrawal_result);
+
     if ('Ok' in notify_withdrawal_result) {
       return {
         result: '',
@@ -436,14 +454,14 @@ export const notify_appic_helper_withdrawal = async (
       return {
         result: '',
         success: false,
-        message: `Failed to notify minter ${notify_withdrawal_result.Err}`,
+        message: `Failed to notify minter ${notify_withdrawal_result.Err}. Your funds are safe and will be transferred to your wallet on destination chain.`,
       };
     }
   } catch (error) {
     return {
       result: '',
       success: false,
-      message: `Failed to notify minter ${error}`,
+      message: `Failed to notify minter ${error}, Your funds are safe and will be transferred to your wallet on destination chain.`,
     };
   }
 };
@@ -466,11 +484,11 @@ export type WithdrawalTxStatus =
 export const check_withdraw_status = async (
   withdrawal_id: WithdrawalId,
   bridge_option: BridgeOption,
-  authenticated_agent: Agent,
+  unauthenticated_agent: HttpAgent,
 ): Promise<Response<WithdrawalTxStatus>> => {
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
-    agent: authenticated_agent,
+    agent: unauthenticated_agent,
   });
   console.log('check withdraw status request');
 
