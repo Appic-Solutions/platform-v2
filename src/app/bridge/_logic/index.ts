@@ -71,6 +71,7 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (txHash && unAuthenticatedAgent && selectedOption && txStep.count === 5) {
         const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
+        console.log('deposit tx res:', res);
         if (res.success) {
           if (res.result === 'Minted') {
             setTxStep({
@@ -111,6 +112,7 @@ export const BridgeLogic = () => {
     queryFn: async () => {
       if (authenticatedAgent && selectedOption && withdrawalId) {
         const res = await check_withdraw_status(withdrawalId, selectedOption, authenticatedAgent);
+        console.log('withdrawal tx res:', res);
         if (res.success) {
           if (res.result === 'Successful') {
             setTxStep({

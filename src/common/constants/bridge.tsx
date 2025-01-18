@@ -2,73 +2,69 @@ import { TxStep } from '@/app/bridge/_api/types';
 
 export const withdrawalStepsDetails: TxStep[] = [
   {
-    logo: '',
     title: 'Step 1',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Please approve the transaction',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Approved successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to approve transaction',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 2',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Sending transaction request to the network',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Sent Successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to send transaction',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 3',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Sending request to minter',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Sent successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to notify minter',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 4',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Transaction submitted, waiting for minter verification',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Minted successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to mint',
       },
     },
@@ -77,91 +73,86 @@ export const withdrawalStepsDetails: TxStep[] = [
 
 export const depositStepsDetails: TxStep[] = [
   {
-    logo: '',
     title: 'Step 1',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Preparing bridge transaction',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Successfully prepared bridge transaction',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to prepare bridge transaction',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 2',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Please approve the transaction',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Approved successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to approve transaction',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 3',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Sending transaction request to the network',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Sent Successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to send transaction',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 4',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Sending request to minter',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Sent successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to notify minter',
       },
     },
   },
   {
-    logo: '',
     title: 'Step 5',
     statuses: {
       pending: {
-        statusTitle: 'pending',
+        statusTitle: 'Pending',
         description: 'Transaction submitted, waiting for minter verification',
       },
       successful: {
-        statusTitle: 'successful',
+        statusTitle: 'Successful',
         description: 'Minted successfully',
       },
       failed: {
-        statusTitle: 'failed',
+        statusTitle: 'Failed',
         description: 'Failed to mint',
       },
     },
