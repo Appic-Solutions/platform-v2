@@ -18,6 +18,11 @@ export const getChainName = (chainId: string | number | undefined): string => {
   return chains.find((chain) => chain.chainId == Number(chainId))?.name || '';
 };
 
+// Get Chain Symbol Helper Function
+export const getChainSymbol = (chainId: string | number | undefined): string => {
+  return chains.find((chain) => chain.chainId == Number(chainId))?.nativeTokenSymbol || '';
+};
+
 // Format number to show only counted items (e.g. 1.23456 -> 1.23)
 export const getCountedNumber = (price: number, decimals: number = 2): string => {
   if (!price || typeof price !== 'number') return '0';

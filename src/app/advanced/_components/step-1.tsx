@@ -1,31 +1,20 @@
-import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
 import { InfoCircleIcon } from "@/common/components/icons";
 import Box from "@/common/components/ui/box";
-import { cn, getChainName } from "@/common/helpers/utils";
+import { cn, getChainName, getChainSymbol } from "@/common/helpers/utils";
 import { useState } from "react";
 import TokenListPage from "./chain-token-list/token-list";
 import RHFInput from "@/common/components/rhf/rhf-input";
 import Link from "next/link";
 import HistoryIcon from "@/common/components/icons/history";
+import { Step1Props } from "../_types";
+import Spinner from "@/common/components/ui/spinner";
 
-export default function Step1({
-  stepHandler,
-  selectedToken,
-  setSelectedToken,
-}: {
-  stepHandler: (mode: "next" | "prev") => void;
-  selectedToken: EvmToken | IcpToken | null;
-  setSelectedToken: (token: EvmToken | IcpToken) => void;
-}) {
+export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) {
   const [selectTokenBox, setSelectTokenBox] = useState(false);
 
   if (selectTokenBox) {
     return (
-      <TokenListPage
-        prevStepHandler={() => setSelectTokenBox(false)}
-        setTokenHandler={setSelectedToken}
-        selectedToken={selectedToken}
-      />
+      <TokenListPage prevStepHandler={() => setSelectTokenBox(false)} />
     );
   } else {
     return (
@@ -34,13 +23,7 @@ export default function Step1({
         "md:h-fit md:max-w-[617px] md:py-[55px] md:px-[65px]"
       )}>
         <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
-          <div
-            className={cn(
-              "flex items-center self-start gap-3.5",
-              "text-2xl font-bold",
-              "md:text-4xl"
-            )}
-          >
+          <div className="flex items-center self-start gap-3.5 text-2xl font-bold md:text-4xl">
             Create Twin Token
             <InfoCircleIcon className="w-4 h-4 md:w-5 md:h-5" />
           </div>
@@ -52,7 +35,7 @@ export default function Step1({
             <span className="hidden xs:block">History</span>
           </Link>
         </div>
-        <div className="w-full flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="w-full flex flex-col justify-between gap-y-1">
           <div className="flex flex-col gap-y-1 min-w-fit w-full cursor-pointer">
             <label className="text-white md:text-black dark:text-white">
               Select Chain
@@ -61,34 +44,33 @@ export default function Step1({
               onClick={() => setSelectTokenBox(true)}
               className={cn(
                 "flex items-center w-full h-[42px] text-white md:text-black dark:text-white",
-                "bg-white/50 dark:bg-white/60 rounded-lg",
-                "text-[#0A0A0B] dark:text-[#333333]",
-                "px-3.5 py-2.5"
+                "bg-white/50 dark:bg-white/60 rounded-lg text-[#0A0A0B] dark:text-[#333333] px-3.5 py-2.5",
               )}>
-              {selectedToken ? `${getChainName(selectedToken.chainId)} (${selectedToken.symbol})` : "Select Chain"}
+              {chainIdWatch !== "" ? `${getChainName(chainIdWatch)} (${getChainSymbol(chainIdWatch)})` : "Select Chain"}
             </div>
           </div>
+          {methods.formState.errors.chain_id && <span className="text-sm text-red-500">{methods.formState.errors.chain_id.message}</span>}
         </div>
         <RHFInput
-          name="blockchainId"
+          name="contract_address"
           label="contract address"
           className="w-full"
           placeholder="Enter Contract Address"
         />
         <RHFInput
-          name="transfer-fee"
-          label="Transfer fee"
+          name="transfer_fee"
+          label="Transfer Fee"
           className="w-full"
           placeholder="Enter Transfer Fee"
+          type="number"
         />
         <button
-          type="button"
-          onClick={() => stepHandler("next")}
           className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
+          disabled={isLoading}
         >
-          Continue
+          {isLoading ? <Spinner /> : "Continue"}
         </button>
-      </Box>
+      </Box >
     );
   }
 }

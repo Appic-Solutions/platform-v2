@@ -46,6 +46,16 @@ export const chains: Chain[] = [
     twin_handle: 'bsc',
   },
   {
+    chainId: 56,
+    name: 'Bitfinity',
+    nativeTokenSymbol: 'BTF',
+    scannerAddress: 'https://explorer.mainnet.bitfinity.network/',
+    type: 'EVM',
+    rpc_url: 'https://mainnet.bitfinity.network/',
+    disabled: true,
+    logo: '/images/logo/chains-logos/bitfinity.png',
+  },
+  {
     chainId: 42161,
     name: 'Arbitrum One',
     nativeTokenSymbol: 'ETH',

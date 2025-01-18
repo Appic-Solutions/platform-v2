@@ -1,36 +1,60 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { EvmToken, IcpToken } from "@/blockchain_api/types/tokens";
-import { DefaultValuesType } from "../_types";
+import { useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { DefaultValuesType, UseLogicReturn } from '../_types';
+import { get_evm_token_and_generate_twin_token } from '@/blockchain_api/functions/icp/new_twin_token';
+import { useSharedStore } from '@/common/state/store';
+import { HttpAgent } from '@dfinity/agent';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { formSchema } from './validation';
 
-export default function LogicHelper() {
-    const [step, setStep] = useState(1);
-    const [selectedToken, setSelectedToken] = useState<EvmToken | IcpToken | null>(null)
+export default function LogicHelper(): UseLogicReturn {
+  const [step, setStep] = useState(1);
+  const [isLoading, setIsloading] = useState(false);
+  const { unAuthenticatedAgent } = useSharedStore();
 
-    const stepHandler = (mode: "next" | "prev") => {
-        if (mode === "next") setStep(step + 1);
-        if (mode === "prev") setStep(step - 1);
+  const methods = useForm<DefaultValuesType>({
+    defaultValues: {
+      chain_id: '',
+      contract_address: '',
+      transfer_fee: '',
+    },
+    resolver: zodResolver(formSchema),
+  });
+
+  const chainIdWatch = useWatch({
+    control: methods.control,
+    name: 'chain_id',
+  });
+
+  const onSubmit = async (data: DefaultValuesType) => {
+    try {
+      setIsloading(true);
+      if (step === 1) {
+        const resStepOne = await get_evm_token_and_generate_twin_token(
+          data.chain_id,
+          data.contract_address,
+          data.transfer_fee,
+          unAuthenticatedAgent as HttpAgent,
+        );
+        console.log('🚀 ~ onSubmit ~ resStepOne:', resStepOne);
+      } else {
+        console.log('Data Stap 1 => ', data);
+      }
+    } catch (error) {
+      console.log('🚀 ~ onSubmit ~ error:', error);
+    } finally {
+      setIsloading(false);
     }
+  };
 
-    const methods = useForm({
-        defaultValues: {
-            name: "",
-            symbol: "",
-            test: "",
-            file: ""
-        },
-    });
+  return {
+    // State
+    step,
+    isLoading,
 
-    const onSubmit = (data: DefaultValuesType) => {
-        console.log(data);
-    }
-
-    return {
-        step,
-        methods,
-        onSubmit,
-        selectedToken,
-        setSelectedToken,
-        stepHandler
-    }
+    // Form
+    methods,
+    onSubmit,
+    chainIdWatch,
+  };
 }

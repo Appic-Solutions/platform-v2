@@ -6,11 +6,8 @@ import { cn, getChainLogo, getChainName } from "@/common/helpers/utils";
 
 export default function Step2({
   stepHandler,
-  selectedToken,
 }: {
   stepHandler: (mode: "next" | "prev") => void;
-  selectedToken: EvmToken | IcpToken | null;
-  setSelectedToken: (token: EvmToken | IcpToken) => void;
 }) {
   const data = [
     {
