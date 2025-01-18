@@ -3,7 +3,7 @@ import { IdentityKitAuthType } from '@nfid/identitykit';
 import { IdentityKitProvider } from '@nfid/identitykit/react';
 import { wagmiAdapter, projectId } from '@/common/configs/wagmi';
 import { createAppKit } from '@reown/appkit/react';
-import { mainnet, arbitrum, avalanche, base, optimism, polygon } from '@reown/appkit/networks';
+import { mainnet, arbitrum, avalanche, base, optimism, polygon, bsc } from '@reown/appkit/networks';
 import { WagmiProvider, type Config } from 'wagmi';
 import { useQuery } from '@tanstack/react-query';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
@@ -27,7 +27,7 @@ const metadata = {
 createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [mainnet, arbitrum, avalanche, base, optimism, polygon],
+  networks: [mainnet, arbitrum, avalanche, base, optimism, polygon, bsc],
   defaultNetwork: mainnet,
 
   metadata: metadata,
