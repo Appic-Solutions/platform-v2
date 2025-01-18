@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { TxStep } from '../../_api/types';
 import { TxStepType, useBridgeStore } from '../../_store';
 import { getChainLogo } from '@/common/helpers/utils';
+import Link from 'next/link';
 
 export const TransactionStep = ({
   currentStep,
@@ -81,6 +82,15 @@ export const TransactionStep = ({
           <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">{txErrorMessage}</p>
         </div>
       )}
+      {(fromToken?.chain_type === 'ICP' && currentStep.count === 4) ||
+        (fromToken?.chain_type === 'EVM' && currentStep.count === 5 && (
+          <Link
+            href={'/transactions-history/bridge'}
+            className="bg-card-background shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border px-4 py-1 rounded-lg border-gray-200"
+          >
+            Check History
+          </Link>
+        ))}
     </div>
   );
 };

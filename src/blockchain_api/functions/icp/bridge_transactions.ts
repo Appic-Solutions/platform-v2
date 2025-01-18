@@ -418,6 +418,7 @@ export const check_withdraw_status = async (
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: authenticated_agent,
   });
+  console.log('check withdraw status request');
 
   try {
     const tx_status = (await appic_helper_actor.get_transaction({
@@ -710,7 +711,7 @@ export const check_deposit_status = async (
   bridge_option: BridgeOption,
   unauthenticated_agent: Agent,
 ): Promise<Response<DepositTxStatus>> => {
-  console.log('here');
+  console.log('check deposit status request');
   const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,

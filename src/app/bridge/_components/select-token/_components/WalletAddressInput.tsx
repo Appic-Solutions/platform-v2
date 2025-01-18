@@ -68,7 +68,11 @@ const WalletAddressInput = ({
         show ? 'max-h-[155px] mb-4' : 'max-h-0',
       )}
     >
-      <Card className={cn('max-h-[133px] md:max-h-[155px] cursor-pointer flex-col items-start justify-center gap-y-2')}>
+      <Card
+        className={cn(
+          'max-h-[133px] md:max-h-[155px] cursor-auto hover:bg-[#000000]/0 flex-col items-start justify-center gap-y-2',
+        )}
+      >
         <p className="text-sm font-semibold">Send To Wallet</p>
         <div className="flex items-center gap-4 w-full">
           <div className="relative">

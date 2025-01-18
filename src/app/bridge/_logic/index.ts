@@ -99,7 +99,7 @@ export const BridgeLogic = () => {
       }
       return null;
     },
-    refetchInterval: 1000 * 5,
+    refetchInterval: 1000 * 60,
   });
   // withdrawal queries =====================>
   const tokenApproval = useTokenApproval();
@@ -330,7 +330,7 @@ export const BridgeLogic = () => {
 
     return {
       isDisable: true,
-      text: '',
+      text: 'Confirm',
     };
   }
 
@@ -525,8 +525,10 @@ export const BridgeLogic = () => {
     // recipient should be evmAddress or toWalletAddress
     //  2. Deposit Transactions (EVM -> ICP)
     // recipient should be icpIdentity.getPrincipal() or toWalletAddress
+    setTxErrorMessage('');
+    setTxHash(undefined);
+    setTxStep({ count: 1, status: 'pending' });
     if (authenticatedAgent && selectedOption && icpIdentity && unAuthenticatedAgent && amount) {
-      resetTransaction();
       if (fromToken?.chain_type === 'ICP') {
         if (toWalletAddress) {
           executeWithdrawal({
