@@ -46,7 +46,7 @@ export const chains: Chain[] = [
     twin_handle: 'bsc',
   },
   {
-    chainId: 56,
+    chainId: 355113,
     name: 'Bitfinity',
     nativeTokenSymbol: 'BTF',
     scannerAddress: 'https://explorer.mainnet.bitfinity.network/',

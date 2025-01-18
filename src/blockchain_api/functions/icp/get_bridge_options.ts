@@ -198,25 +198,9 @@ export const get_bridge_options = async (
         bridge_metadata.operator,
         bridge_metadata.minter_address,
       );
-      if (bridge_metadata.is_native) {
-        console.log(
-          minimum_native_withdrawal_amount,
-          amount,
-          BigNumber(minimum_native_withdrawal_amount).isGreaterThan(BigNumber(amount)),
-        );
 
-        // if the amount of native token to be withdrawn is greater than minimum
-        if (BigNumber(minimum_native_withdrawal_amount).isGreaterThan(BigNumber(amount))) {
-          return {
-            message: `Minimum amount: ${BigNumber(minimum_native_withdrawal_amount)
-              .dividedBy(10 ** 18)
-              .toFixed()}`,
-            result: [],
-            success: false,
-          };
-        }
-      }
-      const estimated_approval_gas = native_currency.fee!;
+      // Native token
+      const estimated_approval_fee = native_currency.fee!;
       const estimated_approval_erc20_fee = bridge_metadata.is_native ? '0' : from_token.fee!;
       const { max_transaction_fee } = await estimate_withdrawal_gas(
         agent,
@@ -226,6 +210,21 @@ export const get_bridge_options = async (
         from_token.canisterId!,
         max_fee_per_gas,
       );
+
+      if (bridge_metadata.is_native) {
+        // if the amount of native token to be withdrawn is greater than minimum
+        if (BigNumber(minimum_native_withdrawal_amount).plus(estimated_approval_fee).isGreaterThan(BigNumber(amount))) {
+          return {
+            message: `Minimum amount: ${BigNumber(minimum_native_withdrawal_amount)
+              .plus(estimated_approval_fee)
+              .dividedBy(10 ** 18)
+              .toFixed()}`,
+            result: [],
+            success: false,
+          };
+        }
+      }
+
       const bridge_options = await calculate_bridge_options(
         from_token.canisterId!,
         to_token.contractAddress!,
@@ -234,7 +233,7 @@ export const get_bridge_options = async (
         agent,
         bridge_metadata,
         max_transaction_fee,
-        estimated_approval_gas,
+        estimated_approval_fee,
         estimated_approval_erc20_fee,
         amount,
         native_currency,

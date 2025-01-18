@@ -4,7 +4,7 @@ import { Principal } from '@dfinity/principal';
 import { createWalletClient, custom, WalletClient, Chain as ViemChain } from 'viem';
 
 import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
-import { Account, ApproveArgs, Result_2 } from '@/blockchain_api/did/ledger/icrc_types';
+import { Account, ApproveArgs, Result_2, Allowance, AllowanceArgs } from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
 import { BridgeOption, encode_approval_function_data, encode_deposit_function_data } from './get_bridge_options';
@@ -90,7 +90,26 @@ export const icrc2_approve = async (
   });
 
   try {
+    const sender_principal = await authenticated_agent.getPrincipal();
     if (bridge_option.is_native) {
+      // Check the allowance
+      const allowance = (await native_actor.icrc2_allowance({
+        account: {
+          owner: sender_principal,
+          subaccount: [],
+        },
+        spender: { owner: bridge_option.minter_id, subaccount: [] },
+      } as AllowanceArgs)) as Allowance;
+
+      // Check if minter already has enough allowance
+      if (
+        BigNumber(allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token),
+        )
+      ) {
+        return { result: 'Successful', success: true, message: '' };
+      }
+
       // In case of Native withdrawal
       const native_approval_result = (await native_actor.icrc2_approve({
         amount: BigInt(
@@ -117,47 +136,82 @@ export const icrc2_approve = async (
         canisterId: bridge_option.from_token_id,
       });
 
-      const native_approval_result = (await native_actor.icrc2_approve({
-        amount: BigInt(
-          BigNumber(bridge_option.fees.total_native_fee)
-            .minus(bridge_option.fees.approval_fee_in_native_token)
-            .toString(),
-        ),
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
-        fee: [],
-        from_subaccount: [],
-        memo: [],
-        spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
-      } as ApproveArgs)) as Result_2;
+      // Check native allowance
+      const native_allowance = (await native_actor.icrc2_allowance({
+        account: {
+          owner: sender_principal,
+          subaccount: [],
+        },
+        spender: { owner: bridge_option.minter_id, subaccount: [] },
+      } as AllowanceArgs)) as Allowance;
 
-      if ('Ok' in native_approval_result) {
+      // Check if minter already has enough allowance for native token
+      if (
+        BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          BigNumber(bridge_option.fees.total_native_fee).minus(bridge_option.fees.approval_fee_in_native_token),
+        )
+      ) {
       } else {
-        return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
+        const native_approval_result = (await native_actor.icrc2_approve({
+          amount: BigInt(
+            BigNumber(bridge_option.fees.total_native_fee)
+              .minus(bridge_option.fees.approval_fee_in_native_token)
+              .toString(),
+          ),
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+          fee: [],
+          from_subaccount: [],
+          memo: [],
+          spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
+        } as ApproveArgs)) as Result_2;
+
+        if ('Ok' in native_approval_result) {
+        } else {
+          return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
+        }
       }
 
-      const erc20_approval_result = (await erc20_actor.icrc2_approve({
-        amount: BigInt(
-          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
-        ),
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
-        fee: [],
-        from_subaccount: [],
-        memo: [],
-        spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
-      } as ApproveArgs)) as Result_2;
+      // Check erc-20 allowance
+      const erc20_allowance = (await erc20_actor.icrc2_allowance({
+        account: {
+          owner: sender_principal,
+          subaccount: [],
+        },
+        spender: { owner: bridge_option.minter_id, subaccount: [] },
+      } as AllowanceArgs)) as Allowance;
 
-      if ('Ok' in erc20_approval_result) {
-        return { result: erc20_approval_result.Ok.toString(), success: true, message: '' };
+      // Check if minter already has enough allowance for erc20 token
+      if (
+        BigNumber(erc20_allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens),
+        )
+      ) {
+        return { result: 'Successful', success: true, message: '' };
       } else {
-        return {
-          result: '',
-          success: false,
-          message: `Failed to approve allowance:${erc20_approval_result.Err}`,
-        };
+        const erc20_approval_result = (await erc20_actor.icrc2_approve({
+          amount: BigInt(
+            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+          ),
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+          fee: [],
+          from_subaccount: [],
+          memo: [],
+          spender: { owner: bridge_option.minter_id, subaccount: [] } as Account,
+        } as ApproveArgs)) as Result_2;
+
+        if ('Ok' in erc20_approval_result) {
+          return { result: erc20_approval_result.Ok.toString(), success: true, message: '' };
+        } else {
+          return {
+            result: '',
+            success: false,
+            message: `Failed to approve allowance:${erc20_approval_result.Err}`,
+          };
+        }
       }
     }
   } catch (error) {
