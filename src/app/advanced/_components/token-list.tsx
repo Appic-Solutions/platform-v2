@@ -1,7 +1,7 @@
 import Box from '@/common/components/ui/box';
 import { cn } from '@/common/helpers/utils';
 import BoxHeader from '@/common/components/ui/box-header';
-import { TokenListProps } from '../../_types';
+import { TokenListProps } from '../_types';
 import { TooltipContent, TooltipProvider, TooltipTrigger } from '@/common/components/ui/tooltip';
 import { Tooltip } from '@radix-ui/react-tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';

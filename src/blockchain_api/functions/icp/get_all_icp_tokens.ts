@@ -67,7 +67,7 @@ export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] =
 };
 
 // Helper converts token_type into supported token_type
-const parse_token_type = (type: IcpTokenType): string => {
+export const parse_token_type = (type: IcpTokenType): string => {
   if ('ICRC1' in type) {
     return 'ICRC1';
   } else if ('ICRC2' in type) {

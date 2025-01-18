@@ -498,6 +498,9 @@ export const create_wallet_client = async (bridge_option: BridgeOption): Promise
     });
 
     // await walletClient.addChain({ chain: bridge_option.viem_chain });
+    if (bridge_option.chain_id != 1) {
+      await walletClient.addChain({ chain: bridge_option.viem_chain });
+    }
     await walletClient.switchChain({ id: bridge_option.chain_id });
     const addresses = await walletClient.requestAddresses();
     console.log(addresses);

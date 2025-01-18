@@ -2,7 +2,7 @@ import { InfoCircleIcon } from "@/common/components/icons";
 import Box from "@/common/components/ui/box";
 import { cn, getChainName, getChainSymbol } from "@/common/helpers/utils";
 import { useState } from "react";
-import TokenListPage from "./chain-token-list/token-list";
+import TokenListPage from "./token-list";
 import RHFInput from "@/common/components/rhf/rhf-input";
 import Link from "next/link";
 import HistoryIcon from "@/common/components/icons/history";
