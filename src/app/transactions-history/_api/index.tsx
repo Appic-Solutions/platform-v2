@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export interface GetBridgeTransactionHistoryPayload {
   evm_wallet_address: string | undefined;
-  principal_id: Principal | undefined;
+  principal_id: Principal;
   unauthenticated_agent: HttpAgent;
   bridge_tokens: (EvmToken | IcpToken)[];
 }
@@ -37,7 +37,7 @@ export const useGetAllBridgeHistory = (params: GetBridgeTransactionHistoryPayloa
 
 export const useGetAllAdvancedHistory = (params: GetAdvancedTransactionHistoryPayload) =>
   useQuery({
-    queryKey: ['bridge-history'],
+    queryKey: ['advanced-history'],
     queryFn: async () => get_advanced_history(params.principal_id, params.unauthenticated_agent),
     refetchInterval: 1000 * 60,
     enabled: !!(params.unauthenticated_agent && params.principal_id),

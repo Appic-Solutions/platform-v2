@@ -16,7 +16,7 @@ export default function AdvancedContent() {
 
   const { data, isLoading, isError } = useGetAllAdvancedHistory({
     unauthenticated_agent: unAuthenticatedAgent as HttpAgent,
-    principal_id: Principal.fromText(icpIdentity?.getPrincipal()?.toString() || ''),
+    principal_id: icpIdentity?.getPrincipal() as Principal,
   });
 
   console.log('data =>  ', data);

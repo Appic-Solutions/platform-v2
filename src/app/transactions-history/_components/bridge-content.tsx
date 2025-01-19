@@ -11,6 +11,7 @@ import useLogic from "../_logic";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { useGetAllBridgeHistory } from "../_api";
 import { HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 
 export default function BridgeContent() {
     const [itemId, setItemId] = useState<null | number>(null);
@@ -20,7 +21,7 @@ export default function BridgeContent() {
         unauthenticated_agent: unAuthenticatedAgent as HttpAgent,
         bridge_tokens: bridgePairs,
         evm_wallet_address: evmAddress,
-        principal_id: icpIdentity?.getPrincipal(),
+        principal_id: icpIdentity?.getPrincipal() as Principal,
     });
 
     console.log("🚀 ~ BridgeContent ~ data:", data)
