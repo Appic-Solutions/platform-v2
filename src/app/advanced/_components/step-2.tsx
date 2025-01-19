@@ -1,50 +1,52 @@
-import { ArrowLongLeftIcon, ExpandLeftIcon } from "@/common/components/icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
-import Box from "@/common/components/ui/box";
-import { cn, getChainLogo, getChainName } from "@/common/helpers/utils";
-import { Step2Props } from "../_types";
-import Spinner from "@/common/components/ui/spinner";
+import { ArrowLongLeftIcon, ExpandLeftIcon } from '@/common/components/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
+import Box from '@/common/components/ui/box';
+import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { Step2Props } from '../_types';
+import Spinner from '@/common/components/ui/spinner';
 
-export default function Step2({
-  isLoading,
-  newTwinMeta,
-  prevStepHandler
-}: Step2Props) {
+export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
   const data = [
     {
-      title: "Original Token Name:",
-      value: newTwinMeta?.icp_twin_token.name,
-    },
-    {
-      title: "Original Token Symbol:",
-      value: "ICP",
-    },
-    {
-      title: "Blockchain:",
-      value: getChainName(newTwinMeta?.icp_twin_token.chain_id),
-    },
-    {
-      title: "Twin Token Name:",
+      title: 'Original Token Name:',
       value: newTwinMeta?.evm_base_token.name,
     },
     {
-      title: "Twin Token Symbol:",
+      title: 'Original Token Symbol:',
       value: newTwinMeta?.evm_base_token.symbol,
     },
     {
-      title: "Twin Token Fee:",
-      value: newTwinMeta?.human_readable_creation_fee,
+      title: 'Original Blockchain:',
+      value: getChainName(newTwinMeta?.evm_base_token.chain_id),
+    },
+    {
+      title: 'Twin Token Name:',
+      value: newTwinMeta?.icp_twin_token.name,
+    },
+    {
+      title: 'Twin Token Symbol:',
+      value: newTwinMeta?.icp_twin_token.symbol,
+    },
+    {
+      title: 'Twin Token Blockchain:',
+      value: `${getChainName(newTwinMeta?.icp_twin_token.chain_id)}`,
+    },
+    {
+      title: 'Twin Token Creation Fee:',
+      value: `${newTwinMeta?.human_readable_creation_fee} ICP`,
     },
   ];
 
   return (
     <Box className="gap-y-5 justify-between h-full md:h-auto md:max-w-[612px] md:gap-y-16 md:p-10">
       <div className="flex flex-col gap-y-8 w-full">
-        <div className={cn(
-          "flex items-center justify-center relative",
-          "text-white md:text-black dark:text-white text-2xl font-bold",
-          "md:text-4xl"
-        )}>
+        <div
+          className={cn(
+            'flex items-center justify-center relative',
+            'text-white md:text-black dark:text-white text-2xl font-bold',
+            'md:text-4xl',
+          )}
+        >
           Token Summary
           <button
             className="hidden md:flex absolute left-0 text-base items-center gap-x-1"
@@ -59,24 +61,22 @@ export default function Step2({
         <div className="flex items-center self-start gap-4">
           <div className="relative">
             <Avatar className=" w-12 h-12 rounded-full">
-              <AvatarImage src={getChainLogo(newTwinMeta?.evm_base_token.chain_id)} />
-              <AvatarFallback>
-                {getChainName(newTwinMeta?.evm_base_token.chain_id)}
-              </AvatarFallback>
+              <AvatarImage src={newTwinMeta?.icp_twin_token.logo} />
+              <AvatarFallback>{newTwinMeta?.icp_twin_token.symbol}</AvatarFallback>
             </Avatar>
-            <Avatar className={cn(
-              "absolute -right-1 -bottom-1 w-5 h-5 rounded-full",
-              "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
-            )}>
-              <AvatarImage src={getChainLogo(newTwinMeta?.evm_base_token.chain_id)} />
-              <AvatarFallback>
-                {getChainName(newTwinMeta?.evm_base_token.chain_id)}
-              </AvatarFallback>
+            <Avatar
+              className={cn(
+                'absolute -right-1 -bottom-1 w-5 h-5 rounded-full',
+                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
+              )}
+            >
+              <AvatarImage src={getChainLogo(newTwinMeta?.icp_twin_token.chain_id)} />
+              <AvatarFallback>{getChainName(newTwinMeta?.icp_twin_token.chain_id)}</AvatarFallback>
             </Avatar>
           </div>
           <div className="text-white md:text-black dark:text-white">
-            <p className="text-2xl">{newTwinMeta?.evm_base_token?.name}</p>
-            <p className="text-lg">{getChainName(newTwinMeta?.evm_base_token.chain_id)}</p>
+            <p className="text-2xl">{newTwinMeta?.icp_twin_token?.symbol}</p>
+            <p className="text-lg">{'on ' + getChainName(newTwinMeta?.icp_twin_token.chain_id)}</p>
           </div>
         </div>
 
@@ -85,11 +85,12 @@ export default function Step2({
             <div
               key={idx}
               className={cn(
-                "flex items-center justify-between gap-x-1",
-                idx === 2 && "border-b border-white/15 pb-4 mb-1"
-              )}>
+                'flex items-center justify-between gap-x-1',
+                idx === 2 && 'border-b border-white/15 pb-4 mb-1',
+              )}
+            >
               <p className="font-medium">{item.title}</p>
-              <p className={cn(idx === 5 && "text-[#27AE60]")}>{item.value}</p>
+              <p className={cn(idx === 6 && 'text-[#27AE60]')}>{item.value}</p>
             </div>
           ))}
         </div>
@@ -109,7 +110,7 @@ export default function Step2({
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? <Spinner /> : "Confirm"}
+          {isLoading ? <Spinner /> : 'Confirm'}
         </button>
       </div>
     </Box>

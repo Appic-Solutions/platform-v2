@@ -499,6 +499,7 @@ export const check_withdraw_status = async (
     } as GetTxParams)) as [] | [Transaction];
     if (tx_status.length != 0 && 'IcpToEvm' in tx_status[0]) {
       const parsed_status = parse_icp_to_evm_tx_status(tx_status[0].IcpToEvm.status);
+      console.log(parsed_status);
       return {
         result: parsed_status,
         message: '',
@@ -798,6 +799,7 @@ export const check_deposit_status = async (
 
     if (tx_status.length != 0 && 'EvmToIcp' in tx_status[0]) {
       const parsed_status = parse_evm_to_icp_tx_status(tx_status[0].EvmToIcp.status);
+      console.log(parsed_status);
       return {
         result: parsed_status,
         message: '',

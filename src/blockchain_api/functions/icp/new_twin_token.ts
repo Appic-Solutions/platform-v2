@@ -75,6 +75,7 @@ export const get_evm_token_and_generate_twin_token = async (
       candid_evm_token.symbol,
       Number(candid_evm_token.chain_id.toString()),
     );
+    const name = `${candid_evm_token.name} on ICP`;
     const human_readable_transfer_fee = transfer_fee;
     const transfer_fee_with_decimals = BigNumber(human_readable_transfer_fee)
       .multipliedBy(10 ** candid_evm_token.decimals)
@@ -89,7 +90,7 @@ export const get_evm_token_and_generate_twin_token = async (
           chain_id: 0,
           decimals: candid_evm_token.decimals,
           logo,
-          name: symbol,
+          name,
           symbol,
           human_readable_transfer_fee,
           transfer_fee: transfer_fee_with_decimals,

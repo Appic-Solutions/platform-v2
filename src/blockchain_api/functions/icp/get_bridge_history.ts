@@ -118,7 +118,10 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         const human_readable_fee =
           fee == '0' ? 'Undefined' : BigNumber(fee).dividedBy(BigNumber(10).pow(18)).toString();
         const fee_token_symbol = native_currency.symbol;
-        const base_value = transaction.value.toString();
+        let base_value = BigNumber(transaction.value.toString()).toFixed();
+        if (from_token.contractAddress == NATIVE_TOKEN_ADDRESS || to_token.contractAddress == NATIVE_TOKEN_ADDRESS) {
+          base_value = BigNumber(base_value).plus(fee).toFixed();
+        }
         const human_readable_base_value = BigNumber(base_value)
           .dividedBy(BigNumber(10).pow(from_token.decimals))
           .toString();
@@ -187,7 +190,8 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         const human_readable_fee =
           fee == '0' ? 'Calculating fees' : BigNumber(fee).dividedBy(BigNumber(10).pow(18)).toString();
         const fee_token_symbol = native_currency.symbol;
-        const base_value = transaction.withdrawal_amount.toString();
+        const base_value = BigNumber(transaction.withdrawal_amount.toString()).toFixed();
+
         const human_readable_base_value = BigNumber(base_value)
           .dividedBy(BigNumber(10).pow(from_token.decimals))
           .toString();
