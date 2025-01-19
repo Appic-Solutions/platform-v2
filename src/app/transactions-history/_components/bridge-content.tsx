@@ -9,10 +9,19 @@ import Link from "next/link";
 import { useState } from "react";
 import useLogic from "../_logic";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
+import { useGetAllBridgeHistory } from "../_api";
+import { HttpAgent } from "@dfinity/agent";
 
 export default function BridgeContent() {
     const [itemId, setItemId] = useState<null | number>(null);
-    const { data, isLoading, isError, } = useLogic()
+    const { bridgePairs, evmAddress, icpIdentity, unAuthenticatedAgent } = useLogic()
+
+    const { data, isLoading, isError } = useGetAllBridgeHistory({
+        unauthenticated_agent: unAuthenticatedAgent as HttpAgent,
+        bridge_tokens: bridgePairs,
+        evm_wallet_address: evmAddress,
+        principal_id: icpIdentity?.getPrincipal(),
+    });
 
     const expandHandler = (id: number) => {
         if (itemId === id) {

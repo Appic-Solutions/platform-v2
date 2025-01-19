@@ -6,6 +6,30 @@ import { useRouter } from "next/navigation";
 import { useSharedStore } from "@/common/state/store";
 import Image from "next/image";
 
+const NeedConnectWaller = () => {
+    return (
+        <div
+            className={cn(
+                "flex flex-col items-center justify-center h-full gap-y-5",
+                "text-center max-w-[490px] mx-auto px-6 text-white",
+            )}>
+            <Image
+                src="/images/wallet.svg"
+                alt="wallet-Image"
+                width={210}
+                height={210}
+                quality={100}
+            />
+            <p className="text-xl">
+                Connect your wallet to access history
+            </p>
+            <p className="text-sm leading-6 mb-24">
+                To access the full history of your wallet transactions, please connect your wallet. It’s quick, secure, and easy.
+            </p>
+        </div>
+    )
+}
+
 export default function TabSection({ defaultValue }: { defaultValue: string }) {
     const router = useRouter()
     const { icpBalance, evmBalance } = useSharedStore();
@@ -29,33 +53,14 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
                 ))}
             </TabsList>
 
-            {!icpBalance && !evmBalance ? (
-                <div className={cn(
-                    "flex flex-col items-center justify-center h-full gap-y-5",
-                    "text-center max-w-[490px] mx-auto px-6 text-white",
-                )}>
-                    <Image
-                        src="/images/wallet.svg"
-                        alt="wallet-Image"
-                        width={210}
-                        height={210}
-                        quality={100}
-                    />
-                    <p className="text-xl">
-                        Connect your wallet to access history
-                    </p>
-                    <p className="text-sm leading-6 mb-24">
-                        To access the full history of your wallet transactions, please connect your wallet. It’s quick, secure, and easy.
-                    </p>
-                </div>
-            ) : (PAGE_PARAMS_DATA.map((item, idx) => (
-                <TabsContent key={idx} value={item.name}>
-                    <div className="w-full flex flex-col gap-y-4 max-md:p-4 md:px-4">
+            {!evmBalance && !icpBalance ? (
+                <NeedConnectWaller />
+            ) : (
+                PAGE_PARAMS_DATA.map((item, idx) => (
+                    <TabsContent key={idx} value={item.name} className="flex flex-col gap-y-5 px-4">
                         <item.component />
-                    </div>
-                </TabsContent>
-            )))}
-
+                    </TabsContent>
+                )))}
         </Tabs>
     )
 }

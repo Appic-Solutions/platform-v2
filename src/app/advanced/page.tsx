@@ -4,7 +4,7 @@ import LogicHelper from "./_logic";
 import Step1 from "./_components/step-1";
 // import Step2 from "./_components/step-2";
 
-const AdvancedPage = () => {
+export default function AdvancedPage() {
   const {
     step,
     isLoading,
@@ -29,5 +29,3 @@ const AdvancedPage = () => {
     </FormProvider>
   );
 };
-
-export default AdvancedPage;
