@@ -1,36 +1,27 @@
 import { ArrowsUpDownIcon, BlockchainIcon, LockIcon, ParkOutlineBridgeIcon } from "@/common/components/icons";
 import { ReactNode } from "react";
-import BridgeContent from "../_components/bridge-content";
-import AutoInvestContent from "../_components/auto-invest-content";
-import SwapContent from "../_components/swap-content";
-import AdvancedContent from "../_components/advanced-content";
 
 export interface PageParamsItem {
   name: string
   icon: ReactNode
-  component: () => ReactNode
 }
 
 export const PAGE_PARAMS_DATA: PageParamsItem[] = [
   {
     name: 'bridge',
     icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-w-5 min-h-5" />,
-    component: BridgeContent
   },
   {
     name: 'auto-invest',
     icon: <BlockchainIcon width={24} height={24} className="min-w-5 min-h-5" />,
-    component: AutoInvestContent
   },
   {
     name: 'swap',
     icon: <ArrowsUpDownIcon width={24} height={24} className="min-w-5 min-h-5" />,
-    component: SwapContent
   },
   {
     name: 'advanced',
     icon: <LockIcon width={24} height={24} className="min-w-5 min-h-5" />,
-    component: AdvancedContent
   }
 ]
 

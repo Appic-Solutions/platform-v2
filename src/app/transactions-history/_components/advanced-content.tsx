@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import useLogic from '../_logic';
-import { useGetAllAdvancedHistory } from '../_api';
 import { HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { cn, getChainLogo, getChainName, getChainSymbol } from '@/common/helpers/utils';
@@ -9,17 +8,21 @@ import Spinner from '@/common/components/ui/spinner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import TwinTokenIcon from '@/common/components/icons/twin-token';
 import { ChevronDownIcon } from '@/common/components/icons';
+import { useQuery } from '@tanstack/react-query';
+import { get_advanced_history } from '@/blockchain_api/functions/icp/get_advanced_history';
 
 export default function AdvancedContent() {
   const [itemId, setItemId] = useState<null | number>(null);
   const { icpIdentity, unAuthenticatedAgent } = useLogic();
 
-  const { data, isLoading, isError } = useGetAllAdvancedHistory({
-    unauthenticated_agent: unAuthenticatedAgent as HttpAgent,
-    principal_id: icpIdentity?.getPrincipal() as Principal,
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['advanced-history'],
+    queryFn: async () => get_advanced_history(icpIdentity?.getPrincipal() as Principal, unAuthenticatedAgent as HttpAgent),
+    refetchInterval: 1000 * 60,
+    enabled: !!(icpIdentity?.getPrincipal() && unAuthenticatedAgent),
   });
 
-  console.log('data =>  ', data);
+  console.log("🚀 ~ AdvancedContent ~ data:", data)
 
   const expandHandler = (id: number) => {
     if (itemId === id) {

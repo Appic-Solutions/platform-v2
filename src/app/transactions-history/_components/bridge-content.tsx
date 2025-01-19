@@ -9,19 +9,30 @@ import Link from "next/link";
 import { useState } from "react";
 import useLogic from "../_logic";
 import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
-import { useGetAllBridgeHistory } from "../_api";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
+import { get_transaction_history } from "@/blockchain_api/functions/icp/get_bridge_history";
+import { useQuery } from "@tanstack/react-query";
 
 export default function BridgeContent() {
     const [itemId, setItemId] = useState<null | number>(null);
     const { bridgePairs, evmAddress, icpIdentity, unAuthenticatedAgent } = useLogic()
 
-    const { data, isLoading, isError } = useGetAllBridgeHistory({
-        unauthenticated_agent: unAuthenticatedAgent as HttpAgent,
-        bridge_tokens: bridgePairs,
-        evm_wallet_address: evmAddress,
-        principal_id: icpIdentity?.getPrincipal() as Principal,
+    const { data, isLoading, isError } = useQuery({
+        queryKey: ['bridge-history'],
+        queryFn: async () =>
+            get_transaction_history(
+                evmAddress,
+                icpIdentity?.getPrincipal() as Principal,
+                unAuthenticatedAgent as HttpAgent,
+                bridgePairs
+            ),
+        refetchInterval: 1000 * 60,
+        enabled: !!(
+            bridgePairs &&
+            unAuthenticatedAgent &&
+            (evmAddress || icpIdentity?.getPrincipal())
+        ),
     });
 
     console.log("🚀 ~ BridgeContent ~ data:", data)
