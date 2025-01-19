@@ -27,7 +27,7 @@ export const useGetAllBridgeHistory = (params: GetBridgeTransactionHistoryPayloa
         params.unauthenticated_agent,
         params.bridge_tokens,
       ),
-    refetchInterval: 1000 * 10,
+    refetchInterval: 1000 * 60,
     enabled: !!(
       params.bridge_tokens &&
       params.unauthenticated_agent &&
@@ -39,6 +39,6 @@ export const useGetAllAdvancedHistory = (params: GetAdvancedTransactionHistoryPa
   useQuery({
     queryKey: ['bridge-history'],
     queryFn: async () => get_advanced_history(params.principal_id, params.unauthenticated_agent),
-    refetchInterval: 1000 * 10,
+    refetchInterval: 1000 * 60,
     enabled: !!(params.unauthenticated_agent && params.principal_id),
   });

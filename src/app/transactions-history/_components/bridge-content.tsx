@@ -23,6 +23,8 @@ export default function BridgeContent() {
         principal_id: icpIdentity?.getPrincipal(),
     });
 
+    console.log("🚀 ~ BridgeContent ~ data:", data)
+
     const expandHandler = (id: number) => {
         if (itemId === id) {
             setItemId(null)
@@ -120,9 +122,6 @@ export default function BridgeContent() {
                     </div>
                     {/* Transaction Detailes */}
                     <div className="flex flex-col gap-y-4 mb-5">
-                        <div>
-                            <div></div>
-                        </div>
                         <div className={cn(
                             "flex items-center justify-between gap-x-4 text-xs font-bold",
                             "max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989] md:text-sm",
@@ -175,7 +174,7 @@ export default function BridgeContent() {
                                     key={idx}
                                     className={cn(
                                         "flex items-center justify-between gap-x-4 group",
-                                        "font-bold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]"
+                                        "text-sm font-semibold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]"
                                     )}>
                                     <div className="flex items-center gap-x-9">
                                         <div className={cn(
@@ -186,11 +185,11 @@ export default function BridgeContent() {
                                             {step.status === "Pending" ? <Spinner /> : step.status === "Successful" ? <CheckIcon /> : <CloseIcon />}
                                         </div>
                                         <div className={step.link && "flex flex-col gap-y-5 h-12 overflow-y-hidden *:duration-300"}>
-                                            <span className={step.link && "translate-y-3 group-hover:-translate-y-6"}>
+                                            <span className={step.link && "group-hover:-translate-y-10 sm:translate-y-4 sm:group-hover:-translate-y-6"}>
                                                 {step.message}
                                             </span>
                                             {step.link &&
-                                                <div className="flex items-center gap-x-1 group-hover:-translate-y-8">
+                                                <div className="flex items-center gap-x-1 translate-y-4 group-hover:-translate-y-12 sm:group-hover:-translate-y-6">
                                                     Details
                                                     <Link
                                                         href={step.link}
