@@ -6,14 +6,10 @@ import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
 import ActionButton from '../select-token/_components/ActionButton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
-import { useState } from 'react';
 import { BridgeLogic } from '../../_logic';
 import { DialogTrigger } from '@/common/components/ui/dialog';
 
-const BridgeReview = () => {
-  const [showStepper, setShowStepper] = useState(false);
-  const [btnText, setBtnText] = useState('Start bridging');
-
+const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   // bridge store
   const { selectedOption: option, toToken } = useBridgeStore();
   const { setActiveStep } = useBridgeActions();
@@ -21,12 +17,9 @@ const BridgeReview = () => {
   // bridge logic
   const { executeTransaction } = BridgeLogic();
 
-  const onSubmit = () => {
-    setBtnText('Show Transaction Status');
-    if (!showStepper) {
-      executeTransaction();
-      setShowStepper(true);
-    }
+  const openModal = () => {
+    // executeTransaction();
+    onOpenModal();
   };
 
   if (option && toToken) {
@@ -139,10 +132,8 @@ const BridgeReview = () => {
               </div>
             </div>
           </Card>
-          <DialogTrigger>
-            <ActionButton isDisabled={false} onClick={onSubmit}>
-              {btnText}
-            </ActionButton>
+          <DialogTrigger onClick={openModal}>
+            <ActionButton isDisabled={false}>Start bridging</ActionButton>
           </DialogTrigger>
         </div>
       </Box>

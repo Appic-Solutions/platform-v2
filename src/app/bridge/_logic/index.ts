@@ -5,7 +5,7 @@ export const dynamic = 'force-static';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import {
   useCreateWalletClient,
   useDepositToken,
@@ -24,6 +24,7 @@ import {
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Principal } from '@dfinity/principal';
+import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 
 export const BridgeLogic = () => {
   const queryClient = useQueryClient();
@@ -55,6 +56,8 @@ export const BridgeLogic = () => {
     unAuthenticatedAgent,
     evmAddress,
   } = useSharedStore();
+
+  const { setIcpBalance, setEvmBalance } = useSharedStoreActions();
 
   // Bridge Transaction states
 
@@ -96,6 +99,7 @@ export const BridgeLogic = () => {
           });
         }
         queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
+        fetchWalletBalances();
         return res;
       }
       return null;
@@ -139,6 +143,7 @@ export const BridgeLogic = () => {
         queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
         return res || null;
       }
+      fetchWalletBalances();
       return null;
     },
     refetchInterval: 1000 * 60,
@@ -163,6 +168,24 @@ export const BridgeLogic = () => {
       setActiveStep(currentStep - 1);
     } else {
       setActiveStep(direction);
+    }
+  }
+
+  function fetchWalletBalances() {
+    if (evmAddress && unAuthenticatedAgent) {
+      fetchEvmBalances({
+        evmAddress,
+      }).then((res) => {
+        setEvmBalance(res);
+      });
+    }
+    if (unAuthenticatedAgent && icpIdentity) {
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        icpIdentity,
+      }).then((res) => {
+        setIcpBalance(res);
+      });
     }
   }
 
@@ -212,14 +235,13 @@ export const BridgeLogic = () => {
       (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
       (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
     ) {
-      if (selectedOption.is_native) {
-        if (Number(amount) > Number(selectedTokenBalance)) {
-          return {
-            isDisable: true,
-            text: 'INSUFFICIENT Funds',
-          };
-        }
-      } else {
+      if (Number(amount) > Number(selectedTokenBalance)) {
+        return {
+          isDisable: true,
+          text: 'INSUFFICIENT Funds',
+        };
+      }
+      if (!selectedOption.is_native) {
         if (fromToken.chain_type === 'EVM') {
           // The native token of the transaction chain that the user holds in their wallet
           const userNativeToken = evmBalance?.tokens.find(

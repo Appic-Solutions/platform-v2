@@ -77,10 +77,16 @@ const AmountInput = () => {
           <div className="w-full flex items-center">
             <input
               type="number"
-              maxLength={10}
+              maxLength={12}
               placeholder="0"
-              value={formatToSignificantFigures(inputAmount)}
-              onChange={(e) => setInputAmount(e.target.value)}
+              value={inputAmount}
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                if (inputValue.length > 12) return;
+                if (/^\d*\.?\d{0,5}$/.test(inputValue)) {
+                  setInputAmount(inputValue);
+                }
+              }}
               className={cn(
                 'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
                 'bg-transparent text-primary',

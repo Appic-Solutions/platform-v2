@@ -151,7 +151,7 @@ const WalletPage = () => {
                   {!isEvmConnected && (
                     <WalletCard
                       connectWallet={() => openEvmModal()}
-                      walletLogo={getChainLogo(chainId)}
+                      walletLogo={'/images/logo/chains-logos/ethereum.svg'}
                       walletTitle="Connect EVM Wallet"
                     />
                   )}
@@ -181,7 +181,7 @@ const WalletPage = () => {
 
         {isEvmBalanceLoading || evmBalance ? (
           <WalletPop
-            logo={getChainLogo(chainId)}
+            logo={'/images/logo/chains-logos/ethereum.svg'}
             title="Your EVM Wallet"
             balance={evmBalance}
             disconnect={handleDisconnectEvm}

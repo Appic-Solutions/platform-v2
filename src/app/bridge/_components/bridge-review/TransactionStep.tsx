@@ -5,6 +5,7 @@ import { TxStep } from '../../_api/types';
 import { TxStepType, useBridgeStore } from '../../_store';
 import { getChainLogo } from '@/common/helpers/utils';
 import Link from 'next/link';
+import HistoryIcon from '@/common/components/icons/history';
 
 export const TransactionStep = ({
   currentStep,
@@ -59,7 +60,7 @@ export const TransactionStep = ({
         {/* steps status before last step */}
         {currentStep.count === index + 1 && currentStep.status === 'pending' && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[85px] h-[85px] border-2 border-t-transparent border-green-600 rounded-full animate-spin" />
+            <div className="w-[86px] h-[85px] border-[3px] border-t-transparent border-green-600 rounded-full animate-spin" />
           </div>
         )}
         <Image
@@ -82,20 +83,21 @@ export const TransactionStep = ({
           <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">{txErrorMessage}</p>
         </div>
       )}
-      {(fromToken?.chain_type === 'ICP' && currentStep.count === 4) ||
-        (fromToken?.chain_type === 'EVM' && currentStep.count === 5 && (
-          <>
-            <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F] pb-2">
-              You can safely close this window
-            </p>
-            <Link
-              href={'/transactions-history/bridge'}
-              className="bg-card-background shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border px-4 py-1 rounded-lg border-gray-200"
-            >
-              Check History
-            </Link>
-          </>
-        ))}
+      {((fromToken?.chain_type === 'ICP' && currentStep.count === 4) ||
+        (fromToken?.chain_type === 'EVM' && currentStep.count === 5)) && (
+        <>
+          <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F] pb-2">
+            You can safely close this window
+          </p>
+          <Link
+            href={'/transactions-history/bridge'}
+            className="bg-card-background flex items-center gap-2 shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border p-2 rounded-lg border-gray-200"
+          >
+            <HistoryIcon width={20} height={20} />
+            Check History
+          </Link>
+        </>
+      )}
     </div>
   );
 };
