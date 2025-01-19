@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { DefaultValuesType, UseLogicReturn } from '../_types';
-import { get_evm_token_and_generate_twin_token } from '@/blockchain_api/functions/icp/new_twin_token';
+import { get_evm_token_and_generate_twin_token, NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
 import { useSharedStore } from '@/common/state/store';
 import { HttpAgent } from '@dfinity/agent';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from './validation';
+import { useToast } from '@/common/hooks/use-toast';
 
 export default function LogicHelper(): UseLogicReturn {
   const [step, setStep] = useState(1);
+  const [newTwinMeta, setNewTwinMeta] = useState<NewTwinMetadata>();
   const [isLoading, setIsloading] = useState(false);
+
   const { unAuthenticatedAgent } = useSharedStore();
+  const { toast } = useToast()
 
   const methods = useForm<DefaultValuesType>({
     defaultValues: {
@@ -37,11 +41,19 @@ export default function LogicHelper(): UseLogicReturn {
           unAuthenticatedAgent as HttpAgent,
         );
         console.log('🚀 ~ onSubmit ~ resStepOne:', resStepOne);
+        if (!resStepOne.success) throw new Error(resStepOne.message || "we have new error")
+        setNewTwinMeta(resStepOne.result)
+        setStep(2)
       } else {
         console.log('Data Stap 1 => ', data);
       }
-    } catch (error) {
-      console.log('🚀 ~ onSubmit ~ error:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast({
+          title: error.message,
+          variant: "destructive"
+        })
+      }
     } finally {
       setIsloading(false);
     }
@@ -50,7 +62,9 @@ export default function LogicHelper(): UseLogicReturn {
   return {
     // State
     step,
+    setStep,
     isLoading,
+    newTwinMeta,
 
     // Form
     methods,

@@ -6,6 +6,7 @@ import '@nfid/identitykit/react/styles.css';
 import { WalletWrapper } from '@/common/components/wallet_wrappers/wrapper';
 import Providers from './providers';
 import { UserWalletProvider } from '@/common/components/wallet_wrappers/userWalletProvider';
+import { Toaster } from '@/common/components/ui/toaster';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
@@ -17,6 +18,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
             <HeaderPage />
             <ShapesPage />
             {children}
+            <Toaster />
           </body>
         </WalletWrapper>
       </Providers>

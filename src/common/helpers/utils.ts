@@ -9,17 +9,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Get Chain Logo Helper Function
-export const getChainLogo = (chainId: string | number | undefined): string => {
+export const getChainLogo = (chainId: bigint | string | number | undefined): string => {
   return chains.find((chain) => chain.chainId == Number(chainId))?.logo || '/images/logo/chains/ethereum.svg';
 };
 
 // Get Chain Name Helper Function
-export const getChainName = (chainId: string | number | undefined): string => {
+export const getChainName = (chainId: bigint | string | number | undefined): string => {
   return chains.find((chain) => chain.chainId == Number(chainId))?.name || '';
 };
 
 // Get Chain Symbol Helper Function
-export const getChainSymbol = (chainId: string | number | undefined): string => {
+export const getChainSymbol = (chainId: bigint | string | number | undefined): string => {
   return chains.find((chain) => chain.chainId == Number(chainId))?.nativeTokenSymbol || '';
 };
 
