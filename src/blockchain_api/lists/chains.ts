@@ -13,6 +13,8 @@ export const chains: Chain[] = [
     is_advance_supported: false,
 
     logo: '/images/logo/chains-logos/icp.svg',
+
+    twin_token_support: false,
   },
   {
     chainId: 1,
@@ -30,6 +32,8 @@ export const chains: Chain[] = [
     is_advance_supported: false,
     viem_config: mainnet,
     twin_handle: 'eth',
+
+    twin_token_support: false,
   },
 
   {
@@ -48,6 +52,8 @@ export const chains: Chain[] = [
     is_advance_supported: true,
     viem_config: bsc,
     twin_handle: 'bsc',
+
+    twin_token_support: true,
   },
   {
     chainId: 355113,
@@ -59,6 +65,8 @@ export const chains: Chain[] = [
     disabled: true,
     is_advance_supported: false,
     logo: '/images/logo/chains-logos/bitfinity.png',
+
+    twin_token_support: false,
   },
   {
     chainId: 42161,
@@ -73,6 +81,8 @@ export const chains: Chain[] = [
     ankr_handle: 'arbitrum',
     viem_config: arbitrum,
     twin_handle: 'arb',
+
+    twin_token_support: false,
   },
   {
     chainId: 137,
@@ -88,6 +98,8 @@ export const chains: Chain[] = [
     ankr_handle: 'polygon',
     viem_config: polygon,
     twin_handle: 'pol',
+
+    twin_token_support: false,
   },
   {
     chainId: 10,
@@ -103,6 +115,8 @@ export const chains: Chain[] = [
     ankr_handle: 'optimism',
     viem_config: optimism,
     twin_handle: 'op',
+
+    twin_token_support: false,
   },
   {
     chainId: 8453,
@@ -118,6 +132,8 @@ export const chains: Chain[] = [
     ankr_handle: 'base',
     viem_config: base,
     twin_handle: 'base',
+
+    twin_token_support: false,
   },
   {
     chainId: 43114,
@@ -132,6 +148,8 @@ export const chains: Chain[] = [
 
     ankr_handle: 'avalanchec',
     viem_config: avalanche,
+
+    twin_token_support: false,
   },
   {
     chainId: 250,
@@ -146,6 +164,8 @@ export const chains: Chain[] = [
 
     ankr_handle: 'fantom',
     viem_config: fantom,
+
+    twin_token_support: false,
   },
 ];
 

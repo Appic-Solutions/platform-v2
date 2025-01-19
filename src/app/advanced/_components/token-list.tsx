@@ -25,10 +25,10 @@ export default function TokenListPage({ prevStepHandler }: TokenListProps) {
                 className={cn(
                   'flex items-center justify-center rounded-full cursor-pointer w-12 h-12 md:w-14 md:h-14',
                   watch("chain_id") === String(chain.chainId) && 'ring-4 ring-primary-buttons',
-                  chain.disabled && 'opacity-50 cursor-not-allowed select-none',
+                  !chain.twin_token_support && 'opacity-50 cursor-not-allowed select-none',
                 )}
                 onClick={() => {
-                  if (!chain.disabled) {
+                  if (chain.twin_token_support) {
                     setValue("chain_id", String(chain.chainId))
                     clearErrors("chain_id")
                     prevStepHandler()

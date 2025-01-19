@@ -21,4 +21,5 @@ export interface Chain {
   ankr_handle?: string;
   viem_config?: ViemChain;
   twin_handle?: string;
+  twin_token_support: boolean;
 }

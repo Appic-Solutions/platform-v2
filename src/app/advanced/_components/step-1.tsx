@@ -62,7 +62,6 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
           label="Transfer Fee"
           className="w-full"
           placeholder="Enter Transfer Fee"
-          type="number"
         />
         <button
           className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
