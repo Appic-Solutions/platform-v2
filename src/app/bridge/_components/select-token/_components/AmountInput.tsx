@@ -98,7 +98,7 @@ const AmountInput = () => {
             {isWalletConnected('from') && (
               <span
                 className={cn(
-                  'px-4 cursor-pointer py-1 text-xs md:text-sm text-black rounded-md',
+                  'px-4 cursor-pointer py-1 ml-3 text-xs md:text-sm text-black rounded-md',
                   'bg-gradient-to-r from-white to-white/35',
                   'hover:bg-white/35 transition-all duration-300',
                 )}

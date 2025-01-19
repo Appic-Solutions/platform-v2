@@ -18,7 +18,7 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { executeTransaction } = BridgeLogic();
 
   const openModal = () => {
-    // executeTransaction();
+    executeTransaction();
     onOpenModal();
   };
 

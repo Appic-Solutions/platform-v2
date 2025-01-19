@@ -13,12 +13,7 @@ interface Props {
   onCloseModal: () => void;
 }
 
-export default function BridgeTransactionStepper({ steps, onCloseModal }: Props) {
-  const currentStep: TxStepType = {
-    count: 5,
-    status: 'pending',
-  };
-
+export default function BridgeTransactionStepper({ steps, onCloseModal, currentStep }: Props) {
   const { resetTransaction } = BridgeLogic();
 
   const closeModal = () => {
