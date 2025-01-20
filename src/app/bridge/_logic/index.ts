@@ -141,9 +141,9 @@ export const BridgeLogic = () => {
           });
         }
         queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
+        fetchWalletBalances();
         return res || null;
       }
-      fetchWalletBalances();
       return null;
     },
     refetchInterval: 1000 * 60,
