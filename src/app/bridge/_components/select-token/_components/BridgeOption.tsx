@@ -79,7 +79,7 @@ const BridgeOption = ({
         <div className="flex flex-col gap-y-3 items-end">
           <div className="px-2 md:px-4 py-1 rounded-xl md:rounded-2xl flex items-center gap-x-1 bg-white">
             <span className={cn('text-xs lg:text-sm text-blue-600')}>via {option.via}</span>
-            <Image src="images/logo/icp-logo.png" alt="logo" width={15} height={15} />
+            <Image src="images/logo/icp-logo.svg" alt="logo" width={15} height={15} />
           </div>
         </div>
       </div>

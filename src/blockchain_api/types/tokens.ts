@@ -35,4 +35,5 @@ export type IcpToken = Token & {
   fee?: string; // Token transfer fee on icp network
   tokenType: string;
   contractAddress?: never; // Address of the token's contract if the token is an EVm token
+  rank: number | undefined;
 };

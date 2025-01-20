@@ -263,7 +263,7 @@ export default function BridgeContent() {
           <div className="gap-x-1 text-[#0F0F0F] bg-white/60 rounded-full py-1 px-2">
             via {item.operator}
             <Image
-              src="/images/logo/icp-logo.png"
+              src="/images/logo/icp-logo.svg"
               alt="Li.FI"
               width={16}
               height={16}
