@@ -10,14 +10,19 @@ import { useToast } from '@/common/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 
 export default function LogicHelper(): UseLogicReturn {
+
+  // State
   const [step, setStep] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
   const [newTwinMeta, setNewTwinMeta] = useState<NewTwinMetadata>();
   const [shouldPoll, setShouldPoll] = useState(false);
   const [isLoading, setIsloading] = useState(false);
-
   const { unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
+
+  // Hook
   const { toast } = useToast()
 
+  // Form
   const methods = useForm<DefaultValuesType>({
     defaultValues: {
       chain_id: '',
@@ -31,6 +36,11 @@ export default function LogicHelper(): UseLogicReturn {
     control: methods.control,
     name: 'chain_id',
   });
+
+  // Handler
+  const closeModalHandler = () => {
+    setIsOpen(false)
+  }
 
   // React Query for polling Step Four
   const { data, error } = useQuery({
@@ -107,6 +117,8 @@ export default function LogicHelper(): UseLogicReturn {
     setStep,
     isLoading,
     newTwinMeta,
+    isOpen,
+    closeModalHandler,
 
     // Form
     methods,

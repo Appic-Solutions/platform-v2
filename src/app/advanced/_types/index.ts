@@ -13,6 +13,8 @@ export interface UseLogicReturn {
   setStep: Dispatch<SetStateAction<number>>;
   isLoading: boolean;
   newTwinMeta: NewTwinMetadata | undefined;
+  isOpen: boolean;
+  closeModalHandler: () => void;
   methods: UseFormReturn<DefaultValuesType>;
   onSubmit: (data: DefaultValuesType) => void;
   chainIdWatch: string;
@@ -32,4 +34,10 @@ export interface Step2Props {
 
 export interface TokenListProps {
   prevStepHandler: () => void;
+}
+
+export interface ProcessModalProps {
+  isOpen: boolean;
+  newTwinMeta: NewTwinMetadata | undefined;
+  closeHandler: () => void;
 }

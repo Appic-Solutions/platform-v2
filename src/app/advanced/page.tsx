@@ -3,6 +3,7 @@ import { FormProvider } from "react-hook-form";
 import LogicHelper from "./_logic";
 import Step1 from "./_components/step-1";
 import Step2 from "./_components/step-2";
+import ProcessModal from "./_components/process-modal";
 
 export default function AdvancedPage() {
   const {
@@ -10,6 +11,8 @@ export default function AdvancedPage() {
     setStep,
     isLoading,
     newTwinMeta,
+    isOpen,
+    closeModalHandler,
     methods,
     onSubmit,
     chainIdWatch,
@@ -31,6 +34,11 @@ export default function AdvancedPage() {
           newTwinMeta={newTwinMeta}
           prevStepHandler={() => setStep(1)}
         />}
+        <ProcessModal
+          isOpen={isOpen}
+          newTwinMeta={newTwinMeta}
+          closeHandler={closeModalHandler}
+        />
       </form>
     </FormProvider>
   );
