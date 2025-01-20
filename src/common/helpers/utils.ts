@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // Get Chain Logo Helper Function
 export const getChainLogo = (chainId: bigint | string | number | undefined): string => {
-  return chains.find((chain) => chain.chainId == Number(chainId))?.logo || '/images/logo/chains/ethereum.svg';
+  return chains.find((chain) => chain.chainId == Number(chainId))?.logo || '';
 };
 
 // Get Chain Name Helper Function

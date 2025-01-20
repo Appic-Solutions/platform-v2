@@ -1,15 +1,10 @@
-import {
-  ArrowsUpDownIcon,
-  ChevronDownIcon,
-  FireIcon,
-  LinkIcon,
-} from "@/common/components/icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
-import { Card } from "@/common/components/ui/card";
-import { cn, getChainLogo, getChainName } from "@/common/helpers/utils";
-import { Transaction } from "../sampleTransactions";
-import { useState } from "react";
-import Link from "next/link";
+import { ArrowsUpDownIcon, ChevronDownIcon, FireIcon, LinkIcon } from '@/common/components/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
+import { Card } from '@/common/components/ui/card';
+import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { Transaction } from '../sampleTransactions';
+import { useState } from 'react';
+import Link from 'next/link';
 
 const AutoInvestTransactionCard = ({
   date,
@@ -27,8 +22,8 @@ const AutoInvestTransactionCard = ({
   return (
     <Card
       className={cn(
-        "cursor-pointer flex-col items-start justify-center gap-2 md:py-5 px-5 py-5 rounded-2xl md:rounded-[36px]",
-        className
+        'cursor-pointer flex-col items-start justify-center gap-2 md:py-5 px-5 py-5 rounded-2xl md:rounded-[36px]',
+        className,
       )}
     >
       {/* main content */}
@@ -42,21 +37,14 @@ const AutoInvestTransactionCard = ({
         <div className="flex items-center justify-between w-full">
           {/* source token avatar */}
           <div className="relative">
-            <Avatar
-              className={cn(
-                "w-[58px] h-[58px] rounded-full",
-                "md:w-[72px] md:h-[72px]"
-              )}
-            >
-              <AvatarImage
-                src={sourceToken?.logo || "images/logo/placeholder.png"}
-              />
+            <Avatar className={cn('w-[58px] h-[58px] rounded-full', 'md:w-[72px] md:h-[72px]')}>
+              <AvatarImage src={sourceToken?.logo || 'images/logo/placeholder.png'} />
               <AvatarFallback>{sourceToken?.symbol}</AvatarFallback>
             </Avatar>
             <Avatar
               className={cn(
-                "absolute -right-1 -bottom-1 w-6 h-6 rounded-full",
-                "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+                'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
+                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
               )}
             >
               <AvatarImage src={getChainLogo(sourceToken?.chainId)} />
@@ -68,41 +56,34 @@ const AutoInvestTransactionCard = ({
             <div className="h-[3px] flex-1 bg-black" />
             <div
               className={cn(
-                "rounded-full p-3 z-10 relative",
-                "bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
-                status === "failed" && "border-2 border-solid border-red-500",
-                status === "pending" &&
-                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin"
+                'rounded-full p-3 z-10 relative',
+                'bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
+                status === 'failed' && 'border-2 border-solid border-red-500',
+                status === 'pending' &&
+                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin",
               )}
             >
               <ArrowsUpDownIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
             </div>
             <div
               className={cn(
-                "h-[3px] flex-1 border-t-[3px]",
-                status === "pending" && "border-dashed border-black",
-                status === "completed" && "border-solid border-black",
-                status === "failed" && "border-solid border-red-500"
+                'h-[3px] flex-1 border-t-[3px]',
+                status === 'pending' && 'border-dashed border-black',
+                status === 'completed' && 'border-solid border-black',
+                status === 'failed' && 'border-solid border-red-500',
               )}
             />
           </div>
           {/* destination token avatar */}
           <div className="relative">
-            <Avatar
-              className={cn(
-                "w-[58px] h-[58px] rounded-full",
-                "md:w-[72px] md:h-[72px]"
-              )}
-            >
-              <AvatarImage
-                src={destinationToken?.logo || "images/logo/placeholder.png"}
-              />
+            <Avatar className={cn('w-[58px] h-[58px] rounded-full', 'md:w-[72px] md:h-[72px]')}>
+              <AvatarImage src={destinationToken?.logo || 'images/logo/placeholder.png'} />
               <AvatarFallback>{destinationToken?.symbol}</AvatarFallback>
             </Avatar>
             <Avatar
               className={cn(
-                "absolute -right-1 -bottom-1 w-6 h-6 rounded-full",
-                "shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+                'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
+                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
               )}
             >
               <AvatarImage src={getChainLogo(destinationToken?.chainId)} />
@@ -115,36 +96,28 @@ const AutoInvestTransactionCard = ({
           <div className="flex flex-col items-start">
             <div
               className={cn(
-                "flex items-center gap-x-1 text-xs md:text-sm",
-                showDetails ? "text-secondary" : "text-primary"
+                'flex items-center gap-x-1 text-xs md:text-sm',
+                showDetails ? 'text-secondary' : 'text-primary',
               )}
             >
               <span>{sourceToken.symbol}</span>
               <span>on</span>
               <span>{getChainName(sourceToken.chainId)}</span>
             </div>
-            {showDetails && (
-              <span className="text-primary text-xl md:text-2xl">
-                {sourceToken.amount}
-              </span>
-            )}
+            {showDetails && <span className="text-primary text-xl md:text-2xl">{sourceToken.amount}</span>}
           </div>
           <div className="flex flex-col items-end">
             <div
               className={cn(
-                "flex items-center gap-x-1 text-xs md:text-sm",
-                showDetails ? "text-secondary" : "text-primary"
+                'flex items-center gap-x-1 text-xs md:text-sm',
+                showDetails ? 'text-secondary' : 'text-primary',
               )}
             >
               <span>{destinationToken.symbol}</span>
               <span>on</span>
               <span>{getChainName(destinationToken.chainId)}</span>
             </div>
-            {showDetails && (
-              <span className="text-primary text-xl md:text-2xl">
-                {destinationToken.amount}
-              </span>
-            )}
+            {showDetails && <span className="text-primary text-xl md:text-2xl">{destinationToken.amount}</span>}
           </div>
         </div>
         <div className="flex flex-col w-full">
@@ -155,15 +128,9 @@ const AutoInvestTransactionCard = ({
               onClick={() => setShowDetails((prev) => !prev)}
               className="flex items-center gap-x-1 hover:bg-white hover:bg-opacity-10 rounded-lg p-1"
             >
-              <span className="text-sm text-secondary">
-                {showDetails ? "Hide" : "View"} Transaction Details
-              </span>
+              <span className="text-sm text-secondary">{showDetails ? 'Hide' : 'View'} Transaction Details</span>
               <div className="p-1 rounded-full bg-black bg-opacity-10 w-min transition-all">
-                <ChevronDownIcon
-                  width={8}
-                  height={8}
-                  className={cn(showDetails && "rotate-180")}
-                />
+                <ChevronDownIcon width={8} height={8} className={cn(showDetails && 'rotate-180')} />
               </div>
             </button>
             {/* time and fee */}
@@ -175,25 +142,20 @@ const AutoInvestTransactionCard = ({
           {/* details section */}
           <div
             className={cn(
-              "transition-all duration-200 transform",
-              showDetails
-                ? "opacity-100 mb-4 translate-y-0"
-                : "opacity-0 h-0 overflow-hidden -translate-y-2"
+              'transition-all duration-200 transform',
+              showDetails ? 'opacity-100 mb-4 translate-y-0' : 'opacity-0 h-0 overflow-hidden -translate-y-2',
             )}
           >
             <p className="text-secondary text-xl my-4">Previous Transactions</p>
             <div className="flex flex-col gap-y-6">
               {steps.map((step, index) => (
-                <div
-                  key={step.message}
-                  className="flex w-full justify-between items-center gap-x-6 group/step"
-                >
+                <div key={step.message} className="flex w-full justify-between items-center gap-x-6 group/step">
                   <div
                     className={cn(
-                      "p-2 rounded-full flex items-center justify-center relative",
-                      "bg-gray-300",
+                      'p-2 rounded-full flex items-center justify-center relative',
+                      'bg-gray-300',
                       index < steps.length - 1 &&
-                        "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300"
+                        "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300",
                     )}
                   ></div>
 
@@ -205,7 +167,7 @@ const AutoInvestTransactionCard = ({
                         <p className="flex items-center gap-x-2">
                           Details
                           <Link
-                            href={"google.com"}
+                            href={'google.com'}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
@@ -221,8 +183,8 @@ const AutoInvestTransactionCard = ({
                     <span>{step.timestamp}</span>
                     <span
                       className={cn(
-                        step.status === "completed" && "text-green-600",
-                        step.status === "failed" && "text-red-600"
+                        step.status === 'completed' && 'text-green-600',
+                        step.status === 'failed' && 'text-red-600',
                       )}
                     >
                       {step.status}
