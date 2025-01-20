@@ -397,7 +397,7 @@ const get_gas_price = async (
 
     const fee_history = await client.getFeeHistory({
       blockCount: 5,
-      rewardPercentiles: [60, 90],
+      rewardPercentiles: [20, 80],
       blockTag: 'latest',
     });
 
@@ -448,12 +448,13 @@ const estimate_deposit_fee = async (
       data: encoded_function_data,
     });
 
-    const estimated_gas_plus_5_percent = BigNumber(estimated_gas.toString())
-      .plus(BigNumber(estimated_gas.toString()).multipliedBy(5).dividedBy(100).decimalPlaces(0))
-      .toFixed(); // plus 5 percent in case gas consumption is higher
+    const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
+      .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
+      .toFixed(); // plus 1 percent in case gas consumption is higher
+    console.log(estimated_gas_plus_1_percent);
     return {
-      total_deposit_fee: BigNumber(estimated_gas_plus_5_percent).multipliedBy(max_fee_per_gas).toFixed(),
-      deposit_gas: estimated_gas_plus_5_percent,
+      total_deposit_fee: BigNumber(estimated_gas_plus_1_percent).multipliedBy(max_fee_per_gas).toFixed(),
+      deposit_gas: estimated_gas_plus_1_percent,
     };
   } catch (error) {
     console.error('Error estimating deposit gas:', error);
@@ -490,7 +491,7 @@ const estimate_deposit_approval_fee: (
       type: 'eip1559',
       data: encoded_function_data,
     });
-
+    console.log(estimated_gas);
     return {
       total_approval_fee: BigNumber(estimated_gas.toString()).multipliedBy(max_fee_per_gas).toFixed(),
       approval_gas: estimated_gas.toString(),
