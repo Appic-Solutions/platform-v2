@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { DefaultValuesType, UseLogicReturn } from '../_types';
-import { get_evm_token_and_generate_twin_token, NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
+import { approve_icp, check_new_twin_ls_request, get_evm_token_and_generate_twin_token, NewTwinMetadata, request_new_twin } from '@/blockchain_api/functions/icp/new_twin_token';
 import { useSharedStore } from '@/common/state/store';
-import { HttpAgent } from '@dfinity/agent';
+import { Agent, HttpAgent } from '@dfinity/agent';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from './validation';
 import { useToast } from '@/common/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
 
 export default function LogicHelper(): UseLogicReturn {
   const [step, setStep] = useState(1);
   const [newTwinMeta, setNewTwinMeta] = useState<NewTwinMetadata>();
+  const [shouldPoll, setShouldPoll] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
-  const { unAuthenticatedAgent } = useSharedStore();
+  const { unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
   const { toast } = useToast()
 
   const methods = useForm<DefaultValuesType>({
@@ -30,6 +32,38 @@ export default function LogicHelper(): UseLogicReturn {
     name: 'chain_id',
   });
 
+  // React Query for polling Step Four
+  const { data, error } = useQuery({
+    queryKey: ['checkStepFour'],
+    queryFn: async () => {
+      const response = await check_new_twin_ls_request(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
+      if (!response.success) throw new Error(response.message || "Still processing...")
+      console.log("🚀 ~ queryFn: ~ response:", response)
+      return response;
+    },
+    enabled: shouldPoll && !!newTwinMeta,
+    refetchInterval: 1000 * 60,
+    refetchIntervalInBackground: true,
+  });
+
+  useEffect(() => {
+    if (data?.success) {
+      toast({ title: data.message || "Twin Token created successfully" });
+      setStep(1);
+      setShouldPoll(false);
+    }
+
+    if (error) {
+      toast({
+        title: (error as Error)?.message || "Failed to create Twin Token",
+        variant: "destructive",
+      });
+      setShouldPoll(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, error]);
+
+
   const onSubmit = async (data: DefaultValuesType) => {
     try {
       setIsloading(true);
@@ -45,7 +79,15 @@ export default function LogicHelper(): UseLogicReturn {
         setNewTwinMeta(resStepOne.result)
         setStep(2)
       } else {
-        console.log('Data Stap 1 => ', data);
+        const resStepTwo = await approve_icp(newTwinMeta as NewTwinMetadata, unAuthenticatedAgent as HttpAgent)
+        console.log("🚀 ~ onSubmit ~ resStepTwo:", resStepTwo)
+        if (!resStepTwo.success) throw new Error(resStepTwo.message || "we have new error")
+
+        const resStepThree = await request_new_twin(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent)
+        console.log("🚀 ~ onSubmit ~ resStepThree:", resStepThree)
+        if (!resStepThree.success) throw new Error(resStepThree.message || "we have new error")
+
+        setShouldPoll(true);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

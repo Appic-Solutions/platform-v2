@@ -19,7 +19,7 @@ export default function AdvancedPage() {
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="w-full h-full md:flex md:justify-center md:items-center overflow-y-auto"
+        className="w-full h-full overflow-y-auto md:flex md:justify-center md:items-center"
       >
         {step === 1 && <Step1
           methods={methods}

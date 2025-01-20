@@ -14,9 +14,10 @@ export default function RHFInput({ name, label, className, ...props }: { name: s
         <div className={cn("flex flex-col gap-1", className)}>
           {label && <label htmlFor={name} className="text-white md:text-black dark:text-white capitalize">{label}</label>}
           <input
+            id={name}
+            autoComplete="off"
             {...field}
             {...props}
-            id={name}
             className={cn(
               "border-none outline-none ring-0",
               "flex items-center w-full h-[42px]",
