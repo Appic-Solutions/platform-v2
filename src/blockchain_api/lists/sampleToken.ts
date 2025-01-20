@@ -143,5 +143,6 @@ export const tokens: (EvmToken | IcpToken)[] = [
     disabled: true,
     fee: '10000',
     tokenType: 'ICRC-2',
+    rank: 1,
   },
 ];

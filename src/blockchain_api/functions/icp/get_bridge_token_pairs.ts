@@ -124,6 +124,7 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
           operator: parsedOperator,
           bridgePairs: [],
           usdPrice: usd_price.result || '0',
+          rank: 1,
         });
       }
     } catch (error) {

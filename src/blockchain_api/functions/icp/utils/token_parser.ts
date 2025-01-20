@@ -26,5 +26,6 @@ export const parse_candid_icp_token_to_icp_token = (token: CandidIcpToken): IcpT
     usdPrice: '0',
     canisterId: token.ledger_id.toString(),
     tokenType: parse_token_type(token.token_type),
+    rank: token.rank[0] || 1,
   };
 };

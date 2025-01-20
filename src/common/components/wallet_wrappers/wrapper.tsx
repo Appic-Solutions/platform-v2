@@ -57,7 +57,7 @@ export const WalletWrapper = ({
       return [];
     },
     enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 30,
+    refetchInterval: 1000 * 60 * 5,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60,
