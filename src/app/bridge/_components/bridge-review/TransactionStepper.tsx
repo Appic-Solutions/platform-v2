@@ -5,7 +5,7 @@ import { TxStepType } from '../../_store';
 import { DialogClose } from '@/common/components/ui/dialog';
 import { CloseIcon } from '@/common/components/icons';
 import { BridgeLogic } from '../../_logic';
-import ProgressBar from './ProgressBar';
+import Stepper from '@/common/components/layout/Stepper';
 
 interface Props {
   steps: TxStep[];
@@ -32,7 +32,7 @@ export default function BridgeTransactionStepper({ steps, onCloseModal, currentS
           <TransactionStep key={index} currentStep={currentStep} index={index} step={step} steps={steps} />
         ))}
       </div>
-      <ProgressBar steps={steps} currentStep={currentStep} />
+      <Stepper totalSteps={steps.length} currentStep={currentStep.count} />
     </div>
   );
 }

@@ -2,9 +2,54 @@ import { ArrowsUpDownIcon, ChevronDownIcon, FireIcon, LinkIcon } from '@/common/
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
-import { Transaction } from '../sampleTransactions';
 import { useState } from 'react';
 import Link from 'next/link';
+export interface Transaction {
+  id: string;
+  date: string;
+  time: string;
+  type: 'bridge' | 'auto-invest' | 'advanced' | 'swap' | 'twin';
+  sourceToken: {
+    chainId: number;
+    amount: string;
+    symbol: string;
+    logo: string;
+    name: string;
+  };
+  destinationToken: {
+    chainId: number;
+    amount: string;
+    symbol: string;
+    logo: string;
+    name: string;
+  };
+  status: 'completed' | 'pending' | 'failed';
+  completedStep: 0 | 1 | 2;
+  bridgeProvider: {
+    name: string;
+    logo: string;
+  };
+  fee: string;
+  isExpanded?: boolean;
+  steps: {
+    status?: 'completed' | 'pending' | 'failed';
+    amount?: string;
+    message: string;
+    timestamp: string;
+  }[];
+  // Additional fields for twin token transactions
+  value?: number;
+  originalToken?: {
+    name: string;
+    symbol: string;
+    blockchain: string;
+  };
+  twinToken?: {
+    name?: string;
+    symbol?: string;
+    fee?: string;
+  };
+}
 
 const AutoInvestTransactionCard = ({
   date,
