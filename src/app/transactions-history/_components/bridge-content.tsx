@@ -54,8 +54,20 @@ export default function BridgeContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
+      <div className="flex items-center justify-center absolute my-auto inset-y-0">
         <Spinner />
+      </div>
+    );
+  } else if (data?.result.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-y-10 text-white text-2xl text-center absolute my-auto inset-y-0">
+        <Image
+          src="/images/empty.png"
+          alt=''
+          width={100}
+          height={100}
+        />
+        You Currently Have No Bridge History Available
       </div>
     );
   } else {
@@ -215,7 +227,7 @@ export default function BridgeContent() {
                           ? 'bg-[#12B76A33] text-[#12b76a]'
                           : 'bg-[#FF0000]/35 text-[#FF0000]',
                       idx < item.bridge_steps.length - 1 &&
-                        'after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full',
+                      'after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full',
                     )}
                   >
                     {step.status === 'Pending' ? (

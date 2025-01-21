@@ -40,3 +40,8 @@
   white-space: nowrap !important;
   display: block !important;
 }
+
+/* Plug Modal */
+#ik-identity-kit-modal {
+  pointer-events: auto !important
+}

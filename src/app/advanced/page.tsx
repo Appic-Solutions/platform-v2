@@ -12,6 +12,8 @@ export default function AdvancedPage() {
     isLoading,
     newTwinMeta,
     isOpen,
+    status,
+    canCloseModal,
     closeModalHandler,
     methods,
     onSubmit,
@@ -36,6 +38,8 @@ export default function AdvancedPage() {
         />}
         <ProcessModal
           isOpen={isOpen}
+          status={status}
+          canCloseModal={canCloseModal}
           newTwinMeta={newTwinMeta}
           closeHandler={closeModalHandler}
         />

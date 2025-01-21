@@ -2,6 +2,8 @@ import { NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
 import { Dispatch, SetStateAction } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
+export type Status = 'failed' | 'pending' | 'successful';
+
 export interface DefaultValuesType {
   chain_id: string;
   contract_address: string;
@@ -14,6 +16,8 @@ export interface UseLogicReturn {
   isLoading: boolean;
   newTwinMeta: NewTwinMetadata | undefined;
   isOpen: boolean;
+  status: Status;
+  canCloseModal: boolean;
   closeModalHandler: () => void;
   methods: UseFormReturn<DefaultValuesType>;
   onSubmit: (data: DefaultValuesType) => void;
@@ -40,4 +44,6 @@ export interface ProcessModalProps {
   isOpen: boolean;
   newTwinMeta: NewTwinMetadata | undefined;
   closeHandler: () => void;
+  status: Status;
+  canCloseModal: boolean;
 }

@@ -14,7 +14,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />
-          <body className="flex flex-col h-full isolate pb-24 sm:pb-28 md:pb-0">
+          <body className="!pointer-events-auto !select-auto flex flex-col h-full isolate pb-24 sm:pb-28 md:pb-0">
             <HeaderPage />
             <ShapesPage />
             {children}

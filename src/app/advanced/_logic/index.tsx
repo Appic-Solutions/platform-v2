@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { DefaultValuesType, UseLogicReturn } from '../_types';
+import { DefaultValuesType, Status, UseLogicReturn } from '../_types';
 import { approve_icp, check_new_twin_ls_request, get_evm_token_and_generate_twin_token, NewTwinMetadata, request_new_twin } from '@/blockchain_api/functions/icp/new_twin_token';
 import { useSharedStore } from '@/common/state/store';
 import { Agent, HttpAgent } from '@dfinity/agent';
@@ -14,6 +14,8 @@ export default function LogicHelper(): UseLogicReturn {
   // State
   const [step, setStep] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
+  const [canCloseModal, setCanCloseModal] = useState(false);
+  const [status, setIStatus] = useState<Status>("pending");
   const [newTwinMeta, setNewTwinMeta] = useState<NewTwinMetadata>();
   const [shouldPoll, setShouldPoll] = useState(false);
   const [isLoading, setIsloading] = useState(false);
@@ -47,7 +49,11 @@ export default function LogicHelper(): UseLogicReturn {
     queryKey: ['checkStepFour'],
     queryFn: async () => {
       const response = await check_new_twin_ls_request(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
-      if (!response.success) throw new Error(response.message || "Still processing...")
+      setCanCloseModal(true)
+      if (!response.success) {
+        setIStatus("failed")
+        throw new Error(response.message || "Still processing...")
+      }
       console.log("🚀 ~ queryFn: ~ response:", response)
       return response;
     },
@@ -60,6 +66,7 @@ export default function LogicHelper(): UseLogicReturn {
     if (data?.success) {
       toast({ title: data.message || "Twin Token created successfully" });
       setStep(1);
+      setIStatus("successful")
       setShouldPoll(false);
     }
 
@@ -89,13 +96,22 @@ export default function LogicHelper(): UseLogicReturn {
         setNewTwinMeta(resStepOne.result)
         setStep(2)
       } else {
+        setIsOpen(true)
         const resStepTwo = await approve_icp(newTwinMeta as NewTwinMetadata, unAuthenticatedAgent as HttpAgent)
         console.log("🚀 ~ onSubmit ~ resStepTwo:", resStepTwo)
-        if (!resStepTwo.success) throw new Error(resStepTwo.message || "we have new error")
+        if (!resStepTwo.success) {
+          setIStatus("failed")
+          setCanCloseModal(true)
+          throw new Error(resStepTwo.message || "we have new error")
+        }
 
         const resStepThree = await request_new_twin(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent)
         console.log("🚀 ~ onSubmit ~ resStepThree:", resStepThree)
-        if (!resStepThree.success) throw new Error(resStepThree.message || "we have new error")
+        if (!resStepThree.success) {
+          setIStatus("failed")
+          setCanCloseModal(true)
+          throw new Error(resStepThree.message || "we have new error")
+        }
 
         setShouldPoll(true);
       }
@@ -118,6 +134,8 @@ export default function LogicHelper(): UseLogicReturn {
     isLoading,
     newTwinMeta,
     isOpen,
+    status,
+    canCloseModal,
     closeModalHandler,
 
     // Form

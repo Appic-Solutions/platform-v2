@@ -10,6 +10,7 @@ import TwinTokenIcon from '@/common/components/icons/twin-token';
 import { ChevronDownIcon } from '@/common/components/icons';
 import { useQuery } from '@tanstack/react-query';
 import { get_advanced_history } from '@/blockchain_api/functions/icp/get_advanced_history';
+import Image from 'next/image';
 
 export default function AdvancedContent() {
   const [itemId, setItemId] = useState<null | number>(null);
@@ -46,8 +47,20 @@ export default function AdvancedContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
+      <div className="flex items-center justify-center absolute my-auto inset-y-0">
         <Spinner />
+      </div>
+    );
+  } else if (data?.result.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-y-10 text-white text-2xl text-center absolute my-auto inset-y-0">
+        <Image
+          src="/images/empty.png"
+          alt=''
+          width={100}
+          height={100}
+        />
+        You Currently Have No Advanced History Available
       </div>
     );
   } else {
