@@ -25,6 +25,8 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Principal } from '@dfinity/principal';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
+import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { HttpAgent } from '@dfinity/agent';
 
 export const BridgeLogic = () => {
   const queryClient = useQueryClient();
@@ -72,39 +74,42 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
-      if (txHash && unAuthenticatedAgent && selectedOption && txStep.count === 5) {
-        const res = await check_deposit_status(txHash, selectedOption, unAuthenticatedAgent);
-        console.log('deposit tx res:', res);
-        if (res.success) {
-          if (res.result === 'Minted') {
-            setTxStep({
-              count: 5,
-              status: 'successful',
-            });
-          } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
-            setTxStep({
-              count: 5,
-              status: 'failed',
-            });
-          } else {
-            setTxStep({
-              count: 5,
-              status: 'pending',
-            });
-          }
-        } else if (!res.success) {
+      console.log('deposit tx started:');
+      const res = await check_deposit_status(
+        txHash as `0x${string}`,
+        selectedOption as BridgeOption,
+        unAuthenticatedAgent as HttpAgent,
+      );
+      console.log('deposit tx res:', res);
+      if (res.success) {
+        if (res.result === 'Minted') {
+          setTxStep({
+            count: 5,
+            status: 'successful',
+          });
+        } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
           setTxStep({
             count: 5,
             status: 'failed',
           });
+        } else {
+          setTxStep({
+            count: 5,
+            status: 'pending',
+          });
         }
-        queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
-        fetchWalletBalances();
-        return res;
+      } else if (!res.success) {
+        setTxStep({
+          count: 5,
+          status: 'failed',
+        });
       }
-      return null;
+      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
+      fetchWalletBalances();
+      return res;
     },
     refetchInterval: 1000 * 60,
+    enabled: !!txHash && !!unAuthenticatedAgent && !!selectedOption,
   });
   // withdrawal queries =====================>
   const tokenApproval = useTokenApproval();
@@ -114,39 +119,42 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-withdrawal-status'],
     queryFn: async () => {
-      if (unAuthenticatedAgent && selectedOption && withdrawalId) {
-        const res = await check_withdraw_status(withdrawalId, selectedOption, unAuthenticatedAgent);
-        console.log('withdrawal tx res:', res);
-        if (res.success) {
-          if (res.result === 'Successful') {
-            setTxStep({
-              count: 4,
-              status: 'successful',
-            });
-          } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
-            setTxStep({
-              count: 4,
-              status: 'failed',
-            });
-          } else {
-            setTxStep({
-              count: 4,
-              status: 'pending',
-            });
-          }
-        } else if (!res.success) {
+      console.log('withdrawal tx started:');
+      const res = await check_withdraw_status(
+        withdrawalId as string,
+        selectedOption as BridgeOption,
+        unAuthenticatedAgent as HttpAgent,
+      );
+      console.log('withdrawal tx res:', res);
+      if (res.success) {
+        if (res.result === 'Successful') {
+          setTxStep({
+            count: 4,
+            status: 'successful',
+          });
+        } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
           setTxStep({
             count: 4,
             status: 'failed',
           });
+        } else {
+          setTxStep({
+            count: 4,
+            status: 'pending',
+          });
         }
-        queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
-        fetchWalletBalances();
-        return res || null;
+      } else if (!res.success) {
+        setTxStep({
+          count: 4,
+          status: 'failed',
+        });
       }
-      return null;
+      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
+      fetchWalletBalances();
+      return res;
     },
     refetchInterval: 1000 * 60,
+    enabled: !!withdrawalId && !!selectedOption && !!unAuthenticatedAgent,
   });
 
   // select token function in chain token list
@@ -217,6 +225,13 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
+    if (!Number(amount) || Number(amount) === 0) {
+      return {
+        isDisable: true,
+        text: 'Set token amount to continue',
+      };
+    }
+
     if (isEvmBalanceLoading || isIcpBalanceLoading) {
       return {
         isDisable: true,
@@ -243,7 +258,7 @@ export const BridgeLogic = () => {
       }
       if (!selectedOption.is_native) {
         if (fromToken.chain_type === 'EVM') {
-          // The native token of the transaction chain that the user holds in their wallet
+          // The native token of the transaction chain that the user holds in his wallet
           const userNativeToken = evmBalance?.tokens.find(
             (token) =>
               token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
@@ -254,7 +269,7 @@ export const BridgeLogic = () => {
           ) {
             return {
               isDisable: true,
-              text: `INSUFFICIENT Token Balance`,
+              text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
             };
           }
         } else if (fromToken.chain_type === 'ICP') {
@@ -265,9 +280,12 @@ export const BridgeLogic = () => {
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
+            console.log('userNativeToken', userNativeToken);
+            console.log('selected option', selectedOption);
+
             return {
               isDisable: true,
-              text: `INSUFFICIENT Token Balance`,
+              text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
             };
           }
         }
@@ -302,13 +320,6 @@ export const BridgeLogic = () => {
       return {
         isDisable: true,
         text: 'Please select different tokens',
-      };
-    }
-
-    if (!Number(amount)) {
-      return {
-        isDisable: true,
-        text: 'Set token amount to continue',
       };
     }
 

@@ -57,7 +57,7 @@ const AmountInput = () => {
   return (
     <Card className="max-h-[133px] md:max-h-[155px] flex-col items-start justify-center hover:bg-[#000000]/0 cursor-auto">
       <p className="text-sm font-semibold">Send</p>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 w-full">
         <div className="relative">
           <Avatar className=" w-11 h-11 rounded-full">
             <AvatarImage src={fromToken?.logo || 'images/logo/placeholder.png'} />

@@ -57,11 +57,11 @@ export const WalletWrapper = ({
       return [];
     },
     enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 60 * 1.5,
+    refetchInterval: 1000 * 60 * 5,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 45,
-    gcTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60,
+    gcTime: 1000 * 60 * 10,
   });
 
   return (
