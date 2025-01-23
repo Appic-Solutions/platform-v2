@@ -473,6 +473,8 @@ export const BridgeLogic = () => {
         });
         return notifyResult.message;
       }
+      console.log('withdrawal tx params:', withdrawalId, selectedOption, unAuthenticatedAgent);
+
       setTxStep({
         count: 4,
         status: 'pending',
@@ -550,6 +552,7 @@ export const BridgeLogic = () => {
       });
       return notifyResult.message;
     }
+    console.log('deposit tx params:', txHash, unAuthenticatedAgent, selectedOption);
     setTxStep({
       count: 5,
       status: 'pending',
