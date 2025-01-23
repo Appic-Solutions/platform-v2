@@ -2,7 +2,7 @@ import { NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
 import { Dispatch, SetStateAction } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
-export type Status = 'failed' | 'pending' | 'successful';
+export type Status = 'failed' | 'pending' | 'successfull';
 
 export interface DefaultValuesType {
   chain_id: string;
@@ -42,8 +42,17 @@ export interface TokenListProps {
 
 export interface ProcessModalProps {
   isOpen: boolean;
+  title: string;
+  subTitle: string;
   newTwinMeta: NewTwinMetadata | undefined;
   closeHandler: () => void;
   status: Status;
   canCloseModal: boolean;
+}
+
+export interface ModalStepDataReturn {
+  title: string;
+  pending: string;
+  successfull: string;
+  failed: string;
 }

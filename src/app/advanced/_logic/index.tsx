@@ -66,7 +66,7 @@ export default function LogicHelper(): UseLogicReturn {
     if (data?.success) {
       toast({ title: data.message || "Twin Token created successfully" });
       setStep(1);
-      setIStatus("successful")
+      setIStatus("successfull")
       setShouldPoll(false);
     }
 

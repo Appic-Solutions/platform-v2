@@ -4,6 +4,7 @@ import LogicHelper from "./_logic";
 import Step1 from "./_components/step-1";
 import Step2 from "./_components/step-2";
 import ProcessModal from "./_components/process-modal";
+import { getModalStepText } from "./_logic/utils";
 
 export default function AdvancedPage() {
   const {
@@ -19,6 +20,8 @@ export default function AdvancedPage() {
     onSubmit,
     chainIdWatch,
   } = LogicHelper()
+
+  const { title, subTitle } = getModalStepText(step, status)
 
   return (
     <FormProvider {...methods}>
@@ -38,6 +41,8 @@ export default function AdvancedPage() {
         />}
         <ProcessModal
           isOpen={isOpen}
+          title={title}
+          subTitle={subTitle}
           status={status}
           canCloseModal={canCloseModal}
           newTwinMeta={newTwinMeta}
