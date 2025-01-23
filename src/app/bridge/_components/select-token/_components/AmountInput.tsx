@@ -1,4 +1,4 @@
-import { formatToSignificantFigures, getChainLogo } from '@/common/helpers/utils';
+import { getChainLogo } from '@/common/helpers/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
@@ -57,7 +57,7 @@ const AmountInput = () => {
   return (
     <Card className="max-h-[133px] md:max-h-[155px] flex-col items-start justify-center hover:bg-[#000000]/0 cursor-auto">
       <p className="text-sm font-semibold">Send</p>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 w-full">
         <div className="relative">
           <Avatar className=" w-11 h-11 rounded-full">
             <AvatarImage src={fromToken?.logo || 'images/logo/placeholder.png'} />
@@ -83,9 +83,7 @@ const AmountInput = () => {
               onChange={(e) => {
                 const inputValue = e.target.value;
                 if (inputValue.length > 12) return;
-                if (/^\d*\.?\d{0,5}$/.test(inputValue)) {
-                  setInputAmount(inputValue);
-                }
+                setInputAmount(inputValue);
               }}
               className={cn(
                 'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
@@ -104,8 +102,9 @@ const AmountInput = () => {
                 )}
                 onClick={() => {
                   if (Number(selectedTokenBalance) > 0) {
-                    setAmount(selectedTokenBalance);
-                    setInputAmount(selectedTokenBalance);
+                    const formattedBalance = Number(selectedTokenBalance).toFixed(5);
+                    setAmount(formattedBalance);
+                    setInputAmount(formattedBalance);
                   } else {
                     setAmount('0');
                     setInputAmount('0');
@@ -120,7 +119,7 @@ const AmountInput = () => {
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
             {isWalletConnected('from') && (
               <p className="text-muted text-center text-xs md:text-sm font-semibold text-nowrap">
-                {formatToSignificantFigures(selectedTokenBalance)}
+                {Number(selectedTokenBalance).toFixed(5)}
               </p>
             )}
           </div>
