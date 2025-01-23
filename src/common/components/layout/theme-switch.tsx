@@ -23,7 +23,7 @@ const ThemeSwitch = () => {
   };
 
   return (
-    <div className="hidden lg:block absolute left-16 bottom-8 z-50">
+    <div className="hidden lg:block absolute left-6 bottom-6 z-50">
       <button
         onClick={toggleTheme}
         type="button"

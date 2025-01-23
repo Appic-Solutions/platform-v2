@@ -7,10 +7,12 @@ import { BridgeOptionsListRequest } from './_api/types/request';
 import { useBridgeActions, useBridgeStore } from './_store';
 import { useSharedStore } from '@/common/state/store';
 import { StepperContainer } from './_components/bridge-review';
+import MinimizeProgressBarWidget from '@/common/components/layout/minimize-progress-bar-widget';
+import { ParkOutlineBridgeIcon } from '@/common/components/icons';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();
-  const { amount, fromToken, toToken, bridgePairs, activeStep } = useBridgeStore();
+  const { amount, fromToken, toToken, bridgePairs, activeStep, txStep } = useBridgeStore();
   const { setBridgePairs, setBridgeOptions } = useBridgeActions();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
@@ -57,7 +59,14 @@ const BridgeHome = () => {
     }
   };
 
-  return renderStep();
+  return (
+    <>
+      {renderStep()}
+      {(txStep.count >= 4 && txStep.status === "pending") && (
+        < MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className='text-white' />} />
+      )}
+    </>
+  );
 };
 
 export default BridgeHome;
