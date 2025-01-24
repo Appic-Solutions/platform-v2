@@ -74,8 +74,10 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white"
-        >
+          className={cn(
+            "bg-primary-buttons w-full min-h-14 rounded-[16px] text-white",
+            "hover:opacity-85 disabled:opacity-50 disabled:pointer-events-none"
+          )}>
           {isLoading ? <Spinner /> : 'Confirm'}
         </button>
       </div>

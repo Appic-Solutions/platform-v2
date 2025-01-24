@@ -59,8 +59,11 @@ export default function ProcessModal({
               </p>
               <Link
                 href={'/transactions-history/advanced'}
-                className="bg-card-background flex items-center gap-2 shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border p-2 rounded-lg border-gray-200"
-              >
+                className={cn(
+                  "flex items-center justify-center gap-2 p-2 rounded-lg",
+                  "bg-card-background text-primary shadow-lg border border-gray-200",
+                  "transition-all hover:opacity-90 hover:shadow-md",
+                )}>
                 <HistoryIcon width={20} height={20} />
                 Check History
               </Link>
@@ -69,6 +72,6 @@ export default function ProcessModal({
         </div>
         <Stepper totalSteps={3} currentStep={1} />
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 }

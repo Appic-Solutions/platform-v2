@@ -1,7 +1,11 @@
 import { ModalStepData } from '../_constants';
 import { Status } from '../_types';
 
-export const getModalStepText = (step: number, status: Status): { title: string; subTitle: string } => {
+export const getModalStepText = (
+  step: number,
+  status: Status,
+  errorMessage?: string,
+): { title: string; subTitle: string } => {
   const stepData = ModalStepData.get(step);
   if (!stepData) {
     return {
@@ -9,8 +13,15 @@ export const getModalStepText = (step: number, status: Status): { title: string;
       subTitle: `${step} not found: message`,
     };
   }
-  return {
-    title: stepData.title,
-    subTitle: stepData[status],
-  };
+  if (status === 'failed') {
+    return {
+      title: stepData.title,
+      subTitle: `${stepData[status]} + ${errorMessage}`,
+    };
+  } else {
+    return {
+      title: stepData.title,
+      subTitle: stepData[status],
+    };
+  }
 };

@@ -14,6 +14,7 @@ export default function AdvancedPage() {
     newTwinMeta,
     isOpen,
     status,
+    errorMessage,
     canCloseModal,
     closeModalHandler,
     methods,
@@ -21,7 +22,7 @@ export default function AdvancedPage() {
     chainIdWatch,
   } = LogicHelper()
 
-  const { title, subTitle } = getModalStepText(step, status)
+  const { title, subTitle } = getModalStepText(step, status, errorMessage)
 
   return (
     <FormProvider {...methods}>

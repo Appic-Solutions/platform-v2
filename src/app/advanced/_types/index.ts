@@ -17,6 +17,7 @@ export interface UseLogicReturn {
   newTwinMeta: NewTwinMetadata | undefined;
   isOpen: boolean;
   status: Status;
+  errorMessage: string;
   canCloseModal: boolean;
   closeModalHandler: () => void;
   methods: UseFormReturn<DefaultValuesType>;

@@ -36,30 +36,30 @@ export const Step2Data = (newTwinMeta: NewTwinMetadata | undefined) => [
 
 export const ModalStepData = new Map<number, ModalStepDataReturn>([
     [
-        1,
+        2,
         {
             title: "Step 1",
             pending: "Please approve the transaction",
             successfull: "Approved successfully",
-            failed: "Failed to approve transaction + reason",
-        },
-    ],
-    [
-        2,
-        {
-            title: "Step 2",
-            pending: "Sending transaction request to the network",
-            successfull: "Sent Successfully",
-            failed: "Failed to send transaction + reason",
+            failed: "Failed to approve transaction",
         },
     ],
     [
         3,
         {
+            title: "Step 2",
+            pending: "Sending transaction request to the network",
+            successfull: "Sent Successfully",
+            failed: "Failed to send transaction",
+        },
+    ],
+    [
+        4,
+        {
             title: "Step 3",
             pending: "Waiting for new twin token verification",
             successfull: "Verified successfully",
-            failed: "Failed to create new twin token + reason",
+            failed: "Failed to create new twin token",
         },
     ],
 ]);
