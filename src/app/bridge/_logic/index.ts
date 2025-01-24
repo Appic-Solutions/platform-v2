@@ -45,7 +45,8 @@ export const BridgeLogic = () => {
     toWalletValidationError,
   } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage } = useBridgeActions();
+  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage, setTxLastStepStatus } =
+    useBridgeActions();
   // Shared Store
   const {
     icpIdentity,
@@ -62,7 +63,6 @@ export const BridgeLogic = () => {
   const { setIcpBalance, setEvmBalance } = useSharedStoreActions();
 
   // Bridge Transaction states
-
   const [txHash, setTxHash] = useState<TxHash | undefined>();
   const [withdrawalId, setWithdrawalId] = useState<string | undefined>();
   // deposit queries ====================>
@@ -74,35 +74,38 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-deposit-status'],
     queryFn: async () => {
-      console.log('deposit tx started:');
       const res = await check_deposit_status(
         txHash as `0x${string}`,
         selectedOption as BridgeOption,
         unAuthenticatedAgent as HttpAgent,
       );
-      console.log('deposit tx res:', res);
+
       if (res.success) {
         if (res.result === 'Minted') {
           setTxStep({
             count: 5,
             status: 'successful',
           });
+          setTxLastStepStatus('successful');
         } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
           setTxStep({
             count: 5,
             status: 'failed',
           });
+          setTxLastStepStatus('failed');
         } else {
           setTxStep({
             count: 5,
             status: 'pending',
           });
+          setTxLastStepStatus('pending');
         }
       } else if (!res.success) {
         setTxStep({
           count: 5,
           status: 'failed',
         });
+        setTxLastStepStatus('failed');
       }
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchWalletBalances();
@@ -119,35 +122,37 @@ export const BridgeLogic = () => {
   useQuery({
     queryKey: ['check-withdrawal-status'],
     queryFn: async () => {
-      console.log('withdrawal tx started:');
       const res = await check_withdraw_status(
         withdrawalId as string,
         selectedOption as BridgeOption,
         unAuthenticatedAgent as HttpAgent,
       );
-      console.log('withdrawal tx res:', res);
       if (res.success) {
         if (res.result === 'Successful') {
           setTxStep({
             count: 4,
             status: 'successful',
           });
+          setTxLastStepStatus('successful');
         } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
           setTxStep({
             count: 4,
             status: 'failed',
           });
+          setTxLastStepStatus('failed');
         } else {
           setTxStep({
             count: 4,
             status: 'pending',
           });
+          setTxLastStepStatus('pending');
         }
       } else if (!res.success) {
         setTxStep({
           count: 4,
           status: 'failed',
         });
+        setTxLastStepStatus('failed');
       }
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchWalletBalances();
@@ -155,17 +160,6 @@ export const BridgeLogic = () => {
     },
     refetchInterval: 1000 * 60,
     enabled: !!withdrawalId && !!selectedOption && !!unAuthenticatedAgent,
-  });
-
-  // fetch ICP and EVM balances every 1.5 minute
-  useQuery({
-    queryKey: ['fetch-wallet-balances'],
-    queryFn: () => {
-      fetchWalletBalances();
-      return null;
-    },
-    refetchInterval: 1000 * 90,
-    enabled: (!!evmAddress && !!unAuthenticatedAgent) || (!!unAuthenticatedAgent && !!icpIdentity),
   });
 
   function fetchWalletBalances() {
@@ -262,7 +256,6 @@ export const BridgeLogic = () => {
       (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
     ) {
       if (BigNumber(amount).isGreaterThan(BigNumber(selectedTokenBalance))) {
-        console.log(amount, selectedTokenBalance);
         return {
           isDisable: true,
           text: 'INSUFFICIENT Funds',
@@ -292,9 +285,6 @@ export const BridgeLogic = () => {
             !userNativeToken ||
             Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
-            console.log('userNativeToken', userNativeToken);
-            console.log('selected option', selectedOption);
-
             return {
               isDisable: true,
               text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
@@ -485,7 +475,6 @@ export const BridgeLogic = () => {
         });
         return notifyResult.message;
       }
-      console.log('withdrawal tx params:', withdrawalId, selectedOption, unAuthenticatedAgent);
 
       setTxStep({
         count: 4,
@@ -564,7 +553,7 @@ export const BridgeLogic = () => {
       });
       return notifyResult.message;
     }
-    console.log('deposit tx params:', txHash, unAuthenticatedAgent, selectedOption);
+
     setTxStep({
       count: 5,
       status: 'pending',

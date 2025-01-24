@@ -2,7 +2,6 @@
 import { cn, getChainLogo } from '@/common/helpers/utils';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit, useDisconnect } from '@reown/appkit/react';
-import { useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '../ui/popover';
 import { CloseIcon } from '../icons';
 import WalletCard from './wallet/wallet-card';
@@ -11,10 +10,11 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
 const WalletPage = () => {
   const {
-    authenticatedAgent,
     icpIdentity,
     evmAddress,
     isEvmConnected,
@@ -45,33 +45,54 @@ const WalletPage = () => {
 
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
-  // fetch evm balance
-  useEffect(() => {
-    if (evmAddress && unAuthenticatedAgent) {
-      setIsEvmBalanceLoading(true);
-      setUnAuthenticatedAgent(unAuthenticatedAgent);
-      fetchEvmBalances({
-        evmAddress,
-      }).then((res) => {
-        setEvmBalance(res);
-        setIsEvmBalanceLoading(false);
-      });
-    }
-  }, [unAuthenticatedAgent, evmAddress, setUnAuthenticatedAgent, setEvmBalance, setIsEvmBalanceLoading]);
+  const [isFetching, setIsFetching] = useState(false);
+  const fetchBalances = async () => {
+    if (isFetching) return null;
+    setIsFetching(true);
 
-  // fetch icp balance
-  useEffect(() => {
-    if (unAuthenticatedAgent && icpIdentity) {
-      setIsIcpBalanceLoading(true);
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        icpIdentity,
-      }).then((res) => {
-        setIcpBalance(res);
-        setIsIcpBalanceLoading(false);
-      });
+    // Fetch EVM balance
+    if (evmAddress) {
+      setIsEvmBalanceLoading(true);
+      try {
+        const evmRes = await fetchEvmBalances({ evmAddress });
+        setEvmBalance(evmRes);
+      } finally {
+        setIsEvmBalanceLoading(false);
+      }
     }
-  }, [icpIdentity, authenticatedAgent, setIcpBalance, unAuthenticatedAgent, setIsIcpBalanceLoading]);
+
+    // Fetch ICP balance
+    if (icpIdentity && unAuthenticatedAgent) {
+      setUnAuthenticatedAgent(unAuthenticatedAgent);
+      setIsIcpBalanceLoading(true);
+      try {
+        const icpRes = await fetchIcpBalances({ unAuthenticatedAgent, icpIdentity });
+        setIcpBalance(icpRes);
+      } finally {
+        setIsIcpBalanceLoading(false);
+      }
+    }
+
+    setIsFetching(false);
+    return null;
+  };
+
+  // Fetch balances on dependency change
+  useEffect(() => {
+    if (evmAddress || icpIdentity) {
+      fetchBalances();
+    }
+  }, [evmAddress, icpIdentity]);
+
+  // Fetch balances every 1.5 minutes
+  useQuery({
+    queryKey: ['fetch-wallet-balances'],
+    queryFn: fetchBalances,
+    refetchInterval: 1000 * 90,
+    gcTime: 1000 * 60,
+    staleTime: 1000 * 60,
+    enabled: !!(evmAddress || icpIdentity), // Enable only if wallets are connected
+  });
 
   const handleDisconnectIcp = () => {
     disconnectIcp();

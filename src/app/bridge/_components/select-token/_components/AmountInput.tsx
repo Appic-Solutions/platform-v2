@@ -105,7 +105,6 @@ const AmountInput = () => {
                     const formattedBalance = BigNumber(selectedTokenBalance)
                       .decimalPlaces(8, BigNumber.ROUND_DOWN)
                       .toFixed();
-                    console.log('formattedBalance:', formattedBalance, 'unformattedBalance:', selectedTokenBalance);
                     setAmount(formattedBalance);
                     setInputAmount(formattedBalance);
                   } else {

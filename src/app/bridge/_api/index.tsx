@@ -68,9 +68,6 @@ const useTokenApproval = () => {
     onError: (error) => {
       console.error('Token approval failed:', error);
     },
-    onSuccess: (data) => {
-      console.log('Token approval successful:', data);
-    },
   });
 };
 
@@ -81,9 +78,6 @@ const useSubmitWithdrawRequest = () => {
       request_withdraw(params.bridgeOption, params.recipient, params.authenticatedAgent),
     onError: (error) => {
       console.error('Withdrawal request failed:', error);
-    },
-    onSuccess: (data) => {
-      console.log('Withdrawal request successful:', data);
     },
   });
 };
@@ -102,9 +96,6 @@ const useNotifyAppicHelper = () => {
     onError: (error) => {
       console.error('Notify Appic Helper failed:', error);
     },
-    onSuccess: (data) => {
-      console.log('Notify Appic Helper successful:', data);
-    },
   });
 };
 
@@ -116,9 +107,6 @@ const useCreateWalletClient = () => {
     onError: (error) => {
       console.error('Create wallet client failed:', error);
     },
-    onSuccess: (data) => {
-      console.log('Create wallet client successful:', data);
-    },
   });
 };
 
@@ -128,9 +116,6 @@ const useDepositTokenWithApproval = () => {
     mutationFn: (params: DepositTokenWithApprovalRequest) => approve_erc20(params.wallet_client, params.bridgeOption),
     onError: (error) => {
       console.error('Token approval failed:', error);
-    },
-    onSuccess: (data) => {
-      console.log('Token approval successful:', data);
     },
   });
 };
@@ -142,9 +127,6 @@ const useDepositToken = () => {
       request_deposit(params.wallet_client, params.bridgeOption, params.recipient),
     onError: (error) => {
       console.error('Deposit request failed:', error);
-    },
-    onSuccess: (data) => {
-      console.log('Deposit request successful:', data);
     },
   });
 };
@@ -162,9 +144,6 @@ const useNotifyAppicHelperDeposit = () => {
       ),
     onError: (error) => {
       console.error('Notify Appic Helper failed:', error);
-    },
-    onSuccess: (data) => {
-      console.log('Notify Appic Helper successful:', data);
     },
   });
 };
