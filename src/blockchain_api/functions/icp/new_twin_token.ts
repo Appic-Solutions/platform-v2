@@ -116,7 +116,7 @@ export const approve_icp = async (
     agent: authenticated_agent,
     canisterId: icp_ledger,
   });
-
+  console.log(authenticated_agent.getPrincipal());
   try {
     const icp_approve_result = (await icp_actor.icrc2_approve({
       amount: BigInt(new_twin_metadata.creation_fee),
@@ -132,6 +132,7 @@ export const approve_icp = async (
     if ('Ok' in icp_approve_result) {
       return { result: icp_approve_result.Ok.toString(), success: true, message: '' };
     } else {
+      console.log(JSON.stringify(icp_approve_result.Err));
       return {
         result: '',
         success: false,
@@ -139,6 +140,7 @@ export const approve_icp = async (
       };
     }
   } catch (error) {
+    console.log(error);
     return {
       result: '',
       success: false,

@@ -54,13 +54,8 @@ export default function AdvancedContent() {
   } else if (data?.result.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-y-10 text-white text-2xl text-center absolute my-auto inset-y-0">
-        <Image
-          src="/images/empty.png"
-          alt=''
-          width={100}
-          height={100}
-        />
-        You Currently Have No Advanced History Available
+        <Image src="/images/empty.png" alt="" width={100} height={100} />
+        Empty Advanced History
       </div>
     );
   } else {

@@ -77,12 +77,12 @@ const AmountInput = () => {
           <div className="w-full flex items-center">
             <input
               type="number"
-              maxLength={12}
+              maxLength={15}
               placeholder="0"
               value={inputAmount}
               onChange={(e) => {
                 const inputValue = e.target.value;
-                if (inputValue.length > 12) return;
+                if (inputValue.length > 15) return;
                 setInputAmount(inputValue);
               }}
               className={cn(
@@ -102,7 +102,10 @@ const AmountInput = () => {
                 )}
                 onClick={() => {
                   if (Number(selectedTokenBalance) > 0) {
-                    const formattedBalance = Number(selectedTokenBalance).toFixed(5);
+                    const formattedBalance = BigNumber(selectedTokenBalance)
+                      .decimalPlaces(8, BigNumber.ROUND_DOWN)
+                      .toFixed();
+                    console.log('formattedBalance:', formattedBalance, 'unformattedBalance:', selectedTokenBalance);
                     setAmount(formattedBalance);
                     setInputAmount(formattedBalance);
                   } else {
@@ -119,7 +122,7 @@ const AmountInput = () => {
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
             {isWalletConnected('from') && (
               <p className="text-muted text-center text-xs md:text-sm font-semibold text-nowrap">
-                {Number(selectedTokenBalance).toFixed(5)}
+                {BigNumber(selectedTokenBalance).decimalPlaces(8, BigNumber.ROUND_DOWN).toFixed()}
               </p>
             )}
           </div>

@@ -27,6 +27,7 @@ import { Principal } from '@dfinity/principal';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
+import BigNumber from 'bignumber.js';
 
 export const BridgeLogic = () => {
   const queryClient = useQueryClient();
@@ -260,7 +261,8 @@ export const BridgeLogic = () => {
       (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
       (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
     ) {
-      if (Number(amount) > Number(selectedTokenBalance)) {
+      if (BigNumber(amount).isGreaterThan(BigNumber(selectedTokenBalance))) {
+        console.log(amount, selectedTokenBalance);
         return {
           isDisable: true,
           text: 'INSUFFICIENT Funds',
