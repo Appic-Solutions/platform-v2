@@ -57,12 +57,6 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
           className="w-full"
           placeholder="Enter Contract Address"
         />
-        <RHFInput
-          name="transfer_fee"
-          label="Transfer Fee"
-          className="w-full"
-          placeholder="Enter Transfer Fee"
-        />
         <button
           className="bg-primary-buttons w-full hover:opacity-85 duration-200 min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
           disabled={isLoading}

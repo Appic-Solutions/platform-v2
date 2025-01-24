@@ -7,7 +7,6 @@ export type Status = 'failed' | 'pending' | 'successfull';
 export interface DefaultValuesType {
   chain_id: string;
   contract_address: string;
-  transfer_fee: string;
 }
 
 export interface UseLogicReturn {

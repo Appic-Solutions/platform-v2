@@ -35,7 +35,6 @@ export default function LogicHelper(): UseLogicReturn {
     defaultValues: {
       chain_id: '',
       contract_address: '',
-      transfer_fee: '',
     },
     resolver: zodResolver(formSchema),
   });
@@ -94,7 +93,6 @@ export default function LogicHelper(): UseLogicReturn {
         const resStepOne = await get_evm_token_and_generate_twin_token(
           data.chain_id,
           data.contract_address,
-          data.transfer_fee,
           unAuthenticatedAgent as HttpAgent,
         );
         console.log('🚀 ~ onSubmit ~ resStepOne:', resStepOne);
