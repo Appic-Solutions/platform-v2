@@ -62,8 +62,8 @@ const BridgeHome = () => {
   return (
     <>
       {renderStep()}
-      {(txStep.count >= 4 && txStep.status === "pending") && (
-        < MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className='text-white' />} />
+      {txStep.count >= 4 && txStep.status === 'pending' && (
+        <MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className="text-white" />} />
       )}
     </>
   );

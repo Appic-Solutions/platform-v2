@@ -40,7 +40,6 @@ export const BridgeLogic = () => {
     selectedOption,
     selectedTokenBalance,
     bridgeOptions,
-    txStep,
     toWalletAddress,
     toWalletValidationError,
   } = useBridgeStore();
@@ -157,6 +156,35 @@ export const BridgeLogic = () => {
     enabled: !!withdrawalId && !!selectedOption && !!unAuthenticatedAgent,
   });
 
+  // fetch ICP and EVM balances every 1.5 minute
+  useQuery({
+    queryKey: ['fetch-wallet-balances'],
+    queryFn: () => {
+      fetchWalletBalances();
+      return null;
+    },
+    refetchInterval: 1000 * 90,
+    enabled: (!!evmAddress && !!unAuthenticatedAgent) || (!!unAuthenticatedAgent && !!icpIdentity),
+  });
+
+  function fetchWalletBalances() {
+    if (evmAddress && unAuthenticatedAgent) {
+      fetchEvmBalances({
+        evmAddress,
+      }).then((res) => {
+        setEvmBalance(res);
+      });
+    }
+    if (unAuthenticatedAgent && icpIdentity) {
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        icpIdentity,
+      }).then((res) => {
+        setIcpBalance(res);
+      });
+    }
+  }
+
   // select token function in chain token list
   function selectToken(token: EvmToken | IcpToken) {
     const setToken = selectedTokenType === 'from' ? setFromToken : setToToken;
@@ -176,24 +204,6 @@ export const BridgeLogic = () => {
       setActiveStep(currentStep - 1);
     } else {
       setActiveStep(direction);
-    }
-  }
-
-  function fetchWalletBalances() {
-    if (evmAddress && unAuthenticatedAgent) {
-      fetchEvmBalances({
-        evmAddress,
-      }).then((res) => {
-        setEvmBalance(res);
-      });
-    }
-    if (unAuthenticatedAgent && icpIdentity) {
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        icpIdentity,
-      }).then((res) => {
-        setIcpBalance(res);
-      });
     }
   }
 

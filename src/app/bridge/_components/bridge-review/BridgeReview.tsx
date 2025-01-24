@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { ClockIcon, FireIcon } from '@/common/components/icons';
 import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
-import ActionButton from '../select-token/_components/ActionButton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { BridgeLogic } from '../../_logic';
 import { DialogTrigger } from '@/common/components/ui/dialog';
@@ -133,7 +132,16 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
             </div>
           </Card>
           <DialogTrigger onClick={openModal}>
-            <ActionButton isDisabled={false}>Start bridging</ActionButton>
+            <div
+              className={cn(
+                'w-full h-14 rounded-[16px] text-white flex items-center justify-center',
+                'bg-primary-buttons',
+                'transition-all ease-in-out',
+                'hover:opacity-85',
+              )}
+            >
+              Start bridging
+            </div>
           </DialogTrigger>
         </div>
       </Box>
