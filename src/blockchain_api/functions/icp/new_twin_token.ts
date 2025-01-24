@@ -39,6 +39,7 @@ export interface NewTwinMetadata {
   };
   creation_fee: string;
   human_readable_creation_fee: string;
+  icp_canister_id: string;
 }
 
 // Step 1, get the target evm token
@@ -86,6 +87,7 @@ export const get_evm_token_and_generate_twin_token = async (
         evm_base_token: candid_evm_token,
         creation_fee: creation_fee.toFixed(),
         human_readable_creation_fee,
+        icp_canister_id: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
         icp_twin_token: {
           chain_id: 0,
           decimals: candid_evm_token.decimals,

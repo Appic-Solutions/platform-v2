@@ -623,7 +623,7 @@ const calculate_bridge_options = async (
       .dividedBy(BigNumber(10).pow(decimals))
       .toFixed();
     const usd_estimated_return = BigNumber(human_readable_estimated_return).multipliedBy(token_price).toFixed();
-    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 2 min' : '15 - 20 min';
+    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 3 min' : '15 - 20 min';
     const native_fee_token_id =
       bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
     return [
