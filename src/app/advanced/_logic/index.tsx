@@ -96,7 +96,7 @@ export default function LogicHelper(): UseLogicReturn {
           data.contract_address,
           data.transfer_fee,
           unAuthenticatedAgent as HttpAgent,
-        ); 
+        );
         console.log('🚀 ~ onSubmit ~ resStepOne:', resStepOne);
         if (!resStepOne.success) throw new Error(resStepOne.message || 'we have new error');
         setNewTwinMeta(resStepOne.result);

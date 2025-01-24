@@ -64,7 +64,7 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
           placeholder="Enter Transfer Fee"
         />
         <button
-          className="bg-primary-buttons w-full min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
+          className="bg-primary-buttons w-full hover:opacity-85 duration-200 min-h-14 rounded-[16px] text-white mt-auto md:mt-0"
           disabled={isLoading}
         >
           {isLoading ? <Spinner /> : "Continue"}

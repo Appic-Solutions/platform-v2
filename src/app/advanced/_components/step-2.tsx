@@ -5,8 +5,25 @@ import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
 import { Step2Props } from '../_types';
 import Spinner from '@/common/components/ui/spinner';
 import { Step2Data } from '../_constants';
+import { useSharedStore } from '@/common/state/store';
 
 export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
+  const { icpIdentity, icpBalance } = useSharedStore();
+
+  const isWalletConnected = Boolean(icpIdentity);
+
+  const token = icpBalance?.tokens.find((token) => token.canisterId === newTwinMeta?.icp_canister_id);
+  const hasSufficientBalance = token ? parseFloat(token.balance || '0') >= parseFloat(newTwinMeta?.human_readable_creation_fee || '0') : false;
+
+  const buttonText = !isWalletConnected
+    ? 'Connect Wallet'
+    : !hasSufficientBalance
+      ? 'Insufficient Balance'
+      : isLoading
+        ? <Spinner />
+        : 'Confirm';
+
+
   return (
     <Box className="gap-y-5 justify-between h-full md:h-auto md:max-w-[612px] md:gap-y-16 md:p-10">
       <div className="flex flex-col gap-y-8 w-full">
@@ -73,12 +90,12 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         </button>
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={!isWalletConnected || !hasSufficientBalance || isLoading}
           className={cn(
-            "bg-primary-buttons w-full min-h-14 rounded-[16px] text-white",
+            "bg-primary-buttons w-full min-h-14 rounded-[16px] text-white duration-200",
             "hover:opacity-85 disabled:opacity-50 disabled:pointer-events-none"
           )}>
-          {isLoading ? <Spinner /> : 'Confirm'}
+          {buttonText}
         </button>
       </div>
     </Box>
