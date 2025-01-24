@@ -19,7 +19,7 @@ import { icp_ledger, lsm_ledger_id } from '@/canister_ids.json';
 import BigNumber from 'bignumber.js';
 import { Principal } from '@dfinity/principal';
 import { convert_png_to_data_uri } from '@/blockchain_api/utils/png_to_data_uri';
-import { generate_twin_token_symbol } from './generate_new_twin_token_symbol';
+import { generate_twin_token_symbol, generate_twin_token_transfer_fee } from './generate_new_twin_token_symbol';
 
 // 1st: Find the base token information from the appic helper contract
 // 2nd: Approve icp spending for lsm canister
@@ -47,7 +47,6 @@ export interface NewTwinMetadata {
 export const get_evm_token_and_generate_twin_token = async (
   chain_id: string,
   contract_address: string,
-  transfer_fee: string,
   unauthenticated_agent: HttpAgent,
 ): Promise<Response<NewTwinMetadata | undefined>> => {
   const lsm_actor = Actor.createActor(lsmIdlFactory, {
@@ -59,7 +58,6 @@ export const get_evm_token_and_generate_twin_token = async (
     const creation_fee = BigNumber(lsm_info.ls_creation_icp_fee.toString());
     const human_readable_creation_fee = creation_fee.dividedBy(10 ** 8).toFixed();
     const evm_token_result = await get_evm_token_info(contract_address, chain_id, unauthenticated_agent);
-
     if (evm_token_result.result.length == 0) {
       return {
         message: 'No evm token available for provided info',
@@ -76,11 +74,18 @@ export const get_evm_token_and_generate_twin_token = async (
       candid_evm_token.symbol,
       Number(candid_evm_token.chain_id.toString()),
     );
+
+    const transfer_fee = await generate_twin_token_transfer_fee(
+      Number(chain_id),
+      contract_address,
+      candid_evm_token.decimals,
+    );
+
     const name = `${candid_evm_token.name} on ICP`;
-    const human_readable_transfer_fee = transfer_fee;
-    const transfer_fee_with_decimals = BigNumber(human_readable_transfer_fee)
-      .multipliedBy(10 ** candid_evm_token.decimals)
+    const human_readable_transfer_fee = BigNumber(transfer_fee)
+      .dividedBy(10 ** candid_evm_token.decimals)
       .toFixed();
+
     return {
       message: '',
       result: {
@@ -95,7 +100,7 @@ export const get_evm_token_and_generate_twin_token = async (
           name,
           symbol,
           human_readable_transfer_fee,
-          transfer_fee: transfer_fee_with_decimals,
+          transfer_fee,
         },
       },
       success: true,

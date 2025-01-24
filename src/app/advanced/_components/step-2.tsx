@@ -13,24 +13,29 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
   const isWalletConnected = Boolean(icpIdentity);
 
   const token = icpBalance?.tokens.find((token) => token.canisterId === newTwinMeta?.icp_canister_id);
-  const hasSufficientBalance = token ? parseFloat(token.balance || '0') >= parseFloat(newTwinMeta?.human_readable_creation_fee || '0') : false;
+  const hasSufficientBalance = token
+    ? parseFloat(token.balance || '0') >= parseFloat(newTwinMeta?.human_readable_creation_fee || '0')
+    : false;
 
-  const buttonText = !isWalletConnected
-    ? 'Connect Wallet'
-    : !hasSufficientBalance
-      ? 'Insufficient Balance'
-      : isLoading
-        ? <Spinner />
-        : 'Confirm';
-
+  const buttonText = !isWalletConnected ? (
+    'Connect Wallet'
+  ) : !hasSufficientBalance ? (
+    'Insufficient Balance'
+  ) : isLoading ? (
+    <Spinner />
+  ) : (
+    'Confirm'
+  );
 
   return (
     <Box className="gap-y-5 justify-between h-full md:h-auto md:max-w-[612px] md:gap-y-16 md:p-10">
       <div className="flex flex-col gap-y-8 w-full">
-        <div className={cn(
-          'flex items-center justify-center relative',
-          'text-white md:text-black dark:text-white text-2xl font-bold md:text-4xl',
-        )}>
+        <div
+          className={cn(
+            'flex items-center justify-center relative',
+            'text-white md:text-black dark:text-white text-2xl font-bold md:text-4xl',
+          )}
+        >
           Token Summary
           <button
             className="hidden md:flex absolute left-0 text-base items-center gap-x-1"
@@ -71,9 +76,10 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
               className={cn(
                 'flex items-center justify-between gap-x-1',
                 idx === 2 && 'border-b border-white/15 pb-4 mb-1',
-              )}>
+              )}
+            >
               <p className="font-medium">{item.title}</p>
-              <p className={cn(idx === 6 && 'text-[#27AE60]')}>{item.value}</p>
+              <p className={cn((idx === 6 || idx === 7) && 'text-[#27AE60]')}>{item.value}</p>
             </div>
           ))}
         </div>
@@ -92,9 +98,10 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
           type="submit"
           disabled={!isWalletConnected || !hasSufficientBalance || isLoading}
           className={cn(
-            "bg-primary-buttons w-full min-h-14 rounded-[16px] text-white duration-200",
-            "hover:opacity-85 disabled:opacity-50 disabled:pointer-events-none"
-          )}>
+            'bg-primary-buttons w-full min-h-14 rounded-[16px] text-white duration-200',
+            'hover:opacity-85 disabled:opacity-50 disabled:pointer-events-none',
+          )}
+        >
           {buttonText}
         </button>
       </div>

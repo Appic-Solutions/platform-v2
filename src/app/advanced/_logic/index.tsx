@@ -71,7 +71,7 @@ export default function LogicHelper(): UseLogicReturn {
     if (data?.success) {
       toast({ title: data.message || 'Twin Token created successfully' });
       setStep(1);
-      setStatus('successfull');
+      setStatus('successful');
       setShouldPoll(false);
     }
 
@@ -100,7 +100,7 @@ export default function LogicHelper(): UseLogicReturn {
         setNewTwinMeta(resStepOne.result);
         setStep(2);
       } else {
-        if (!!icpIdentity) return
+        if (!!icpIdentity) return;
         setIsOpen(true);
         const resStepTwo = await approve_icp(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
         console.log('🚀 ~ onSubmit ~ resStepTwo:', resStepTwo);
