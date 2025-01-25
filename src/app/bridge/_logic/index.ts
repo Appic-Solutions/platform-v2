@@ -1,7 +1,5 @@
 export const dynamic = 'force-static';
 
-// TODO: Tx queries and functions should move to a separate file
-
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
 import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
@@ -28,6 +26,7 @@ import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
 import BigNumber from 'bignumber.js';
+import { setPendingTransactionToSession } from '@/common/helpers/session';
 
 export const BridgeLogic = () => {
   const queryClient = useQueryClient();
@@ -45,7 +44,7 @@ export const BridgeLogic = () => {
     toWalletValidationError,
   } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage, setTxLastStepStatus } =
+  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage, setPendingTx } =
     useBridgeActions();
   // Shared Store
   const {
@@ -86,26 +85,22 @@ export const BridgeLogic = () => {
             count: 5,
             status: 'successful',
           });
-          setTxLastStepStatus('successful');
         } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
           setTxStep({
             count: 5,
             status: 'failed',
           });
-          setTxLastStepStatus('failed');
         } else {
           setTxStep({
             count: 5,
             status: 'pending',
           });
-          setTxLastStepStatus('pending');
         }
       } else if (!res.success) {
         setTxStep({
           count: 5,
           status: 'failed',
         });
-        setTxLastStepStatus('failed');
       }
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchWalletBalances();
@@ -133,26 +128,22 @@ export const BridgeLogic = () => {
             count: 4,
             status: 'successful',
           });
-          setTxLastStepStatus('successful');
         } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
           setTxStep({
             count: 4,
             status: 'failed',
           });
-          setTxLastStepStatus('failed');
         } else {
           setTxStep({
             count: 4,
             status: 'pending',
           });
-          setTxLastStepStatus('pending');
         }
       } else if (!res.success) {
         setTxStep({
           count: 4,
           status: 'failed',
         });
-        setTxLastStepStatus('failed');
       }
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchWalletBalances();
@@ -453,6 +444,14 @@ export const BridgeLogic = () => {
         });
         return withdrawResponse.message;
       }
+      setPendingTransactionToSession({
+        bridge_option: params.bridgeOption,
+        id: withdrawResponse.result,
+      });
+      setPendingTx({
+        bridge_option: params.bridgeOption,
+        id: withdrawResponse.result,
+      });
       setWithdrawalId(withdrawResponse.result);
       setTxStep({
         count: 3,
@@ -531,6 +530,14 @@ export const BridgeLogic = () => {
       });
       return depositResponse.message;
     }
+    setPendingTransactionToSession({
+      bridge_option: params.bridgeOption,
+      id: depositResponse.result,
+    });
+    setPendingTx({
+      bridge_option: params.bridgeOption,
+      id: depositResponse.result,
+    });
     setTxHash(depositResponse.result);
     setTxStep({
       count: 4,

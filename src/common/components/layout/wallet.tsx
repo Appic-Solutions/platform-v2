@@ -10,8 +10,13 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '../ui/drawer
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/common/hooks/useUnauthenticatedAgent';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { check_deposit_status, check_withdraw_status } from '@/blockchain_api/functions/icp/bridge_transactions';
+import { getPendingTransaction, PendingTransaction, removePendingTransaction } from '@/common/helpers/session';
+import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
+import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { HttpAgent } from '@dfinity/agent';
 
 const WalletPage = () => {
   const {
@@ -35,6 +40,11 @@ const WalletPage = () => {
     setIsEvmBalanceLoading,
     setIsIcpBalanceLoading,
   } = useSharedStoreActions();
+
+  const { pendingTx } = useBridgeStore();
+  const { setPendingTx } = useBridgeActions();
+
+  const queryClient = useQueryClient();
 
   // ICP Wallet Hooks
   const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
@@ -107,6 +117,90 @@ const WalletPage = () => {
     setChainId(undefined);
     setEvmAddress(undefined);
   };
+
+  // [{bridge_option: BridgeOption, id: TxHash | string}]
+  // get pending tx on reload
+  useEffect(() => {
+    const pendingTxFromSession = getPendingTransaction() as PendingTransaction;
+    if (pendingTxFromSession) {
+      if (pendingTxFromSession.bridge_option.bridge_tx_type === TxType.Deposit && evmAddress) {
+        setPendingTx(pendingTxFromSession);
+      }
+      if (pendingTxFromSession.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
+        setPendingTx(pendingTxFromSession);
+      }
+    }
+  }, [evmAddress, icpIdentity, setPendingTx]);
+
+  // check pending deposit tx status
+  useQuery({
+    queryKey: ['check-pending-deposit-status'],
+    queryFn: async () => {
+      const res = await check_deposit_status(
+        pendingTx?.id as `0x${string}`,
+        pendingTx?.bridge_option as BridgeOption,
+        unAuthenticatedAgent as HttpAgent,
+      );
+      if (res.success) {
+        if (res.result === 'Minted') {
+          setPendingTx(undefined);
+          removePendingTransaction();
+        } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
+          setPendingTx(undefined);
+          removePendingTransaction();
+        } else {
+          setPendingTx(pendingTx);
+        }
+      } else if (!res.success) {
+        setPendingTx(undefined);
+        removePendingTransaction();
+      }
+      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
+      fetchBalances();
+      return res;
+    },
+    refetchInterval: 1000 * 60,
+    enabled:
+      !!pendingTx &&
+      !!unAuthenticatedAgent &&
+      pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
+      !!evmAddress,
+  });
+  // check pending withdrawal tx status
+  useQuery({
+    queryKey: ['check-pending-withdrawal-status'],
+    queryFn: async () => {
+      const res = await check_withdraw_status(
+        pendingTx?.id as string,
+        pendingTx?.bridge_option as BridgeOption,
+        unAuthenticatedAgent as HttpAgent,
+      );
+
+      if (res.success) {
+        if (res.result === 'Successful') {
+          setPendingTx(undefined);
+          removePendingTransaction();
+        } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
+          setPendingTx(undefined);
+          removePendingTransaction();
+        } else {
+          setPendingTx(pendingTx);
+        }
+      } else if (!res.success) {
+        setPendingTx(undefined);
+        removePendingTransaction();
+      }
+      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
+      fetchBalances();
+      return res;
+    },
+    refetchInterval: 1000 * 60,
+    enabled:
+      !!pendingTx &&
+      !!unAuthenticatedAgent &&
+      pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
+      !!icpIdentity,
+  });
 
   return (
     <div

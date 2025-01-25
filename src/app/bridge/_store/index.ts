@@ -1,5 +1,6 @@
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+import { PendingTransaction } from '@/common/helpers/session';
 import { create } from 'zustand';
 
 export type TokenType = EvmToken | IcpToken;
@@ -30,7 +31,7 @@ interface BridgeState {
   // tx states
   txStep: TxStepType;
   txErrorMessage: string | undefined;
-  txLastStepStatus: Status | undefined;
+  pendingTx: PendingTransaction | undefined;
 }
 
 type Action = {
@@ -49,7 +50,7 @@ type Action = {
     setSelectedTokenBalance: (tokenBalance: string) => void;
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
-    setTxLastStepStatus: (status: Status) => void;
+    setPendingTx: (pendingTxs: PendingTransaction | undefined) => void;
   };
 };
 
@@ -74,7 +75,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   toWalletValidationError: '',
   selectedTokenBalance: '',
   txErrorMessage: undefined,
-  txLastStepStatus: undefined,
+  pendingTx: undefined,
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
     setSelectedTokenType: (selectedTokenType) => set({ selectedTokenType }),
@@ -90,7 +91,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setSelectedTokenBalance: (selectedTokenBalance) => set({ selectedTokenBalance }),
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
-    setTxLastStepStatus: (txLastStepStatus) => set({ txLastStepStatus }),
+    setPendingTx: (pendingTx) => set({ pendingTx }),
   },
 }));
 

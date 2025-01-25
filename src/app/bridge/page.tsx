@@ -12,7 +12,7 @@ import { ParkOutlineBridgeIcon } from '@/common/components/icons';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();
-  const { amount, fromToken, toToken, bridgePairs, activeStep, txLastStepStatus } = useBridgeStore();
+  const { amount, fromToken, toToken, bridgePairs, activeStep, pendingTx } = useBridgeStore();
   const { setBridgePairs, setBridgeOptions } = useBridgeActions();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
@@ -62,7 +62,7 @@ const BridgeHome = () => {
   return (
     <>
       {renderStep()}
-      {txLastStepStatus && txLastStepStatus === 'pending' && (
+      {pendingTx && (
         <MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className="text-white" />} />
       )}
     </>

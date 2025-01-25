@@ -37,7 +37,7 @@ enum Badge {
   CHEAPEST = 'Cheapest',
 }
 
-enum TxType {
+export enum TxType {
   Deposit,
   Withdrawal,
 }
