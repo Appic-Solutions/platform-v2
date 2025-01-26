@@ -21,6 +21,8 @@ import { Principal } from '@dfinity/principal';
 import { convert_png_to_data_uri } from '@/blockchain_api/utils/png_to_data_uri';
 import { generate_twin_token_symbol, generate_twin_token_transfer_fee } from './generate_new_twin_token_symbol';
 
+const icp_transfer_fee = 10_000;
+
 // 1st: Find the base token information from the appic helper contract
 // 2nd: Approve icp spending for lsm canister
 // 3rd: request a new twin token through lsm
@@ -55,7 +57,7 @@ export const get_evm_token_and_generate_twin_token = async (
   });
   try {
     const lsm_info = (await lsm_actor.get_lsm_info()) as LedgerManagerInfo;
-    const creation_fee = BigNumber(lsm_info.ls_creation_icp_fee.toString());
+    const creation_fee = BigNumber(lsm_info.ls_creation_icp_fee.toString()).plus(icp_transfer_fee);
     const human_readable_creation_fee = creation_fee.dividedBy(10 ** 8).toFixed();
     const evm_token_result = await get_evm_token_info(contract_address, chain_id, unauthenticated_agent);
     if (evm_token_result.result.length == 0) {
@@ -206,10 +208,10 @@ export const request_new_twin = async (
 // Step 3
 export const check_new_twin_ls_request = async (
   new_twin_metadata: NewTwinMetadata,
-  authenticated_agent: Agent,
+  unauthenticated_agent: HttpAgent,
 ): Promise<Response<string>> => {
   const lsm_actor = Actor.createActor(lsmIdlFactory, {
-    agent: authenticated_agent,
+    agent: unauthenticated_agent,
     canisterId: lsm_ledger_id,
   });
   try {
@@ -218,7 +220,7 @@ export const check_new_twin_ls_request = async (
       chain_id: new_twin_metadata.evm_base_token.chain_id,
     } as Erc20Contract;
 
-    const new_lsm_twin_status = (await lsm_actor.add_erc20_ls(erc2_contract)) as [] | [ManagedCanisterIds];
+    const new_lsm_twin_status = (await lsm_actor.all_twins_canister_ids(erc2_contract)) as [] | [ManagedCanisterIds];
 
     if (new_lsm_twin_status.length != 0) {
       return { result: 'Successfully created a new ledger suite', success: true, message: '' };

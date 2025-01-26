@@ -3,7 +3,7 @@ import { useState } from 'react';
 import useLogic from '../_logic';
 import { HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
-import { cn, getChainLogo, getChainName, getChainSymbol } from '@/common/helpers/utils';
+import { cn, getChainName } from '@/common/helpers/utils';
 import Spinner from '@/common/components/ui/spinner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import TwinTokenIcon from '@/common/components/icons/twin-token';
@@ -84,8 +84,8 @@ export default function AdvancedContent() {
           <div className="flex justify-start items-center gap-4 w-full">
             <div className="relative">
               <Avatar className="w-[58px] h-[58px] rounded-full md:w-[72px] md:h-[72px]">
-                <AvatarImage src={getChainLogo(item.evm_token?.chainId) || 'images/logo/placeholder.png'} />
-                <AvatarFallback>{getChainSymbol(item.evm_token?.chainId)}</AvatarFallback>
+                <AvatarImage src={item.icp_token?.logo || 'images/logo/placeholder.png'} />
+                <AvatarFallback>{item.icp_token?.symbol}</AvatarFallback>
               </Avatar>
               <Avatar
                 className={cn(
@@ -93,7 +93,7 @@ export default function AdvancedContent() {
                   'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
                 )}
               >
-                <AvatarImage src={'/images/logo/icp-logo.svg'} />
+                <AvatarImage src={'/images/logo/wallet_logos/icp.svg'} />
                 <AvatarFallback>{'ICP'}</AvatarFallback>
               </Avatar>
             </div>
@@ -144,8 +144,12 @@ export default function AdvancedContent() {
           </div>
 
           <div className="flex items-center text-xs md:text-sm w-full justify-between">
-            <span className="text-primary">Twin Token Fee:</span>
-            <span className="text-[#12B76A] text-right">{item.human_readable_fee_charged}</span>
+            <span className="text-primary">Twin Token Creation Fee:</span>
+            <span className="text-[#12B76A] text-right">{item.human_readable_fee_charged} ICP</span>
+          </div>
+          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+            <span className="text-primary">Ledger Id:</span>
+            <span className="text-[#12B76A] text-right">{item.token_id} ICP</span>
           </div>
         </div>
 

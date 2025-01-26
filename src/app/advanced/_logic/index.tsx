@@ -53,7 +53,10 @@ export default function LogicHelper(): UseLogicReturn {
   const { data, error } = useQuery({
     queryKey: ['checkStepFour'],
     queryFn: async () => {
-      const response = await check_new_twin_ls_request(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
+      const response = await check_new_twin_ls_request(
+        newTwinMeta as NewTwinMetadata,
+        unAuthenticatedAgent as HttpAgent,
+      );
       setCanCloseModal(true);
       if (!response.success) {
         setStatus('failed');
@@ -100,10 +103,11 @@ export default function LogicHelper(): UseLogicReturn {
         setNewTwinMeta(resStepOne.result);
         setStep(2);
       } else {
-        if (!!icpIdentity) return;
+        if (!icpIdentity) return;
         setIsOpen(true);
         const resStepTwo = await approve_icp(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
         console.log('🚀 ~ onSubmit ~ resStepTwo:', resStepTwo);
+
         if (!resStepTwo.success) {
           setStatus('failed');
           setErrorMessage(resStepTwo.message);

@@ -58,7 +58,7 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
               <div className="flex items-center gap-x-3">
                 <div className="border-2 border-white/50 rounded-full p-2">
                   <div className={cn('relative w-7 h-7', 'lg:w-10 lg:h-10')}>
-                    <Image src={toToken.logo} alt="btc" className="object-contain" fill />
+                    <Image src={toToken.logo} alt="btc" className="object-contain rounded-full" fill />
                   </div>
                 </div>
                 <p

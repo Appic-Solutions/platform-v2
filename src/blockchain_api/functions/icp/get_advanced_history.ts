@@ -21,6 +21,7 @@ export interface NewTwinRequest {
   human_readable_fee_charged: string;
   chain_id: number;
   icp_token: IcpToken | undefined;
+  token_id: string | undefined;
 }
 
 export const get_advanced_history = async (
@@ -59,7 +60,7 @@ const transform_ls_request_response = (requests: CandidLedgerSuiteRequest[]): Ne
     const fee_token_symbol = 'Icp' in request.fee_charged ? 'ICP' : 'APPIC';
 
     const human_readable_fee_charged = BigNumber(fee_charged)
-      .dividedBy(8 ** 10)
+      .dividedBy(10 ** 8)
       .toFixed();
     return {
       chain_id: Number(request.chain_id.toString()),
@@ -74,6 +75,7 @@ const transform_ls_request_response = (requests: CandidLedgerSuiteRequest[]): Ne
       fee_token_symbol,
       icp_token: request.icp_token.length != 0 ? parse_candid_icp_token_to_icp_token(request.icp_token[0]) : undefined,
       status: parse_new_twin_request_status(request.status),
+      token_id: request.icp_token.length != 0 ? request.icp_token[0].ledger_id.toText() : undefined,
     };
   });
   return mapped_results.sort((a, b) => b.date_object.getTime() - a.date_object.getTime());
