@@ -18,14 +18,15 @@ import { useQuery } from '@tanstack/react-query';
 export default function LogicHelper(): UseLogicReturn {
   // State
   const [step, setStep] = useState(1);
+  const [creationStep, setCreationStep] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [canCloseModal, setCanCloseModal] = useState(false);
   const [status, setStatus] = useState<Status>('pending');
   const [errorMessage, setErrorMessage] = useState('');
   const [newTwinMeta, setNewTwinMeta] = useState<NewTwinMetadata>();
   const [shouldPoll, setShouldPoll] = useState(false);
-  const [isLoading, setIsloading] = useState(false);
-  const { unAuthenticatedAgent, authenticatedAgent, icpIdentity } = useSharedStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const { unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
 
   // Hook
   const { toast } = useToast();
@@ -50,48 +51,39 @@ export default function LogicHelper(): UseLogicReturn {
   };
 
   // React Query for polling Step Four
-  const { data, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['checkStepFour'],
     queryFn: async () => {
       const response = await check_new_twin_ls_request(
         newTwinMeta as NewTwinMetadata,
         unAuthenticatedAgent as HttpAgent,
       );
-      setCanCloseModal(true);
-      if (!response.success) {
-        setStatus('failed');
-        throw new Error(response.message || 'Still processing...');
-      }
-      console.log('🚀 ~ queryFn: ~ response:', response);
       return response;
     },
     enabled: shouldPoll && !!newTwinMeta,
     refetchInterval: 1000 * 60,
-    refetchIntervalInBackground: true,
   });
 
   useEffect(() => {
-    if (data?.success) {
-      toast({ title: data.message || 'Twin Token created successfully' });
-      setStep(1);
+    if (data?.result === 'success') {
+      setShouldPoll(false);
+      setIsLoading(false);
       setStatus('successful');
-      setShouldPoll(false);
+      setCanCloseModal(true);
     }
+  }, [data]);
 
-    if (error) {
-      toast({
-        title: (error as Error)?.message || 'Failed to create Twin Token',
-        variant: 'destructive',
-      });
-      setErrorMessage(error.message);
-      setShouldPoll(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, error]);
+  const failedSubmitHandler = (message: string) => {
+    setStatus('failed');
+    setCreationStep(1)
+    setErrorMessage(message);
+    setCanCloseModal(true);
+    throw new Error(message || 'we have new error')
+  }
 
   const onSubmit = async (data: DefaultValuesType) => {
     try {
-      setIsloading(true);
+      setIsLoading(true);
       if (step === 1) {
         const resStepOne = await get_evm_token_and_generate_twin_token(
           data.chain_id,
@@ -103,27 +95,16 @@ export default function LogicHelper(): UseLogicReturn {
         setNewTwinMeta(resStepOne.result);
         setStep(2);
       } else {
-        if (!icpIdentity) return;
         setIsOpen(true);
         const resStepTwo = await approve_icp(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
         console.log('🚀 ~ onSubmit ~ resStepTwo:', resStepTwo);
-
-        if (!resStepTwo.success) {
-          setStatus('failed');
-          setErrorMessage(resStepTwo.message);
-          setCanCloseModal(true);
-          throw new Error(resStepTwo.message || 'we have new error');
-        }
+        if (!resStepTwo.success) failedSubmitHandler(resStepTwo.message)
+        setCreationStep(2)
 
         const resStepThree = await request_new_twin(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
         console.log('🚀 ~ onSubmit ~ resStepThree:', resStepThree);
-        if (!resStepThree.success) {
-          setStatus('failed');
-          setErrorMessage(resStepThree.message);
-          setCanCloseModal(true);
-          throw new Error(resStepThree.message || 'we have new error');
-        }
-
+        if (!resStepThree.success) failedSubmitHandler(resStepThree.message)
+        setCreationStep(3)
         setShouldPoll(true);
       }
     } catch (error: unknown) {
@@ -134,7 +115,7 @@ export default function LogicHelper(): UseLogicReturn {
         });
       }
     } finally {
-      setIsloading(false);
+      setIsLoading(false);
     }
   };
 
@@ -142,6 +123,7 @@ export default function LogicHelper(): UseLogicReturn {
     // State
     step,
     setStep,
+    creationStep,
     isLoading,
     newTwinMeta,
     isOpen,

@@ -13,6 +13,7 @@ export default function ProcessModal({
   title,
   subTitle,
   canCloseModal,
+  step,
   newTwinMeta,
   closeHandler,
 }: ProcessModalProps) {
@@ -62,7 +63,7 @@ export default function ProcessModal({
                 className={cn(
                   "flex items-center justify-center gap-2 p-2 rounded-lg",
                   "bg-card-background text-primary shadow-lg border border-gray-200",
-                  "transition-all hover:opacity-90 hover:shadow-md",
+                  "transition-all hover:opacity-90 hover:shadow-md max-w-fit",
                 )}>
                 <HistoryIcon width={20} height={20} />
                 Check History
@@ -70,7 +71,7 @@ export default function ProcessModal({
             </>
           )}
         </div>
-        <Stepper totalSteps={3} currentStep={1} />
+        <Stepper totalSteps={3} currentStep={step} />
       </DialogContent>
     </Dialog >
   );

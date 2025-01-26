@@ -12,6 +12,7 @@ export interface DefaultValuesType {
 export interface UseLogicReturn {
   step: number;
   setStep: Dispatch<SetStateAction<number>>;
+  creationStep: number;
   isLoading: boolean;
   newTwinMeta: NewTwinMetadata | undefined;
   isOpen: boolean;
@@ -43,6 +44,7 @@ export interface TokenListProps {
 export interface ProcessModalProps {
   isOpen: boolean;
   title: string;
+  step: number;
   subTitle: string;
   newTwinMeta: NewTwinMetadata | undefined;
   closeHandler: () => void;
