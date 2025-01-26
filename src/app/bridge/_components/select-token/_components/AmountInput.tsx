@@ -21,7 +21,9 @@ const AmountInput = () => {
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find(
-        (t) => t.contractAddress === fromToken.contractAddress && t.chainId === fromToken.chainId,
+        (t) =>
+          t.contractAddress.toLocaleLowerCase() === fromToken.contractAddress?.toLocaleLowerCase() &&
+          t.chainId === fromToken.chainId,
       );
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
@@ -36,7 +38,7 @@ const AmountInput = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleAmountChange(inputAmount);
-    }, 1000);
+    }, 800);
 
     return () => clearTimeout(delayDebounceFn);
   }, [inputAmount]);

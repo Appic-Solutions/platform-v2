@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Actor, Agent, HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
-import { createWalletClient, custom, WalletClient, Chain as ViemChain } from 'viem';
+import { createWalletClient, custom, WalletClient, Chain as ViemChain, createPublicClient, http } from 'viem';
 
 import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
 import { Account, ApproveArgs, Result_2, Allowance, AllowanceArgs } from '@/blockchain_api/did/ledger/icrc_types';
@@ -42,6 +42,7 @@ import {
 import { appic_helper_canister_id } from '@/canister_ids.json';
 import { parse_evm_to_icp_tx_status, parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
+import { check_allowance } from '../evm/check_allowance';
 /**
  * Bridge Transactions: Overview
  *
@@ -597,7 +598,24 @@ export const approve_erc20 = async (
   } else {
     try {
       const [account] = await wallet_client.getAddresses();
-      console.log('account', account);
+
+      // Check if there is enough allowance
+      const allowance = await check_allowance(
+        bridge_option.from_token_id as `0x${string}`,
+        account as `0x${string}`,
+        bridge_option.deposit_helper_contract as `0x${string}`,
+        bridge_option.viem_chain,
+        bridge_option.rpc_url,
+      );
+
+      if (BigNumber(allowance).isGreaterThanOrEqualTo(bridge_option.amount)) {
+        return {
+          result: true,
+          success: true,
+          message: '',
+        };
+      }
+
       const encoded_function_data = encode_approval_function_data(
         bridge_option.deposit_helper_contract as `0x${string}`,
         bridge_option.amount,
@@ -619,11 +637,29 @@ export const approve_erc20 = async (
         ...prepared_transaction,
       });
 
-      return {
-        result: hash,
-        message: '',
-        success: true,
-      };
+      const public_client = createPublicClient({
+        transport: http(bridge_option.rpc_url),
+        chain: bridge_option.viem_chain,
+      });
+
+      const tx_status = await public_client.waitForTransactionReceipt({
+        hash,
+        confirmations: 2,
+      });
+
+      if (tx_status.status == 'success') {
+        return {
+          result: hash,
+          message: 'Failed to get erc20 approval',
+          success: true,
+        };
+      } else {
+        return {
+          result: hash,
+          message: '',
+          success: false,
+        };
+      }
     } catch (error) {
       return {
         result: false,
@@ -684,11 +720,29 @@ export const request_deposit = async (
       ...prepared_transaction,
     });
 
-    return {
-      result: hash,
-      message: '',
-      success: true,
-    };
+    const public_client = createPublicClient({
+      transport: http(bridge_option.rpc_url),
+      chain: bridge_option.viem_chain,
+    });
+
+    const tx_status = await public_client.waitForTransactionReceipt({
+      hash,
+      confirmations: 2,
+    });
+
+    if (tx_status.status == 'success') {
+      return {
+        result: hash,
+        message: 'Failed to request deposit',
+        success: true,
+      };
+    } else {
+      return {
+        result: hash,
+        message: '',
+        success: false,
+      };
+    }
   } catch (error) {
     return {
       result: '0x',

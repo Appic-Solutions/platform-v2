@@ -60,7 +60,10 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
         if (evmBalance) {
           updatedTokenList = updatedTokenList.map((token) => {
             const foundToken = evmBalance.tokens.find((item) => {
-              if (token.contractAddress === item.contractAddress && token.chainId === item.chainId) {
+              if (
+                token.contractAddress?.toLowerCase() === item.contractAddress.toLowerCase() &&
+                token.chainId === item.chainId
+              ) {
                 return true;
               }
             });

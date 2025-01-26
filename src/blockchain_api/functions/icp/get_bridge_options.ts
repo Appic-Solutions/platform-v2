@@ -136,7 +136,7 @@ export const get_bridge_options = async (
         bridge_metadata.operator,
         bridge_metadata.is_native,
         principal_bytes,
-        '0',
+        '1',
       );
       const encoded_approval_data = encode_approval_function_data(bridge_metadata.deposit_helper_contract, amount);
 
@@ -151,6 +151,8 @@ export const get_bridge_options = async (
         bridge_metadata.rpc_url,
       );
 
+      console.log('Approval', approval_gas, total_approval_fee);
+
       const { total_deposit_fee, deposit_gas } = await estimate_deposit_fee(
         value,
         encoded_function_data,
@@ -160,6 +162,8 @@ export const get_bridge_options = async (
         bridge_metadata.viem_chain,
         bridge_metadata.rpc_url,
       );
+
+      console.log('Deposit', deposit_gas, total_deposit_fee);
 
       if (bridge_metadata.is_native) {
         if (BigNumber(total_deposit_fee).plus(total_approval_fee).isGreaterThan(amount)) {
@@ -397,7 +401,7 @@ const get_gas_price = async (
 
     const fee_history = await client.getFeeHistory({
       blockCount: 5,
-      rewardPercentiles: [20, 80],
+      rewardPercentiles: [50, 70, 80, 90],
       blockTag: 'latest',
     });
 
@@ -439,23 +443,31 @@ const estimate_deposit_fee = async (
   rpc_url: string,
 ): Promise<{ deposit_gas: string; total_deposit_fee: string }> => {
   try {
-    const client = createPublicClient({ transport: http(rpc_url), chain });
-    const estimated_gas = await client.estimateGas({
-      account: is_native ? undefined : '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
-      to: deposit_helper_contract,
-      value: BigInt(value),
-      type: 'eip1559',
-      data: encoded_function_data,
-    });
+    if (is_native) {
+      const client = createPublicClient({ transport: http(rpc_url), chain });
+      const estimated_gas = await client.estimateGas({
+        account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
+        to: deposit_helper_contract,
+        value: value == '0' ? undefined : BigInt(value),
+        type: 'eip1559',
+        data: encoded_function_data,
+      });
 
-    const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
-      .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
-      .toFixed(); // plus 1 percent in case gas consumption is higher
-    console.log(estimated_gas_plus_1_percent);
-    return {
-      total_deposit_fee: BigNumber(estimated_gas_plus_1_percent).multipliedBy(max_fee_per_gas).toFixed(),
-      deposit_gas: estimated_gas_plus_1_percent,
-    };
+      const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
+        .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
+        .toFixed(); // plus 1 percent in case gas consumption is higher
+      console.log(estimated_gas_plus_1_percent);
+      return {
+        total_deposit_fee: BigNumber(estimated_gas_plus_1_percent).multipliedBy(max_fee_per_gas).toFixed(),
+        deposit_gas: estimated_gas_plus_1_percent,
+      };
+    } else {
+      const required_gas = '75493';
+      return {
+        deposit_gas: required_gas,
+        total_deposit_fee: BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
+      };
+    }
   } catch (error) {
     console.error('Error estimating deposit gas:', error);
     throw error;
@@ -486,7 +498,7 @@ const estimate_deposit_approval_fee: (
   try {
     const client = createPublicClient({ transport: http(rpc_url), chain });
     const estimated_gas = await client.estimateGas({
-      account: '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+      account: '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
       to: token_contract_address,
       type: 'eip1559',
       data: encoded_function_data,
