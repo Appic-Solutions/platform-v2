@@ -39,7 +39,7 @@ export const Step2Data = (newTwinMeta: NewTwinMetadata | undefined) => [
 
 export const ModalStepData = new Map<number, ModalStepDataReturn>([
   [
-    2,
+    1,
     {
       title: 'Step 1',
       pending: 'Please approve the transaction',
@@ -48,7 +48,7 @@ export const ModalStepData = new Map<number, ModalStepDataReturn>([
     },
   ],
   [
-    3,
+    2,
     {
       title: 'Step 2',
       pending: 'Sending transaction request to the network',
@@ -57,7 +57,7 @@ export const ModalStepData = new Map<number, ModalStepDataReturn>([
     },
   ],
   [
-    4,
+    3,
     {
       title: 'Step 3',
       pending: 'Waiting for new twin token verification',
