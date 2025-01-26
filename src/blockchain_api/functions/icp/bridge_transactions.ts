@@ -88,13 +88,15 @@ export const icrc2_approve = async (
 ): Promise<Response<string>> => {
   const native_actor = Actor.createActor(IcrcIdlFactory, {
     agent: authenticated_agent,
-    canisterId: bridge_option.is_native ? bridge_option.native_fee_token_id : bridge_option.from_token_id,
+    canisterId: bridge_option.native_fee_token_id,
   });
 
   const native_actor_unauthenticated = Actor.createActor(IcrcIdlFactory, {
     agent: unauthenticated_agent,
-    canisterId: bridge_option.is_native ? bridge_option.native_fee_token_id : bridge_option.from_token_id,
+    canisterId: bridge_option.native_fee_token_id,
   });
+
+  console.log(bridge_option.native_fee_token_id);
 
   try {
     const sender_principal = await authenticated_agent.getPrincipal();
@@ -157,7 +159,12 @@ export const icrc2_approve = async (
         },
         spender: { owner: bridge_option.minter_id, subaccount: [] },
       } as AllowanceArgs)) as Allowance;
-
+      console.log(
+        native_allowance.allowance.toString(),
+        BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          BigNumber(bridge_option.fees.total_native_fee).minus(bridge_option.fees.approval_fee_in_native_token),
+        ),
+      );
       // Check if minter already has enough allowance for native token
       if (
         BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
@@ -231,7 +238,7 @@ export const icrc2_approve = async (
     return {
       result: '',
       success: false,
-      message: `Failed to approve allowance:${error}`,
+      message: `Failed to approve allowance:${JSON.stringify(error)}`,
     };
   }
 };
@@ -277,7 +284,7 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw native token from Appic minter: ${native_withdrawal_result.Err}`,
+            message: `Failed to withdraw native token from Appic minter: ${JSON.stringify(native_withdrawal_result.Err)}`,
             success: false,
           };
         }
@@ -308,14 +315,14 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw ERC20 token from Appic minter: ${erc20_withdrawal_result.Err}`,
+            message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(erc20_withdrawal_result.Err)}`,
             success: false,
           };
         }
       } catch (error) {
         return {
           result: '',
-          message: `Failed to withdraw ERC20 token from Appic minter: ${error}`,
+          message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(error)}`,
           success: false,
         };
       }
@@ -462,7 +469,7 @@ export const notify_appic_helper_withdrawal = async (
     return {
       result: '',
       success: false,
-      message: `Failed to notify minter ${error}, Your funds are safe and will be transferred to your wallet on destination chain.`,
+      message: `Failed to notify minter ${JSON.stringify(error)}, Your funds are safe and will be transferred to your wallet on destination chain.`,
     };
   }
 };
@@ -516,7 +523,7 @@ export const check_withdraw_status = async (
   } catch (error) {
     return {
       result: 'Call Failed',
-      message: `Canister call error ${error}`,
+      message: `Canister call error ${JSON.stringify(error)}`,
       success: false,
     };
   }

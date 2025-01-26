@@ -33,6 +33,7 @@ const BridgeHome = () => {
       };
       try {
         getBridgeOptions(getBridgeOptionsParams).then((res) => {
+          console.log(res);
           if (res) {
             setBridgeOptions({
               message: res.message,

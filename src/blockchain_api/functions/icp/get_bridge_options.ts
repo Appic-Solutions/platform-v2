@@ -248,6 +248,14 @@ export const get_bridge_options = async (
         '0',
       );
 
+      if (bridge_options.length == 0) {
+        return {
+          result: [],
+          success: false,
+          message: 'Amount Too Low',
+        };
+      }
+
       return { result: bridge_options, message: '', success: true };
     } else {
       return { result: [], message: 'Failed to calculate bridge options, Tx type not supported', success: false };
@@ -635,6 +643,11 @@ const calculate_bridge_options = async (
       .dividedBy(BigNumber(10).pow(decimals))
       .toFixed();
     const usd_estimated_return = BigNumber(human_readable_estimated_return).multipliedBy(token_price).toFixed();
+
+    if (BigNumber(usd_estimated_return).isLessThanOrEqualTo(0)) {
+      return [];
+    }
+
     const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 3 min' : '15 - 20 min';
     const native_fee_token_id =
       bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
