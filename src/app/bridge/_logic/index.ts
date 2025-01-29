@@ -44,8 +44,16 @@ export const BridgeLogic = () => {
     toWalletValidationError,
   } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setActiveStep, setTxStep, setTxErrorMessage, setPendingTx } =
-    useBridgeActions();
+  const {
+    setFromToken,
+    setToToken,
+    setAmount,
+    setActiveStep,
+    setTxStep,
+    setTxErrorMessage,
+    setPendingTx,
+    setToWalletAddress,
+  } = useBridgeActions();
   // Shared Store
   const {
     icpIdentity,
@@ -497,7 +505,6 @@ export const BridgeLogic = () => {
       count: 2,
       status: 'pending',
     });
-
     // Step 2: Token Approval
     const approvalResult = await depositTokenWithApproval.mutateAsync({
       bridgeOption: params.bridgeOption,
@@ -515,7 +522,6 @@ export const BridgeLogic = () => {
       count: 3,
       status: 'pending',
     });
-
     // Step 3: Submit Deposit Request
     const depositResponse = await depositToken.mutateAsync({
       bridgeOption: params.bridgeOption,
@@ -543,7 +549,6 @@ export const BridgeLogic = () => {
       count: 4,
       status: 'pending',
     });
-
     // Step 4: Notify Appic Helper
     const notifyResult = await notifyAppicHelperDeposit.mutateAsync({
       bridgeOption: params.bridgeOption,
@@ -575,43 +580,24 @@ export const BridgeLogic = () => {
     setTxErrorMessage('');
     setTxHash(undefined);
     setTxStep({ count: 1, status: 'pending' });
-    if (authenticatedAgent && selectedOption && icpIdentity && unAuthenticatedAgent && amount) {
-      if (fromToken?.chain_type === 'ICP') {
-        if (toWalletAddress) {
-          executeWithdrawal({
-            authenticatedAgent,
-            bridgeOption: selectedOption,
-            recipient: toWalletAddress,
-            userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-            unAuthenticatedAgent,
-          });
-        } else if (evmAddress) {
-          executeWithdrawal({
-            authenticatedAgent,
-            bridgeOption: selectedOption,
-            recipient: evmAddress,
-            userWalletPrincipal: icpIdentity.getPrincipal().toString(),
-            unAuthenticatedAgent,
-          });
-        }
+
+    if (selectedOption && unAuthenticatedAgent && amount) {
+      if (fromToken?.chain_type === 'ICP' && authenticatedAgent && icpIdentity) {
+        executeWithdrawal({
+          bridgeOption: selectedOption,
+          authenticatedAgent,
+          unAuthenticatedAgent,
+          recipient: toWalletAddress || evmAddress || '', // destination wallet EVM address
+          userWalletPrincipal: icpIdentity.getPrincipal().toString(), // source wallet Principal ID
+        });
       } else if (fromToken?.chain_type === 'EVM') {
-        if (toWalletAddress && evmAddress) {
-          executeDeposit({
-            bridgeOption: selectedOption,
-            recipient: Principal.fromText(toWalletAddress),
-            recipientPrincipal: toWalletAddress,
-            unAuthenticatedAgent,
-            userWalletAddress: evmAddress,
-          });
-        } else if (evmAddress) {
-          executeDeposit({
-            bridgeOption: selectedOption,
-            recipient: icpIdentity.getPrincipal(),
-            recipientPrincipal: icpIdentity.getPrincipal().toString(),
-            unAuthenticatedAgent,
-            userWalletAddress: evmAddress,
-          });
-        }
+        executeDeposit({
+          bridgeOption: selectedOption,
+          unAuthenticatedAgent,
+          recipient: Principal.fromText(toWalletAddress) || icpIdentity?.getPrincipal() || '', // destination wallet Principal
+          recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
+          userWalletAddress: evmAddress || '', // source wallet EVM address
+        });
       }
     }
   }
@@ -624,6 +610,7 @@ export const BridgeLogic = () => {
     setTxErrorMessage(undefined);
     setActiveStep(1);
     setAmount('');
+    setToWalletAddress('');
   }
 
   return {
