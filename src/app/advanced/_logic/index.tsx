@@ -106,6 +106,7 @@ export default function LogicHelper(): UseLogicReturn {
         if (!resStepThree.success) failedSubmitHandler(resStepThree.message)
         setCreationStep(3)
         setShouldPoll(true);
+        setCanCloseModal(true);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
