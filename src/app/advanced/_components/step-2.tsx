@@ -79,7 +79,7 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         </button>
         <button
           type="submit"
-          // disabled={!isWalletConnected || !hasSufficientBalance || isLoading}
+          disabled={!isWalletConnected || !hasSufficientBalance || isLoading}
           className={cn(
             'bg-primary-buttons w-full min-h-14 rounded-[16px] text-white duration-200',
             'hover:opacity-85 disabled:opacity-50 disabled:pointer-events-none',
