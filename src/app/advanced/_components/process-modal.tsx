@@ -50,7 +50,7 @@ export default function ProcessModal({
             className="rounded-full min-h-min-w-20 min-w-20"
           />
         </div>
-        <div className="flex flex-col gap-y-2 text-center">
+        <div className="flex flex-col items-center justify-center gap-y-2 text-center">
           <div className="text-xl font-bold text-white capitalize">{status}</div>
           <div className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">{subTitle}</div>
           {canCloseModal && (
