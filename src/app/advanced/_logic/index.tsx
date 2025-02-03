@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { DefaultValuesType, Status, UseLogicReturn } from '../_types';
-import {
-  approve_icp,
-  check_new_twin_ls_request,
-  get_evm_token_and_generate_twin_token,
-  NewTwinMetadata,
-  request_new_twin,
-} from '@/blockchain_api/functions/icp/new_twin_token';
+import { approve_icp, check_new_twin_ls_request, get_evm_token_and_generate_twin_token, NewTwinMetadata, request_new_twin } from '@/blockchain_api/functions/icp/new_twin_token';
 import { useSharedStore } from '@/common/state/store';
 import { Agent, HttpAgent } from '@dfinity/agent';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -65,7 +59,7 @@ export default function LogicHelper(): UseLogicReturn {
   });
 
   useEffect(() => {
-    if (data?.result === 'success') {
+    if (data?.success) {
       setShouldPoll(false);
       setIsLoading(false);
       setStatus('successful');
@@ -75,7 +69,6 @@ export default function LogicHelper(): UseLogicReturn {
 
   const failedSubmitHandler = (message: string) => {
     setStatus('failed');
-    setCreationStep(1)
     setErrorMessage(message);
     setCanCloseModal(true);
     throw new Error(message || 'we have new error')
@@ -106,6 +99,7 @@ export default function LogicHelper(): UseLogicReturn {
         if (!resStepThree.success) failedSubmitHandler(resStepThree.message)
         setCreationStep(3)
         setShouldPoll(true);
+        setCanCloseModal(true);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
