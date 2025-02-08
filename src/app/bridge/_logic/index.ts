@@ -229,19 +229,6 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
-    if (!isWalletConnected('from')) {
-      if (isEvmBalanceLoading || isIcpBalanceLoading) {
-        return {
-          isDisable: true,
-          text: 'Fetching wallet balance',
-        };
-      }
-      return {
-        isDisable: false,
-        text: `Connect ${fromToken?.chain_type} Wallet`,
-      };
-    }
-
     if (!Number(amount) || Number(amount) === 0) {
       return {
         isDisable: true,
