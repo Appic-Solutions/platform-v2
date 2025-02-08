@@ -686,6 +686,7 @@ export const request_deposit = async (
   recipient: Principal, // Users Destination Principal Address
 ): Promise<Response<TxHash>> => {
   const principal_bytes = principal_to_bytes32(recipient.toText());
+  // TODO: TO be fixed
   const encoded_deposit_function_data = encode_deposit_function_data(
     bridge_option.from_token_id,
     bridge_option.operator,
