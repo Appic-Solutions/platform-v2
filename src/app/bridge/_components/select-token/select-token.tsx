@@ -44,7 +44,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   };
 
   const actionButtonHandler = () => {
-    if (!isWalletConnected('from') && fromToken && !showWalletAddress) {
+    if (!isWalletConnected('from') && fromToken) {
       openConnectWalletModalHandler(fromToken);
       return;
     }

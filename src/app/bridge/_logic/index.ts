@@ -229,6 +229,19 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
+    if (!isWalletConnected('from')) {
+      if (isEvmBalanceLoading || isIcpBalanceLoading) {
+        return {
+          isDisable: true,
+          text: 'Fetching wallet balance',
+        };
+      }
+      return {
+        isDisable: false,
+        text: `Connect ${fromToken?.chain_type} Wallet`,
+      };
+    }
+
     if (!Number(amount) || Number(amount) === 0) {
       return {
         isDisable: true,
@@ -492,6 +505,7 @@ export const BridgeLogic = () => {
 
   async function executeDeposit(params: FullDepositRequest) {
     // Step 1: Create Wallet Client
+
     const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
     setTxErrorMessage('');
     if (!walletClientResult) {
@@ -591,13 +605,23 @@ export const BridgeLogic = () => {
           userWalletPrincipal: icpIdentity.getPrincipal().toString(), // source wallet Principal ID
         });
       } else if (fromToken?.chain_type === 'EVM') {
-        executeDeposit({
-          bridgeOption: selectedOption,
-          unAuthenticatedAgent,
-          recipient: Principal.fromText(toWalletAddress) || icpIdentity?.getPrincipal() || '', // destination wallet Principal
-          recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
-          userWalletAddress: evmAddress || '', // source wallet EVM address
-        });
+        if (toWalletAddress.length > 0 && !toWalletValidationError) {
+          executeDeposit({
+            bridgeOption: selectedOption,
+            unAuthenticatedAgent,
+            recipient: Principal.fromText(toWalletAddress), // destination wallet Principal
+            recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
+            userWalletAddress: evmAddress || '', // source wallet EVM address
+          });
+        } else if (icpIdentity) {
+          executeDeposit({
+            bridgeOption: selectedOption,
+            unAuthenticatedAgent,
+            recipient: icpIdentity?.getPrincipal(), // destination wallet Principal
+            recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
+            userWalletAddress: evmAddress || '', // source wallet EVM address
+          });
+        }
       }
     }
   }
