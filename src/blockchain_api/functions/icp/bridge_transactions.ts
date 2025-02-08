@@ -692,9 +692,11 @@ export const request_deposit = async (
     bridge_option.operator,
     bridge_option.is_native,
     principal_bytes,
-    BigNumber(bridge_option.amount)
-      .minus(BigNumber(bridge_option.fees.max_network_fee).plus(bridge_option.fees.approval_fee_in_native_token))
-      .toFixed(),
+    bridge_option.is_native
+      ? BigNumber(bridge_option.amount)
+          .minus(BigNumber(bridge_option.fees.max_network_fee).plus(bridge_option.fees.approval_fee_in_native_token))
+          .toFixed()
+      : bridge_option.amount,
   );
 
   try {
