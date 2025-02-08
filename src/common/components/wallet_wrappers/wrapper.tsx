@@ -68,8 +68,9 @@ export const WalletWrapper = ({
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
       <IdentityKitProvider
         signers={[NFIDW, Plug, Stoic, InternetIdentity]}
-        authType={IdentityKitAuthType.DELEGATION}
-        signerClientOptions={{ targets: ['zjydy-zyaaa-aaaaj-qnfka-cai'] }}
+        authType={IdentityKitAuthType.ACCOUNTS}
+
+        // signerClientOptions={{ targets: ['zjydy-zyaaa-aaaaj-qnfka-cai'] }}
       >
         {children}
       </IdentityKitProvider>
