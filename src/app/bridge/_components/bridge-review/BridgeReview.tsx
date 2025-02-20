@@ -5,8 +5,8 @@ import { ClockIcon, FireIcon } from '@/common/components/icons';
 import Box from '@/common/components/ui/box';
 import BoxHeader from '@/common/components/ui/box-header';
 import { useBridgeActions, useBridgeStore } from '../../_store';
-import { BridgeLogic } from '../../_logic';
 import { DialogTrigger } from '@/common/components/ui/dialog';
+import BridgeReviewLogic from './_logic';
 
 const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   // bridge store
@@ -14,7 +14,7 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { setActiveStep } = useBridgeActions();
 
   // bridge logic
-  const { executeTransaction } = BridgeLogic();
+  const { executeTransaction } = BridgeReviewLogic();
 
   const openModal = () => {
     executeTransaction();
