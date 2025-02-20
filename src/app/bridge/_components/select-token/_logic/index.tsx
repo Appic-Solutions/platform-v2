@@ -141,6 +141,11 @@ const SelectTokenLogic = () => {
           isDisable: true,
           text: 'Set token amount to continue',
         };
+      } else if (!isWalletConnected('from')) {
+        return {
+          isDisable: false,
+          text: `Connect ${fromToken.chain_type} Wallet`,
+        };
       } else if (bridgeOptions.options?.length && toWalletAddress && !toWalletValidationError) {
         return {
           isDisable: false,
