@@ -1,62 +1,27 @@
-import { ArrowsUpDownIcon } from '@/common/components/icons';
+import { ArrowsUpDownIcon, WalletIcon } from '@/common/components/icons';
 import Box from '@/common/components/ui/box';
 import { cn, getChainLogo } from '@/common/helpers/utils';
-import { TokenCard } from './_components/TokenCard';
-import AmountInput from './_components/AmountInput';
-import { useState } from 'react';
-import ActionButton from './_components/ActionButton';
-import BridgeOptionsList from './_components/BridgeOptionsList';
-import WalletIcon from '@/common/components/icons/wallet';
-import WalletAddressInput from './_components/WalletAddressInput';
 import HistoryIcon from '@/common/components/icons/history';
 import Link from 'next/link';
-import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
-import { useAuth } from '@nfid/identitykit/react';
-import { useAppKit } from '@reown/appkit/react';
-import { BridgeLogic } from '../../_logic';
+import { TokenCard } from './TokenCard';
+import AmountInput from './AmountInput';
+import WalletAddressInput from './WalletAddressInput';
+import ActionButton from './ActionButton';
+import BridgeOptionsList from './BridgeOptionsList';
+import SelectTokenLogic from './_logic';
+import { useBridgeActions, useBridgeStore } from '../../_store';
 
 interface SelectTokenProps {
   isPendingBridgeOptions: boolean;
 }
 
 export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
-  const [showWalletAddress, setShowWalletAddress] = useState(false);
-
-  const { connect: openIcpModal } = useAuth();
-  const { open: openEvmModal } = useAppKit();
   // bridge store
   const { fromToken, toToken, amount, toWalletAddress, bridgeOptions, toWalletValidationError } = useBridgeStore();
   const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } = useBridgeActions();
   // Logic
-  const { changeStep, swapTokens, isWalletConnected, getActionButtonStatus } = BridgeLogic();
-
-  const actionButtonStatus = getActionButtonStatus({
-    showWalletAddress,
-  });
-
-  const openConnectWalletModalHandler = (token: TokenType) => {
-    if (token?.chain_type === 'ICP') {
-      return openIcpModal();
-    }
-    if (token?.chain_type === 'EVM') {
-      return openEvmModal();
-    }
-  };
-
-  const actionButtonHandler = () => {
-    if (!isWalletConnected('from') && fromToken) {
-      openConnectWalletModalHandler(fromToken);
-      return;
-    }
-    if (!isWalletConnected('to') && toToken && !showWalletAddress) {
-      openConnectWalletModalHandler(toToken);
-      return;
-    }
-
-    if (isWalletConnected('from') && (isWalletConnected('to') || (toWalletAddress && !toWalletValidationError))) {
-      changeStep(3);
-    }
-  };
+  const { changeStep, swapTokens, showWalletAddress, setShowWalletAddress, actionButtonHandler, actionButtonStatus } =
+    SelectTokenLogic();
 
   return (
     <Box

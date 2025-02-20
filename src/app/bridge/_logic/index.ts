@@ -25,7 +25,6 @@ import { Principal } from '@dfinity/principal';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
-import BigNumber from 'bignumber.js';
 import { setPendingTransactionToSession } from '@/common/helpers/session';
 
 export const BridgeLogic = () => {
@@ -190,24 +189,6 @@ export const BridgeLogic = () => {
     setToken(token);
   }
 
-  function changeStep(direction: 'next' | 'prev' | number) {
-    const currentStep = typeof direction === 'number' ? direction : activeStep;
-    if (direction === 'next') {
-      setActiveStep(currentStep + 1);
-    } else if (direction === 'prev') {
-      setActiveStep(currentStep - 1);
-    } else {
-      setActiveStep(direction);
-    }
-  }
-
-  function swapTokens() {
-    if (!fromToken || !toToken) return;
-    const temp = fromToken;
-    setFromToken(toToken);
-    setToToken(temp);
-  }
-
   function isWalletConnected(type: 'from' | 'to') {
     let mainToken: TokenType | undefined;
     if (type === 'from') mainToken = fromToken;
@@ -223,151 +204,6 @@ export const BridgeLogic = () => {
       return false;
     }
     return false;
-  }
-
-  function getActionButtonStatus({ showWalletAddress }: { showWalletAddress: boolean }): {
-    isDisable: boolean;
-    text: string;
-  } {
-    if (!Number(amount) || Number(amount) === 0) {
-      return {
-        isDisable: true,
-        text: 'Set token amount to continue',
-      };
-    }
-
-    if (isEvmBalanceLoading || isIcpBalanceLoading) {
-      return {
-        isDisable: true,
-        text: 'Fetching wallet balance',
-      };
-    }
-
-    if (!fromToken || !toToken) {
-      return {
-        isDisable: true,
-        text: 'Select token to bridge',
-      };
-    }
-
-    if (
-      (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
-      (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
-    ) {
-      if (BigNumber(amount).isGreaterThan(BigNumber(selectedTokenBalance))) {
-        return {
-          isDisable: true,
-          text: 'INSUFFICIENT Funds',
-        };
-      }
-      if (!selectedOption.is_native) {
-        if (fromToken.chain_type === 'EVM') {
-          // The native token of the transaction chain that the user holds in his wallet
-          const userNativeToken = evmBalance?.tokens.find(
-            (token) =>
-              token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
-          );
-          if (
-            !userNativeToken ||
-            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
-          ) {
-            return {
-              isDisable: true,
-              text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
-            };
-          }
-        } else if (fromToken.chain_type === 'ICP') {
-          const userNativeToken = icpBalance?.tokens.find(
-            (token) => token.canisterId === selectedOption.native_fee_token_id,
-          );
-          if (
-            !userNativeToken ||
-            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
-          ) {
-            return {
-              isDisable: true,
-              text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
-            };
-          }
-        }
-      }
-    }
-
-    if (showWalletAddress) {
-      if (!toWalletAddress || toWalletValidationError) {
-        return {
-          isDisable: true,
-          text: 'Enter Valid Address',
-        };
-      } else if (!bridgeOptions.options?.length) {
-        return {
-          isDisable: true,
-          text: 'Set token amount to continue',
-        };
-      } else if (bridgeOptions.options?.length && toWalletAddress && !toWalletValidationError) {
-        return {
-          isDisable: false,
-          text: 'Review Bridge',
-        };
-      }
-    }
-
-    if (
-      fromToken &&
-      toToken &&
-      fromToken.contractAddress === toToken.contractAddress &&
-      fromToken.chainId === toToken.chainId
-    ) {
-      return {
-        isDisable: true,
-        text: 'Please select different tokens',
-      };
-    }
-
-    if (bridgeOptions.options && bridgeOptions.options.length > 0 && !selectedOption) {
-      return {
-        isDisable: true,
-        text: 'Select Bridge Option',
-      };
-    }
-
-    if (!isWalletConnected('from')) {
-      return {
-        isDisable: false,
-        text: `Connect ${fromToken.chain_type} Wallet`,
-      };
-    }
-
-    if (!showWalletAddress && !isWalletConnected('to')) {
-      return {
-        isDisable: false,
-        text: `Connect ${toToken.chain_type} Wallet`,
-      };
-    }
-
-    if (
-      toWalletAddress &&
-      !toWalletValidationError &&
-      isWalletConnected('from') &&
-      bridgeOptions.options &&
-      bridgeOptions.options?.length > 0
-    ) {
-      return {
-        isDisable: false,
-        text: 'Review Bridge',
-      };
-    }
-    if (isWalletConnected('from') && isWalletConnected('to') && bridgeOptions.options?.length) {
-      return {
-        isDisable: false,
-        text: 'Review Bridge',
-      };
-    }
-
-    return {
-      isDisable: true,
-      text: 'Confirm',
-    };
   }
 
   function isTokenSelected(token: TokenType) {
@@ -626,8 +462,6 @@ export const BridgeLogic = () => {
 
   return {
     selectToken,
-    changeStep,
-    swapTokens,
     isWalletConnected,
     isTokenSelected,
     setBridgePairsWithTime,
@@ -636,6 +470,5 @@ export const BridgeLogic = () => {
     executeWithdrawal,
     executeTransaction,
     resetTransaction,
-    getActionButtonStatus,
   };
 };

@@ -1,5 +1,5 @@
 'use client';
-import BridgeSelectTokenPage from './_components/select-token/select-token';
+import BridgeSelectTokenPage from './_components/select-token';
 import TokenListPage from './_components/chain-token-list/token-list';
 import { useEffect } from 'react';
 import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
