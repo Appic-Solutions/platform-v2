@@ -10,7 +10,6 @@ import AutoInvestReview from './_components/AutoInvestReview';
 import InvestPeriod from './_components/InvestPeriod';
 import InvestRepeat from './_components/InvestRepeat';
 import { format } from 'date-fns';
-import ActionButton from '@/app/bridge/_components/select-token/_components/ActionButton';
 
 interface AutoInvestSelectTokenProps {
   stepHandler: (value: 'next' | 'prev' | number) => void;
@@ -150,9 +149,9 @@ const AutoInvestSelectToken = ({
           </div>
           {/* DESKTOP ACTION BUTTONS */}
           <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
-            <ActionButton onClick={() => setShowDetails(true)} isDisabled={disabled()}>
+            <button onClick={() => setShowDetails(true)} disabled={disabled()}>
               {getButtonText()}
-            </ActionButton>
+            </button>
           </div>
         </div>
 
@@ -169,9 +168,9 @@ const AutoInvestSelectToken = ({
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
-        <ActionButton onClick={() => setShowDetails(true)} isDisabled={disabled()}>
+        <button onClick={() => setShowDetails(true)} disabled={disabled()}>
           {getButtonText()}
-        </ActionButton>
+        </button>
       </div>
     </Box>
   );

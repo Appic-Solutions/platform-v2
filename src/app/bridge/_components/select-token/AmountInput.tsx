@@ -6,7 +6,6 @@ import { useSharedStore } from '@/common/state/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import BigNumber from 'bignumber.js';
 import SelectTokenLogic from './_logic';
-import { BridgeLogic } from '@/app/bridge/_logic';
 import { Avatar } from '@/components/common/ui/avatar';
 
 const AmountInput = () => {
