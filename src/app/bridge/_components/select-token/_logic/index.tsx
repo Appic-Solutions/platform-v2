@@ -248,6 +248,7 @@ const SelectTokenLogic = () => {
     setShowWalletAddress,
     showWalletAddress,
     actionButtonStatus,
+    isWalletConnected,
   };
 };
 

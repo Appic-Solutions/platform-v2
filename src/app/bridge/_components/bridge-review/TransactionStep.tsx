@@ -1,24 +1,29 @@
+'use client';
+
 import { cn } from '@/common/helpers/utils';
 import React from 'react';
 import Image from 'next/image';
 import { TxStep } from '../../_api/types';
 import { TxStepType, useBridgeStore } from '../../_store';
 import { getChainLogo } from '@/common/helpers/utils';
-import Link from 'next/link';
 import HistoryIcon from '@/common/components/icons/history';
+import { useRouter } from 'next/navigation';
 
 export const TransactionStep = ({
   currentStep,
   step,
   index,
   steps,
+  onResetTransaction,
 }: {
   step: TxStep;
   currentStep: TxStepType;
   index: number;
   steps: TxStep[];
+  onResetTransaction: () => void;
 }) => {
   const { txErrorMessage, fromToken, toToken } = useBridgeStore();
+  const router = useRouter();
   const getLogoHandler = () => {
     // withdrawal tx
     if (steps.length === 4) {
@@ -30,6 +35,11 @@ export const TransactionStep = ({
       if (currentStep.count < 3) return getChainLogo(fromToken?.chainId);
       return getChainLogo(toToken?.chainId);
     }
+  };
+
+  const onNavigateToHistory = () => {
+    onResetTransaction();
+    router.push('/transactions-history/bridge');
   };
 
   return (
@@ -89,13 +99,13 @@ export const TransactionStep = ({
           <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F] pb-2">
             You can safely close this window
           </p>
-          <Link
-            href={'/transactions-history/bridge'}
+          <button
+            onClick={onNavigateToHistory}
             className="bg-card-background flex items-center gap-2 shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border p-2 rounded-lg border-gray-200"
           >
             <HistoryIcon width={20} height={20} />
             Check History
-          </Link>
+          </button>
         </>
       )}
     </div>

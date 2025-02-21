@@ -1,39 +1,53 @@
-'use client';
+import { TokenType, useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
+import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
-import Box from '@/common/components/ui/box';
-import { cn } from '@/common/helpers/utils';
-import { useMemo, useState, useEffect } from 'react';
-import ChainBoxPage from './chain-box';
-import TokenCard from './token-card';
-import BoxHeader from '@/common/components/ui/box-header';
-import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
-import TokenSkeleton from './token-skeleton';
-import { TokenType, useBridgeActions, useBridgeStore } from '../../_store';
-import { BridgeLogic } from '../../_logic';
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useSharedStore } from '@/common/state/store';
+import { useEffect, useMemo, useState } from 'react';
 
-interface TokenListProps {
-  isPending: boolean;
-  isError: boolean;
-}
-
-export default function TokenListPage({ isPending, isError }: TokenListProps) {
-  const [query, setQuery] = useState('');
-  const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
-  const [updatedBridgePairs, setUpdatedBridgePairs] = useState<TokenType[]>();
+export function ChainTokenListLogic() {
+  // Bridge Actions
+  const { setFromToken, setToToken, setAmount } = useBridgeActions();
+  // Bridge Store
+  const { selectedTokenType, fromToken, toToken, bridgePairs } = useBridgeStore();
   // shared store
   const { evmBalance, icpBalance } = useSharedStore();
-  // store
-  const { fromToken, toToken, bridgePairs: tokens, selectedTokenType } = useBridgeStore();
-  // Logic
-  const { isTokenSelected, selectToken } = BridgeLogic();
-  const { setActiveStep } = useBridgeActions();
+
+  const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
+  const [updatedBridgePairs, setUpdatedBridgePairs] = useState<TokenType[]>();
+  const [query, setQuery] = useState('');
+
+  // select token function in chain token list
+  function selectToken(token: EvmToken | IcpToken) {
+    const setToken = selectedTokenType === 'from' ? setFromToken : setToToken;
+    if (fromToken && toToken) {
+      setFromToken(undefined);
+      setToToken(undefined);
+      setAmount('');
+    }
+    setToken(token);
+  }
+
+  function isTokenSelected(token: TokenType) {
+    if (selectedTokenType === 'from' && fromToken) {
+      if (fromToken?.chain_type === 'ICP') {
+        return fromToken.canisterId === token.canisterId;
+      }
+      return fromToken?.contractAddress === token.contractAddress;
+    } else if (selectedTokenType === 'to' && toToken) {
+      if (toToken?.chain_type === 'ICP') {
+        return toToken.canisterId === token.canisterId;
+      }
+      return toToken?.contractAddress === token.contractAddress;
+    }
+    return false;
+  }
 
   useEffect(() => {
-    if ((icpBalance || evmBalance) && tokens) {
+    if ((icpBalance || evmBalance) && bridgePairs) {
       setUpdatedBridgePairs((prevTokens) => {
-        let updatedTokenList = prevTokens || tokens;
+        let updatedTokenList = prevTokens || bridgePairs;
 
         if (icpBalance === undefined) {
           updatedTokenList = updatedTokenList.map((token) =>
@@ -74,9 +88,9 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
         return updatedTokenList;
       });
     } else {
-      setUpdatedBridgePairs(tokens);
+      setUpdatedBridgePairs(bridgePairs);
     }
-  }, [evmBalance, icpBalance, tokens]);
+  }, [evmBalance, icpBalance, bridgePairs]);
 
   // set selected chain id
   useEffect(() => {
@@ -128,50 +142,14 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
     });
   };
 
-  return (
-    <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
-      <BoxHeader title={selectedTokenType === 'from' ? 'Bridge From' : 'Bridge To'} onBack={() => setActiveStep(1)} />
-      <ChainBoxPage selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
-      <hr className="bg-white dark:bg-[#636363]/25 w-[calc(100%-52px)] max-md:hidden" />
-      <input
-        type="text"
-        placeholder="Search token"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className={cn(
-          'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 px-3 md:mt-7 mb-6',
-          'bg-white/50 dark:bg-white/30 text-black dark:text-white',
-          'placeholder:text-black/50 dark:placeholder:text-white/50',
-          'w-full',
-        )}
-      />
-      <div className="w-full flex flex-col gap-y-5 overflow-y-scroll h-full">
-        {isPending ? (
-          <>
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-          </>
-        ) : isError ? (
-          <div>Error While loading. Please try again</div>
-        ) : tokens && filteredTokens && filteredTokens.length > 0 ? (
-          sortTokens(filteredTokens)?.map((token, idx) => (
-            <TokenCard
-              key={idx}
-              token={token}
-              onClick={() => {
-                selectToken(token);
-                setActiveStep(1);
-              }}
-              isSelected={isTokenSelected(token)}
-            />
-          ))
-        ) : (
-          <div className="w-full h-full flex justify-center items-center text-primary">No coins were found.</div>
-        )}
-      </div>
-    </Box>
-  );
+  return {
+    selectToken,
+    isTokenSelected,
+    filteredTokens,
+    sortTokens,
+    query,
+    setQuery,
+    selectedChainId,
+    setSelectedChainId,
+  };
 }

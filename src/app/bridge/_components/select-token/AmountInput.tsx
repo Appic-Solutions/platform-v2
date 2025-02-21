@@ -6,13 +6,13 @@ import React, { useEffect, useState } from 'react';
 import { useSharedStore } from '@/common/state/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import BigNumber from 'bignumber.js';
-import { BridgeLogic } from '@/app/bridge/_logic';
+import SelectTokenLogic from './_logic';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
 
   // Logic
-  const { isWalletConnected } = BridgeLogic();
+  const { isWalletConnected } = SelectTokenLogic();
 
   const { fromToken, usdPrice, amount, selectedTokenBalance, bridgeOptions } = useBridgeStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useBridgeActions();

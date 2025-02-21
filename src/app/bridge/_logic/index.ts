@@ -2,9 +2,8 @@ export const dynamic = 'force-static';
 
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
-import { TokenType, useBridgeActions, useBridgeStore } from '../_store';
+import { useBridgeActions, useBridgeStore } from '../_store';
 import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
-
 import { check_deposit_status, check_withdraw_status } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
@@ -14,11 +13,11 @@ import { HttpAgent } from '@dfinity/agent';
 export const BridgeLogic = () => {
   const queryClient = useQueryClient();
   // Bridge Store
-  const { selectedTokenType, fromToken, toToken, selectedOption, txHash, withdrawalId } = useBridgeStore();
+  const { selectedOption, txHash, withdrawalId } = useBridgeStore();
   // Bridge Actions
-  const { setFromToken, setToToken, setAmount, setTxStep } = useBridgeActions();
+  const { setTxStep } = useBridgeActions();
   // Shared Store
-  const { icpIdentity, isEvmConnected, evmBalance, icpBalance, unAuthenticatedAgent, evmAddress } = useSharedStore();
+  const { icpIdentity, unAuthenticatedAgent, evmAddress } = useSharedStore();
 
   const { setIcpBalance, setEvmBalance } = useSharedStoreActions();
 
@@ -121,49 +120,6 @@ export const BridgeLogic = () => {
     }
   }
 
-  // select token function in chain token list
-  function selectToken(token: EvmToken | IcpToken) {
-    const setToken = selectedTokenType === 'from' ? setFromToken : setToToken;
-    if (fromToken && toToken) {
-      setFromToken(undefined);
-      setToToken(undefined);
-      setAmount('');
-    }
-    setToken(token);
-  }
-
-  function isWalletConnected(type: 'from' | 'to') {
-    let mainToken: TokenType | undefined;
-    if (type === 'from') mainToken = fromToken;
-    if (type === 'to') mainToken = toToken;
-
-    if (mainToken) {
-      if (mainToken?.chain_type === 'EVM' && isEvmConnected && evmBalance) {
-        return true;
-      }
-      if (mainToken?.chain_type === 'ICP' && icpIdentity && icpBalance) {
-        return true;
-      }
-      return false;
-    }
-    return false;
-  }
-
-  function isTokenSelected(token: TokenType) {
-    if (selectedTokenType === 'from' && fromToken) {
-      if (fromToken?.chain_type === 'ICP') {
-        return fromToken.canisterId === token.canisterId;
-      }
-      return fromToken?.contractAddress === token.contractAddress;
-    } else if (selectedTokenType === 'to' && toToken) {
-      if (toToken?.chain_type === 'ICP') {
-        return toToken.canisterId === token.canisterId;
-      }
-      return toToken?.contractAddress === token.contractAddress;
-    }
-    return false;
-  }
-
   // set data and last fetch time in localstorage
   function setBridgePairsWithTime(data: (EvmToken | IcpToken)[]) {
     const currentTime = new Date().getTime();
@@ -194,9 +150,6 @@ export const BridgeLogic = () => {
   }
 
   return {
-    selectToken,
-    isWalletConnected,
-    isTokenSelected,
     setBridgePairsWithTime,
     getBridgePairsFromLocalStorage,
   };
