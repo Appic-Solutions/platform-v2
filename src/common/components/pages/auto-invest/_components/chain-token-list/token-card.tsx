@@ -1,7 +1,7 @@
 import { IcpToken } from "@/blockchain_api/types/tokens";
 import { LinkIcon } from "@/common/components/icons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { cn } from "@/common/helpers/utils";
+import { Avatar } from "@/components/common/ui/avatar";
 import Link from "next/link";
 
 const TokenCard = ({
@@ -21,11 +21,10 @@ const TokenCard = ({
     )}
     onClick={onClick}
   >
-    <Avatar className="w-[50px] h-[50px] rounded-full">
-      <AvatarImage src={token.logo} alt={token.name} />
-      <AvatarFallback>{token.name}</AvatarFallback>
-    </Avatar>
-
+    <Avatar
+      src={token.logo}
+      className="w-[50px] h-[50px]"
+    />
     <div className="flex flex-col flex-1 min-w-0">
       <p className="text-xl font-bold text-black dark:text-white truncate">
         {token.symbol}

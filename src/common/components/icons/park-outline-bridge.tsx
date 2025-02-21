@@ -1,4 +1,4 @@
-const ParkOutlineBridgeIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function ParkOutlineBridgeIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="24"
@@ -18,5 +18,3 @@ const ParkOutlineBridgeIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 }
-
-export default ParkOutlineBridgeIcon;

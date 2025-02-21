@@ -1,4 +1,4 @@
-const HistoryIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function HistoryIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="21"
@@ -12,5 +12,3 @@ const HistoryIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default HistoryIcon;

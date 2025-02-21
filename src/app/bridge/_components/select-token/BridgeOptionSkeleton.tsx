@@ -1,5 +1,5 @@
-import { Skeleton } from '@/common/components/ui/skeleton';
 import { Card } from '@/common/components/ui/card';
+import Skeleton from '@/components/common/ui/skeleton';
 
 const BridgeOptionSkeleton = () => {
   return (

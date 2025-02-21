@@ -1,9 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { isValidEvmAddress, isValidIcpAddress } from '@/common/helpers/validation';
 import { TokenType } from '@/app/bridge/_store';
+import { Avatar } from '@/components/common/ui/avatar';
 
 interface WalletAddressInputProps {
   token: TokenType | undefined;
@@ -76,10 +76,10 @@ const WalletAddressInput = ({
         <p className="text-sm font-semibold">Send To Wallet</p>
         <div className="flex items-center gap-4 w-full">
           <div className="relative">
-            <Avatar className=" w-11 h-11 rounded-full">
-              <AvatarImage src={avatar} />
-              <AvatarFallback>{token?.symbol}</AvatarFallback>
-            </Avatar>
+            <Avatar
+              src={avatar}
+              className='w-11 h-11 '
+            />
           </div>
           <div className="w-full relative">
             <input

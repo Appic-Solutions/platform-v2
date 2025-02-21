@@ -1,4 +1,4 @@
-const TokenPlaceHolderIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function TokenPlaceHolderIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="38.5"
@@ -14,5 +14,3 @@ const TokenPlaceHolderIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default TokenPlaceHolderIcon;

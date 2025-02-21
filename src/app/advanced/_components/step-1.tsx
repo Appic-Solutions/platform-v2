@@ -3,11 +3,11 @@ import Box from "@/common/components/ui/box";
 import { cn, getChainName, getChainSymbol } from "@/common/helpers/utils";
 import { useState } from "react";
 import TokenListPage from "./token-list";
-import RHFInput from "@/common/components/rhf/rhf-input";
 import Link from "next/link";
 import HistoryIcon from "@/common/components/icons/history";
 import { Step1Props } from "../_types";
-import Spinner from "@/common/components/ui/spinner";
+import RHFInput from "@/components/common/form/rhf-input";
+import Spinner from "@/components/common/ui/spinner";
 
 export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) {
   const [selectTokenBox, setSelectTokenBox] = useState(false);

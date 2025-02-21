@@ -1,9 +1,8 @@
 import { getChainName } from "@/common/helpers/utils";
-
 import { IcpToken } from "@/blockchain_api/types/tokens";
-import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { Card } from "@/common/components/ui/card";
 import { cn } from "@/common/helpers/utils";
+import { Avatar } from "@/components/common/ui/avatar";
 
 interface TokenCardProps {
   customOnClick: () => void;
@@ -32,10 +31,10 @@ export function TokenCard({
       <p className="text-sm font-semibold">{label}</p>
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Avatar className=" w-11 h-11 rounded-full">
-            <AvatarImage src={token?.logo || "images/logo/placeholder.png"} />
-            <AvatarFallback>{token?.symbol}</AvatarFallback>
-          </Avatar>
+          <Avatar
+            src={token?.logo}
+            className="w-11 h-1"
+          />
         </div>
         <div className="flex items-center gap-x-4">
           <p>{token?.symbol || "Select Token"}</p>

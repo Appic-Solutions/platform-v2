@@ -1,4 +1,4 @@
-const NoteRemoveIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function NoteRemoveIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="24"
@@ -25,5 +25,3 @@ const NoteRemoveIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default NoteRemoveIcon;

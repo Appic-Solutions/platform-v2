@@ -1,4 +1,4 @@
-const ArrowDownIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function ArrowDownIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -15,5 +15,3 @@ const ArrowDownIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default ArrowDownIcon;

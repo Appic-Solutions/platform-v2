@@ -1,18 +1,18 @@
 'use client';
 import { CloseIcon, CopyIcon, FireIcon, LinkIcon, ParkOutlineBridgeIcon } from '@/common/components/icons';
 import CheckIcon from '@/common/components/icons/check';
-import Spinner from '@/common/components/ui/spinner';
 import { cn, copyToClipboard, formatToSignificantFigures, getChainLogo, getChainName } from '@/common/helpers/utils';
 import { ChevronDownIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import useLogic from '../_logic';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
 import { useQuery } from '@tanstack/react-query';
+import { Avatar } from '@/components/common/ui/avatar';
+import Spinner from '@/components/common/ui/spinner';
 
 export default function BridgeContent() {
   const [itemId, setItemId] = useState<null | number>(null);
@@ -87,19 +87,14 @@ export default function BridgeContent() {
         </div>
         <div className="flex items-center justify-between w-full my-5 *:relative">
           <div>
-            <Avatar className={cn('w-[58px] h-[58px] rounded-full', 'md:w-[72px] md:h-[72px]')}>
-              <AvatarImage src={item.from_token.logo || 'images/logo/placeholder.png'} />
-              <AvatarFallback>{item.from_token.symbol}</AvatarFallback>
-            </Avatar>
             <Avatar
-              className={cn(
-                'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
-                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-              )}
-            >
-              <AvatarImage src={getChainLogo(item.from_token.chainId)} />
-              <AvatarFallback>{item.from_token.symbol}</AvatarFallback>
-            </Avatar>
+              src={item.from_token.logo}
+              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
+            />
+            <Avatar
+              src={getChainLogo(item.from_token.chainId)}
+              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+            />
           </div>
           <div className="flex items-center justify-center w-full">
             <div
@@ -130,19 +125,14 @@ export default function BridgeContent() {
             />
           </div>
           <div>
-            <Avatar className={cn('w-[58px] h-[58px] rounded-full', 'md:w-[72px] md:h-[72px]')}>
-              <AvatarImage src={item.to_token.logo || 'images/logo/placeholder.png'} />
-              <AvatarFallback>{item.to_token.symbol}</AvatarFallback>
-            </Avatar>
             <Avatar
-              className={cn(
-                'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
-                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-              )}
-            >
-              <AvatarImage src={getChainLogo(item.to_token.chainId)} />
-              <AvatarFallback>{item.to_token.symbol}</AvatarFallback>
-            </Avatar>
+              src={item.to_token.logo}
+              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
+            />
+            <Avatar
+              src={getChainLogo(item.to_token.chainId)}
+              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+            />
           </div>
         </div>
         {/* Transaction Details */}

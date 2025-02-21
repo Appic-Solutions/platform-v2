@@ -1,5 +1,4 @@
 import { getChainLogo } from '@/common/helpers/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +6,8 @@ import { useSharedStore } from '@/common/state/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import BigNumber from 'bignumber.js';
 import SelectTokenLogic from './_logic';
+import { BridgeLogic } from '@/app/bridge/_logic';
+import { Avatar } from '@/components/common/ui/avatar';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
@@ -61,19 +62,14 @@ const AmountInput = () => {
       <p className="text-sm font-semibold">Send</p>
       <div className="flex items-center gap-4 w-full">
         <div className="relative">
-          <Avatar className=" w-11 h-11 rounded-full">
-            <AvatarImage src={fromToken?.logo || 'images/logo/placeholder.png'} />
-            <AvatarFallback>{fromToken?.symbol}</AvatarFallback>
-          </Avatar>
           <Avatar
-            className={cn(
-              'absolute -right-1 -bottom-1 w-5 h-5 rounded-full',
-              'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-            )}
-          >
-            <AvatarImage src={getChainLogo(fromToken?.chainId)} />
-            <AvatarFallback>{fromToken?.symbol}</AvatarFallback>
-          </Avatar>
+            src={fromToken?.logo}
+            className='w-11 h-11'
+          />
+          <Avatar
+            src={getChainLogo(fromToken?.chainId)}
+            className='absolute -right-1 -bottom-1 w-5 h-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+          />
         </div>
         <div className="flex flex-col w-full relative">
           <div className="w-full flex items-center">

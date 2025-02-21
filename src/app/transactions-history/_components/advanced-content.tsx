@@ -4,13 +4,13 @@ import useLogic from '../_logic';
 import { HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { cn, getChainName } from '@/common/helpers/utils';
-import Spinner from '@/common/components/ui/spinner';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import TwinTokenIcon from '@/common/components/icons/twin-token';
 import { ChevronDownIcon } from '@/common/components/icons';
 import { useQuery } from '@tanstack/react-query';
 import { get_advanced_history } from '@/blockchain_api/functions/icp/get_advanced_history';
 import Image from 'next/image';
+import { Avatar } from '@/components/common/ui/avatar';
+import Spinner from '@/components/common/ui/spinner';
 
 export default function AdvancedContent() {
   const [itemId, setItemId] = useState<null | number>(null);
@@ -83,19 +83,14 @@ export default function AdvancedContent() {
           {/* token avatar */}
           <div className="flex justify-start items-center gap-4 w-full">
             <div className="relative">
-              <Avatar className="w-[58px] h-[58px] rounded-full md:w-[72px] md:h-[72px]">
-                <AvatarImage src={item.icp_token?.logo || 'images/logo/placeholder.png'} />
-                <AvatarFallback>{item.icp_token?.symbol}</AvatarFallback>
-              </Avatar>
               <Avatar
-                className={cn(
-                  'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
-                  'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-                )}
-              >
-                <AvatarImage src={'/images/logo/wallet_logos/icp.svg'} />
-                <AvatarFallback>{'ICP'}</AvatarFallback>
-              </Avatar>
+                src={item.icp_token?.logo}
+                className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
+              />
+              <Avatar
+                src={'/images/logo/wallet_logos/icp.svg'}
+                className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+              />
             </div>
             <div className="flex flex-col items-start">
               <div className={cn('flex flex-col items-start gap-x-1')}>

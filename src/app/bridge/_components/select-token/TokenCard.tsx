@@ -1,10 +1,9 @@
 import { getChainName } from '@/common/helpers/utils';
-
 import { getChainLogo } from '@/common/helpers/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Card } from '@/common/components/ui/card';
 import { cn } from '@/common/helpers/utils';
 import { TokenType } from '@/app/bridge/_store';
+import { Avatar } from '@/components/common/ui/avatar';
 
 interface TokenCardProps {
   customOnClick: () => void;
@@ -27,19 +26,14 @@ export function TokenCard({ token, customOnClick, label, className }: TokenCardP
       <p className="text-sm font-semibold">{label}</p>
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Avatar className=" w-11 h-11 rounded-full">
-            <AvatarImage src={token?.logo || 'images/logo/placeholder.png'} />
-            <AvatarFallback>{token?.symbol}</AvatarFallback>
-          </Avatar>
           <Avatar
-            className={cn(
-              'absolute -right-1 -bottom-1 w-5 h-5 rounded-full',
-              'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-            )}
-          >
-            <AvatarImage src={getChainLogo(token?.chainId)} />
-            <AvatarFallback>{token?.symbol}</AvatarFallback>
-          </Avatar>
+            src={token?.logo}
+            className='w-11 h-11 '
+          />
+          <Avatar
+            src={getChainLogo(token?.chainId)}
+            className='absolute -right-1 -bottom-1 w-5 h-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+          />
         </div>
         <div>
           <p className={cn('text-nowrap ', token?.symbol.length && token?.symbol.length > 7 && 'text-ellipsis w-28')}>

@@ -1,5 +1,5 @@
+import Skeleton from '@/components/common/ui/skeleton';
 import React from 'react';
-import { Skeleton } from '../../ui/skeleton';
 
 const WalletPopSkeletonDesktop = () => {
   return (

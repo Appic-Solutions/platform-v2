@@ -10,22 +10,22 @@ import {
   getCountedNumber,
   getFormattedWalletAddress,
 } from '@/common/helpers/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/common/components/ui/drawer';
 import { useState } from 'react';
 import WalletChart from './wallet-chart';
 import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
 import WalletPopSkeletonDesktop from './wallet-pop-skeleton-dektop';
+import { Avatar } from '@/components/common/ui/avatar';
 
 export type WalletBalance =
   | {
-      tokens: IcpToken[];
-      totalBalanceUsd: string;
-    }
+    tokens: IcpToken[];
+    totalBalanceUsd: string;
+  }
   | {
-      tokens: EvmToken[];
-      totalBalanceUsd: string;
-    };
+    tokens: EvmToken[];
+    totalBalanceUsd: string;
+  };
 
 interface WalletCardProps {
   logo: string;
@@ -90,14 +90,14 @@ export function WalletPop({ logo, title, balance, disconnect, address }: WalletC
                           className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
                         >
                           <div className="relative flex items-center gap-x-5">
-                            <Avatar className="w-9 h-9">
-                              <AvatarImage src={token.logo} alt={token.name} />
-                              <AvatarFallback>{token.symbol}</AvatarFallback>
-                            </Avatar>
-                            <Avatar className="w-4 h-4 absolute top-5 left-7">
-                              <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
-                              <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
-                            </Avatar>
+                            <Avatar
+                              src={token.logo}
+                              className="w-9 h-9"
+                            />
+                            <Avatar
+                              src={getChainLogo(token.chainId)}
+                              className='w-4 h-4 absolute top-5 left-7'
+                            />
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>
                           <span>$ {getCountedNumber(Number(token.usdBalance), 2)}</span>
@@ -169,14 +169,14 @@ export function WalletPop({ logo, title, balance, disconnect, address }: WalletC
                           className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
                         >
                           <div className="relative flex items-center gap-x-5">
-                            <Avatar className="w-9 h-9">
-                              <AvatarImage src={token.logo} alt={token.name} />
-                              <AvatarFallback>{token.symbol}</AvatarFallback>
-                            </Avatar>
-                            <Avatar className="w-4 h-4 absolute top-5 left-7">
-                              <AvatarImage src={getChainLogo(token.chainId)} alt={token.name} />
-                              <AvatarFallback>{getChainName(token.chainId)}</AvatarFallback>
-                            </Avatar>
+                            <Avatar
+                              src={token.logo}
+                              className="w-9 h-9"
+                            />
+                            <Avatar
+                              src={getChainLogo(token.chainId)}
+                              className='w-4 h-4 absolute top-5 left-7'
+                            />
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>
                           <span>$ {getCountedNumber(Number(token.usdBalance), 2)}</span>

@@ -1,4 +1,4 @@
-const SunIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function SunIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -16,5 +16,3 @@ const SunIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default SunIcon;

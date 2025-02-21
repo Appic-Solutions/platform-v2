@@ -2,7 +2,7 @@ import { cn } from "@/common/helpers/utils";
 
 type SkeletonProps = React.HTMLAttributes<HTMLDivElement>;
 
-function Skeleton({ className, ...props }: SkeletonProps) {
+export default function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
       className={cn(
@@ -13,5 +13,3 @@ function Skeleton({ className, ...props }: SkeletonProps) {
     />
   );
 }
-
-export { Skeleton };

@@ -1,4 +1,4 @@
-const CalendarEditIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function CalendarEditIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="24"
@@ -22,5 +22,3 @@ const CalendarEditIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default CalendarEditIcon;

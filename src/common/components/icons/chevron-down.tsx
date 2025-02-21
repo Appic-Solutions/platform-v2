@@ -1,4 +1,4 @@
-const ChevronDownIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
+export default function ChevronDownIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -18,5 +18,3 @@ const ChevronDownIcon = ({ ...props }: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
-
-export default ChevronDownIcon;
