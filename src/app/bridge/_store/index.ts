@@ -33,6 +33,7 @@ interface BridgeState {
   txStep: TxStepType;
   txErrorMessage: string | undefined;
   pendingTx: PendingTransaction | undefined;
+  prevTxStep: TxStepType;
   txHash: TxHash | undefined;
   withdrawalId: string | undefined;
 }
@@ -56,6 +57,7 @@ type Action = {
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
     setPendingTx: (pendingTxs: PendingTransaction | undefined) => void;
+    setPrevTxStep: (prevStep: TxStepType) => void;
     setTxHash: (txHash: TxHash | undefined) => void;
     setWithdrawalId: (withdrawalId: string | undefined) => void;
   };
@@ -64,8 +66,12 @@ type Action = {
 export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   activeStep: 1,
   txStep: {
-    count: 1,
+    count: 2,
     status: 'pending' as Status,
+  },
+  prevTxStep: {
+    count: 0,
+    status: 'successful' as Status,
   },
   amount: '',
   bridgeOptions: {
@@ -102,6 +108,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
     setTxHash: (txHash) => set({ txHash }),
+    setPrevTxStep: (prevTxStep) => set({ prevTxStep }),
     setWithdrawalId: (withdrawalId) => set({ withdrawalId }),
     setPendingTx: (pendingTx) => set({ pendingTx }),
   },
