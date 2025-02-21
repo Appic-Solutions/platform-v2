@@ -284,14 +284,14 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw native token from Appic minter: ${JSON.stringify(native_withdrawal_result.Err)}, please try again later.`,
+            message: `Failed to withdraw native token from Appic minter: ${JSON.stringify(native_withdrawal_result.Err)}`,
             success: false,
           };
         }
       } catch (error) {
         return {
           result: '',
-          message: `Failed to withdraw native token from Appic minter: ${error}, please try again later.`,
+          message: `Failed to withdraw native token from Appic minter: ${error}`,
           success: false,
         };
       }
@@ -315,14 +315,14 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(erc20_withdrawal_result.Err)}, please try again later.`,
+            message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(erc20_withdrawal_result.Err)}`,
             success: false,
           };
         }
       } catch (error) {
         return {
           result: '',
-          message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(error)}, please try again later.`,
+          message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(error)}`,
           success: false,
         };
       }
@@ -361,14 +361,14 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw native token from Dfinity minter: ${JSON.stringify(native_withdrawal_result.Err)}, please try again later.`,
+            message: `Failed to withdraw native token from Dfinity minter: ${native_withdrawal_result.Err}`,
             success: false,
           };
         }
       } catch (error) {
         return {
           result: '',
-          message: `Failed to withdraw native token from Dfinity minter: ${JSON.stringify(error)}, please try again later.`,
+          message: `Failed to withdraw native token from Dfinity minter: ${error}`,
           success: false,
         };
       }
@@ -394,14 +394,14 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw ERC20 token from Dfinity minter: ${JSON.stringify(erc20_withdrawal_result.Err)}, please try again later.`,
+            message: `Failed to withdraw ERC20 token from Dfinity minter: ${erc20_withdrawal_result.Err}`,
             success: false,
           };
         }
       } catch (error) {
         return {
           result: '',
-          message: `Failed to withdraw ERC20 token from Dfinity minter: ${JSON.stringify(error)}, please try again later.`,
+          message: `Failed to withdraw ERC20 token from Dfinity minter: ${error}`,
           success: false,
         };
       }
@@ -686,17 +686,14 @@ export const request_deposit = async (
   recipient: Principal, // Users Destination Principal Address
 ): Promise<Response<TxHash>> => {
   const principal_bytes = principal_to_bytes32(recipient.toText());
-  // TODO: TO be fixed
   const encoded_deposit_function_data = encode_deposit_function_data(
     bridge_option.from_token_id,
     bridge_option.operator,
     bridge_option.is_native,
     principal_bytes,
-    bridge_option.is_native
-      ? BigNumber(bridge_option.amount)
-          .minus(BigNumber(bridge_option.fees.max_network_fee).plus(bridge_option.fees.approval_fee_in_native_token))
-          .toFixed()
-      : bridge_option.amount,
+    BigNumber(bridge_option.amount)
+      .minus(BigNumber(bridge_option.fees.max_network_fee).plus(bridge_option.fees.approval_fee_in_native_token))
+      .toFixed(),
   );
 
   try {

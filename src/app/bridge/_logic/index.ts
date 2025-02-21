@@ -229,6 +229,13 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
+    if (!fromToken || !toToken) {
+      return {
+        isDisable: true,
+        text: 'Select token to bridge',
+      };
+    }
+
     if (!Number(amount) || Number(amount) === 0) {
       return {
         isDisable: true,
@@ -240,13 +247,6 @@ export const BridgeLogic = () => {
       return {
         isDisable: true,
         text: 'Fetching wallet balance',
-      };
-    }
-
-    if (!fromToken || !toToken) {
-      return {
-        isDisable: true,
-        text: 'Select token to bridge',
       };
     }
 
@@ -303,6 +303,11 @@ export const BridgeLogic = () => {
         return {
           isDisable: true,
           text: 'Set token amount to continue',
+        };
+      } else if (!isWalletConnected('from')) {
+        return {
+          isDisable: false,
+          text: `Connect ${fromToken.chain_type} Wallet`,
         };
       } else if (bridgeOptions.options?.length && toWalletAddress && !toWalletValidationError) {
         return {
@@ -492,7 +497,6 @@ export const BridgeLogic = () => {
 
   async function executeDeposit(params: FullDepositRequest) {
     // Step 1: Create Wallet Client
-
     const walletClientResult = await createWalletClient.mutateAsync(params.bridgeOption);
     setTxErrorMessage('');
     if (!walletClientResult) {
@@ -592,23 +596,13 @@ export const BridgeLogic = () => {
           userWalletPrincipal: icpIdentity.getPrincipal().toString(), // source wallet Principal ID
         });
       } else if (fromToken?.chain_type === 'EVM') {
-        if (toWalletAddress.length > 0 && !toWalletValidationError) {
-          executeDeposit({
-            bridgeOption: selectedOption,
-            unAuthenticatedAgent,
-            recipient: Principal.fromText(toWalletAddress), // destination wallet Principal
-            recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
-            userWalletAddress: evmAddress || '', // source wallet EVM address
-          });
-        } else if (icpIdentity) {
-          executeDeposit({
-            bridgeOption: selectedOption,
-            unAuthenticatedAgent,
-            recipient: icpIdentity?.getPrincipal(), // destination wallet Principal
-            recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
-            userWalletAddress: evmAddress || '', // source wallet EVM address
-          });
-        }
+        executeDeposit({
+          bridgeOption: selectedOption,
+          unAuthenticatedAgent,
+          recipient: Principal.fromText(toWalletAddress) || icpIdentity?.getPrincipal() || '', // destination wallet Principal
+          recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
+          userWalletAddress: evmAddress || '', // source wallet EVM address
+        });
       }
     }
   }

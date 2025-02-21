@@ -504,10 +504,13 @@ const estimate_deposit_approval_fee: (
     return { approval_gas: '0', total_approval_fee: '0' };
   }
   try {
-    // const client = createPublicClient({ transport: http(rpc_url), chain });
-    // Standard ERC-20 approve function: ~45,000 to 55,000 gas units.
-
-    const estimated_gas = '55000';
+    const client = createPublicClient({ transport: http(rpc_url), chain });
+    const estimated_gas = await client.estimateGas({
+      account: '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
+      to: token_contract_address,
+      type: 'eip1559',
+      data: encoded_function_data,
+    });
     console.log(estimated_gas);
     return {
       total_approval_fee: BigNumber(estimated_gas.toString()).multipliedBy(max_fee_per_gas).toFixed(),
