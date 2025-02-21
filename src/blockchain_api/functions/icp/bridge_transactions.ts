@@ -37,6 +37,8 @@ import {
   GetTxParams,
   Transaction,
   TransactionSearchParam,
+  AddEvmToIcpTxError,
+  AddIcpToEvmTxError,
 } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
 import { appic_helper_canister_id } from '@/canister_ids.json';
@@ -75,7 +77,7 @@ import { check_allowance } from '../evm/check_allowance';
  *    - Submit the successful withdrawal request to the `appic_helper` service.
  *
  * 4. Monitor Transaction Status:
- *    - Continuously check the transaction status by calling the `appic_helper` every minute.
+ *    - Continuously check the transaction status by calling the `appic_helper` every 30 seconds.
  *    - Wait until the transaction is successful.
  */
 
@@ -459,6 +461,13 @@ export const notify_appic_helper_withdrawal = async (
         message: '',
       };
     } else {
+      if ('TxAlreadyExists' in (notify_withdrawal_result.Err as AddIcpToEvmTxError)) {
+        return {
+          result: '',
+          success: true,
+          message: '',
+        };
+      }
       return {
         result: '',
         success: false,
@@ -561,7 +570,7 @@ export const check_withdraw_status = async (
  *
  * 5. **Monitor Transaction Status**:
  *    - Periodically check the transaction status by querying the `appic_helper` service.
- *    - Repeat every minute until the transaction is confirmed as successful.
+ *    - Repeat every 30 seconds until the transaction is confirmed as successful.
  */
 
 // Step 1
@@ -651,7 +660,7 @@ export const approve_erc20 = async (
 
       const tx_status = await public_client.waitForTransactionReceipt({
         hash,
-        confirmations: 2,
+        confirmations: 1,
       });
 
       if (tx_status.status == 'success') {
@@ -734,7 +743,7 @@ export const request_deposit = async (
 
     const tx_status = await public_client.waitForTransactionReceipt({
       hash,
-      confirmations: 2,
+      confirmations: 12,
     });
 
     if (tx_status.status == 'success') {
@@ -794,23 +803,21 @@ export const notify_appic_helper_deposit = async (
 
     // If the minter is of type of appic minter
     // Request minter to start log scraping
-    //  Wait for 60 seconds and then request a log scraping
     if (bridge_option.operator === 'Appic') {
       // Create an actor for the Appic minter
       const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
         canisterId: bridge_option.minter_id,
         agent: unauthenticated_agent,
       });
-      setTimeout(async () => {
-        const log_scraping_request_result = (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
-        if ('Err' in log_scraping_request_result) {
-          if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
-            setTimeout(async () => {
-              await appic_minter_actor.request_scraping_logs();
-            }, 60000);
-          }
+
+      const log_scraping_request_result = (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+      if ('Err' in log_scraping_request_result) {
+        if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
+          setTimeout(async () => {
+            await appic_minter_actor.request_scraping_logs();
+          }, 60000);
         }
-      }, 70000); // 70 seconds
+      }
     }
 
     if ('Ok' in notify_withdrawal_result) {
@@ -820,6 +827,13 @@ export const notify_appic_helper_deposit = async (
         message: '',
       };
     } else {
+      if ('TxAlreadyExists' in (notify_withdrawal_result.Err as AddEvmToIcpTxError)) {
+        return {
+          result: '',
+          success: true,
+          message: '',
+        };
+      }
       console.error(notify_withdrawal_result.Err);
       return {
         result: '',
@@ -840,7 +854,7 @@ export const notify_appic_helper_deposit = async (
 export type DepositTxStatus = 'Invalid' | 'PendingVerification' | 'Minted' | 'Accepted' | 'Quarantined';
 
 //  Step 5
-// This function should be called internally until the transaction status is either "Minted" or "Invalid" or "Quarantined"
+// This function should be called on a interval basis until the transaction status is either "Minted" or "Invalid" or "Quarantined"
 export const check_deposit_status = async (
   tx_hash: TxHash,
   bridge_option: BridgeOption,

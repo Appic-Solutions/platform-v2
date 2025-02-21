@@ -114,7 +114,7 @@ export const BridgeLogic = () => {
       fetchWalletBalances();
       return res;
     },
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 30,
     enabled: !!txHash && !!unAuthenticatedAgent && !!selectedOption,
   });
   // withdrawal queries =====================>
@@ -157,7 +157,7 @@ export const BridgeLogic = () => {
       fetchWalletBalances();
       return res;
     },
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 30,
     enabled: !!withdrawalId && !!selectedOption && !!unAuthenticatedAgent,
   });
 
