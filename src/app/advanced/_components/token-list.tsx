@@ -7,10 +7,12 @@ import { Tooltip } from '@radix-ui/react-tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import { Skeleton } from '@/common/components/ui/skeleton';
 import { chains } from '@/blockchain_api/lists/chains';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 export default function TokenListPage({ prevStepHandler }: TokenListProps) {
-  const { setValue, watch, clearErrors } = useFormContext()
+  const { setValue, control, clearErrors } = useFormContext()
+
+  const ChainIdWatched = useWatch({ control, name: "chain_id" })
 
   return (
     <Box className='justify-normal animate-slide-in opacity-0 md:max-w-[612px] md:h-[280px] md:px-9 md:pt-8'>
@@ -24,7 +26,7 @@ export default function TokenListPage({ prevStepHandler }: TokenListProps) {
                 type='button'
                 className={cn(
                   'flex items-center justify-center rounded-full cursor-pointer w-12 h-12 md:w-14 md:h-14',
-                  watch("chain_id") === String(chain.chainId) && 'ring-4 ring-primary-buttons',
+                  ChainIdWatched === String(chain.chainId) && 'ring-4 ring-primary-buttons',
                   !chain.twin_token_support && 'opacity-50 cursor-not-allowed select-none',
                 )}
                 onClick={() => {

@@ -32,6 +32,7 @@ interface BridgeState {
   txStep: TxStepType;
   txErrorMessage: string | undefined;
   pendingTx: PendingTransaction | undefined;
+  prevTxStep: TxStepType;
 }
 
 type Action = {
@@ -51,14 +52,19 @@ type Action = {
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
     setPendingTx: (pendingTxs: PendingTransaction | undefined) => void;
+    setPrevTxStep: (prevStep: TxStepType) => void;
   };
 };
 
 export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   activeStep: 1,
   txStep: {
-    count: 1,
+    count: 2,
     status: 'pending' as Status,
+  },
+  prevTxStep: {
+    count: 0,
+    status: 'successful' as Status,
   },
   amount: '',
   bridgeOptions: {
@@ -92,6 +98,7 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
     setPendingTx: (pendingTx) => set({ pendingTx }),
+    setPrevTxStep: (prevTxStep) => set({ prevTxStep }),
   },
 }));
 

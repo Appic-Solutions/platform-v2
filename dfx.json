@@ -1,5 +1,13 @@
 {
   "canisters": {
+    "platform_v2_test": {
+      "frontend": {
+        "entrypoint": "out/index.html"
+      },
+      "source": ["out"],
+      "type": "assets",
+      "build": ["npm run build"]
+    },
     "platform_v2": {
       "frontend": {
         "entrypoint": "out/index.html"

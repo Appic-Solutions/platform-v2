@@ -1,5 +1,8 @@
 {
-  "platform_v2": {
+  "platform_v2_test": {
     "ic": "ib67n-yiaaa-aaaao-qjwca-cai"
+  },
+  "platform_v2": {
+    "ic": "dduc6-3yaaa-aaaal-ai63a-cai"
   }
 }

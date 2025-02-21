@@ -12,7 +12,7 @@ export const StepperContainer = () => {
   // all steps of transaction details like title, logo and status
   const [steps, setSteps] = useState<TxStep[]>();
   // bridge store
-  const { fromToken, txStep } = useBridgeStore();
+  const { fromToken } = useBridgeStore();
 
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM') {
@@ -26,20 +26,17 @@ export const StepperContainer = () => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <BridgeReview onOpenModal={() => setIsOpen(true)} />
-      <DialogTitle></DialogTitle>
-      <DialogOverlay
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
+      <DialogTitle />
+      <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
-          onInteractOutside={(e) => {
-            e.preventDefault();
-          }}
+          onInteractOutside={(e) => e.preventDefault()}
           className="h-[350] w-fit min-w-80"
         >
           {steps && (
-            <BridgeTransactionStepper onCloseModal={() => setIsOpen(false)} steps={steps} currentStep={txStep} />
+            <BridgeTransactionStepper
+              onCloseModal={() => setIsOpen(false)}
+              steps={steps}
+            />
           )}
         </DialogContent>
       </DialogOverlay>

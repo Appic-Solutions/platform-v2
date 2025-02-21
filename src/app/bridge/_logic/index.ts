@@ -114,7 +114,7 @@ export const BridgeLogic = () => {
       fetchWalletBalances();
       return res;
     },
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 30,
     enabled: !!txHash && !!unAuthenticatedAgent && !!selectedOption,
   });
   // withdrawal queries =====================>
@@ -157,7 +157,7 @@ export const BridgeLogic = () => {
       fetchWalletBalances();
       return res;
     },
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 30,
     enabled: !!withdrawalId && !!selectedOption && !!unAuthenticatedAgent,
   });
 
@@ -229,6 +229,13 @@ export const BridgeLogic = () => {
     isDisable: boolean;
     text: string;
   } {
+    if (!fromToken || !toToken) {
+      return {
+        isDisable: true,
+        text: 'Select token to bridge',
+      };
+    }
+
     if (!Number(amount) || Number(amount) === 0) {
       return {
         isDisable: true,
@@ -240,13 +247,6 @@ export const BridgeLogic = () => {
       return {
         isDisable: true,
         text: 'Fetching wallet balance',
-      };
-    }
-
-    if (!fromToken || !toToken) {
-      return {
-        isDisable: true,
-        text: 'Select token to bridge',
       };
     }
 
@@ -303,6 +303,11 @@ export const BridgeLogic = () => {
         return {
           isDisable: true,
           text: 'Set token amount to continue',
+        };
+      } else if (!isWalletConnected('from')) {
+        return {
+          isDisable: false,
+          text: `Connect ${fromToken.chain_type} Wallet`,
         };
       } else if (bridgeOptions.options?.length && toWalletAddress && !toWalletValidationError) {
         return {
