@@ -1,10 +1,10 @@
-import Box from '@/common/components/ui/box';
-import BoxHeader from '@/common/components/ui/box-header';
+import Box from '@/components/ui/box';
+import BoxHeader from '@/components/ui/box-header';
 import { TokenListProps } from '../_types';
 import { chains } from '@/blockchain_api/lists/chains';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Chain } from '@/blockchain_api/types/chains';
-import ChainItem from '@/components/common/ui/chain-item';
+import ChainItem from '@/components/ui/chain-item';
 
 export default function TokenListPage({ prevStepHandler }: TokenListProps) {
   const { setValue, control, clearErrors } = useFormContext()

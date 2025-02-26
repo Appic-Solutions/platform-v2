@@ -1,5 +1,5 @@
-import { cn } from '@/common/helpers/utils';
-import Spinner from '@/components/common/ui/spinner';
+import { cn } from '@/lib/utils';
+import Spinner from '@/components/ui/spinner';
 import { forwardRef } from 'react';
 
 interface ActionButtonProps {

@@ -1,4 +1,4 @@
-import Skeleton from "@/components/common/ui/skeleton";
+import Skeleton from "@/components/ui/skeleton";
 
 const TokenSkeleton = () => {
   return (

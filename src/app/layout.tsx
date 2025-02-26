@@ -1,12 +1,12 @@
 'use client';
 import '../style/globals.css';
-import HeaderPage from '@/common/components/layout/header';
-import ShapesPage from '@/common/components/layout/shapes';
+import HeaderPage from '@/app/_layout/header';
+import ShapesPage from '@/app/_layout/shapes';
 import '@nfid/identitykit/react/styles.css';
-import { WalletWrapper } from '@/common/components/wallet_wrappers/wrapper';
+import { WalletWrapper } from '@/lib/wrappers/wallet/wrapper';
 import Providers from './providers';
-import { UserWalletProvider } from '@/common/components/wallet_wrappers/userWalletProvider';
-import { Toaster } from '@/common/components/ui/toaster';
+import { UserWalletProvider } from '@/lib/wrappers/wallet/userWalletProvider';
+import { Toaster } from '@/components/ui/toaster';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (

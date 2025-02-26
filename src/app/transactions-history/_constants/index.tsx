@@ -1,4 +1,4 @@
-import { ArrowsUpDownIcon, BlockchainIcon, LockIcon, ParkOutlineBridgeIcon } from "@/common/components/icons";
+import { ArrowsUpDownIcon, BlockchainIcon, LockIcon, ParkOutlineBridgeIcon } from "@/components/icons";
 import { ReactNode } from "react";
 
 export interface PageParamsItem {

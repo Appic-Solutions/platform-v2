@@ -1,9 +1,9 @@
 'use client';
-import Box from '@/common/components/ui/box';
-import { cn } from '@/common/helpers/utils';
+import Box from '@/components/ui/box';
+import { cn } from '@/lib/utils';
 import ChainBoxPage from './chain-box';
 import TokenCard from './token-card';
-import BoxHeader from '@/common/components/ui/box-header';
+import BoxHeader from '@/components/ui/box-header';
 import TokenSkeleton from './token-skeleton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { ChainTokenListLogic } from './_logic';

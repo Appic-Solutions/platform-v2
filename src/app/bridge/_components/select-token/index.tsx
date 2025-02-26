@@ -1,7 +1,7 @@
-import { ArrowsUpDownIcon, WalletIcon } from '@/common/components/icons';
-import Box from '@/common/components/ui/box';
-import { cn, getChainLogo } from '@/common/helpers/utils';
-import HistoryIcon from '@/common/components/icons/history';
+import { ArrowsUpDownIcon, WalletIcon } from '@/components/icons';
+import Box from '@/components/ui/box';
+import { cn, getChainLogo } from '@/lib/utils';
+import HistoryIcon from '@/components/icons/history';
 import Link from 'next/link';
 import { TokenCard } from './TokenCard';
 import AmountInput from './AmountInput';
@@ -31,9 +31,9 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         Number(amount) > 0 &&
-          bridgeOptions.options &&
-          bridgeOptions.options.length > 0 &&
-          'lg:max-w-[1060px] lg:w-[1060px]',
+        bridgeOptions.options &&
+        bridgeOptions.options.length > 0 &&
+        'lg:max-w-[1060px] lg:w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >

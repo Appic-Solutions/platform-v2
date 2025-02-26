@@ -2,9 +2,9 @@
 import { TransactionStep } from './TransactionStep';
 import { TxStep } from '../../_api/types';
 import { useBridgeStore } from '../../_store';
-import { DialogClose } from '@/common/components/ui/dialog';
-import { CloseIcon } from '@/common/components/icons';
-import Stepper from '@/common/components/layout/Stepper';
+import { DialogClose } from '@/components/ui/dialog';
+import { CloseIcon } from '@/components/icons';
+import Stepper from '@/app/_layout/Stepper';
 import BridgeReviewLogic from './_logic';
 
 interface Props {

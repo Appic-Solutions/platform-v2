@@ -1,7 +1,7 @@
 'use client';
-import { CloseIcon, CopyIcon, FireIcon, LinkIcon, ParkOutlineBridgeIcon } from '@/common/components/icons';
-import CheckIcon from '@/common/components/icons/check';
-import { cn, copyToClipboard, formatToSignificantFigures, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { CloseIcon, CopyIcon, FireIcon, LinkIcon, ParkOutlineBridgeIcon } from '@/components/icons';
+import CheckIcon from '@/components/icons/check';
+import { cn, copyToClipboard, formatToSignificantFigures, getChainLogo, getChainName } from '@/lib/utils';
 import { ChevronDownIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,8 +11,8 @@ import { HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
 import { useQuery } from '@tanstack/react-query';
-import { Avatar } from '@/components/common/ui/avatar';
-import Spinner from '@/components/common/ui/spinner';
+import { Avatar } from '@/components/common/avatar';
+import Spinner from '@/components/ui/spinner';
 
 export default function BridgeContent() {
   const [itemId, setItemId] = useState<null | number>(null);

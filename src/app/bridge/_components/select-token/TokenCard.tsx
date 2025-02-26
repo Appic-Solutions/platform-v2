@@ -1,9 +1,9 @@
-import { getChainName } from '@/common/helpers/utils';
-import { getChainLogo } from '@/common/helpers/utils';
-import { Card } from '@/common/components/ui/card';
-import { cn } from '@/common/helpers/utils';
+import { getChainName } from '@/lib/utils';
+import { getChainLogo } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { TokenType } from '@/app/bridge/_store';
-import { Avatar } from '@/components/common/ui/avatar';
+import { Avatar } from '@/components/common/avatar';
 
 interface TokenCardProps {
   customOnClick: () => void;

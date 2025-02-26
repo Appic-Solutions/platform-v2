@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { DefaultValuesType, Status, UseLogicReturn } from '../_types';
 import { approve_icp, check_new_twin_ls_request, get_evm_token_and_generate_twin_token, NewTwinMetadata, request_new_twin } from '@/blockchain_api/functions/icp/new_twin_token';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
 import { Agent, HttpAgent } from '@dfinity/agent';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from './validation';
-import { useToast } from '@/common/hooks/use-toast';
+import { useToast } from '@/lib/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 
 export default function LogicHelper(): UseLogicReturn {

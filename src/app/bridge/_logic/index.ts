@@ -1,12 +1,12 @@
 export const dynamic = 'force-static';
 
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { getStorageItem, setStorageItem } from '@/common/helpers/localstorage';
+import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
 import { useBridgeActions, useBridgeStore } from '../_store';
-import { useSharedStore, useSharedStoreActions } from '@/common/state/store';
+import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { check_deposit_status, check_withdraw_status } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchEvmBalances, fetchIcpBalances } from '@/common/helpers/wallet';
+import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
 

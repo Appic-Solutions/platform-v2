@@ -1,9 +1,9 @@
-import { Card } from '@/common/components/ui/card';
-import { cn } from '@/common/helpers/utils';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
-import { isValidEvmAddress, isValidIcpAddress } from '@/common/helpers/validation';
+import { isValidEvmAddress, isValidIcpAddress } from '@/lib/helpers/validation';
 import { TokenType } from '@/app/bridge/_store';
-import { Avatar } from '@/components/common/ui/avatar';
+import { Avatar } from '@/components/common/avatar';
 
 interface WalletAddressInputProps {
   token: TokenType | undefined;

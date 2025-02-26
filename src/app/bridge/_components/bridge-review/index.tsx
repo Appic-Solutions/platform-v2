@@ -1,10 +1,10 @@
-import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/common/components/ui/dialog';
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 import BridgeTransactionStepper from './TransactionStepper';
 import { useEffect, useState } from 'react';
 import { useBridgeStore } from '../../_store';
 import BridgeReview from './BridgeReview';
 import { TxStep } from '../../_api/types';
-import { depositStepsDetails, withdrawalStepsDetails } from '@/common/constants/bridge';
+import { depositStepsDetails, withdrawalStepsDetails } from '@/lib/constants/bridge';
 
 export const StepperContainer = () => {
   // Modal states

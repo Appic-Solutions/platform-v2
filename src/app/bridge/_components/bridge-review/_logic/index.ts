@@ -9,8 +9,8 @@ import {
 } from '@/app/bridge/_api';
 import { FullDepositRequest, FullWithdrawalRequest } from '@/app/bridge/_api/types/request';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
-import { setPendingTransactionToSession } from '@/common/helpers/session';
-import { useSharedStore } from '@/common/state/store';
+import { setPendingTransactionToSession } from '@/lib/helpers/session';
+import { useSharedStore } from '@/store/store';
 import { Principal } from '@dfinity/principal';
 
 const BridgeReviewLogic = () => {

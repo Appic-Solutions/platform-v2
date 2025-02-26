@@ -1,7 +1,7 @@
 import { TxHash } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { PendingTransaction } from '@/common/helpers/session';
+import { PendingTransaction } from '@/lib/helpers/session';
 import { create } from 'zustand';
 
 export type TokenType = EvmToken | IcpToken;

@@ -1,12 +1,12 @@
 'use client';
 
-import { cn } from '@/common/helpers/utils';
+import { cn } from '@/lib/utils';
 import React from 'react';
 import Image from 'next/image';
 import { TxStep } from '../../_api/types';
 import { TxStepType, useBridgeStore } from '../../_store';
-import { getChainLogo } from '@/common/helpers/utils';
-import HistoryIcon from '@/common/components/icons/history';
+import { getChainLogo } from '@/lib/utils';
+import HistoryIcon from '@/components/icons/history';
 import { useRouter } from 'next/navigation';
 
 export const TransactionStep = ({
@@ -95,19 +95,19 @@ export const TransactionStep = ({
       )}
       {((fromToken?.chain_type === 'ICP' && currentStep.count === 4) ||
         (fromToken?.chain_type === 'EVM' && currentStep.count === 5)) && (
-        <>
-          <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F] pb-2">
-            You can safely close this window
-          </p>
-          <button
-            onClick={onNavigateToHistory}
-            className="bg-card-background flex items-center gap-2 shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border p-2 rounded-lg border-gray-200"
-          >
-            <HistoryIcon width={20} height={20} />
-            Check History
-          </button>
-        </>
-      )}
+          <>
+            <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F] pb-2">
+              You can safely close this window
+            </p>
+            <button
+              onClick={onNavigateToHistory}
+              className="bg-card-background flex items-center gap-2 shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border p-2 rounded-lg border-gray-200"
+            >
+              <HistoryIcon width={20} height={20} />
+              Check History
+            </button>
+          </>
+        )}
     </div>
   );
 };

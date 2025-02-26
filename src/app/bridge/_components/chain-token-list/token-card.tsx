@@ -1,9 +1,9 @@
 'use client';
 
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { LinkIcon } from '@/common/components/icons';
-import { cn, formatToSignificantFigures } from '@/common/helpers/utils';
-import { Avatar } from '@/components/common/ui/avatar';
+import { LinkIcon } from '@/components/icons';
+import { cn, formatToSignificantFigures } from '@/lib/utils';
+import { Avatar } from '@/components/common/avatar';
 import Link from 'next/link';
 const TokenCard = ({
   token,

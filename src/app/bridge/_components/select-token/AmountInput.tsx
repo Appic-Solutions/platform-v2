@@ -1,12 +1,12 @@
-import { getChainLogo } from '@/common/helpers/utils';
-import { Card } from '@/common/components/ui/card';
-import { cn } from '@/common/helpers/utils';
+import { getChainLogo } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import BigNumber from 'bignumber.js';
 import SelectTokenLogic from './_logic';
-import { Avatar } from '@/components/common/ui/avatar';
+import { Avatar } from '@/components/common/avatar';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');

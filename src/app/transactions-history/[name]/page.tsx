@@ -1,7 +1,7 @@
-import Box from "@/common/components/ui/box";
-import { cn } from "@/common/helpers/utils";
+import Box from "@/components/ui/box";
+import { cn } from "@/lib/utils";
 import { PAGE_PARAMS_DATA, PageParamsItem } from "../_constants";
-import BackButton from "@/common/components/ui/BackButton";
+import BackButton from "@/components/ui/BackButton";
 import TabSection from "../_components/TabSections";
 
 export function generateStaticParams() {

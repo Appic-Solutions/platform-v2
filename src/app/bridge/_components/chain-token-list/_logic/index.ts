@@ -3,7 +3,7 @@ import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_b
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
 import { useEffect, useMemo, useState } from 'react';
 
 export function ChainTokenListLogic() {

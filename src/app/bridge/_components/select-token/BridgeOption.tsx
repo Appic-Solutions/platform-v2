@@ -1,7 +1,7 @@
-import { Card } from '@/common/components/ui/card';
-import { cn, formatToSignificantFigures } from '@/common/helpers/utils';
+import { Card } from '@/components/ui/card';
+import { cn, formatToSignificantFigures } from '@/lib/utils';
 import Image from 'next/image';
-import { ChevronDownIcon, ClockIcon, FireIcon } from '@/common/components/icons';
+import { ChevronDownIcon, ClockIcon, FireIcon } from '@/components/icons';
 import { BridgeOption as BridgeOptionType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { TokenType } from '@/app/bridge/_store';
 

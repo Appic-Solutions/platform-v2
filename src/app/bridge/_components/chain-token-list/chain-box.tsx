@@ -1,7 +1,7 @@
 import React from 'react';
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
-import ChainItem from '@/components/common/ui/chain-item';
+import ChainItem from '@/components/ui/chain-item';
 
 const ChainBoxPage = ({
   selectedChainId,

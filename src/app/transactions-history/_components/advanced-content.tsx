@@ -3,14 +3,14 @@ import { useState } from 'react';
 import useLogic from '../_logic';
 import { HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
-import { cn, getChainName } from '@/common/helpers/utils';
-import TwinTokenIcon from '@/common/components/icons/twin-token';
-import { ChevronDownIcon } from '@/common/components/icons';
+import { cn, getChainName } from '@/lib/utils';
+import TwinTokenIcon from '@/components/icons/twin-token';
+import { ChevronDownIcon } from '@/components/icons';
 import { useQuery } from '@tanstack/react-query';
 import { get_advanced_history } from '@/blockchain_api/functions/icp/get_advanced_history';
 import Image from 'next/image';
-import { Avatar } from '@/components/common/ui/avatar';
-import Spinner from '@/components/common/ui/spinner';
+import { Avatar } from '@/components/common/avatar';
+import Spinner from '@/components/ui/spinner';
 
 export default function AdvancedContent() {
   const [itemId, setItemId] = useState<null | number>(null);

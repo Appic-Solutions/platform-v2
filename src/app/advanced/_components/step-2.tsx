@@ -1,11 +1,11 @@
-import { ArrowLongLeftIcon, ExpandLeftIcon } from '@/common/components/icons';
-import Box from '@/common/components/ui/box';
-import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { ArrowLongLeftIcon, ExpandLeftIcon } from '@/components/icons';
+import Box from '@/components/ui/box';
+import { cn, getChainLogo, getChainName } from '@/lib/utils';
 import { Step2Props } from '../_types';
 import { Step2Data } from '../_constants';
-import { useSharedStore } from '@/common/state/store';
-import { Avatar } from '@/components/common/ui/avatar';
-import Spinner from '@/components/common/ui/spinner';
+import { useSharedStore } from '@/store/store';
+import { Avatar } from '@/components/common/avatar';
+import Spinner from '@/components/ui/spinner';
 
 export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
   const { icpIdentity, icpBalance } = useSharedStore();

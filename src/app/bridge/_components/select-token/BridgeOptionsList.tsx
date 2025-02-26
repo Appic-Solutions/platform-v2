@@ -1,4 +1,4 @@
-import { cn } from '@/common/helpers/utils';
+import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import BridgeOption from './BridgeOption';
 import BridgeOptionSkeleton from './BridgeOptionSkeleton';

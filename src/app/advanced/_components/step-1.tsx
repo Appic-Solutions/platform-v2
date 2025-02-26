@@ -1,13 +1,13 @@
-import { InfoCircleIcon } from "@/common/components/icons";
-import Box from "@/common/components/ui/box";
-import { cn, getChainName, getChainSymbol } from "@/common/helpers/utils";
+import { InfoCircleIcon } from "@/components/icons";
+import Box from "@/components/ui/box";
+import { cn, getChainName, getChainSymbol } from "@/lib/utils";
 import { useState } from "react";
 import TokenListPage from "./token-list";
 import Link from "next/link";
-import HistoryIcon from "@/common/components/icons/history";
+import HistoryIcon from "@/components/icons/history";
 import { Step1Props } from "../_types";
-import RHFInput from "@/components/common/form/rhf-input";
-import Spinner from "@/components/common/ui/spinner";
+import RHFInput from "@/components/form/rhf-input";
+import Spinner from "@/components/ui/spinner";
 
 export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) {
   const [selectTokenBox, setSelectTokenBox] = useState(false);

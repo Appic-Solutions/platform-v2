@@ -1,9 +1,9 @@
-import { ArrowsUpDownIcon, ChevronDownIcon, FireIcon, LinkIcon } from '@/common/components/icons';
-import { Card } from '@/common/components/ui/card';
-import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { ArrowsUpDownIcon, ChevronDownIcon, FireIcon, LinkIcon } from '@/components/icons';
+import { Card } from '@/components/ui/card';
+import { cn, getChainLogo, getChainName } from '@/lib/utils';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Avatar } from '@/components/common/ui/avatar';
+import { Avatar } from '@/components/common/avatar';
 export interface Transaction {
   id: string;
   date: string;

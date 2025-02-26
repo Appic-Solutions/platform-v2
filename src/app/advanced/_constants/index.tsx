@@ -1,5 +1,5 @@
 import { NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
-import { getChainName } from '@/common/helpers/utils';
+import { getChainName } from '@/lib/utils';
 import { ModalStepDataReturn } from '../_types';
 
 export const Step2Data = (newTwinMeta: NewTwinMetadata | undefined) => [

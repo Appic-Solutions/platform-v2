@@ -1,5 +1,5 @@
 import { TokenType, useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
 import BigNumber from 'bignumber.js';
