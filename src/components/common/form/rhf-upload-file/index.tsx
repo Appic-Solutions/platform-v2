@@ -2,9 +2,9 @@
 "use client"
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { cn } from "@/common/helpers/utils";
-import { UploadIcon } from "@/common/components/icons";
+import { UploadIcon } from "@/components/icons";
 import { UploadFileProps } from "./types";
+import { cn } from "@/lib/utils";
 
 export default function RHFUploadFile({
     name,

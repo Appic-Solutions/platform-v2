@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/common/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SelectProps } from "./types";
 
 export default function RHFSelect({

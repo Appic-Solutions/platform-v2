@@ -1,4 +1,4 @@
-import { cn } from "@/common/helpers/utils";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { AllHTMLAttributes } from "react";
 

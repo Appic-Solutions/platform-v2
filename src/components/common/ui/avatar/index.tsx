@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import { cn } from "@/common/helpers/utils";
+import { cn } from "@/lib/utils";
 import Skeleton from "../skeleton";
 
 interface AvatarProps extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> {

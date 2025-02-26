@@ -1,7 +1,7 @@
 "use client";
-import { cn } from "@/common/helpers/utils";
 import { Controller, useFormContext } from "react-hook-form";
 import { InputProps } from "./types";
+import { cn } from "@/lib/utils";
 
 export default function RHFInput({ name, label, className, ...props }: InputProps) {
     const { control } = useFormContext();

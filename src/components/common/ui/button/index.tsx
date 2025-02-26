@@ -1,7 +1,7 @@
 import { FC, HTMLAttributes } from "react";
 import Link, { LinkProps } from "next/link";
 import { ButtonProps } from "./types";
-import { cn } from "@/common/helpers/utils";
+import { cn } from "@/lib/utils";
 import Spinner from "../spinner"
 
 const variantStyles = {
