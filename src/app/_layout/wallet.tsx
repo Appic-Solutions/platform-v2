@@ -283,7 +283,7 @@ const WalletPage = () => {
 
       {/* wallet content */}
       <div className="flex items-center gap-x-2">
-        {isIcpBalanceLoading || icpBalance ? (
+        {icpIdentity ? (
           <WalletPop
             logo="/images/logo/wallet_logos/icp.svg"
             title="Your ICP Wallet"
@@ -294,7 +294,7 @@ const WalletPage = () => {
           />
         ) : null}
 
-        {isEvmBalanceLoading || evmBalance ? (
+        {isEvmConnected ? (
           <WalletPop
             logo={'/images/logo/chains-logos/ethereum.svg'}
             title="Your EVM Wallet"
