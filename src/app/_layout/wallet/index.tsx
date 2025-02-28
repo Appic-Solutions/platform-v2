@@ -3,13 +3,13 @@ import { cn, getChainLogo } from '@/lib/utils';
 
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import { CloseIcon } from '@/components/icons';
-import WalletCard from './wallet/wallet-card';
-import { WalletPop } from './wallet/wallet-pop';
+import WalletCard from './wallet-card';
+import { WalletPop } from './wallet-pop';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
 import { useSharedStore } from '@/store/store';
-import { WalletLogic } from './wallet/_logic';
+import { WalletLogic } from './_logic';
 
-const WalletPage = () => {
+const Wallet = () => {
   const {
     icpIdentity,
     evmAddress,
@@ -129,4 +129,4 @@ const WalletPage = () => {
   );
 };
 
-export default WalletPage;
+export default Wallet;

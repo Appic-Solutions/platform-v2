@@ -5,7 +5,7 @@ import { useBridgeStore } from '../../_store';
 import { DialogClose } from '@/components/ui/dialog';
 import { CloseIcon } from '@/components/icons';
 import Stepper from '@/app/_layout/Stepper';
-import BridgeReviewLogic from './_logic';
+import useBridgeReviewLogic from './_logic';
 
 interface Props {
   steps: TxStep[];
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function BridgeTransactionStepper({ steps, onCloseModal }: Props) {
-  const { resetTransaction } = BridgeReviewLogic();
+  const { resetTransaction } = useBridgeReviewLogic();
   const { txStep, prevTxStep, actions } = useBridgeStore();
   const closeModal = () => {
     onCloseModal();

@@ -29,15 +29,11 @@ export const StepperContainer = () => {
       <DialogTitle />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
+          aria-describedby={undefined}
           onInteractOutside={(e) => e.preventDefault()}
-          className="h-[350] w-fit min-w-80"
+          className="h-fit max-h-[450px] w-fit min-w-80"
         >
-          {steps && (
-            <BridgeTransactionStepper
-              onCloseModal={() => setIsOpen(false)}
-              steps={steps}
-            />
-          )}
+          {steps && <BridgeTransactionStepper onCloseModal={() => setIsOpen(false)} steps={steps} />}
         </DialogContent>
       </DialogOverlay>
     </Dialog>

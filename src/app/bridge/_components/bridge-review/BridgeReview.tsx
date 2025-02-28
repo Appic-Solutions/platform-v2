@@ -6,7 +6,7 @@ import Box from '@/components/ui/box';
 import BoxHeader from '@/components/ui/box-header';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { DialogTrigger } from '@/components/ui/dialog';
-import BridgeReviewLogic from './_logic';
+import useBridgeReviewLogic from './_logic';
 
 const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   // bridge store
@@ -14,7 +14,7 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { setActiveStep } = useBridgeActions();
 
   // bridge logic
-  const { executeTransaction } = BridgeReviewLogic();
+  const { executeTransaction } = useBridgeReviewLogic();
 
   const openModal = () => {
     executeTransaction();

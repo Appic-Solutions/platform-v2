@@ -9,8 +9,10 @@ import { useSharedStore } from '@/store/store';
 import { StepperContainer } from './_components/bridge-review';
 import MinimizeProgressBarWidget from '@/app/_layout/minimize-progress-bar-widget';
 import { ParkOutlineBridgeIcon } from '@/components/icons';
+import { BridgeLogic } from './_logic';
 
 const BridgeHome = () => {
+  BridgeLogic();
   const { unAuthenticatedAgent } = useSharedStore();
   const { amount, fromToken, toToken, bridgePairs, activeStep, pendingTx } = useBridgeStore();
   const { setBridgePairs, setBridgeOptions } = useBridgeActions();

@@ -65,9 +65,9 @@ interface NotifyAppicHelperDepositRequest {
 }
 // STEP 5
 interface CheckDepositStatusRequest {
-  bridgeOption: BridgeOption;
-  tx_hash: TxHash;
-  unauthenticatedAgent: Agent | HttpAgent;
+  bridgeOption?: BridgeOption;
+  tx_hash?: TxHash;
+  unauthenticatedAgent?: Agent | HttpAgent;
 }
 
 interface FullDepositRequest {

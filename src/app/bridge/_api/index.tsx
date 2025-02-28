@@ -22,10 +22,9 @@ import {
   request_deposit,
   request_withdraw,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
-import { BridgeLogic } from '../_logic';
+import { getBridgePairsFromLocalStorage, setBridgePairsWithTime } from '../_logic/bridgeUtils';
 
 const useGetBridgePairs = (agent: HttpAgent | undefined) => {
-  const { getBridgePairsFromLocalStorage, setBridgePairsWithTime } = BridgeLogic();
   const refetchTime = 1000 * 60 * 10;
   const fetchBridgePairs = async () => {
     const { data, lastFetchTime } = getBridgePairsFromLocalStorage();
