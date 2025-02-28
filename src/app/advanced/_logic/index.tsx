@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
 import { DefaultValuesType, Status, UseLogicReturn } from '../_types';
-import { approve_icp, check_new_twin_ls_request, get_evm_token_and_generate_twin_token, NewTwinMetadata, request_new_twin } from '@/blockchain_api/functions/icp/new_twin_token';
+import { NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
 import { useSharedStore } from '@/store/store';
-import { Agent, HttpAgent } from '@dfinity/agent';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema } from './validation';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
+import { useFormLogic } from './form';
+import { apiService } from './api';
 
 export default function LogicHelper(): UseLogicReturn {
   // State
@@ -20,40 +18,21 @@ export default function LogicHelper(): UseLogicReturn {
   const [newTwinMeta, setNewTwinMeta] = useState<NewTwinMetadata>();
   const [shouldPoll, setShouldPoll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const { unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
-
-  // Hook
   const { toast } = useToast();
-
-  // Form
-  const methods = useForm<DefaultValuesType>({
-    defaultValues: {
-      chain_id: '',
-      contract_address: '',
-    },
-    resolver: zodResolver(formSchema),
-  });
-
-  const chainIdWatch = useWatch({
-    control: methods.control,
-    name: 'chain_id',
-  });
+  const { methods, chainIdWatch } = useFormLogic()
 
   // Handler
   const closeModalHandler = () => {
     setIsOpen(false);
+    setStatus("pending")
   };
 
   // React Query for polling Step Four
   const { data } = useQuery({
     queryKey: ['checkStepFour'],
-    queryFn: async () => {
-      const response = await check_new_twin_ls_request(
-        newTwinMeta as NewTwinMetadata,
-        unAuthenticatedAgent as HttpAgent,
-      );
-      return response;
-    },
+    queryFn: () => apiService.checkTwinRequest(newTwinMeta!, unAuthenticatedAgent!),
     enabled: shouldPoll && !!newTwinMeta,
     refetchInterval: 1000 * 60,
   });
@@ -67,47 +46,33 @@ export default function LogicHelper(): UseLogicReturn {
     }
   }, [data]);
 
-  const failedSubmitHandler = (message: string) => {
+  const handleError = (message: string) => {
     setStatus('failed');
     setErrorMessage(message);
     setCanCloseModal(true);
-    throw new Error(message || 'we have new error')
-  }
+    toast({ title: message, variant: 'destructive' });
+    throw new Error(message);
+  };
 
   const onSubmit = async (data: DefaultValuesType) => {
     try {
       setIsLoading(true);
       if (step === 1) {
-        const resStepOne = await get_evm_token_and_generate_twin_token(
-          data.chain_id,
-          data.contract_address,
-          unAuthenticatedAgent as HttpAgent,
-        );
-        console.log('🚀 ~ onSubmit ~ resStepOne:', resStepOne);
-        if (!resStepOne.success) throw new Error(resStepOne.message || 'we have new error');
-        setNewTwinMeta(resStepOne.result);
+        const result = await apiService.fetchTwinToken(data.chain_id, data.contract_address, unAuthenticatedAgent!);
+        setNewTwinMeta(result);
         setStep(2);
       } else {
         setIsOpen(true);
-        const resStepTwo = await approve_icp(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
-        console.log('🚀 ~ onSubmit ~ resStepTwo:', resStepTwo);
-        if (!resStepTwo.success) failedSubmitHandler(resStepTwo.message)
-        setCreationStep(2)
+        await apiService.approveICP(newTwinMeta!, authenticatedAgent!);
+        setCreationStep(2);
 
-        const resStepThree = await request_new_twin(newTwinMeta as NewTwinMetadata, authenticatedAgent as Agent);
-        console.log('🚀 ~ onSubmit ~ resStepThree:', resStepThree);
-        if (!resStepThree.success) failedSubmitHandler(resStepThree.message)
-        setCreationStep(3)
+        await apiService.requestNewTwin(newTwinMeta!, authenticatedAgent!);
+        setCreationStep(3);
         setShouldPoll(true);
         setCanCloseModal(true);
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast({
-          title: error.message,
-          variant: 'destructive',
-        });
-      }
+      handleError(error instanceof Error ? error.message : 'Unknown error');
     } finally {
       setIsLoading(false);
     }
