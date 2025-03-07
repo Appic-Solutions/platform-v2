@@ -648,7 +648,7 @@ const calculate_bridge_options = async (
       return [];
     }
 
-    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 3 min' : '15 - 20 min';
+    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 1 min' : '15 - 20 min';
     const native_fee_token_id =
       bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
     return [

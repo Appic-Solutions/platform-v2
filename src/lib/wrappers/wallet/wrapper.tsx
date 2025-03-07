@@ -69,7 +69,7 @@ export const WalletWrapper = ({
       <IdentityKitProvider
         signers={[NFIDW, Plug, Stoic, InternetIdentity]}
         authType={IdentityKitAuthType.DELEGATION}
-        signerClientOptions={{ targets: ['zjydy-zyaaa-aaaaj-qnfka-cai', '2ztvj-yaaaa-aaaap-ahiza-cai'] }}
+        signerClientOptions={{ targets: ['zjydy-zyaaa-aaaaj-qnfka-cai'] }}
       >
         {children}
       </IdentityKitProvider>

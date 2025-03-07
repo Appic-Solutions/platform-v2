@@ -15,6 +15,8 @@ import {
   WithdrawalNativeResult as AppicWithdrawalNativeResult,
   WithdrawalErc20Result as AppicWithdrawalErc20Result,
   LogScrapingResult,
+  DepositStatus,
+  RetrieveWithdrawalStatus,
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 
 import { idlFactory as DfinityMinterIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
@@ -25,6 +27,7 @@ import {
   WithdrawalError as DfinityWithdrawalError,
   RetrieveErc20Request as DfinityRetrieveErc20Request,
   RetrieveEthRequest as DfinityRetrieveEthRequest,
+  RetrieveEthStatus,
 } from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
 
 import { idlFactory as AppicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
@@ -42,9 +45,16 @@ import {
 } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
 import { appic_helper_canister_id } from '@/canister_ids.json';
-import { parse_evm_to_icp_tx_status, parse_icp_to_evm_tx_status } from './utils/tx_status_parser';
+import {
+  parse_deposit_status_result,
+  parse_evm_to_icp_tx_status,
+  parse_icp_to_evm_tx_status,
+  parse_retrieve_eth_status_result,
+  parse_retrieve_withdrawal_status_result,
+} from './utils/tx_status_parser';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
 import { check_allowance } from '../evm/check_allowance';
+import App from 'next/app';
 /**
  * Bridge Transactions: Overview
  *
@@ -300,6 +310,7 @@ export const request_withdraw = async (
     } else {
       // Handle ERC20 token withdrawal for Appic minter
       try {
+        console.log(appic_minter_actor);
         const erc20_withdrawal_result = (await appic_minter_actor.withdraw_erc20({
           amount: BigInt(
             BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
@@ -322,6 +333,7 @@ export const request_withdraw = async (
           };
         }
       } catch (error) {
+        console.log(error);
         return {
           result: '',
           message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(error)}`,
@@ -507,15 +519,19 @@ export const check_withdraw_status = async (
     canisterId: Principal.fromText(appic_helper_canister_id),
     agent: unauthenticated_agent,
   });
+
   console.log('check withdraw status request');
 
   try {
-    const tx_status = (await appic_helper_actor.get_transaction({
-      chain_id: BigInt(bridge_option.chain_id),
-      search_param: { TxWithdrawalId: BigInt(withdrawal_id) } as TransactionSearchParam,
-    } as GetTxParams)) as [] | [Transaction];
-    if (tx_status.length != 0 && 'IcpToEvm' in tx_status[0]) {
-      const parsed_status = parse_icp_to_evm_tx_status(tx_status[0].IcpToEvm.status);
+    // Check minters directly for withdraw result
+    if (bridge_option.operator == 'Dfinity') {
+      const dfinity_minter = Actor.createActor(DfinityMinterIdlFactory, {
+        canisterId: bridge_option.minter_id,
+        agent: unauthenticated_agent,
+      });
+
+      const tx_status = (await dfinity_minter.retrieve_eth_status(BigInt(withdrawal_id))) as RetrieveEthStatus;
+      let parsed_status = parse_retrieve_eth_status_result(tx_status);
       console.log(parsed_status);
       return {
         result: parsed_status,
@@ -523,8 +539,18 @@ export const check_withdraw_status = async (
         success: true,
       };
     } else {
+      const appic_minter = Actor.createActor(AppicMinterIdlFactory, {
+        canisterId: bridge_option.minter_id,
+        agent: unauthenticated_agent,
+      });
+
+      const tx_status = (await appic_minter.retrieve_withdrawal_status(
+        BigInt(withdrawal_id),
+      )) as RetrieveWithdrawalStatus;
+      let parsed_status = parse_retrieve_withdrawal_status_result(tx_status);
+      console.log(parsed_status);
       return {
-        result: 'PendingVerification',
+        result: parsed_status,
         message: '',
         success: true,
       };
@@ -741,9 +767,12 @@ export const request_deposit = async (
       chain: bridge_option.viem_chain,
     });
 
+    // TODO: to be changed later
+    let confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 12;
+
     const tx_status = await public_client.waitForTransactionReceipt({
       hash,
-      confirmations: 12,
+      confirmations: confirmations_required,
     });
 
     if (tx_status.status == 'success') {
@@ -786,7 +815,7 @@ export const notify_appic_helper_deposit = async (
     bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
   ) as AppicHelperOperator;
   try {
-    const notify_withdrawal_result = (await appic_helper_actor.new_evm_to_icp_tx({
+    const notify_deposit_result = (await appic_helper_actor.new_evm_to_icp_tx({
       chain_id: BigInt(bridge_option.chain_id),
       from_address: user_wallet_address,
       principal: Principal.fromText(recipient_principal),
@@ -799,7 +828,7 @@ export const notify_appic_helper_deposit = async (
       operator: parsed_operator,
     } as AddEvmToIcpTx)) as NewEvmToIcpResult;
 
-    console.log(notify_withdrawal_result);
+    console.log(notify_deposit_result);
 
     // If the minter is of type of appic minter
     // Request minter to start log scraping
@@ -820,25 +849,25 @@ export const notify_appic_helper_deposit = async (
       }
     }
 
-    if ('Ok' in notify_withdrawal_result) {
+    if ('Ok' in notify_deposit_result) {
       return {
         result: '',
         success: true,
         message: '',
       };
     } else {
-      if ('TxAlreadyExists' in (notify_withdrawal_result.Err as AddEvmToIcpTxError)) {
+      if ('TxAlreadyExists' in (notify_deposit_result.Err as AddEvmToIcpTxError)) {
         return {
           result: '',
           success: true,
           message: '',
         };
       }
-      console.error(notify_withdrawal_result.Err);
+      console.error(notify_deposit_result.Err);
       return {
         result: '',
         success: false,
-        message: `Failed to notify appic helper ${notify_withdrawal_result.Err}`,
+        message: `Failed to notify appic helper ${notify_deposit_result.Err}`,
       };
     }
   } catch (error) {
@@ -866,26 +895,53 @@ export const check_deposit_status = async (
     agent: unauthenticated_agent,
   });
 
-  try {
-    const tx_status = (await appic_helper_actor.get_transaction({
-      chain_id: BigInt(bridge_option.chain_id),
-      search_param: { TxHash: tx_hash } as TransactionSearchParam,
-    } as GetTxParams)) as [] | [Transaction];
+  const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+    canisterId: bridge_option.minter_id,
+    agent: unauthenticated_agent,
+  });
 
-    if (tx_status.length != 0 && 'EvmToIcp' in tx_status[0]) {
-      const parsed_status = parse_evm_to_icp_tx_status(tx_status[0].EvmToIcp.status);
-      console.log(parsed_status);
-      return {
-        result: parsed_status,
-        message: '',
-        success: true,
-      };
-    } else {
-      return {
-        result: 'PendingVerification',
-        message: '',
-        success: true,
-      };
+  try {
+    // Check appic_helper for dfinity minter
+    if (bridge_option.operator == 'Dfinity') {
+      const tx_status = (await appic_helper_actor.get_transaction({
+        chain_id: BigInt(bridge_option.chain_id),
+        search_param: { TxHash: tx_hash } as TransactionSearchParam,
+      } as GetTxParams)) as [] | [Transaction];
+
+      if (tx_status.length != 0 && 'EvmToIcp' in tx_status[0]) {
+        const parsed_status = parse_evm_to_icp_tx_status(tx_status[0].EvmToIcp.status);
+        console.log(parsed_status);
+        return {
+          result: parsed_status,
+          message: '',
+          success: true,
+        };
+      } else {
+        return {
+          result: 'PendingVerification',
+          message: '',
+          success: true,
+        };
+      }
+    }
+    // Check appic_minter directly for appic minters
+    else {
+      const tx_status = (await appic_minter_actor.retrieve_deposit_status(tx_hash)) as [] | [DepositStatus];
+      if (tx_status.length != 0) {
+        const parsed_status = parse_deposit_status_result(tx_status[0]);
+        console.log(parsed_status);
+        return {
+          result: parsed_status,
+          message: '',
+          success: true,
+        };
+      } else {
+        return {
+          result: 'PendingVerification',
+          message: '',
+          success: true,
+        };
+      }
     }
   } catch (error) {
     return {
