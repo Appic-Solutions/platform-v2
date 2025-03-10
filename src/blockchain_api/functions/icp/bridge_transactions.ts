@@ -734,7 +734,12 @@ export const request_deposit = async (
     const [account] = await wallet_client.getAddresses();
 
     const value = bridge_option.is_native
-      ? BigInt(BigNumber(bridge_option.estimated_return).decimalPlaces(0, BigNumber.ROUND_DOWN).toFixed())
+      ? BigInt(
+          BigNumber(bridge_option.amount)
+            .minus(bridge_option.fees.total_native_fee)
+            .decimalPlaces(0, BigNumber.ROUND_DOWN)
+            .toFixed(),
+        )
       : undefined;
 
     const prepared_transaction = await wallet_client.prepareTransactionRequest({
