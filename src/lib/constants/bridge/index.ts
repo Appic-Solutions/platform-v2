@@ -149,7 +149,7 @@ export const depositStepsDetails: TxStep[] = [
       },
       successful: {
         statusTitle: 'Successful',
-        description: 'Minted successfully',
+        description: 'Withdrew successfully',
       },
       failed: {
         statusTitle: 'Failed',

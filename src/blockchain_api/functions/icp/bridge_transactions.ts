@@ -48,13 +48,12 @@ import { appic_helper_canister_id } from '@/canister_ids.json';
 import {
   parse_deposit_status_result,
   parse_evm_to_icp_tx_status,
-  parse_icp_to_evm_tx_status,
   parse_retrieve_eth_status_result,
   parse_retrieve_withdrawal_status_result,
 } from './utils/tx_status_parser';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
 import { check_allowance } from '../evm/check_allowance';
-import App from 'next/app';
+
 /**
  * Bridge Transactions: Overview
  *
@@ -531,7 +530,7 @@ export const check_withdraw_status = async (
       });
 
       const tx_status = (await dfinity_minter.retrieve_eth_status(BigInt(withdrawal_id))) as RetrieveEthStatus;
-      let parsed_status = parse_retrieve_eth_status_result(tx_status);
+      const parsed_status = parse_retrieve_eth_status_result(tx_status);
       console.log(parsed_status);
       return {
         result: parsed_status,
@@ -547,7 +546,7 @@ export const check_withdraw_status = async (
       const tx_status = (await appic_minter.retrieve_withdrawal_status(
         BigInt(withdrawal_id),
       )) as RetrieveWithdrawalStatus;
-      let parsed_status = parse_retrieve_withdrawal_status_result(tx_status);
+      const parsed_status = parse_retrieve_withdrawal_status_result(tx_status);
       console.log(parsed_status);
       return {
         result: parsed_status,
@@ -735,12 +734,7 @@ export const request_deposit = async (
     const [account] = await wallet_client.getAddresses();
 
     const value = bridge_option.is_native
-      ? BigInt(
-          BigNumber(bridge_option.amount)
-            .minus(BigNumber(bridge_option.fees.deposit_gas).multipliedBy(bridge_option.fees.max_fee_per_gas))
-            .decimalPlaces(0, BigNumber.ROUND_DOWN)
-            .toFixed(),
-        )
+      ? BigInt(BigNumber(bridge_option.estimated_return).decimalPlaces(0, BigNumber.ROUND_DOWN).toFixed())
       : undefined;
 
     const prepared_transaction = await wallet_client.prepareTransactionRequest({
@@ -768,7 +762,7 @@ export const request_deposit = async (
     });
 
     // TODO: to be changed later
-    let confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 12;
+    const confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 12;
 
     const tx_status = await public_client.waitForTransactionReceipt({
       hash,

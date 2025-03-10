@@ -159,7 +159,7 @@ const WalletPage = () => {
       fetchBalances();
       return res;
     },
-    refetchInterval: 1000 * 10,
+    refetchInterval: 1000 * 5,
     enabled:
       !!pendingTx &&
       !!unAuthenticatedAgent &&
@@ -194,7 +194,7 @@ const WalletPage = () => {
       fetchBalances();
       return res;
     },
-    refetchInterval: 1000 * 10,
+    refetchInterval: 1000 * 5,
     enabled:
       !!pendingTx &&
       !!unAuthenticatedAgent &&

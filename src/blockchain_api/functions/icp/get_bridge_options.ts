@@ -99,6 +99,9 @@ export interface BridgeOption {
 // Constants
 export const DEFAULT_SUBACCOUNT = '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
+// We also add a buffer of 50000000000000 wei or 0.00005 eth, in case that the tx is native to prevent gas + amount > balance
+const buffer = 50000000000000;
+
 /**
  * Get bridge options for a transaction.
  */
@@ -166,10 +169,11 @@ export const get_bridge_options = async (
       console.log('Deposit', deposit_gas, total_deposit_fee);
 
       if (bridge_metadata.is_native) {
-        if (BigNumber(total_deposit_fee).plus(total_approval_fee).isGreaterThan(amount)) {
+        if (BigNumber(total_deposit_fee).plus(total_approval_fee).plus(buffer).isGreaterThan(amount)) {
           return {
             message: `Minimum amount: ${BigNumber(total_deposit_fee)
               .plus(total_approval_fee)
+              .plus(buffer)
               .dividedBy(10 ** 18)
               .toFixed()}`,
             result: [],
@@ -409,7 +413,7 @@ const get_gas_price = async (
 
     const fee_history = await client.getFeeHistory({
       blockCount: 5,
-      rewardPercentiles: [50, 70, 80, 90],
+      rewardPercentiles: [50],
       blockTag: 'latest',
     });
 
@@ -452,22 +456,25 @@ const estimate_deposit_fee = async (
 ): Promise<{ deposit_gas: string; total_deposit_fee: string }> => {
   try {
     if (is_native) {
-      const client = createPublicClient({ transport: http(rpc_url), chain });
-      const estimated_gas = await client.estimateGas({
-        account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
-        to: deposit_helper_contract,
-        value: value == '0' ? undefined : BigInt(value),
-        type: 'eip1559',
-        data: encoded_function_data,
-      });
+      // const client = createPublicClient({ transport: http(rpc_url), chain });
+      // const estimated_gas = await client.estimateGas({
+      //   account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
+      //   to: deposit_helper_contract,
+      //   value: value == '0' ? undefined : BigInt(value),
+      //   type: 'eip1559',
+      //   data: encoded_function_data,
+      // });
 
-      const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
-        .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
-        .toFixed(); // plus 1 percent in case gas consumption is higher
-      console.log(estimated_gas_plus_1_percent);
+      // const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
+      //   .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
+      //   .toFixed(); // plus 1 percent in case gas consumption is higher
+      // console.log(estimated_gas_plus_1_percent);
+
+      const required_gas = '34240';
+
       return {
-        total_deposit_fee: BigNumber(estimated_gas_plus_1_percent).multipliedBy(max_fee_per_gas).toFixed(),
-        deposit_gas: estimated_gas_plus_1_percent,
+        total_deposit_fee: BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
+        deposit_gas: required_gas,
       };
     } else {
       const required_gas = '75493';
@@ -636,8 +643,9 @@ const calculate_bridge_options = async (
     console.log(minter_fee);
 
     const total_native_fee = new BigNumber(minter_fee).plus(estimated_network_fee).plus(approve_native_fee).toFixed();
+
     const estimated_return = bridge_metadata.is_native
-      ? new BigNumber(amount).minus(total_native_fee).toFixed()
+      ? new BigNumber(amount).minus(total_native_fee).minus(buffer).toFixed()
       : new BigNumber(amount).minus(approve_erc20_fee).toFixed();
     const human_readable_estimated_return = BigNumber(estimated_return)
       .dividedBy(BigNumber(10).pow(decimals))
