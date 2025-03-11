@@ -15,7 +15,7 @@ export const BridgeLogic = () => {
   // Bridge Store
   const { selectedOption, txHash, withdrawalId } = useBridgeStore();
   // Bridge Actions
-  const { setTxStep } = useBridgeActions();
+  const { setTxStep, setTxHash, setWithdrawalId } = useBridgeActions();
   // Shared Store
   const { icpIdentity, unAuthenticatedAgent, evmAddress } = useSharedStore();
 
@@ -37,11 +37,13 @@ export const BridgeLogic = () => {
             count: 5,
             status: 'successful',
           });
+          setTxHash(undefined);
         } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
           setTxStep({
             count: 5,
             status: 'failed',
           });
+          setTxHash(undefined);
         } else {
           setTxStep({
             count: 5,
@@ -53,6 +55,7 @@ export const BridgeLogic = () => {
           count: 5,
           status: 'failed',
         });
+        setTxHash(undefined);
       }
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchWalletBalances();
@@ -77,11 +80,13 @@ export const BridgeLogic = () => {
             count: 4,
             status: 'successful',
           });
+          setWithdrawalId(undefined);
         } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
           setTxStep({
             count: 4,
             status: 'failed',
           });
+          setWithdrawalId(undefined);
         } else {
           setTxStep({
             count: 4,
@@ -93,6 +98,7 @@ export const BridgeLogic = () => {
           count: 4,
           status: 'failed',
         });
+        setWithdrawalId(undefined);
       }
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchWalletBalances();

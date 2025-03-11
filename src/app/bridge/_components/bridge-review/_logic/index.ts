@@ -208,6 +208,7 @@ const BridgeReviewLogic = () => {
     // recipient should be icpIdentity.getPrincipal() or toWalletAddress
     setTxErrorMessage('');
     setTxHash(undefined);
+    setWithdrawalId(undefined);
     setTxStep({ count: 1, status: 'pending' });
 
     if (selectedOption && unAuthenticatedAgent && amount) {
@@ -250,6 +251,8 @@ const BridgeReviewLogic = () => {
     setActiveStep(1);
     setAmount('');
     setToWalletAddress('');
+    setTxHash(undefined);
+    setWithdrawalId(undefined);
   }
 
   return {
