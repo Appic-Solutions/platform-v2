@@ -24,3 +24,4 @@ export { default as TokenPlaceholderIcon } from './token-placeholder';
 export { default as TwinTokenIcon } from './twin-token';
 export { default as UploadIcon } from './upload';
 export { default as WalletIcon } from './wallet';
+export { default as ArrowPathIcon } from './arrow-path';

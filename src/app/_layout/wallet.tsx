@@ -291,6 +291,7 @@ const WalletPage = () => {
             disconnect={handleDisconnectIcp}
             isLoading={isIcpBalanceLoading}
             address={icpIdentity?.getPrincipal().toString() || ''}
+            refetchBalance={fetchBalances}
           />
         ) : null}
 
@@ -302,6 +303,7 @@ const WalletPage = () => {
             disconnect={handleDisconnectEvm}
             isLoading={isEvmBalanceLoading}
             address={evmAddress || ''}
+            refetchBalance={fetchBalances}
           />
         ) : null}
       </div>

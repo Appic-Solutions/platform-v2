@@ -2,8 +2,9 @@
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import Image from 'next/image';
-import { CloseIcon, CopyIcon } from '@/components/icons';
+import { ArrowPathIcon, CloseIcon, CopyIcon } from '@/components/icons';
 import {
+  cn,
   copyToClipboard,
   getChainLogo,
   getChainName,
@@ -34,9 +35,11 @@ interface WalletCardProps {
   disconnect: () => void;
   isLoading: boolean;
   address: string;
+  refetchBalance: () => void;
 }
 
-export function WalletPop({ logo, title, balance, disconnect, address }: WalletCardProps) {
+export function WalletPop({ logo, title, balance, disconnect, address, isLoading, refetchBalance }: WalletCardProps) {
+
   const [showCopyPopover, setShowCopyPopover] = useState(false);
 
   const copyToClipboardHandler = (address: string) => {
@@ -59,7 +62,17 @@ export function WalletPop({ logo, title, balance, disconnect, address }: WalletC
             <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
           </DrawerTrigger>
           <DrawerContent>
-            <DrawerHeader>{title}</DrawerHeader>
+            <DrawerHeader className='pl-10'>
+              {title}
+              <ArrowPathIcon
+                onClick={refetchBalance}
+                className={cn(
+                  "absolute top-14 left-4 cursor-pointer",
+                  "disabled:pointer-events-none disabled:cursor-not-allowed",
+                  isLoading && "animate-spin"
+                )}
+              />
+            </DrawerHeader>
 
             {!balance ? (
               <WalletPopSkeletonMobile />
@@ -138,6 +151,14 @@ export function WalletPop({ logo, title, balance, disconnect, address }: WalletC
                 <CloseIcon width={20} height={20} />
               </PopoverClose>
               {title}
+              <ArrowPathIcon
+                onClick={refetchBalance}
+                className={cn(
+                  "absolute top-4 left-4 cursor-pointer",
+                  "disabled:pointer-events-none disabled:cursor-not-allowed",
+                  isLoading && "animate-spin"
+                )}
+              />
             </div>
 
             {!balance ? (
