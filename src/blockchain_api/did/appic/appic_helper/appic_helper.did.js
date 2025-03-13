@@ -1,4 +1,12 @@
 export const idlFactory = ({ IDL }) => {
+  const CandidEvmToken = IDL.Record({
+    decimals: IDL.Nat8,
+    logo: IDL.Text,
+    name: IDL.Text,
+    erc20_contract_address: IDL.Text,
+    chain_id: IDL.Nat,
+    symbol: IDL.Text,
+  });
   const IcpTokenType = IDL.Variant({
     ICRC1: IDL.Null,
     ICRC2: IDL.Null,
@@ -20,14 +28,6 @@ export const idlFactory = ({ IDL }) => {
   const Operator = IDL.Variant({
     AppicMinter: IDL.Null,
     DfinityCkEthMinter: IDL.Null,
-  });
-  const CandidEvmToken = IDL.Record({
-    decimals: IDL.Nat8,
-    logo: IDL.Text,
-    name: IDL.Text,
-    erc20_contract_address: IDL.Text,
-    chain_id: IDL.Nat,
-    symbol: IDL.Text,
   });
   const TokenPair = IDL.Record({
     operator: Operator,
@@ -192,6 +192,7 @@ export const idlFactory = ({ IDL }) => {
     evm_token_chain_id: IDL.Nat,
   });
   return IDL.Service({
+    add_evm_token: IDL.Func([CandidEvmToken], [], []),
     add_icp_token: IDL.Func([CandidIcpToken], [], []),
     get_bridge_pairs: IDL.Func([], [IDL.Vec(TokenPair)], ['query']),
     get_erc20_twin_ls_requests_by_creator: IDL.Func([IDL.Principal], [IDL.Vec(CandidLedgerSuiteRequest)], ['query']),

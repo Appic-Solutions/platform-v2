@@ -35,7 +35,6 @@ export const chains: Chain[] = [
 
     twin_token_support: false,
   },
-
   {
     chainId: 56,
     name: 'BSC',
@@ -56,17 +55,23 @@ export const chains: Chain[] = [
     twin_token_support: true,
   },
   {
-    chainId: 355113,
-    name: 'Bitfinity',
-    nativeTokenSymbol: 'BTF',
-    scannerAddress: 'https://explorer.mainnet.bitfinity.network/',
+    chainId: 8453,
+    name: 'Base',
+    nativeTokenSymbol: 'ETH',
+    scannerAddress: 'https://basescan.org',
     type: 'EVM',
-    rpc_url: 'https://mainnet.bitfinity.network/',
-    disabled: true,
+    rpc_url: 'https://base-rpc.publicnode.com',
+    disabled: false,
     is_advance_supported: false,
-    logo: '/images/logo/chains-logos/bitfinity.png',
+    logo: '/images/logo/chains-logos/base.svg',
+    appic_deposit_helper_contract: '0x6b3aDc89A0CA462F2aB9FbEf2f25DB6eA3aA1D00',
+    appic_minter_address: '4ati2-naaaa-aaaad-qg6la-cai',
+    appic_twin_native_ledger_canister_id: '3iven-myaaa-aaaai-q3u5q-cai',
+    ankr_handle: 'base',
+    viem_config: base,
+    twin_handle: 'base',
 
-    twin_token_support: false,
+    twin_token_support: true,
   },
   {
     chainId: 42161,
@@ -119,23 +124,6 @@ export const chains: Chain[] = [
     twin_token_support: false,
   },
   {
-    chainId: 8453,
-    name: 'Base',
-    nativeTokenSymbol: 'ETH',
-    scannerAddress: 'https://basescan.org',
-    type: 'EVM',
-    rpc_url: 'https://base-rpc.publicnode.com',
-    disabled: true,
-    is_advance_supported: false,
-    logo: '/images/logo/chains-logos/base.svg',
-
-    ankr_handle: 'base',
-    viem_config: base,
-    twin_handle: 'base',
-
-    twin_token_support: false,
-  },
-  {
     chainId: 43114,
     name: 'Avalanche',
     nativeTokenSymbol: 'AVAX',
@@ -164,6 +152,19 @@ export const chains: Chain[] = [
 
     ankr_handle: 'fantom',
     viem_config: fantom,
+
+    twin_token_support: false,
+  },
+  {
+    chainId: 355113,
+    name: 'Bitfinity',
+    nativeTokenSymbol: 'BTF',
+    scannerAddress: 'https://explorer.mainnet.bitfinity.network/',
+    type: 'EVM',
+    rpc_url: 'https://mainnet.bitfinity.network/',
+    disabled: true,
+    is_advance_supported: false,
+    logo: '/images/logo/chains-logos/bitfinity.png',
 
     twin_token_support: false,
   },

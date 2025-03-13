@@ -1,11 +1,11 @@
-import { ArrowLongLeftIcon, ExpandLeftIcon } from '@/common/components/icons';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
-import Box from '@/common/components/ui/box';
-import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { ArrowLongLeftIcon, ExpandLeftIcon } from '@/components/icons';
+import Box from '@/components/ui/box';
+import { cn, getChainLogo, getChainName } from '@/lib/utils';
 import { Step2Props } from '../_types';
-import Spinner from '@/common/components/ui/spinner';
 import { Step2Data } from '../_constants';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
+import { Avatar } from '@/components/common/avatar';
+import Spinner from '@/components/ui/spinner';
 
 export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
   const { icpIdentity, icpBalance } = useSharedStore();
@@ -35,17 +35,14 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
 
         <div className="flex items-center self-start gap-4">
           <div className="relative">
-            <Avatar className=" w-12 h-12 rounded-full">
-              <AvatarImage src={newTwinMeta?.icp_twin_token.logo} />
-              <AvatarFallback>{newTwinMeta?.icp_twin_token.symbol}</AvatarFallback>
-            </Avatar>
-            <Avatar className={cn(
-              'absolute -right-1 -bottom-1 w-5 h-5 rounded-full',
-              'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-            )}>
-              <AvatarImage src={getChainLogo(newTwinMeta?.icp_twin_token.chain_id)} />
-              <AvatarFallback>{getChainName(newTwinMeta?.icp_twin_token.chain_id)}</AvatarFallback>
-            </Avatar>
+            <Avatar
+              src={newTwinMeta?.icp_twin_token.logo}
+              className='w-12 h-12'
+            />
+            <Avatar
+              src={getChainLogo(newTwinMeta?.icp_twin_token.chain_id)}
+              className='absolute -right-1 -bottom-1 w-5 h-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+            />
           </div>
           <div className="text-white md:text-black dark:text-white">
             <p className="text-2xl">{newTwinMeta?.icp_twin_token?.symbol}</p>

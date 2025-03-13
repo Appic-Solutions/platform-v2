@@ -1,14 +1,14 @@
 'use client';
-import BridgeSelectTokenPage from './_components/select-token/select-token';
-import TokenListPage from './_components/chain-token-list/token-list';
+import BridgeSelectTokenPage from './_components/select-token';
+import TokenListPage from './_components/chain-token-list';
 import { useEffect } from 'react';
 import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
 import { BridgeOptionsListRequest } from './_api/types/request';
 import { useBridgeActions, useBridgeStore } from './_store';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
 import { StepperContainer } from './_components/bridge-review';
-import MinimizeProgressBarWidget from '@/common/components/layout/minimize-progress-bar-widget';
-import { ParkOutlineBridgeIcon } from '@/common/components/icons';
+import MinimizeProgressBarWidget from '@/app/_layout/minimize-progress-bar-widget';
+import { ParkOutlineBridgeIcon } from '@/components/icons';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();

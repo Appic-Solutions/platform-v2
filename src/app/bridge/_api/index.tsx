@@ -68,6 +68,7 @@ const useTokenApproval = () => {
     onError: (error) => {
       console.error('Token approval failed:', error);
     },
+    gcTime: 0,
   });
 };
 
@@ -79,6 +80,7 @@ const useSubmitWithdrawRequest = () => {
     onError: (error) => {
       console.error('Withdrawal request failed:', error);
     },
+    gcTime: 0,
   });
 };
 
@@ -96,6 +98,7 @@ const useNotifyAppicHelper = () => {
     onError: (error) => {
       console.error('Notify Appic Helper failed:', error);
     },
+    gcTime: 0,
   });
 };
 
@@ -107,6 +110,7 @@ const useCreateWalletClient = () => {
     onError: (error) => {
       console.error('Create wallet client failed:', error);
     },
+    gcTime: 0,
   });
 };
 
@@ -117,6 +121,7 @@ const useDepositTokenWithApproval = () => {
     onError: (error) => {
       console.error('Token approval failed:', error);
     },
+    gcTime: 0,
   });
 };
 
@@ -128,6 +133,7 @@ const useDepositToken = () => {
     onError: (error) => {
       console.error('Deposit request failed:', error);
     },
+    gcTime: 0,
   });
 };
 
@@ -145,6 +151,7 @@ const useNotifyAppicHelperDeposit = () => {
     onError: (error) => {
       console.error('Notify Appic Helper failed:', error);
     },
+    gcTime: 0,
   });
 };
 

@@ -1,6 +1,7 @@
+import { TxHash } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { PendingTransaction } from '@/common/helpers/session';
+import { PendingTransaction } from '@/lib/helpers/session';
 import { create } from 'zustand';
 
 export type TokenType = EvmToken | IcpToken;
@@ -32,14 +33,15 @@ interface BridgeState {
   txStep: TxStepType;
   txErrorMessage: string | undefined;
   pendingTx: PendingTransaction | undefined;
+  prevTxStep: TxStepType;
+  txHash: TxHash | undefined;
+  withdrawalId: string | undefined;
 }
 
 type Action = {
   actions: {
     setActiveStep: (step: number) => void;
     setSelectedTokenType: (type: SelectionType) => void;
-    setFromToken: (token: TokenType | undefined) => void;
-    setToToken: (token: TokenType | undefined) => void;
     setAmount: (amount: string) => void;
     setSelectedOption: (option: BridgeOption) => void;
     setBridgePairs: (bridgePairs: (EvmToken | IcpToken)[]) => void;
@@ -48,17 +50,28 @@ type Action = {
     setToWalletAddress: (walletAddress: string) => void;
     setToWalletValidationError: (toWalletValidationError: string) => void;
     setSelectedTokenBalance: (tokenBalance: string) => void;
+    // select token actions
+    setFromToken: (token: TokenType | undefined) => void;
+    setToToken: (token: TokenType | undefined) => void;
+    // tx actions
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
     setPendingTx: (pendingTxs: PendingTransaction | undefined) => void;
+    setPrevTxStep: (prevStep: TxStepType) => void;
+    setTxHash: (txHash: TxHash | undefined) => void;
+    setWithdrawalId: (withdrawalId: string | undefined) => void;
   };
 };
 
 export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   activeStep: 1,
   txStep: {
-    count: 1,
+    count: 2,
     status: 'pending' as Status,
+  },
+  prevTxStep: {
+    count: 0,
+    status: 'successful' as Status,
   },
   amount: '',
   bridgeOptions: {
@@ -76,6 +89,8 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
   selectedTokenBalance: '',
   txErrorMessage: undefined,
   pendingTx: undefined,
+  txHash: undefined,
+  withdrawalId: undefined,
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
     setSelectedTokenType: (selectedTokenType) => set({ selectedTokenType }),
@@ -89,8 +104,12 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),
     setToWalletValidationError: (toWalletValidationError) => set({ toWalletValidationError }),
     setSelectedTokenBalance: (selectedTokenBalance) => set({ selectedTokenBalance }),
+    // tx actions
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
+    setTxHash: (txHash) => set({ txHash }),
+    setPrevTxStep: (prevTxStep) => set({ prevTxStep }),
+    setWithdrawalId: (withdrawalId) => set({ withdrawalId }),
     setPendingTx: (pendingTx) => set({ pendingTx }),
   },
 }));

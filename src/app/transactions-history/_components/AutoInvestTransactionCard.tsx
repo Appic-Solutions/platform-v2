@@ -1,9 +1,9 @@
-import { ArrowsUpDownIcon, ChevronDownIcon, FireIcon, LinkIcon } from '@/common/components/icons';
-import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
-import { Card } from '@/common/components/ui/card';
-import { cn, getChainLogo, getChainName } from '@/common/helpers/utils';
+import { ArrowsUpDownIcon, ChevronDownIcon, FireIcon, LinkIcon } from '@/components/icons';
+import { Card } from '@/components/ui/card';
+import { cn, getChainLogo, getChainName } from '@/lib/utils';
 import { useState } from 'react';
 import Link from 'next/link';
+import { Avatar } from '@/components/common/avatar';
 export interface Transaction {
   id: string;
   date: string;
@@ -82,19 +82,14 @@ const AutoInvestTransactionCard = ({
         <div className="flex items-center justify-between w-full">
           {/* source token avatar */}
           <div className="relative">
-            <Avatar className={cn('w-[58px] h-[58px] rounded-full', 'md:w-[72px] md:h-[72px]')}>
-              <AvatarImage src={sourceToken?.logo || 'images/logo/placeholder.png'} />
-              <AvatarFallback>{sourceToken?.symbol}</AvatarFallback>
-            </Avatar>
             <Avatar
-              className={cn(
-                'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
-                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-              )}
-            >
-              <AvatarImage src={getChainLogo(sourceToken?.chainId)} />
-              <AvatarFallback>{sourceToken?.symbol}</AvatarFallback>
-            </Avatar>
+              src={sourceToken?.logo}
+              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
+            />
+            <Avatar
+              src={getChainLogo(sourceToken?.chainId)}
+              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+            />
           </div>
           {/* connecting line and bridge icon */}
           <div className="flex items-center justify-center w-full">
@@ -105,7 +100,7 @@ const AutoInvestTransactionCard = ({
                 'bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
                 status === 'failed' && 'border-2 border-solid border-red-500',
                 status === 'pending' &&
-                  "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin",
+                "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin",
               )}
             >
               <ArrowsUpDownIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
@@ -121,19 +116,14 @@ const AutoInvestTransactionCard = ({
           </div>
           {/* destination token avatar */}
           <div className="relative">
-            <Avatar className={cn('w-[58px] h-[58px] rounded-full', 'md:w-[72px] md:h-[72px]')}>
-              <AvatarImage src={destinationToken?.logo || 'images/logo/placeholder.png'} />
-              <AvatarFallback>{destinationToken?.symbol}</AvatarFallback>
-            </Avatar>
             <Avatar
-              className={cn(
-                'absolute -right-1 -bottom-1 w-6 h-6 rounded-full',
-                'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
-              )}
-            >
-              <AvatarImage src={getChainLogo(destinationToken?.chainId)} />
-              <AvatarFallback>{destinationToken?.symbol}</AvatarFallback>
-            </Avatar>
+              src={destinationToken?.logo}
+              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
+            />
+            <Avatar
+              src={getChainLogo(destinationToken?.chainId)}
+              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+            />
           </div>
         </div>
         {/* bottom section */}
@@ -200,7 +190,7 @@ const AutoInvestTransactionCard = ({
                       'p-2 rounded-full flex items-center justify-center relative',
                       'bg-gray-300',
                       index < steps.length - 1 &&
-                        "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300",
+                      "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300",
                     )}
                   ></div>
 

@@ -37,6 +37,7 @@ export interface DefiniteCanisterSettings {
   memory_allocation: bigint;
   compute_allocation: bigint;
 }
+export type DepositStatus = { Minted: null } | { Accepted: null } | { InvalidDeposit: null } | { Quarantined: null };
 export interface Eip1559TransactionPrice {
   max_priority_fee_per_gas: bigint;
   max_fee_per_gas: bigint;
@@ -442,6 +443,7 @@ export interface _SERVICE {
   icrc28_trusted_origins: ActorMethod<[], Icrc28TrustedOriginsResponse>;
   minter_address: ActorMethod<[], string>;
   request_scraping_logs: ActorMethod<[], LogScrapingResult>;
+  retrieve_deposit_status: ActorMethod<[string], [] | [DepositStatus]>;
   retrieve_withdrawal_status: ActorMethod<[bigint], RetrieveWithdrawalStatus>;
   smart_contract_address: ActorMethod<[], string>;
   withdraw_erc20: ActorMethod<[WithdrawErc20Arg], WithdrawalErc20Result>;

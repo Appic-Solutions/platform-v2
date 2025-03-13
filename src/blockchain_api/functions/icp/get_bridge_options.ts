@@ -99,6 +99,9 @@ export interface BridgeOption {
 // Constants
 export const DEFAULT_SUBACCOUNT = '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
+// We also add a buffer of 1000000000000 wei or 0.000001 eth, in case that the tx is native to prevent gas + amount > balance
+const buffer = 1000000000000;
+
 /**
  * Get bridge options for a transaction.
  */
@@ -130,6 +133,9 @@ export const get_bridge_options = async (
 
     if (bridge_metadata.tx_type == TxType.Deposit) {
       const principal_bytes = principal_to_bytes32('6gplx-n62xg-ky6br-utvsz-l3vfe-jggch-hhico-7tydb-qtwu6-yiyhn-gqe');
+
+      // In case of native deposit we need to keep some native tokens in users wallet, otherwise the transaction will be rejected by wallet
+      amount = BigNumber(amount).minus(buffer).toFixed();
 
       const encoded_function_data = encode_deposit_function_data(
         from_token.contractAddress!,
@@ -409,7 +415,7 @@ const get_gas_price = async (
 
     const fee_history = await client.getFeeHistory({
       blockCount: 5,
-      rewardPercentiles: [50, 70, 80, 90],
+      rewardPercentiles: [50],
       blockTag: 'latest',
     });
 
@@ -418,19 +424,20 @@ const get_gas_price = async (
       throw new Error('No reward data found in fee history.');
     }
 
+    // Latest base fee plus 10%
     const latestBaseFee = new BigNumber(fee_history.baseFeePerGas[fee_history.baseFeePerGas.length - 1].toString());
 
     // Calculate Average Priority Fee
     const allPriorityFees: BigNumber[] = fee_history.reward.flat().map((fee) => new BigNumber(fee.toString()));
     const sumPriorityFees = allPriorityFees.reduce((sum, fee) => sum.plus(fee), new BigNumber(0));
-    const averagePriorityFee = sumPriorityFees.dividedBy(allPriorityFees.length);
+    const averagePriorityFee = sumPriorityFees.dividedBy(allPriorityFees.length).decimalPlaces(0, BigNumber.ROUND_CEIL);
 
     // Optionally round the result to 9 decimals (common for gas prices)
-    const maxFeePerGas = latestBaseFee.plus(averagePriorityFee).decimalPlaces(0, BigNumber.ROUND_DOWN).toFixed();
+    const maxFeePerGas = latestBaseFee.plus(averagePriorityFee).toFixed();
 
     return {
       max_fee_per_gas: maxFeePerGas,
-      max_priority_fee_per_gas: averagePriorityFee.decimalPlaces(0, BigNumber.ROUND_DOWN).toFixed(),
+      max_priority_fee_per_gas: averagePriorityFee.toFixed(),
     };
   } catch (error) {
     console.error('Error fetching gas price:', error);
@@ -452,22 +459,25 @@ const estimate_deposit_fee = async (
 ): Promise<{ deposit_gas: string; total_deposit_fee: string }> => {
   try {
     if (is_native) {
-      const client = createPublicClient({ transport: http(rpc_url), chain });
-      const estimated_gas = await client.estimateGas({
-        account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
-        to: deposit_helper_contract,
-        value: value == '0' ? undefined : BigInt(value),
-        type: 'eip1559',
-        data: encoded_function_data,
-      });
+      // const client = createPublicClient({ transport: http(rpc_url), chain });
+      // const estimated_gas = await client.estimateGas({
+      //   account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
+      //   to: deposit_helper_contract,
+      //   value: value == '0' ? undefined : BigInt(value),
+      //   type: 'eip1559',
+      //   data: encoded_function_data,
+      // });
 
-      const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
-        .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
-        .toFixed(); // plus 1 percent in case gas consumption is higher
-      console.log(estimated_gas_plus_1_percent);
+      // const estimated_gas_plus_1_percent = BigNumber(estimated_gas.toString())
+      //   .plus(BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
+      //   .toFixed(); // plus 1 percent in case gas consumption is higher
+      // console.log(estimated_gas_plus_1_percent);
+
+      const required_gas = '34240';
+      console.log('Deposit Fee:', BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed());
       return {
-        total_deposit_fee: BigNumber(estimated_gas_plus_1_percent).multipliedBy(max_fee_per_gas).toFixed(),
-        deposit_gas: estimated_gas_plus_1_percent,
+        total_deposit_fee: BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
+        deposit_gas: required_gas,
       };
     } else {
       const required_gas = '75493';
@@ -636,6 +646,7 @@ const calculate_bridge_options = async (
     console.log(minter_fee);
 
     const total_native_fee = new BigNumber(minter_fee).plus(estimated_network_fee).plus(approve_native_fee).toFixed();
+
     const estimated_return = bridge_metadata.is_native
       ? new BigNumber(amount).minus(total_native_fee).toFixed()
       : new BigNumber(amount).minus(approve_erc20_fee).toFixed();
@@ -648,7 +659,9 @@ const calculate_bridge_options = async (
       return [];
     }
 
-    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 3 min' : '15 - 20 min';
+    console.log('Check fees and amount backward', amount, BigNumber(estimated_return).plus(total_native_fee).toFixed());
+
+    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 1 min' : '15 - 20 min';
     const native_fee_token_id =
       bridge_metadata.tx_type == TxType.Withdrawal ? native_currency.canisterId! : native_currency.contractAddress!;
     return [

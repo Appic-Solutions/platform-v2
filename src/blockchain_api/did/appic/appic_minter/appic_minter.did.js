@@ -284,6 +284,12 @@ export const idlFactory = ({ IDL }) => {
     InvalidBlockNumber: IDL.Null,
   });
   const Result = IDL.Variant({ Ok: IDL.Null, Err: RequestScrapingError });
+  const DepositStatus = IDL.Variant({
+    Minted: IDL.Null,
+    Accepted: IDL.Null,
+    InvalidDeposit: IDL.Null,
+    Quarantined: IDL.Null,
+  });
   const Transaction = IDL.Record({ transaction_hash: IDL.Text });
   const TxFinalizedStatus = IDL.Variant({
     Success: IDL.Record({
@@ -423,6 +429,7 @@ export const idlFactory = ({ IDL }) => {
     icrc28_trusted_origins: IDL.Func([], [Icrc28TrustedOriginsResponse], []),
     minter_address: IDL.Func([], [IDL.Text], []),
     request_scraping_logs: IDL.Func([], [Result], []),
+    retrieve_deposit_status: IDL.Func([IDL.Text], [IDL.Opt(DepositStatus)], ['query']),
     retrieve_withdrawal_status: IDL.Func([IDL.Nat64], [RetrieveWithdrawalStatus], []),
     smart_contract_address: IDL.Func([], [IDL.Text], ['query']),
     withdraw_erc20: IDL.Func([WithdrawErc20Arg], [Result_1], []),

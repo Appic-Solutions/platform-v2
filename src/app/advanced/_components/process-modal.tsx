@@ -1,11 +1,11 @@
-import { Dialog, DialogClose, DialogContent } from '@/common/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { ProcessModalProps } from '../_types';
-import Stepper from '@/common/components/layout/Stepper';
+import Stepper from '@/app/_layout/Stepper';
 import Image from 'next/image';
-import { cn } from '@/common/helpers/utils';
-import { CloseIcon } from '@/common/components/icons';
+import { cn } from '@/lib/utils';
+import { CloseIcon } from '@/components/icons';
 import Link from 'next/link';
-import HistoryIcon from '@/common/components/icons/history';
+import HistoryIcon from '@/components/icons/history';
 
 export default function ProcessModal({
   isOpen,

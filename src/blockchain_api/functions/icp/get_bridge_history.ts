@@ -201,8 +201,11 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
           .dividedBy(BigNumber(10).pow(to_token.decimals))
           .toString();
         const scanner = chain.scannerAddress;
+        console.log(transaction.status);
         const bridge_steps = transform_tx_history_to_steps(tx, scanner, human_readable_final_value, to_token.symbol);
         const bridge_status = map_tx_status_to_status(parse_icp_to_evm_tx_status(transaction.status));
+        console.log(bridge_status);
+
         return {
           id,
           date,
@@ -274,6 +277,7 @@ const transform_tx_history_to_steps = (
     }
   } else if ('IcpToEvm' in tx) {
     const parsed_status = parse_icp_to_evm_tx_status(tx.IcpToEvm.status);
+    console.log('Parsed_status:', parsed_status, tx.IcpToEvm.status);
 
     const steps: BridgeStep[] = [
       create_bridge_step('Successful', `Transaction submitted with Id: ${tx.IcpToEvm.native_ledger_burn_index}`),

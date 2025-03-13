@@ -1,9 +1,9 @@
 'use client';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/common/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PAGE_PARAMS_DATA } from '../_constants';
-import { cn } from '@/common/helpers/utils';
+import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { useSharedStore } from '@/common/state/store';
+import { useSharedStore } from '@/store/store';
 import Image from 'next/image';
 import BridgeContent from './bridge-content';
 import AdvancedContent from './advanced-content';

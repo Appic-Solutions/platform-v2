@@ -1,5 +1,5 @@
-import { useSharedStore } from '@/common/state/store';
-import { getStorageItem } from '@/common/helpers/localstorage';
+import { useSharedStore } from '@/store/store';
+import { getStorageItem } from '@/lib/helpers/localstorage';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 
 export default function useLogic() {

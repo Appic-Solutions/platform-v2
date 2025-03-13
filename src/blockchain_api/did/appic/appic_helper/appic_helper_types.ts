@@ -185,6 +185,7 @@ export interface UpgradeArg {
   update_minters: [] | [Array<UpdateMinterArgs>];
 }
 export interface _SERVICE {
+  add_evm_token: ActorMethod<[CandidEvmToken], undefined>;
   add_icp_token: ActorMethod<[CandidIcpToken], undefined>;
   get_bridge_pairs: ActorMethod<[], Array<TokenPair>>;
   get_erc20_twin_ls_requests_by_creator: ActorMethod<[Principal], Array<CandidLedgerSuiteRequest>>;
