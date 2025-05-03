@@ -10,16 +10,16 @@ import { Toaster } from '@/components/ui/toaster';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <html lang="en" className="dark bg-[#060607] relative overflow-hidden h-full">
+    <html lang="en" className="dark bg-[#060607] relative h-full">
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />
-          <body className="!pointer-events-auto !select-auto flex flex-col h-full isolate pb-24 sm:pb-28 md:pb-0">
+          <ShapesPage />
+          <body className="!pointer-events-auto !select-auto flex flex-col md:gap-y-10 h-full isolate pb-24 sm:pb-28 md:pb-10">
             <HeaderPage />
-            <ShapesPage />
             {children}
-            <Toaster />
           </body>
+          <Toaster />
         </WalletWrapper>
       </Providers>
     </html>
