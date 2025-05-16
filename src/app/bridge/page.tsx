@@ -62,12 +62,10 @@ const BridgeHome = () => {
 
   return (
     <>
-      <div className='pb-10'>
-        {renderStep()}
-        {pendingTx && (
-          <MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className="text-white" />} />
-        )}
-      </div>
+      {renderStep()}
+      {pendingTx && (
+        <MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className="text-white" />} />
+      )}
     </>
   );
 };

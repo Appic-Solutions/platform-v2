@@ -17,7 +17,9 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
           <ShapesPage />
           <body className="!pointer-events-auto !select-auto flex flex-col md:gap-y-10 h-full isolate pb-24 sm:pb-28 md:pb-10">
             <HeaderPage />
-            {children}
+            <main className='flex-1 flex items-center justify-center pb-10'>
+              {children}
+            </main>
           </body>
           <Toaster />
         </WalletWrapper>
