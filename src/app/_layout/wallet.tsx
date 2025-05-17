@@ -76,7 +76,7 @@ const WalletPage = () => {
       setUnAuthenticatedAgent(unAuthenticatedAgent);
       setIsIcpBalanceLoading(true);
       try {
-        const icpRes = await fetchIcpBalances({ unAuthenticatedAgent, icpIdentity });
+        const icpRes = await fetchIcpBalances({ unAuthenticatedAgent, principal: icpIdentity });
         setIcpBalance(icpRes);
       } finally {
         setIsIcpBalanceLoading(false);
@@ -290,7 +290,7 @@ const WalletPage = () => {
             balance={icpBalance}
             disconnect={handleDisconnectIcp}
             isLoading={isIcpBalanceLoading}
-            address={icpIdentity?.getPrincipal().toString() || ''}
+            address={icpIdentity?.toString() || ''}
             refetchBalance={fetchBalances}
           />
         ) : null}

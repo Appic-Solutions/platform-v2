@@ -1,20 +1,21 @@
-import { HttpAgent, Identity } from '@dfinity/agent';
+import { HttpAgent } from '@dfinity/agent';
 import { getStorageItem } from './localstorage';
 import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
+import { Principal } from '@dfinity/principal';
 
 export const fetchIcpBalances = async ({
   unAuthenticatedAgent,
-  icpIdentity,
+  principal,
 }: {
   unAuthenticatedAgent: HttpAgent | null;
-  icpIdentity: Identity | null;
+  principal: Principal | null;
 }) => {
   try {
-    if (unAuthenticatedAgent && icpIdentity) {
+    if (unAuthenticatedAgent && principal) {
       const all_tokens = getStorageItem('icpTokens');
       const icp_balance = await get_icp_wallet_tokens_balances(
-        icpIdentity.getPrincipal().toString(),
+        principal.toString(),
         JSON.parse(all_tokens || '[]'),
         unAuthenticatedAgent,
       ).then((res) => res.result);

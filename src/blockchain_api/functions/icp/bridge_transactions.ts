@@ -767,7 +767,7 @@ export const request_deposit = async (
     });
 
     // TODO: to be changed later
-    const confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 12;
+    const confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 3;
 
     const tx_status = await public_client.waitForTransactionReceipt({
       hash,

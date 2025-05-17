@@ -1,6 +1,8 @@
 'use client';
-import { IdentityKitAuthType, Plug, InternetIdentity, Stoic, NFIDW } from '@nfid/identitykit';
+import { IdentityKitAuthType } from '@nfid/identitykit';
 import { IdentityKitProvider } from '@nfid/identitykit/react';
+import { NFIDW, InternetIdentity, Stoic, OISY } from '@nfid/identitykit';
+
 import { wagmiAdapter, projectId } from '@/lib/configs/wagmi';
 import { createAppKit } from '@reown/appkit/react';
 import { mainnet, arbitrum, avalanche, base, optimism, polygon, bsc } from '@reown/appkit/networks';
@@ -66,11 +68,7 @@ export const WalletWrapper = ({
 
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
-      <IdentityKitProvider
-        signers={[NFIDW, Plug, Stoic, InternetIdentity]}
-        authType={IdentityKitAuthType.DELEGATION}
-        signerClientOptions={{ targets: ['zjydy-zyaaa-aaaaj-qnfka-cai'] }}
-      >
+      <IdentityKitProvider authType={IdentityKitAuthType.ACCOUNTS} signers={[NFIDW, InternetIdentity, Stoic, OISY]}>
         {children}
       </IdentityKitProvider>
     </WagmiProvider>

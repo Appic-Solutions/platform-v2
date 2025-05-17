@@ -218,7 +218,7 @@ const BridgeReviewLogic = () => {
           authenticatedAgent,
           unAuthenticatedAgent,
           recipient: toWalletAddress || evmAddress || '', // destination wallet EVM address
-          userWalletPrincipal: icpIdentity.getPrincipal().toString(), // source wallet Principal ID
+          userWalletPrincipal: icpIdentity.toString(), // source wallet Principal ID
         });
       } else if (fromToken?.chain_type === 'EVM') {
         if (toWalletAddress.length > 0 && !toWalletValidationError) {
@@ -226,15 +226,15 @@ const BridgeReviewLogic = () => {
             bridgeOption: selectedOption,
             unAuthenticatedAgent,
             recipient: Principal.fromText(toWalletAddress), // destination wallet Principal
-            recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
+            recipientPrincipal: toWalletAddress || icpIdentity?.toString() || '', // destination wallet principal ID
             userWalletAddress: evmAddress || '', // source wallet EVM address
           });
         } else if (icpIdentity) {
           executeDeposit({
             bridgeOption: selectedOption,
             unAuthenticatedAgent,
-            recipient: icpIdentity?.getPrincipal(), // destination wallet Principal
-            recipientPrincipal: toWalletAddress || icpIdentity?.getPrincipal().toString() || '', // destination wallet principal ID
+            recipient: icpIdentity as Principal, // destination wallet Principal
+            recipientPrincipal: toWalletAddress || icpIdentity?.toString() || '', // destination wallet principal ID
             userWalletAddress: evmAddress || '', // source wallet EVM address
           });
         }

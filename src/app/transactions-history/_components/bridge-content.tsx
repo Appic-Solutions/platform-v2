@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import useLogic from '../_logic';
 import { HttpAgent } from '@dfinity/agent';
-import { Principal } from '@dfinity/principal';
 import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
 import { useQuery } from '@tanstack/react-query';
 import { Avatar } from '@/components/common/avatar';
@@ -21,14 +20,9 @@ export default function BridgeContent() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['bridge-history'],
     queryFn: async () =>
-      get_transaction_history(
-        evmAddress,
-        icpIdentity?.getPrincipal() as Principal,
-        unAuthenticatedAgent as HttpAgent,
-        bridgePairs,
-      ),
+      get_transaction_history(evmAddress, icpIdentity, unAuthenticatedAgent as HttpAgent, bridgePairs),
     refetchInterval: 1000 * 60,
-    enabled: !!(bridgePairs && unAuthenticatedAgent && (evmAddress || icpIdentity?.getPrincipal())),
+    enabled: !!(bridgePairs && unAuthenticatedAgent && (evmAddress || icpIdentity)),
   });
 
   console.log('🚀 ~ BridgeContent ~ data:', data);
@@ -87,13 +81,10 @@ export default function BridgeContent() {
         </div>
         <div className="flex items-center justify-between w-full my-5 *:relative">
           <div>
-            <Avatar
-              src={item.from_token.logo}
-              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
-            />
+            <Avatar src={item.from_token.logo} className="w-[58px] h-[58px] md:w-[72px] md:h-[72px]" />
             <Avatar
               src={getChainLogo(item.from_token.chainId)}
-              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+              className="absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
           <div className="flex items-center justify-center w-full">
@@ -125,13 +116,10 @@ export default function BridgeContent() {
             />
           </div>
           <div>
-            <Avatar
-              src={item.to_token.logo}
-              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
-            />
+            <Avatar src={item.to_token.logo} className="w-[58px] h-[58px] md:w-[72px] md:h-[72px]" />
             <Avatar
               src={getChainLogo(item.to_token.chainId)}
-              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+              className="absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
         </div>
@@ -212,7 +200,7 @@ export default function BridgeContent() {
                           ? 'bg-[#12B76A33] text-[#12b76a]'
                           : 'bg-[#FF0000]/35 text-[#FF0000]',
                       idx < item.bridge_steps.length - 1 &&
-                      'after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full',
+                        'after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full',
                     )}
                   >
                     {step.status === 'Pending' ? (

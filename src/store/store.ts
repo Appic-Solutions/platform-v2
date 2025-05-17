@@ -1,6 +1,7 @@
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { IcpToken } from '@/blockchain_api/types/tokens';
-import { HttpAgent, Identity, Agent } from '@dfinity/agent';
+import { HttpAgent, Agent } from '@dfinity/agent';
+import { Principal } from '@dfinity/principal';
 import { create } from 'zustand';
 
 interface SharedState {
@@ -13,7 +14,7 @@ interface SharedState {
   evmBalance: EvmTokensBalances | undefined;
   authenticatedAgent: Agent | undefined;
   unAuthenticatedAgent: HttpAgent | undefined;
-  icpIdentity: Identity | undefined;
+  icpIdentity: Principal | undefined;
   isEvmConnected: boolean;
   isIcpBalanceLoading: boolean;
   isEvmBalanceLoading: boolean;

@@ -18,10 +18,9 @@ export default function AdvancedContent() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['advanced-history'],
-    queryFn: async () =>
-      get_advanced_history(icpIdentity?.getPrincipal() as Principal, unAuthenticatedAgent as HttpAgent),
+    queryFn: async () => get_advanced_history(icpIdentity as Principal, unAuthenticatedAgent as HttpAgent),
     refetchInterval: 1000 * 60,
-    enabled: !!(icpIdentity?.getPrincipal() && unAuthenticatedAgent),
+    enabled: !!(icpIdentity && unAuthenticatedAgent),
   });
 
   console.log('🚀 ~ AdvancedContent ~ data:', data);
@@ -83,13 +82,10 @@ export default function AdvancedContent() {
           {/* token avatar */}
           <div className="flex justify-start items-center gap-4 w-full">
             <div className="relative">
-              <Avatar
-                src={item.icp_token?.logo}
-                className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
-              />
+              <Avatar src={item.icp_token?.logo} className="w-[58px] h-[58px] md:w-[72px] md:h-[72px]" />
               <Avatar
                 src={'/images/logo/wallet_logos/icp.svg'}
-                className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+                className="absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
               />
             </div>
             <div className="flex flex-col items-start">

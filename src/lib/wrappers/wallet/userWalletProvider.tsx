@@ -3,7 +3,7 @@ import { useAuthenticatedAgent } from '@/lib/hooks/useAuthenticatedAgent';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useSharedStoreActions } from '@/store/store';
 import { Principal } from '@dfinity/principal';
-import { useIdentity } from '@nfid/identitykit/react';
+import { useAccounts } from '@nfid/identitykit/react';
 import { useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
 
 export const UserWalletProvider = () => {
@@ -17,7 +17,7 @@ export const UserWalletProvider = () => {
   } = useSharedStoreActions();
 
   // ICP Wallet Hooks
-  const icpIdentity = useIdentity();
+  const icpIdentity = useAccounts();
 
   // EVM Wallet Hooks
   const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
@@ -36,9 +36,10 @@ export const UserWalletProvider = () => {
 
   // Set ICP identity and authenticated agent
   useEffect(() => {
-    if (icpIdentity && authenticatedAgent) {
-      if (icpIdentity.getPrincipal() !== Principal.anonymous()) {
-        setIcpIdentity(icpIdentity);
+    console.log(icpIdentity);
+    if (icpIdentity != undefined && authenticatedAgent) {
+      if (icpIdentity[0].principal !== Principal.anonymous()) {
+        setIcpIdentity(icpIdentity[0].principal);
         setAuthenticatedAgent(authenticatedAgent);
       }
     }

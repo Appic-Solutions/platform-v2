@@ -119,7 +119,7 @@ export const BridgeLogic = () => {
     if (unAuthenticatedAgent && icpIdentity) {
       fetchIcpBalances({
         unAuthenticatedAgent,
-        icpIdentity,
+        principal: icpIdentity,
       }).then((res) => {
         setIcpBalance(res);
       });
