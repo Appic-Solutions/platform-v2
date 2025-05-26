@@ -17,4 +17,4 @@ export default function ChevronUpIcon({ ...props }: React.SVGProps<SVGSVGElement
       />
     </svg>
   );
-};
+}

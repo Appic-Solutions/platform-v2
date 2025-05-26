@@ -16,4 +16,4 @@ export default function InfoCircleIcon({ ...props }: React.SVGProps<SVGSVGElemen
       <path d="M12 16V12M12 8H12.01" />
     </svg>
   );
-};
+}

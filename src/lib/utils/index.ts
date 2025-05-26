@@ -48,7 +48,10 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 // Format crypto values to show only 4 significant decimals digits
-export const formatToSignificantFigures = (number: string, significantDecimals: number = 5): string => {
+export const formatToSignificantFigures = (
+  number: string,
+  significantDecimals: number = 5,
+): string => {
   /**
    * Formats a number such that integers remain unchanged, and decimal numbers
    * are trimmed to the specified number of significant decimals without rounding.
@@ -58,7 +61,7 @@ export const formatToSignificantFigures = (number: string, significantDecimals: 
    * @returns The formatted number as a string.
    */
 
-  if (BigNumber(number).isInteger()) {
+  if (new BigNumber(number).isInteger()) {
     return number.toString();
   }
 

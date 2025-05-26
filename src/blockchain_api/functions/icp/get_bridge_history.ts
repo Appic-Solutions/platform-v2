@@ -59,7 +59,9 @@ export const get_transaction_history = async (
       )) as Transaction[];
       return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
     } else if (evm_wallet_address) {
-      const txs = (await appic_helper_actor.get_txs_by_address(evm_wallet_address)) as Transaction[];
+      const txs = (await appic_helper_actor.get_txs_by_address(
+        evm_wallet_address,
+      )) as Transaction[];
       return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
     } else if (principal_id) {
       const txs = (await appic_helper_actor.get_txs_by_principal(principal_id)) as Transaction[];
@@ -83,13 +85,18 @@ export const get_transaction_history = async (
 };
 
 // convert Transaction into BridgeHistory
-const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpToken)[]): BridgeHistory[] => {
+const transform_bridge_tx = (
+  txs: Transaction[],
+  bridge_tokens: (EvmToken | IcpToken)[],
+): BridgeHistory[] => {
   return txs
     .map((tx): BridgeHistory => {
       if ('EvmToIcp' in tx) {
         const transaction = tx.EvmToIcp;
         const id = `${transaction.transaction_hash}-${transaction.chain_id}`;
-        const epoch = Math.floor(BigNumber(transaction.time.toString()).dividedBy(1_000_000).toNumber());
+        const epoch = Math.floor(
+          new BigNumber(transaction.time.toString()).dividedBy(1_000_000).toNumber(),
+        );
         const date_object = new Date(epoch);
         const date = date_object.toLocaleDateString('en-GB');
         const time = date_object.toLocaleTimeString();
@@ -103,7 +110,8 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         const to_token = bridge_tokens.find(
           (token) =>
             token.chain_type == 'ICP' &&
-            token.canisterId!.toLocaleLowerCase() == transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
+            token.canisterId!.toLocaleLowerCase() ==
+              transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
         )!;
 
         const native_currency = bridge_tokens.find(
@@ -116,25 +124,37 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         const tx_type = 'Deposit';
         const fee = transaction.total_gas_spent[0]?.toString() || '0';
         const human_readable_fee =
-          fee == '0' ? 'Undefined' : BigNumber(fee).dividedBy(BigNumber(10).pow(18)).toString();
+          fee == '0'
+            ? 'Undefined'
+            : new BigNumber(fee).dividedBy(new BigNumber(10).pow(18)).toString();
         const fee_token_symbol = native_currency.symbol;
-        let base_value = BigNumber(transaction.value.toString()).toFixed();
-        if (from_token.contractAddress == NATIVE_TOKEN_ADDRESS || to_token.contractAddress == NATIVE_TOKEN_ADDRESS) {
-          base_value = BigNumber(base_value).plus(fee).toFixed();
+        let base_value = new BigNumber(transaction.value.toString()).toFixed();
+        if (
+          from_token.contractAddress == NATIVE_TOKEN_ADDRESS ||
+          to_token.contractAddress == NATIVE_TOKEN_ADDRESS
+        ) {
+          base_value = new BigNumber(base_value).plus(fee).toFixed();
         }
-        const human_readable_base_value = BigNumber(base_value)
-          .dividedBy(BigNumber(10).pow(from_token.decimals))
+        const human_readable_base_value = new BigNumber(base_value)
+          .dividedBy(new BigNumber(10).pow(from_token.decimals))
           .toString();
 
         const final_value = transaction.actual_received[0]?.toString() || '0';
-        const human_readable_final_value = BigNumber(final_value)
-          .dividedBy(BigNumber(10).pow(to_token.decimals))
+        const human_readable_final_value = new BigNumber(final_value)
+          .dividedBy(new BigNumber(10).pow(to_token.decimals))
           .toString();
         const scanner = chains.find(
           (chain) => chain.chainId.toString() == transaction.chain_id.toString(),
         )!.scannerAddress;
-        const bridge_steps = transform_tx_history_to_steps(tx, scanner, human_readable_final_value, to_token.symbol);
-        const bridge_status = map_tx_status_to_status(parse_evm_to_icp_tx_status(transaction.status));
+        const bridge_steps = transform_tx_history_to_steps(
+          tx,
+          scanner,
+          human_readable_final_value,
+          to_token.symbol,
+        );
+        const bridge_status = map_tx_status_to_status(
+          parse_evm_to_icp_tx_status(transaction.status),
+        );
         return {
           id,
           date,
@@ -158,14 +178,17 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
       } else if ('IcpToEvm' in tx) {
         const transaction = tx.IcpToEvm;
         const id = `${transaction.native_ledger_burn_index}-${transaction.chain_id}`;
-        const epoch = Math.floor(BigNumber(transaction.time.toString()).dividedBy(1_000_000).toNumber());
+        const epoch = Math.floor(
+          new BigNumber(transaction.time.toString()).dividedBy(1_000_000).toNumber(),
+        );
         const date_object = new Date(epoch);
         const date = date_object.toLocaleDateString('en-GB');
         const time = date_object.toLocaleTimeString();
         const from_token = bridge_tokens.find(
           (token) =>
             token.chain_type == 'ICP' &&
-            token.canisterId!.toLocaleLowerCase() == transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
+            token.canisterId!.toLocaleLowerCase() ==
+              transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
         )!;
 
         const to_token = bridge_tokens.find(
@@ -175,7 +198,9 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
             token.chainId == Number(transaction.chain_id.toString()),
         )!;
 
-        const chain = chains.find((chain) => chain.chainId.toString() == transaction.chain_id.toString())!;
+        const chain = chains.find(
+          (chain) => chain.chainId.toString() == transaction.chain_id.toString(),
+        )!;
         const native_ledger_principal =
           'AppicMinter' in transaction.operator
             ? chain.appic_twin_native_ledger_canister_id!
@@ -188,22 +213,31 @@ const transform_bridge_tx = (txs: Transaction[], bridge_tokens: (EvmToken | IcpT
         const tx_type = 'Withdrawal';
         const fee = transaction.total_gas_spent[0]?.toString() || '0';
         const human_readable_fee =
-          fee == '0' ? 'Calculating fees' : BigNumber(fee).dividedBy(BigNumber(10).pow(18)).toString();
+          fee == '0'
+            ? 'Calculating fees'
+            : new BigNumber(fee).dividedBy(new BigNumber(10).pow(18)).toString();
         const fee_token_symbol = native_currency.symbol;
-        const base_value = BigNumber(transaction.withdrawal_amount.toString()).toFixed();
+        const base_value = new BigNumber(transaction.withdrawal_amount.toString()).toFixed();
 
-        const human_readable_base_value = BigNumber(base_value)
-          .dividedBy(BigNumber(10).pow(from_token.decimals))
+        const human_readable_base_value = new BigNumber(base_value)
+          .dividedBy(new BigNumber(10).pow(from_token.decimals))
           .toString();
 
         const final_value = transaction.actual_received[0]?.toString() || '0';
-        const human_readable_final_value = BigNumber(final_value)
-          .dividedBy(BigNumber(10).pow(to_token.decimals))
+        const human_readable_final_value = new BigNumber(final_value)
+          .dividedBy(new BigNumber(10).pow(to_token.decimals))
           .toString();
         const scanner = chain.scannerAddress;
         console.log(transaction.status);
-        const bridge_steps = transform_tx_history_to_steps(tx, scanner, human_readable_final_value, to_token.symbol);
-        const bridge_status = map_tx_status_to_status(parse_icp_to_evm_tx_status(transaction.status));
+        const bridge_steps = transform_tx_history_to_steps(
+          tx,
+          scanner,
+          human_readable_final_value,
+          to_token.symbol,
+        );
+        const bridge_status = map_tx_status_to_status(
+          parse_icp_to_evm_tx_status(transaction.status),
+        );
         console.log(bridge_status);
 
         return {
@@ -258,7 +292,11 @@ const transform_tx_history_to_steps = (
       case 'PendingVerification':
         return steps.slice(0, 2);
       case 'Accepted':
-        return [steps[0], create_bridge_step('Successful', 'Transaction verified by minter'), steps[2]];
+        return [
+          steps[0],
+          create_bridge_step('Successful', 'Transaction verified by minter'),
+          steps[2],
+        ];
       case 'Minted':
         return [
           steps[0],
@@ -280,7 +318,10 @@ const transform_tx_history_to_steps = (
     console.log('Parsed_status:', parsed_status, tx.IcpToEvm.status);
 
     const steps: BridgeStep[] = [
-      create_bridge_step('Successful', `Transaction submitted with Id: ${tx.IcpToEvm.native_ledger_burn_index}`),
+      create_bridge_step(
+        'Successful',
+        `Transaction submitted with Id: ${tx.IcpToEvm.native_ledger_burn_index}`,
+      ),
       create_bridge_step('Pending', 'Transaction verification in progress'),
       create_bridge_step('Pending', 'Signing in progress'),
       create_bridge_step('Failed', `Transaction failed, ${parsed_status}`),

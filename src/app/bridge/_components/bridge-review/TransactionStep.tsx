@@ -46,20 +46,20 @@ export const TransactionStep = ({
     <div
       className={cn(
         'flex flex-col items-center justify-center gap-2 text-center',
-        'duration-500 ease-in-out w-64',
+        'w-64 duration-500 ease-in-out',
         'md:animate-slide-in-from-right',
         'animate-slide-in-from-top',
         index === currentStep.count - 1
           ? 'opacity-100'
           : index === currentStep.count && currentStep.status === 'pending'
-            ? 'opacity-50 select-none'
+            ? 'select-none opacity-50'
             : 'hidden',
       )}
     >
       <div className="text-lg font-bold text-[#333333] dark:text-white">{step.title}</div>
       <div
         className={cn(
-          'flex items-center justify-center w-[90px] h-[90px] relative rounded-full',
+          'relative flex h-[90px] w-[90px] items-center justify-center rounded-full',
           currentStep.count === index + 1 && currentStep.status === 'failed'
             ? 'border-2 border-red-500'
             : currentStep.count === index + 1 && currentStep.status === 'successful'
@@ -70,7 +70,7 @@ export const TransactionStep = ({
         {/* steps status before last step */}
         {currentStep.count === index + 1 && currentStep.status === 'pending' && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[86px] h-[85px] border-[3px] border-t-transparent border-green-600 rounded-full animate-spin" />
+            <div className="h-[85px] w-[86px] animate-spin rounded-full border-[3px] border-green-600 border-t-transparent" />
           </div>
         )}
         <Image
@@ -90,24 +90,26 @@ export const TransactionStep = ({
           <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
             {step.statuses[currentStep.status].description}
           </p>
-          <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">{txErrorMessage}</p>
+          <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
+            {txErrorMessage}
+          </p>
         </div>
       )}
       {((fromToken?.chain_type === 'ICP' && currentStep.count === 4) ||
         (fromToken?.chain_type === 'EVM' && currentStep.count === 5)) && (
-          <>
-            <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F] pb-2">
-              You can safely close this window
-            </p>
-            <button
-              onClick={onNavigateToHistory}
-              className="bg-card-background flex items-center gap-2 shadow-lg hover:opacity-90 hover:shadow-md transition-all text-primary border p-2 rounded-lg border-gray-200"
-            >
-              <HistoryIcon width={20} height={20} />
-              Check History
-            </button>
-          </>
-        )}
+        <>
+          <p className="pb-2 text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
+            You can safely close this window
+          </p>
+          <button
+            onClick={onNavigateToHistory}
+            className="flex items-center gap-2 rounded-lg border border-gray-200 bg-card-background p-2 text-primary shadow-lg transition-all hover:opacity-90 hover:shadow-md"
+          >
+            <HistoryIcon width={20} height={20} />
+            Check History
+          </button>
+        </>
+      )}
     </div>
   );
 };

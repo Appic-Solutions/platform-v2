@@ -19,7 +19,10 @@ import { icp_ledger, lsm_ledger_id } from '@/canister_ids.json';
 import BigNumber from 'bignumber.js';
 import { Principal } from '@dfinity/principal';
 import { convert_png_to_data_uri } from '@/blockchain_api/utils/png_to_data_uri';
-import { generate_twin_token_symbol, generate_twin_token_transfer_fee } from './generate_new_twin_token_symbol';
+import {
+  generate_twin_token_symbol,
+  generate_twin_token_transfer_fee,
+} from './generate_new_twin_token_symbol';
 
 const icp_transfer_fee = 10_000;
 
@@ -57,9 +60,15 @@ export const get_evm_token_and_generate_twin_token = async (
   });
   try {
     const lsm_info = (await lsm_actor.get_lsm_info()) as LedgerManagerInfo;
-    const creation_fee = BigNumber(lsm_info.ls_creation_icp_fee.toString()).plus(icp_transfer_fee);
+    const creation_fee = new BigNumber(lsm_info.ls_creation_icp_fee.toString()).plus(
+      icp_transfer_fee,
+    );
     const human_readable_creation_fee = creation_fee.dividedBy(10 ** 8).toFixed();
-    const evm_token_result = await get_evm_token_info(contract_address, chain_id, unauthenticated_agent);
+    const evm_token_result = await get_evm_token_info(
+      contract_address,
+      chain_id,
+      unauthenticated_agent,
+    );
     if (evm_token_result.result.length == 0) {
       return {
         message: 'No evm token available for provided info',
@@ -84,7 +93,7 @@ export const get_evm_token_and_generate_twin_token = async (
     );
 
     const name = `${candid_evm_token.name} on ICP`;
-    const human_readable_transfer_fee = BigNumber(transfer_fee)
+    const human_readable_transfer_fee = new BigNumber(transfer_fee)
       .dividedBy(10 ** candid_evm_token.decimals)
       .toFixed();
 
@@ -220,7 +229,9 @@ export const check_new_twin_ls_request = async (
       chain_id: new_twin_metadata.evm_base_token.chain_id,
     } as Erc20Contract;
 
-    const new_lsm_twin_status = (await lsm_actor.all_twins_canister_ids(erc2_contract)) as [] | [ManagedCanisterIds];
+    const new_lsm_twin_status = (await lsm_actor.all_twins_canister_ids(erc2_contract)) as
+      | []
+      | [ManagedCanisterIds];
 
     if (new_lsm_twin_status.length != 0) {
       return { result: 'Successfully created a new ledger suite', success: true, message: '' };

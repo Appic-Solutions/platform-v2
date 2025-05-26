@@ -15,4 +15,4 @@ export default function SunIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
       />
     </svg>
   );
-};
+}

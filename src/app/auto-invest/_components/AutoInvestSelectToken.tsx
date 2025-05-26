@@ -71,32 +71,35 @@ const AutoInvestSelectToken = ({
   return (
     <Box
       className={cn(
-        'flex flex-col gap-4 h-full md:min-h-[10vh]',
-        'md:px-[65px] md:py-[55px] md:max-w-[617px]',
+        'flex h-full flex-col gap-4 md:min-h-[10vh]',
+        'md:max-w-[617px] md:px-[65px] md:py-[55px]',
         'overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         showDetails && 'lg:max-w-[1200px]',
       )}
     >
-      <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
-        <div className="flex items-center w-full justify-between text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold gap-x-16">
+      <div className="mb-5 flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
+        <div className="flex w-full items-center justify-between gap-x-16 text-[26px] font-bold leading-7 md:text-[40px] md:leading-10">
           <h1 className="w-full">Auto Invest</h1>
-          {showDetails && <h2 className="w-full hidden lg:block">Details</h2>}
+          {showDetails && <h2 className="hidden w-full lg:block">Details</h2>}
         </div>
-        <Link href="/transactions-history/auto-invest" className="flex items-center gap-x-2 text-sm">
+        <Link
+          href="/transactions-history/auto-invest"
+          className="flex items-center gap-x-2 text-sm"
+        >
           <HistoryIcon width={20} height={20} />
           History
         </Link>
       </div>
-      <div className="flex flex-col gap-x-16 flex-1 justify-between lg:flex-row lg:overflow-hidden w-full">
+      <div className="flex w-full flex-1 flex-col justify-between gap-x-16 lg:flex-row lg:overflow-hidden">
         {/* TOKENS */}
         <div
           className={cn(
-            'flex flex-col justify-between h-full items-center gap-y-4 w-full lg:max-w-[482px] md:overflow-y-hidden',
+            'flex h-full w-full flex-col items-center justify-between gap-y-4 md:overflow-y-hidden lg:max-w-[482px]',
             showDetails && 'hidden lg:flex',
           )}
         >
-          <div className="flex flex-col gap-y-8 md:gap-y-4 w-full h-full">
+          <div className="flex h-full w-full flex-col gap-y-8 md:gap-y-4">
             {/* TOKENS */}
             <div className="relative flex w-full flex-col gap-y-4">
               <TokenCard
@@ -109,8 +112,8 @@ const AutoInvestSelectToken = ({
               />
               <div
                 className={cn(
-                  'absolute rounded-full w-12 h-12 md:w-14 md:h-14 z-20 cursor-pointer group',
-                  'top-1/2 -translate-y-1/2 right-4 -translate-x-1/2',
+                  'group absolute z-20 h-12 w-12 cursor-pointer rounded-full md:h-14 md:w-14',
+                  'right-4 top-1/2 -translate-x-1/2 -translate-y-1/2',
                   'flex items-center justify-center',
                   'bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white',
                   'border-2 border-white dark:border-white/30',
@@ -130,8 +133,10 @@ const AutoInvestSelectToken = ({
                 label="Buy"
               />
             </div>
-            <div className="text-white flex flex-col gap-y-8 md:gap-y-4">
-              <p className="text-[28px] font-bold hidden md:block text-black dark:text-white">Recurrence</p>
+            <div className="flex flex-col gap-y-8 text-white md:gap-y-4">
+              <p className="hidden text-[28px] font-bold text-black dark:text-white md:block">
+                Recurrence
+              </p>
               <InvestPeriod
                 investmentPeriod={investmentPeriod}
                 setRepeatCountHandle={setRepeatCountHandle}
@@ -140,16 +145,21 @@ const AutoInvestSelectToken = ({
                 setSelectedCycle={setSelectedCycle}
               />
               <div className={cn('flex flex-col gap-y-8', 'md:flex-row md:items-start md:gap-x-8')}>
-                <InvestRepeat repeatOn={repeatOn} setRepeatOn={setRepeatOn} selectedCycle={selectedCycle} date={date} />
-                <div className="flex-col gap-y-2 flex md:hidden">
+                <InvestRepeat
+                  repeatOn={repeatOn}
+                  setRepeatOn={setRepeatOn}
+                  selectedCycle={selectedCycle}
+                  date={date}
+                />
+                <div className="flex flex-col gap-y-2 md:hidden">
                   <p className="text-[18px] text-black dark:text-white">Ends On</p>
-                  <div className="text-primary font-light text-md">{format(date, 'PP')}</div>
+                  <div className="text-md font-light text-primary">{format(date, 'PP')}</div>
                 </div>
               </div>
             </div>
           </div>
           {/* DESKTOP ACTION BUTTONS */}
-          <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
+          <div className={cn('flex w-full items-center gap-x-2', 'max-lg:hidden')}>
             <button onClick={() => setShowDetails(true)} disabled={disabled()}>
               {getButtonText()}
             </button>
@@ -168,7 +178,7 @@ const AutoInvestSelectToken = ({
         )}
       </div>
       {/* MOBILE ACTION BUTTONS */}
-      <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
+      <div className={cn('flex w-full items-center gap-x-2', 'lg:hidden')}>
         <button onClick={() => setShowDetails(true)} disabled={disabled()}>
           {getButtonText()}
         </button>

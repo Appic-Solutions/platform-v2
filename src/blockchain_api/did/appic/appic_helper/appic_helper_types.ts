@@ -50,7 +50,10 @@ export interface CandidAddErc20TwinLedgerSuiteRequest {
   evm_token_chain_id: bigint;
 }
 export type CandidErc20TwinLedgerSuiteFee = { Icp: bigint } | { Appic: bigint };
-export type CandidErc20TwinLedgerSuiteStatus = { PendingApproval: null } | { Created: null } | { Installed: null };
+export type CandidErc20TwinLedgerSuiteStatus =
+  | { PendingApproval: null }
+  | { Created: null }
+  | { Installed: null };
 export interface CandidEvmToIcp {
   status: EvmToIcpStatus;
   principal: Principal;
@@ -146,7 +149,12 @@ export type IcpToEvmStatus =
   | { Reimbursed: null }
   | { Successful: null }
   | { Created: null };
-export type IcpTokenType = { ICRC1: null } | { ICRC2: null } | { ICRC3: null } | { DIP20: null } | { Other: string };
+export type IcpTokenType =
+  | { ICRC1: null }
+  | { ICRC2: null }
+  | { ICRC3: null }
+  | { DIP20: null }
+  | { Other: string };
 export interface Icrc28TrustedOriginsResponse {
   trusted_origins: Array<string>;
 }
@@ -172,7 +180,10 @@ export interface TokenPair {
   icp_token: CandidIcpToken;
 }
 export type Transaction = { EvmToIcp: CandidEvmToIcp } | { IcpToEvm: CandidIcpToEvm };
-export type TransactionSearchParam = { TxWithdrawalId: bigint } | { TxMintId: bigint } | { TxHash: string };
+export type TransactionSearchParam =
+  | { TxWithdrawalId: bigint }
+  | { TxMintId: bigint }
+  | { TxHash: string };
 export interface UpdateMinterArgs {
   operator: Operator;
   chain_id: bigint;

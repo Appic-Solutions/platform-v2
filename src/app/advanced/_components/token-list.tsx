@@ -7,20 +7,20 @@ import { Chain } from '@/blockchain_api/types/chains';
 import ChainItem from '@/components/ui/chain-item';
 
 export default function TokenListPage({ prevStepHandler }: TokenListProps) {
-  const { setValue, control, clearErrors } = useFormContext()
+  const { setValue, control, clearErrors } = useFormContext();
 
-  const ChainIdWatched = useWatch({ control, name: "chain_id" })
+  const ChainIdWatched = useWatch({ control, name: 'chain_id' });
 
   const ChainItemClickHandler = (chain: Chain) => {
-    setValue("chain_id", String(chain.chainId))
-    clearErrors("chain_id")
-    prevStepHandler()
-  }
+    setValue('chain_id', String(chain.chainId));
+    clearErrors('chain_id');
+    prevStepHandler();
+  };
 
   return (
-    <Box className='justify-normal animate-slide-in opacity-0 md:max-w-[612px] md:h-[280px] md:px-9 md:pt-8'>
+    <Box className="animate-slide-in justify-normal opacity-0 md:h-[280px] md:max-w-[612px] md:px-9 md:pt-8">
       <BoxHeader title="Select Chain" onBack={prevStepHandler} />
-      <div className="grid grid-cols-5 gap-5 place-items-center w-full select-none md:px-4 mb-7">
+      <div className="mb-7 grid w-full select-none grid-cols-5 place-items-center gap-5 md:px-4">
         {chains.map((chain, idx) => (
           <ChainItem
             key={idx}
@@ -31,6 +31,6 @@ export default function TokenListPage({ prevStepHandler }: TokenListProps) {
           />
         ))}
       </div>
-    </Box >
+    </Box>
   );
 }

@@ -30,30 +30,47 @@ export default function TransactionStepper({
 
   return (
     <Box className="w-full max-w-[691px] justify-start gap-y-9">
-      <div className="text-center text-lg font-bold text-[#333333] dark:text-white">Bridge Transaction</div>
+      <div className="text-center text-lg font-bold text-[#333333] dark:text-white">
+        Bridge Transaction
+      </div>
       <div className="flex items-center justify-center gap-x-16">
         {steps.slice(currentStep - 1, currentStep + 1).map((step, index, array) => (
           <div
             key={currentStep + index}
             className={cn(
               'flex flex-col items-center justify-center gap-4 text-center',
-              'duration-500 ease-in-out w-64',
+              'w-64 duration-500 ease-in-out',
               animationDirection === 'left' && 'animate-slide-in-from-right',
               animationDirection === 'right' && 'animate-slide-in-from-left',
-              step.status === 'completed' && array.length > 1 && index === 0 && 'translate-x-[-120%] opacity-50',
-              currentStep === index + 1 ? 'opacity-100' : 'opacity-60 select-none',
+              step.status === 'completed' &&
+                array.length > 1 &&
+                index === 0 &&
+                'translate-x-[-120%] opacity-50',
+              currentStep === index + 1 ? 'opacity-100' : 'select-none opacity-60',
             )}
           >
             <div className="text-lg font-bold text-[#333333] dark:text-white">Step {index + 1}</div>
-            <div className={cn('flex items-center justify-center w-[90px] h-[90px] relative rounded-full')}>
-              {currentStep === index + 1 && (
-                <div className="absolute inset-0 border-[3px] border-t-transparent border-success rounded-full animate-[spin_1.5s_linear_infinite]" />
+            <div
+              className={cn(
+                'relative flex h-[90px] w-[90px] items-center justify-center rounded-full',
               )}
-              <Image src={step.logo} alt={step.title} height={80} width={80} className="object-contain" />
+            >
+              {currentStep === index + 1 && (
+                <div className="absolute inset-0 animate-[spin_1.5s_linear_infinite] rounded-full border-[3px] border-success border-t-transparent" />
+              )}
+              <Image
+                src={step.logo}
+                alt={step.title}
+                height={80}
+                width={80}
+                className="object-contain"
+              />
             </div>
             <div className="flex flex-col gap-y-4">
               <p className="text-lg font-bold text-[#333333] dark:text-white">{step.title}</p>
-              <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">{step.description}</p>
+              <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
+                {step.description}
+              </p>
             </div>
           </div>
         ))}

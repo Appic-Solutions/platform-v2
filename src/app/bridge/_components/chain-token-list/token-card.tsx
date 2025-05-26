@@ -17,22 +17,24 @@ const TokenCard = ({
   return (
     <div
       className={cn(
-        'flex justify-between items-center w-full rounded-md p-2',
+        'flex w-full items-center justify-between rounded-md p-2',
         isSelected && 'bg-[#F5F5F5] dark:bg-[#2A2A2A]',
         'hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]',
       )}
     >
-      <div className={cn('flex items-center gap-x-5 cursor-pointer group duration-200 flex-grow')} onClick={onClick}>
-        <Avatar
-          src={token.logo} alt={token.name}
-          className='w-[50px] h-[50px]'
-        />
-        <div className="flex flex-col flex-1 min-w-0">
-          <p className="text-xl font-bold text-black dark:text-white truncate">{token.symbol}</p>
-          <div className="overflow-hidden h-5">
+      <div
+        className={cn('group flex flex-grow cursor-pointer items-center gap-x-5 duration-200')}
+        onClick={onClick}
+      >
+        <Avatar src={token.logo} alt={token.name} className="h-[50px] w-[50px]" />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="truncate text-xl font-bold text-black dark:text-white">{token.symbol}</p>
+          <div className="h-5 overflow-hidden">
             <div className="flex flex-col transition-transform duration-300 group-hover:-translate-y-5">
-              <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate">{token.name}</p>
-              <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate flex items-center gap-x-2">
+              <p className="truncate text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3]">
+                {token.name}
+              </p>
+              <p className="flex items-center gap-x-2 truncate text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3]">
                 {token?.contractAddress?.slice(0, 14) || token?.canisterId?.slice(0, 14)}
                 <Link
                   href={
@@ -54,10 +56,10 @@ const TokenCard = ({
       </div>
       {token.balance && (
         <div className="flex flex-col">
-          <p className="text-xl font-bold text-black dark:text-white truncate">
+          <p className="truncate text-xl font-bold text-black dark:text-white">
             {formatToSignificantFigures(token.balance)}
           </p>
-          <p className="text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3] truncate flex items-center gap-x-2">
+          <p className="flex items-center gap-x-2 truncate text-sm font-semibold text-[#6E6E6E] dark:text-[#B5B3B3]">
             ${Number(token.usdBalance).toFixed(3)}
           </p>
         </div>

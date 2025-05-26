@@ -1,4 +1,4 @@
-import { useAgent } from "@nfid/identitykit/react";
+import { useAgent } from '@nfid/identitykit/react';
 
 export const useAuthenticatedAgent = () => {
   // Use an authenticatedAgent when making authenticated calls.

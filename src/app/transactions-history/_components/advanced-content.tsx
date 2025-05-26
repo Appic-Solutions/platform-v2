@@ -37,8 +37,8 @@ export default function AdvancedContent() {
     return (
       <div
         className={cn(
-          'flex items-center justify-center h-full text-xl',
-          'text-center max-w-[490px] mx-auto px-6 text-white',
+          'flex h-full items-center justify-center text-xl',
+          'mx-auto max-w-[490px] px-6 text-center text-white',
         )}
       >
         Failed To Get Transaction History
@@ -46,13 +46,13 @@ export default function AdvancedContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="flex items-center justify-center absolute my-auto inset-y-0">
+      <div className="absolute inset-y-0 my-auto flex items-center justify-center">
         <Spinner />
       </div>
     );
   } else if (data?.result.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-y-10 text-white text-2xl text-center absolute my-auto inset-y-0">
+      <div className="absolute inset-y-0 my-auto flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white">
         <Image src="/images/empty.png" alt="" width={100} height={100} />
         Empty Advanced History
       </div>
@@ -62,15 +62,15 @@ export default function AdvancedContent() {
       <div
         key={idx}
         className={cn(
-          'flex flex-col items-center justify-center w-full p-5',
-          'bg-input-fields bg-center bg-no-repeat bg-cover shadow-md backdrop-blur-[30px]',
-          'rounded-2xl md:px-10 md:rounded-[36px]',
+          'flex w-full flex-col items-center justify-center p-5',
+          'bg-input-fields bg-cover bg-center bg-no-repeat shadow-md backdrop-blur-[30px]',
+          'rounded-2xl md:rounded-[36px] md:px-10',
         )}
       >
         {/* Date & Time */}
         <div
           className={cn(
-            'flex items-center justify-between gap-x-4 w-full',
+            'flex w-full items-center justify-between gap-x-4',
             'text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
           )}
         >
@@ -78,9 +78,9 @@ export default function AdvancedContent() {
           <p>{item.time}</p>
         </div>
 
-        <div className="flex items-center justify-between w-full my-6">
+        <div className="my-6 flex w-full items-center justify-between">
           {/* token avatar */}
-          <div className="flex justify-start items-center gap-4 w-full">
+          <div className="flex w-full items-center justify-start gap-4">
             <div className="relative">
               <Avatar src={item.icp_token?.logo} className="w-[58px] h-[58px] md:w-[72px] md:h-[72px]" />
               <Avatar
@@ -90,57 +90,61 @@ export default function AdvancedContent() {
             </div>
             <div className="flex flex-col items-start">
               <div className={cn('flex flex-col items-start gap-x-1')}>
-                <span className="text-primary text-lg md:text-2xl">{item.icp_token?.name}</span>
-                <div className="text-secondary text-xs md:text-sm">on ICP</div>
+                <span className="text-lg text-primary md:text-2xl">{item.icp_token?.name}</span>
+                <div className="text-xs text-secondary md:text-sm">on ICP</div>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-x-1 bg-black text-white rounded-full px-2 md:px-6 py-2">
-            <TwinTokenIcon className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="text-xs md:text-sm text-nowrap">Twin Token</span>
+          <div className="flex items-center gap-x-1 rounded-full bg-black px-2 py-2 text-white md:px-6">
+            <TwinTokenIcon className="h-4 w-4 md:h-5 md:w-5" />
+            <span className="text-nowrap text-xs md:text-sm">Twin Token</span>
           </div>
         </div>
 
         <div
           className={cn(
-            'flex flex-col gap-y-4 w-full duration-300',
-            itemId === idx ? 'opacity-100 mb-6 translate-y-0' : 'opacity-0 h-0 overflow-hidden -translate-y-2',
+            'flex w-full flex-col gap-y-4 duration-300',
+            itemId === idx
+              ? 'mb-6 translate-y-0 opacity-100'
+              : 'h-0 -translate-y-2 overflow-hidden opacity-0',
           )}
         >
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Original Token Name:</span>
-            <span className="text-secondary text-right">{item.evm_token?.name}</span>
+            <span className="text-right text-secondary">{item.evm_token?.name}</span>
           </div>
 
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Original Token Symbol:</span>
-            <span className="text-secondary text-right">{item.evm_token?.symbol}</span>
+            <span className="text-right text-secondary">{item.evm_token?.symbol}</span>
           </div>
 
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Blockchain:</span>
-            <span className="text-secondary text-right">{getChainName(item.evm_token?.chainId)}</span>
+            <span className="text-right text-secondary">
+              {getChainName(item.evm_token?.chainId)}
+            </span>
           </div>
 
           <hr className="w-full border-t border-secondary" />
 
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Twin Token Name:</span>
-            <span className="text-secondary text-right">{item.icp_token?.name}</span>
+            <span className="text-right text-secondary">{item.icp_token?.name}</span>
           </div>
 
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Twin Token Symbol:</span>
-            <span className="text-secondary text-right">{item.icp_token?.symbol}</span>
+            <span className="text-right text-secondary">{item.icp_token?.symbol}</span>
           </div>
 
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Twin Token Creation Fee:</span>
-            <span className="text-[#12B76A] text-right">{item.human_readable_fee_charged} ICP</span>
+            <span className="text-right text-[#12B76A]">{item.human_readable_fee_charged} ICP</span>
           </div>
-          <div className="flex items-center text-xs md:text-sm w-full justify-between">
+          <div className="flex w-full items-center justify-between text-xs md:text-sm">
             <span className="text-primary">Ledger Id:</span>
-            <span className="text-[#12B76A] text-right">{item.token_id} ICP</span>
+            <span className="text-right text-[#12B76A]">{item.token_id} ICP</span>
           </div>
         </div>
 
@@ -149,7 +153,7 @@ export default function AdvancedContent() {
           onClick={() => expandHandler(idx)}
           className={cn(
             'flex items-center justify-center gap-x-4',
-            'text-xs font-semibold cursor-pointer select-none',
+            'cursor-pointer select-none text-xs font-semibold',
             'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
           )}
         >
@@ -157,7 +161,7 @@ export default function AdvancedContent() {
           <ChevronDownIcon
             width={20}
             height={20}
-            className={cn('duration-300 ease-in-out', itemId === idx && 'transform rotate-180')}
+            className={cn('duration-300 ease-in-out', itemId === idx && 'rotate-180 transform')}
           />
         </div>
       </div>

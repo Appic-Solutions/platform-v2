@@ -1,31 +1,25 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "./scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
-import { useState } from "react";
-import CalendarEditIcon from "@/components/icons/calendar-edit";
+import { cn } from '@/lib/utils';
+import { ScrollArea } from './scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { useState } from 'react';
+import CalendarEditIcon from '@/components/icons/calendar-edit';
 
 const DaySelect = () => {
-  const [day, setDay] = useState<string | null>("1");
+  const [day, setDay] = useState<string | null>('1');
   function getDaySuffix(day: number): string {
-    if (day >= 11 && day <= 13) return "th";
+    if (day >= 11 && day <= 13) return 'th';
 
     switch (day % 10) {
       case 1:
-        return "st";
+        return 'st';
       case 2:
-        return "nd";
+        return 'nd';
       case 3:
-        return "rd";
+        return 'rd';
       default:
-        return "th";
+        return 'th';
     }
   }
 
@@ -38,18 +32,18 @@ const DaySelect = () => {
     >
       <SelectTrigger
         className={cn(
-          "text-[#0A0A0B] text-sm gap-x-4 rounded-lg py-4 border-[1px] border-white w-[160px]",
-          "bg-white/50 dark:bg-[#F5F5F5]"
+          'w-[160px] gap-x-4 rounded-lg border-[1px] border-white py-4 text-sm text-[#0A0A0B]',
+          'bg-white/50 dark:bg-[#F5F5F5]',
         )}
         hideIcon
       >
         <SelectValue />
-        <CalendarEditIcon className="w-5 h-5 text-gray-500" />
+        <CalendarEditIcon className="h-5 w-5 text-gray-500" />
       </SelectTrigger>
       <SelectContent
         className={cn(
-          "text-[#0A0A0B] text-sm gap-x-4 rounded-lg py-2 border-[1px] border-white w-[120px]",
-          "bg-white/50 dark:bg-[#F5F5F5]"
+          'w-[120px] gap-x-4 rounded-lg border-[1px] border-white py-2 text-sm text-[#0A0A0B]',
+          'bg-white/50 dark:bg-[#F5F5F5]',
         )}
       >
         <ScrollArea className="h-[15rem]">

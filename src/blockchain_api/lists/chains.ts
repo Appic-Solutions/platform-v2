@@ -1,3 +1,5 @@
+// cspell:ignore avalanchec ztvj yaaaa aaaap ahiza qyaaa aaaam qbuha naaaa aaaad 3iven myaaa aaaai Bitfinity bitfinity
+
 import { Chain } from '../types/chains';
 import { Operator } from '../types/tokens';
 import { mainnet, bsc, polygon, fantom, arbitrum, base, avalanche, optimism } from 'viem/chains';
@@ -133,7 +135,6 @@ export const chains: Chain[] = [
     disabled: true,
     is_advance_supported: false,
     logo: '/images/logo/chains-logos/avalanche.svg',
-
     ankr_handle: 'avalanchec',
     viem_config: avalanche,
 

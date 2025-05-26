@@ -4,7 +4,10 @@ import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
 import { useBridgeActions, useBridgeStore } from '../_store';
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
-import { check_deposit_status, check_withdraw_status } from '@/blockchain_api/functions/icp/bridge_transactions';
+import {
+  check_deposit_status,
+  check_withdraw_status,
+} from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';

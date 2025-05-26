@@ -10,11 +10,7 @@ export default function CheckIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
       stroke="currentColor"
       {...props}
     >
-      <path strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m4.5 12.75 6 6 9-13.5"
-      />
-    </svg >
-
+      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+    </svg>
   );
-};
+}

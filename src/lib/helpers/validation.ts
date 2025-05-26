@@ -1,5 +1,5 @@
-import { Principal } from "@dfinity/principal";
-import { isAddress } from "web3-validator";
+import { Principal } from '@dfinity/principal';
+import { isAddress } from 'web3-validator';
 
 export const isValidEvmAddress = (address: string): boolean => {
   return isAddress(address);

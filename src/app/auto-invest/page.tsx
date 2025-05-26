@@ -1,31 +1,29 @@
-"use client";
+'use client';
 
-import { IcpToken } from "@/blockchain_api/types/tokens";
-import { useState } from "react";
-import AutoInvestSelectToken from "./_components/AutoInvestSelectToken";
-import AutoInvestTokenListPage from "./_components/chain-token-list/AutoInvestTokenListPage";
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { useState } from 'react';
+import AutoInvestSelectToken from './_components/AutoInvestSelectToken';
+import AutoInvestTokenListPage from './_components/chain-token-list/AutoInvestTokenListPage';
 
-type SelectionType = "buy" | "sell";
+type SelectionType = 'buy' | 'sell';
 type TokenType = IcpToken | null;
 
 const AutoInvestPage = () => {
   const [activeStep, setActiveStep] = useState(1);
-  const [selectedType, setSelectedType] = useState<SelectionType>("buy");
+  const [selectedType, setSelectedType] = useState<SelectionType>('buy');
   const [fromToken, setFromToken] = useState<TokenType>(null);
   const [toToken, setToToken] = useState<TokenType>(null);
 
-  const handleStepChange = (direction: "next" | "prev" | number) => {
+  const handleStepChange = (direction: 'next' | 'prev' | number) => {
     setActiveStep((prev) => {
       const newStep =
-        typeof direction === "number"
-          ? direction
-          : prev + (direction === "next" ? 1 : -1);
+        typeof direction === 'number' ? direction : prev + (direction === 'next' ? 1 : -1);
       return Math.min(Math.max(newStep, 1), 4);
     });
   };
 
   const handleTokenSelection = (token: IcpToken) => {
-    const setToken = selectedType === "sell" ? setFromToken : setToToken;
+    const setToken = selectedType === 'sell' ? setFromToken : setToToken;
     setToken(token);
   };
 
@@ -51,7 +49,7 @@ const AutoInvestPage = () => {
       case 2:
         return (
           <AutoInvestTokenListPage
-            prevStepHandler={() => handleStepChange("prev")}
+            prevStepHandler={() => handleStepChange('prev')}
             setTokenHandler={handleTokenSelection}
             selectedType={selectedType}
             fromToken={fromToken}

@@ -17,4 +17,4 @@ export default function ArrowLongLeftIcon({ ...props }: React.SVGProps<SVGSVGEle
       />
     </svg>
   );
-};
+}

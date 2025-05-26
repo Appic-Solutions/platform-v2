@@ -1,6 +1,9 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { idlFactory as appicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
-import { TokenPair, Operator as BackendOperator } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import {
+  TokenPair,
+  Operator as BackendOperator,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { Response } from '@/blockchain_api/types/response';
 import BigNumber from 'bignumber.js';
 import { EvmToken, IcpToken, Operator } from '../../types/tokens';
@@ -9,7 +12,9 @@ import { appic_helper_canister_id } from '@/canister_ids.json';
 import { Principal } from '@dfinity/principal';
 import { get_evm_token_price } from '../evm/get_tokens_price';
 
-export const get_bridge_pairs = async (agent: HttpAgent): Promise<Response<Array<EvmToken | IcpToken>>> => {
+export const get_bridge_pairs = async (
+  agent: HttpAgent,
+): Promise<Response<Array<EvmToken | IcpToken>>> => {
   const appic_actor = Actor.createActor(appicHelperIdlFactory, {
     agent,
     canisterId: Principal.fromText(appic_helper_canister_id),
@@ -42,7 +47,9 @@ export const get_bridge_pairs_for_token = (
 ): (EvmToken | IcpToken)[] => {
   // Find the base token by matching `token_id` with `canisterId` or `contractAddress`
   const base_token = bridge_tokens.find(
-    (token) => token.chainId == base_chain_id && (token.canisterId === token_id || token.contractAddress === token_id),
+    (token) =>
+      token.chainId == base_chain_id &&
+      (token.canisterId === token_id || token.contractAddress === token_id),
   );
 
   if (!base_token?.bridgePairs) {
@@ -57,7 +64,8 @@ export const get_bridge_pairs_for_token = (
     bridge_tokens.filter(
       (token) =>
         token.chainId == selected_chain_id &&
-        (token.canisterId === pair.contract_or_canister_id || token.contractAddress === pair.contract_or_canister_id),
+        (token.canisterId === pair.contract_or_canister_id ||
+          token.contractAddress === pair.contract_or_canister_id),
     ),
   );
 
@@ -88,9 +96,12 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
     const evmKey = `${evm_token.erc20_contract_address}-${evm_token.chain_id}`;
     const icpKey = icp_token.ledger_id.toString();
 
-    const parsed_chain_id: number = BigNumber(evm_token.chain_id.toString()).toNumber();
+    const parsed_chain_id: number = new BigNumber(evm_token.chain_id.toString()).toNumber();
     try {
-      const usd_price = await get_evm_token_price(evm_token.erc20_contract_address, parsed_chain_id);
+      const usd_price = await get_evm_token_price(
+        evm_token.erc20_contract_address,
+        parsed_chain_id,
+      );
 
       // Parse EVM token
 

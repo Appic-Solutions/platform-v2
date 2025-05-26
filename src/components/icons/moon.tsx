@@ -15,4 +15,4 @@ export default function MoonIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
       />
     </svg>
   );
-};
+}

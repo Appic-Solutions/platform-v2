@@ -30,23 +30,31 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const { setActiveStep } = useBridgeActions();
 
   return (
-    <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
-      <BoxHeader title={selectedTokenType === 'from' ? 'Bridge From' : 'Bridge To'} onBack={() => setActiveStep(1)} />
+    <Box
+      className={cn(
+        'animate-slide-in justify-normal opacity-0',
+        'md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
+      )}
+    >
+      <BoxHeader
+        title={selectedTokenType === 'from' ? 'Bridge From' : 'Bridge To'}
+        onBack={() => setActiveStep(1)}
+      />
       <ChainBoxPage selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
-      <hr className="bg-white dark:bg-[#636363]/25 w-[calc(100%-52px)] max-md:hidden" />
+      <hr className="w-[calc(100%-52px)] bg-white dark:bg-[#636363]/25 max-md:hidden" />
       <input
         type="text"
         placeholder="Search token"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className={cn(
-          'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 px-3 md:mt-7 mb-6',
-          'bg-white/50 dark:bg-white/30 text-black dark:text-white',
+          'mb-6 rounded-md border-[#1C68F8] px-3 py-2 dark:border-[#000000] md:mt-7',
+          'bg-white/50 text-black dark:bg-white/30 dark:text-white',
           'placeholder:text-black/50 dark:placeholder:text-white/50',
           'w-full',
         )}
       />
-      <div className="w-full flex flex-col gap-y-5 overflow-y-scroll h-full">
+      <div className="flex h-full w-full flex-col gap-y-5 overflow-y-scroll">
         {isPending ? (
           <>
             <TokenSkeleton />
@@ -70,7 +78,9 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
             />
           ))
         ) : (
-          <div className="w-full h-full flex justify-center items-center text-primary">No coins were found.</div>
+          <div className="flex h-full w-full items-center justify-center text-primary">
+            No coins were found.
+          </div>
         )}
       </div>
     </Box>

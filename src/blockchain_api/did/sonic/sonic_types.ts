@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
-import type { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface CanisterSettings {
   freezing_threshold: [] | [bigint];
@@ -134,8 +134,14 @@ export interface WithdrawState {
 }
 export interface _SERVICE {
   addAuth: ActorMethod<[Principal], boolean>;
-  addLiquidity: ActorMethod<[Principal, Principal, bigint, bigint, bigint, bigint, bigint], TxReceipt>;
-  addLiquidityForUser: ActorMethod<[Principal, Principal, Principal, bigint, bigint, boolean], TxReceipt>;
+  addLiquidity: ActorMethod<
+    [Principal, Principal, bigint, bigint, bigint, bigint, bigint],
+    TxReceipt
+  >;
+  addLiquidityForUser: ActorMethod<
+    [Principal, Principal, Principal, bigint, bigint, boolean],
+    TxReceipt
+  >;
   addLiquidityForUserTest: ActorMethod<[Principal, Principal, Principal, bigint, bigint], string>;
   addNatLabsToken: ActorMethod<[string], boolean>;
   addToken: ActorMethod<[Principal, string], TxReceipt>;
@@ -187,7 +193,10 @@ export interface _SERVICE {
   getUserICRC1SubAccount: ActorMethod<[Principal], string>;
   getUserInfo: ActorMethod<[Principal], UserInfo>;
   getUserInfoAbove: ActorMethod<[Principal, bigint, bigint], UserInfo>;
-  getUserInfoByNamePageAbove: ActorMethod<[Principal, bigint, string, bigint, bigint, bigint, string, bigint, bigint], UserInfoPage>;
+  getUserInfoByNamePageAbove: ActorMethod<
+    [Principal, bigint, string, bigint, bigint, bigint, string, bigint, bigint],
+    UserInfoPage
+  >;
   getUserLPBalances: ActorMethod<[Principal], Array<[string, bigint]>>;
   getUserLPBalancesAbove: ActorMethod<[Principal, bigint], Array<[string, bigint]>>;
   getUserReward: ActorMethod<[Principal, string, string], Result_1>;
@@ -201,7 +210,10 @@ export interface _SERVICE {
   name: ActorMethod<[string], string>;
   registerFundRecoveryForUser: ActorMethod<[Principal, Principal, bigint], TxReceipt>;
   removeAuth: ActorMethod<[Principal], boolean>;
-  removeLiquidity: ActorMethod<[Principal, Principal, bigint, bigint, bigint, Principal, bigint], TxReceipt>;
+  removeLiquidity: ActorMethod<
+    [Principal, Principal, bigint, bigint, bigint, Principal, bigint],
+    TxReceipt
+  >;
   removeNatLabsToken: ActorMethod<[string], boolean>;
   removeTokenFromBlocklist: ActorMethod<[Principal], boolean>;
   removeTokenFromBlocklistValidate: ActorMethod<[Principal], ValidateFunctionReturnType>;
@@ -218,7 +230,10 @@ export interface _SERVICE {
   setMaxTokenValidate: ActorMethod<[bigint], ValidateFunctionReturnType>;
   setMaxTokens: ActorMethod<[bigint], boolean>;
   setOwner: ActorMethod<[Principal], boolean>;
-  swapExactTokensForTokens: ActorMethod<[bigint, bigint, Array<string>, Principal, bigint], TxReceipt>;
+  swapExactTokensForTokens: ActorMethod<
+    [bigint, bigint, Array<string>, Principal, bigint],
+    TxReceipt
+  >;
   symbol: ActorMethod<[string], string>;
   totalSupply: ActorMethod<[string], bigint>;
   transferFrom: ActorMethod<[string, Principal, Principal, bigint], boolean>;
@@ -228,7 +243,10 @@ export interface _SERVICE {
   updateTokenType: ActorMethod<[Principal, string], boolean>;
   updateTokenTypeValidate: ActorMethod<[Principal, string], ValidateFunctionReturnType>;
   validateExecuteFundRecoveryForUser: ActorMethod<[Principal], ValidateFunctionReturnType>;
-  validateRegisterFundRecoveryForUser: ActorMethod<[Principal, Principal, bigint], ValidateFunctionReturnType>;
+  validateRegisterFundRecoveryForUser: ActorMethod<
+    [Principal, Principal, bigint],
+    ValidateFunctionReturnType
+  >;
   withdraw: ActorMethod<[Principal, bigint], TxReceipt>;
   withdrawTo: ActorMethod<[Principal, Principal], TxReceipt>;
 }

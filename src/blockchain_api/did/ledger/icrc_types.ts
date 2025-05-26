@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
-import type { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface Account {
   owner: Principal;
@@ -174,7 +174,13 @@ export interface ICRC3DataCertificate {
   certificate: Uint8Array | number[];
   hash_tree: Uint8Array | number[];
 }
-export type ICRC3Value = { Int: bigint } | { Map: Array<[string, ICRC3Value]> } | { Nat: bigint } | { Blob: Uint8Array | number[] } | { Text: string } | { Array: Array<ICRC3Value> };
+export type ICRC3Value =
+  | { Int: bigint }
+  | { Map: Array<[string, ICRC3Value]> }
+  | { Nat: bigint }
+  | { Blob: Uint8Array | number[] }
+  | { Text: string }
+  | { Array: Array<ICRC3Value> };
 export type Icrc21Error =
   | {
       GenericError: { description: string; error_code: bigint };
@@ -201,7 +207,11 @@ export type LedgerArgument = { Upgrade: [] | [UpgradeArgs] } | { Init: InitArgs 
 export interface LineDisplayPage {
   lines: Array<string>;
 }
-export type MetadataValue = { Int: bigint } | { Nat: bigint } | { Blob: Uint8Array | number[] } | { Text: string };
+export type MetadataValue =
+  | { Int: bigint }
+  | { Nat: bigint }
+  | { Blob: Uint8Array | number[] }
+  | { Text: string };
 export interface Mint {
   to: Account;
   memo: [] | [Uint8Array | number[]];
@@ -291,8 +301,23 @@ export interface UpgradeArgs {
   token_name: [] | [string];
   feature_flags: [] | [FeatureFlags];
 }
-export type Value = { Int: bigint } | { Map: Array<[string, Value]> } | { Nat: bigint } | { Nat64: bigint } | { Blob: Uint8Array | number[] } | { Text: string } | { Array: Vec };
-export type Vec = Array<{ Int: bigint } | { Map: Array<[string, Value]> } | { Nat: bigint } | { Nat64: bigint } | { Blob: Uint8Array | number[] } | { Text: string } | { Array: Vec }>;
+export type Value =
+  | { Int: bigint }
+  | { Map: Array<[string, Value]> }
+  | { Nat: bigint }
+  | { Nat64: bigint }
+  | { Blob: Uint8Array | number[] }
+  | { Text: string }
+  | { Array: Vec };
+export type Vec = Array<
+  | { Int: bigint }
+  | { Map: Array<[string, Value]> }
+  | { Nat: bigint }
+  | { Nat64: bigint }
+  | { Blob: Uint8Array | number[] }
+  | { Text: string }
+  | { Array: Vec }
+>;
 export interface _SERVICE {
   archives: ActorMethod<[], Array<ArchiveInfo>>;
   get_blocks: ActorMethod<[GetBlocksRequest], GetBlocksResponse>;

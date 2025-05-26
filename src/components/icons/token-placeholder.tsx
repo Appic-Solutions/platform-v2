@@ -13,4 +13,4 @@ export default function TokenPlaceHolderIcon({ ...props }: React.SVGProps<SVGSVG
       <circle cx="37" cy="38" r="9.25" strokeWidth="2.5" />
     </svg>
   );
-};
+}

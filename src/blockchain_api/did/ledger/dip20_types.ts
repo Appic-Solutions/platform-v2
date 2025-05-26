@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
-import { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { Principal } from '@dfinity/principal';
+import { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface Metadata {
   fee: bigint;
@@ -14,7 +14,16 @@ export interface Metadata {
 
 export type Result = { Ok: bigint } | { Err: TxError };
 
-export type TxError = { InsufficientAllowance: null } | { InsufficientBalance: null } | { ErrorOperationStyle: null } | { Unauthorized: null } | { LedgerTrap: null } | { ErrorTo: null } | { Other: null } | { BlockUsed: null } | { AmountTooSmall: null };
+export type TxError =
+  | { InsufficientAllowance: null }
+  | { InsufficientBalance: null }
+  | { ErrorOperationStyle: null }
+  | { Unauthorized: null }
+  | { LedgerTrap: null }
+  | { ErrorTo: null }
+  | { Other: null }
+  | { BlockUsed: null }
+  | { AmountTooSmall: null };
 
 export interface _SERVICE {
   allowance: ActorMethod<[Principal, Principal], bigint>;

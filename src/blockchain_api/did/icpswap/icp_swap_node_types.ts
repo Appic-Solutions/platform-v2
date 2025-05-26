@@ -1,6 +1,6 @@
-import type { Principal } from "@dfinity/principal";
-import type { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { Principal } from '@dfinity/principal';
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export type Address = string;
 export interface CallbackStrategy {
@@ -104,7 +104,12 @@ export interface Transaction {
   token1Symbol: string;
   poolId: string;
 }
-export type TransactionType = { decreaseLiquidity: null } | { claim: null } | { swap: null } | { addLiquidity: null } | { increaseLiquidity: null };
+export type TransactionType =
+  | { decreaseLiquidity: null }
+  | { claim: null }
+  | { swap: null }
+  | { addLiquidity: null }
+  | { increaseLiquidity: null };
 export interface _SERVICE {
   addOwner: ActorMethod<[Principal], undefined>;
   addQuoteToken: ActorMethod<[string, boolean], undefined>;

@@ -46,7 +46,9 @@ export interface EvmTokensBalances {
   totalBalanceUsd: string;
 }
 
-export async function get_evm_wallet_tokens_balances(wallet_address: string): Promise<Response<EvmTokensBalances>> {
+export async function get_evm_wallet_tokens_balances(
+  wallet_address: string,
+): Promise<Response<EvmTokensBalances>> {
   const chains_ankr_array: string[] = chains
     .filter((chain): chain is Chain & { ankr_handle: string } => chain.ankr_handle !== undefined)
     .map((chain) => chain.ankr_handle);

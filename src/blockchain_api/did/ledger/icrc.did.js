@@ -87,8 +87,8 @@ export const idlFactory = ({ IDL }) => {
         Blob: IDL.Vec(IDL.Nat8),
         Text: IDL.Text,
         Array: Vec,
-      })
-    )
+      }),
+    ),
   );
   Value.fill(
     IDL.Variant({
@@ -99,11 +99,11 @@ export const idlFactory = ({ IDL }) => {
       Blob: IDL.Vec(IDL.Nat8),
       Text: IDL.Text,
       Array: Vec,
-    })
+    }),
   );
   const BlockRange = IDL.Record({ blocks: IDL.Vec(Value) });
   const ArchivedRange = IDL.Record({
-    callback: IDL.Func([GetBlocksRequest], [BlockRange], ["query"]),
+    callback: IDL.Func([GetBlocksRequest], [BlockRange], ['query']),
     start: IDL.Nat,
     length: IDL.Nat,
   });
@@ -162,7 +162,7 @@ export const idlFactory = ({ IDL }) => {
     transactions: IDL.Vec(Transaction),
   });
   const ArchivedRange_1 = IDL.Record({
-    callback: IDL.Func([GetBlocksRequest], [TransactionRange], ["query"]),
+    callback: IDL.Func([GetBlocksRequest], [TransactionRange], ['query']),
     start: IDL.Nat,
     length: IDL.Nat,
   });
@@ -306,19 +306,19 @@ export const idlFactory = ({ IDL }) => {
       Blob: IDL.Vec(IDL.Nat8),
       Text: IDL.Text,
       Array: IDL.Vec(ICRC3Value),
-    })
+    }),
   );
   const BlockWithId = IDL.Record({ id: IDL.Nat, block: ICRC3Value });
   const ArchivedBlocks = IDL.Record({
     args: IDL.Vec(GetBlocksRequest),
-    callback: IDL.Func([IDL.Vec(GetBlocksRequest)], [GetBlocksResult], ["query"]),
+    callback: IDL.Func([IDL.Vec(GetBlocksRequest)], [GetBlocksResult], ['query']),
   });
   GetBlocksResult.fill(
     IDL.Record({
       log_length: IDL.Nat,
       blocks: IDL.Vec(BlockWithId),
       archived_blocks: IDL.Vec(ArchivedBlocks),
-    })
+    }),
   );
   const ICRC3DataCertificate = IDL.Record({
     certificate: IDL.Vec(IDL.Nat8),
@@ -329,30 +329,30 @@ export const idlFactory = ({ IDL }) => {
     block_type: IDL.Text,
   });
   return IDL.Service({
-    archives: IDL.Func([], [IDL.Vec(ArchiveInfo)], ["query"]),
-    get_blocks: IDL.Func([GetBlocksRequest], [GetBlocksResponse], ["query"]),
-    get_data_certificate: IDL.Func([], [DataCertificate], ["query"]),
-    get_transactions: IDL.Func([GetBlocksRequest], [GetTransactionsResponse], ["query"]),
-    icrc10_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ["query"]),
-    icrc1_balance_of: IDL.Func([Account], [IDL.Nat], ["query"]),
-    icrc1_decimals: IDL.Func([], [IDL.Nat8], ["query"]),
-    icrc1_fee: IDL.Func([], [IDL.Nat], ["query"]),
-    icrc1_metadata: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))], ["query"]),
-    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ["query"]),
-    icrc1_name: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ["query"]),
-    icrc1_symbol: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_total_supply: IDL.Func([], [IDL.Nat], ["query"]),
+    archives: IDL.Func([], [IDL.Vec(ArchiveInfo)], ['query']),
+    get_blocks: IDL.Func([GetBlocksRequest], [GetBlocksResponse], ['query']),
+    get_data_certificate: IDL.Func([], [DataCertificate], ['query']),
+    get_transactions: IDL.Func([GetBlocksRequest], [GetTransactionsResponse], ['query']),
+    icrc10_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ['query']),
+    icrc1_balance_of: IDL.Func([Account], [IDL.Nat], ['query']),
+    icrc1_decimals: IDL.Func([], [IDL.Nat8], ['query']),
+    icrc1_fee: IDL.Func([], [IDL.Nat], ['query']),
+    icrc1_metadata: IDL.Func([], [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))], ['query']),
+    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ['query']),
+    icrc1_name: IDL.Func([], [IDL.Text], ['query']),
+    icrc1_supported_standards: IDL.Func([], [IDL.Vec(StandardRecord)], ['query']),
+    icrc1_symbol: IDL.Func([], [IDL.Text], ['query']),
+    icrc1_total_supply: IDL.Func([], [IDL.Nat], ['query']),
     icrc1_transfer: IDL.Func([TransferArg], [Result], []),
     icrc21_canister_call_consent_message: IDL.Func([ConsentMessageRequest], [Result_1], []),
-    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ["query"]),
+    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ['query']),
     icrc2_approve: IDL.Func([ApproveArgs], [Result_2], []),
     icrc2_transfer_from: IDL.Func([TransferFromArgs], [Result_3], []),
-    icrc3_get_archives: IDL.Func([GetArchivesArgs], [IDL.Vec(ICRC3ArchiveInfo)], ["query"]),
-    icrc3_get_blocks: IDL.Func([IDL.Vec(GetBlocksRequest)], [GetBlocksResult], ["query"]),
-    icrc3_get_tip_certificate: IDL.Func([], [IDL.Opt(ICRC3DataCertificate)], ["query"]),
-    icrc3_supported_block_types: IDL.Func([], [IDL.Vec(SupportedBlockType)], ["query"]),
-    is_ledger_ready: IDL.Func([], [IDL.Bool], ["query"]),
+    icrc3_get_archives: IDL.Func([GetArchivesArgs], [IDL.Vec(ICRC3ArchiveInfo)], ['query']),
+    icrc3_get_blocks: IDL.Func([IDL.Vec(GetBlocksRequest)], [GetBlocksResult], ['query']),
+    icrc3_get_tip_certificate: IDL.Func([], [IDL.Opt(ICRC3DataCertificate)], ['query']),
+    icrc3_supported_block_types: IDL.Func([], [IDL.Vec(SupportedBlockType)], ['query']),
+    is_ledger_ready: IDL.Func([], [IDL.Bool], ['query']),
   });
 };
 export const init = ({ IDL }) => {

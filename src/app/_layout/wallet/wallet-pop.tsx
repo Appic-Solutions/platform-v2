@@ -20,13 +20,13 @@ import { Avatar } from '@/components/common/avatar';
 
 export type WalletBalance =
   | {
-    tokens: IcpToken[];
-    totalBalanceUsd: string;
-  }
+      tokens: IcpToken[];
+      totalBalanceUsd: string;
+    }
   | {
-    tokens: EvmToken[];
-    totalBalanceUsd: string;
-  };
+      tokens: EvmToken[];
+      totalBalanceUsd: string;
+    };
 
 interface WalletCardProps {
   logo: string;
@@ -38,8 +38,15 @@ interface WalletCardProps {
   refetchBalance: () => void;
 }
 
-export function WalletPop({ logo, title, balance, disconnect, address, isLoading, refetchBalance }: WalletCardProps) {
-
+export function WalletPop({
+  logo,
+  title,
+  balance,
+  disconnect,
+  address,
+  isLoading,
+  refetchBalance,
+}: WalletCardProps) {
   const [showCopyPopover, setShowCopyPopover] = useState(false);
 
   const copyToClipboardHandler = (address: string) => {
@@ -56,19 +63,21 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
   return (
     <>
       {/* mobile size */}
-      <div className="md:hidden flex items-center justify-center">
+      <div className="flex items-center justify-center md:hidden">
         <Drawer>
           <DrawerTrigger>
-            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
+            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-h-6 min-w-6" />
           </DrawerTrigger>
           <DrawerContent>
-            <DrawerHeader className='pl-10'>
+            <DrawerHeader className="pl-10">
               {title}
               <ArrowPathIcon
                 onClick={refetchBalance}
                 className={cn(
-                  "absolute top-14 left-4",
-                  isLoading ? "animate-spin pointer-events-none cursor-not-allowed opacity-75" : "cursor-pointer"
+                  'absolute left-4 top-14',
+                  isLoading
+                    ? 'pointer-events-none animate-spin cursor-not-allowed opacity-75'
+                    : 'cursor-pointer',
                 )}
               />
             </DrawerHeader>
@@ -83,7 +92,7 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                   <button className="relative" onClick={() => copyToClipboardHandler(address)}>
                     <CopyIcon width={20} height={20} />
                     {showCopyPopover && (
-                      <div className="absolute py-1 px-2 rounded-lg bg-[#1C1D1F] border border-white/20 -left-5 -top-8 animate-fade">
+                      <div className="absolute -left-5 -top-8 animate-fade rounded-lg border border-white/20 bg-[#1C1D1F] px-2 py-1">
                         Copied!
                       </div>
                     )}
@@ -99,16 +108,13 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                       {balance.tokens.map((token, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
+                          className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
                         >
                           <div className="relative flex items-center gap-x-5">
-                            <Avatar
-                              src={token.logo}
-                              className="w-9 h-9"
-                            />
+                            <Avatar src={token.logo} className="h-9 w-9" />
                             <Avatar
                               src={getChainLogo(token.chainId)}
-                              className='w-4 h-4 absolute top-5 left-7'
+                              className="absolute left-7 top-5 h-4 w-4"
                             />
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>
@@ -117,7 +123,7 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                       ))}
                     </div>
                     <hr className="bg-[#494949]" />
-                    <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
+                    <div className="text-dark flex items-center justify-between text-sm font-semibold dark:text-white">
                       <span>Total :</span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}
                     </div>
                   </>
@@ -128,7 +134,7 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                 )}
                 <button
                   onClick={disconnect}
-                  className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
+                  className="rounded-[10px] px-4 py-2 text-sm font-semibold text-fail duration-200 hover:bg-fail hover:text-white"
                 >
                   Disconnect
                 </button>
@@ -139,22 +145,27 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
       </div>
 
       {/* desktop size */}
-      <div className="hidden md:flex items-center justify-center">
+      <div className="hidden items-center justify-center md:flex">
         <Popover>
           <PopoverTrigger>
-            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-w-6 min-h-6" />
+            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-h-6 min-w-6" />
           </PopoverTrigger>
-          <PopoverContent className="w-[360px] translate-y-4 flex flex-col gap-y-4 px-10" align="end">
-            <div className="flex items-center justify-center text-black font-medium dark:text-white">
-              <PopoverClose className="absolute top-4 right-4">
+          <PopoverContent
+            className="flex w-[360px] translate-y-4 flex-col gap-y-4 px-10"
+            align="end"
+          >
+            <div className="flex items-center justify-center font-medium text-black dark:text-white">
+              <PopoverClose className="absolute right-4 top-4">
                 <CloseIcon width={20} height={20} />
               </PopoverClose>
               {title}
               <ArrowPathIcon
                 onClick={refetchBalance}
                 className={cn(
-                  "absolute top-4 left-4",
-                  isLoading ? "animate-spin pointer-events-none cursor-not-allowed opacity-75" : "cursor-pointer"
+                  'absolute left-4 top-4',
+                  isLoading
+                    ? 'pointer-events-none animate-spin cursor-not-allowed opacity-75'
+                    : 'cursor-pointer',
                 )}
               />
             </div>
@@ -169,7 +180,7 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                   <button className="relative" onClick={() => copyToClipboardHandler(address)}>
                     <CopyIcon width={20} height={20} />
                     {showCopyPopover && (
-                      <div className="absolute py-1 px-2 rounded-lg bg-[#1C1D1F] border border-white/20 -left-5 -top-8 animate-fade">
+                      <div className="absolute -left-5 -top-8 animate-fade rounded-lg border border-white/20 bg-[#1C1D1F] px-2 py-1">
                         Copied!
                       </div>
                     )}
@@ -181,20 +192,17 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                       <span>Token</span>
                       Value
                     </div>
-                    <div className="flex flex-col gap-y-5 max-h-56 overflow-y-auto">
+                    <div className="flex max-h-56 flex-col gap-y-5 overflow-y-auto">
                       {balance.tokens.map((token, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between gap-x-4 text-sm text-dark dark:text-white"
+                          className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
                         >
                           <div className="relative flex items-center gap-x-5">
-                            <Avatar
-                              src={token.logo}
-                              className="w-9 h-9"
-                            />
+                            <Avatar src={token.logo} className="h-9 w-9" />
                             <Avatar
                               src={getChainLogo(token.chainId)}
-                              className='w-4 h-4 absolute top-5 left-7'
+                              className="absolute left-7 top-5 h-4 w-4"
                             />
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>
@@ -203,7 +211,7 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                       ))}
                     </div>
                     <hr className="bg-[#494949]" />
-                    <div className="flex items-center justify-between text-sm font-semibold text-dark dark:text-white">
+                    <div className="text-dark flex items-center justify-between text-sm font-semibold dark:text-white">
                       <span>Total :</span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}
                     </div>
                   </>
@@ -214,7 +222,7 @@ export function WalletPop({ logo, title, balance, disconnect, address, isLoading
                 )}
                 <button
                   onClick={disconnect}
-                  className="text-sm font-semibold text-fail px-4 py-2 rounded-[10px] duration-200 hover:bg-fail hover:text-white"
+                  className="rounded-[10px] px-4 py-2 text-sm font-semibold text-fail duration-200 hover:bg-fail hover:text-white"
                 >
                   Disconnect
                 </button>

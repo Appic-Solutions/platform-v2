@@ -382,15 +382,24 @@ export type WithdrawalStatus =
   | { Pending: null };
 export interface _SERVICE {
   add_ckerc20_token: ActorMethod<[AddCkErc20Token], undefined>;
-  eip_1559_transaction_price: ActorMethod<[[] | [Eip1559TransactionPriceArg]], Eip1559TransactionPrice>;
+  eip_1559_transaction_price: ActorMethod<
+    [[] | [Eip1559TransactionPriceArg]],
+    Eip1559TransactionPrice
+  >;
   get_canister_status: ActorMethod<[], CanisterStatusResponse>;
-  get_events: ActorMethod<[{ start: bigint; length: bigint }], { total_event_count: bigint; events: Array<Event> }>;
+  get_events: ActorMethod<
+    [{ start: bigint; length: bigint }],
+    { total_event_count: bigint; events: Array<Event> }
+  >;
   get_minter_info: ActorMethod<[], MinterInfo>;
   is_address_blocked: ActorMethod<[string], boolean>;
   minter_address: ActorMethod<[], string>;
   retrieve_eth_status: ActorMethod<[bigint], RetrieveEthStatus>;
   smart_contract_address: ActorMethod<[], string>;
-  withdraw_erc20: ActorMethod<[WithdrawErc20Arg], { Ok: RetrieveErc20Request } | { Err: WithdrawErc20Error }>;
+  withdraw_erc20: ActorMethod<
+    [WithdrawErc20Arg],
+    { Ok: RetrieveErc20Request } | { Err: WithdrawErc20Error }
+  >;
   withdraw_eth: ActorMethod<[WithdrawalArg], { Ok: RetrieveEthRequest } | { Err: WithdrawalError }>;
   withdrawal_status: ActorMethod<[WithdrawalSearchParameter], Array<WithdrawalDetail>>;
 }

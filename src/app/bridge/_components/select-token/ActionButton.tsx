@@ -8,23 +8,25 @@ interface ActionButtonProps {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(({ isDisabled, onClick, children }, ref) => {
-  return (
-    <button
-      ref={ref}
-      className={cn(
-        'w-full h-14 rounded-[16px] text-white',
-        'bg-primary-buttons',
-        'transition-all ease-in-out',
-        isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-85',
-      )}
-      onClick={onClick}
-      disabled={isDisabled}
-    >
-      {children || <Spinner className="text-white dark:text-white" />}
-    </button>
-  );
-});
+const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
+  ({ isDisabled, onClick, children }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          'h-14 w-full rounded-[16px] text-white',
+          'bg-primary-buttons',
+          'transition-all ease-in-out',
+          isDisabled ? 'cursor-not-allowed opacity-50' : 'hover:opacity-85',
+        )}
+        onClick={onClick}
+        disabled={isDisabled}
+      >
+        {children || <Spinner className="text-white dark:text-white" />}
+      </button>
+    );
+  },
+);
 
 ActionButton.displayName = 'ActionButton';
 

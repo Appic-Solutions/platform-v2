@@ -52,7 +52,12 @@ export default function AutoInvestTokenListPage({
   };
 
   return (
-    <Box className={cn('justify-normal animate-slide-in opacity-0', 'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8')}>
+    <Box
+      className={cn(
+        'animate-slide-in justify-normal opacity-0',
+        'md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
+      )}
+    >
       <BoxHeader title="Select Token" onBack={prevStepHandler} />
       <input
         type="text"
@@ -60,13 +65,13 @@ export default function AutoInvestTokenListPage({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className={cn(
-          'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 px-3 mb-6',
-          'bg-white/50 dark:bg-white/30 text-black dark:text-white',
+          'mb-6 rounded-md border-[#1C68F8] px-3 py-2 dark:border-[#000000]',
+          'bg-white/50 text-black dark:bg-white/30 dark:text-white',
           'placeholder:text-black/50 dark:placeholder:text-white/50',
           'w-full',
         )}
       />
-      <div className="w-full flex flex-col gap-y-5 overflow-y-auto">
+      <div className="flex w-full flex-col gap-y-5 overflow-y-auto">
         {filteredTokens.map((token, idx) => (
           <TokenCard
             key={idx}

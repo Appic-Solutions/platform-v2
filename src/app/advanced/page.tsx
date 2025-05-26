@@ -1,10 +1,10 @@
-"use client"
-import { FormProvider } from "react-hook-form";
-import LogicHelper from "./_logic";
-import Step1 from "./_components/step-1";
-import Step2 from "./_components/step-2";
-import ProcessModal from "./_components/process-modal";
-import { getModalStepText } from "./_logic/utils";
+'use client';
+import { FormProvider } from 'react-hook-form';
+import LogicHelper from './_logic';
+import Step1 from './_components/step-1';
+import Step2 from './_components/step-2';
+import ProcessModal from './_components/process-modal';
+import { getModalStepText } from './_logic/utils';
 
 export default function AdvancedPage() {
   const {
@@ -21,26 +21,26 @@ export default function AdvancedPage() {
     methods,
     onSubmit,
     chainIdWatch,
-  } = LogicHelper()
+  } = LogicHelper();
 
-  const { title, subTitle } = getModalStepText(creationStep, status, errorMessage)
+  const { title, subTitle } = getModalStepText(creationStep, status, errorMessage);
 
   return (
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="w-full h-full overflow-y-auto md:flex md:justify-center md:items-center"
+        className="h-full w-full overflow-y-auto md:flex md:items-center md:justify-center"
       >
-        {step === 1 && <Step1
-          methods={methods}
-          chainIdWatch={chainIdWatch}
-          isLoading={isLoading}
-        />}
-        {step === 2 && <Step2
-          isLoading={isLoading}
-          newTwinMeta={newTwinMeta}
-          prevStepHandler={() => setStep(1)}
-        />}
+        {step === 1 && (
+          <Step1 methods={methods} chainIdWatch={chainIdWatch} isLoading={isLoading} />
+        )}
+        {step === 2 && (
+          <Step2
+            isLoading={isLoading}
+            newTwinMeta={newTwinMeta}
+            prevStepHandler={() => setStep(1)}
+          />
+        )}
         <ProcessModal
           isOpen={isOpen}
           title={title}
@@ -54,4 +54,4 @@ export default function AdvancedPage() {
       </form>
     </FormProvider>
   );
-};
+}

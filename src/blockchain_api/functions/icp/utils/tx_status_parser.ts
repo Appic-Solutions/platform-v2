@@ -1,6 +1,12 @@
-import { DepositStatus, RetrieveWithdrawalStatus } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
+import {
+  DepositStatus,
+  RetrieveWithdrawalStatus,
+} from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 import { DepositTxStatus, WithdrawalTxStatus } from '../bridge_transactions';
-import { EvmToIcpStatus, IcpToEvmStatus } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import {
+  EvmToIcpStatus,
+  IcpToEvmStatus,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { RetrieveEthStatus } from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
 
 export const parse_icp_to_evm_tx_status = (tx_status: IcpToEvmStatus): WithdrawalTxStatus => {
@@ -33,7 +39,9 @@ export const parse_deposit_status_result = (tx_status: DepositStatus): DepositTx
   else return 'PendingVerification';
 };
 
-export const parse_retrieve_eth_status_result = (tx_status: RetrieveEthStatus): WithdrawalTxStatus => {
+export const parse_retrieve_eth_status_result = (
+  tx_status: RetrieveEthStatus,
+): WithdrawalTxStatus => {
   if ('NotFound' in tx_status) return 'Failed';
   else if ('TxFinalized' in tx_status) return 'Successful';
   else if ('TxSent' in tx_status) return 'SignedTransaction';
@@ -42,7 +50,9 @@ export const parse_retrieve_eth_status_result = (tx_status: RetrieveEthStatus): 
   else return 'PendingVerification';
 };
 
-export const parse_retrieve_withdrawal_status_result = (tx_status: RetrieveWithdrawalStatus): WithdrawalTxStatus => {
+export const parse_retrieve_withdrawal_status_result = (
+  tx_status: RetrieveWithdrawalStatus,
+): WithdrawalTxStatus => {
   if ('NotFound' in tx_status) return 'Failed';
   else if ('TxFinalized' in tx_status) return 'Successful';
   else if ('TxSent' in tx_status) return 'SignedTransaction';

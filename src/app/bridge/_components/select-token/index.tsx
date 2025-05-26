@@ -17,43 +17,53 @@ interface SelectTokenProps {
 
 export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
   // bridge store
-  const { fromToken, toToken, amount, toWalletAddress, bridgeOptions, toWalletValidationError } = useBridgeStore();
-  const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } = useBridgeActions();
+  const { fromToken, toToken, amount, toWalletAddress, bridgeOptions, toWalletValidationError } =
+    useBridgeStore();
+  const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } =
+    useBridgeActions();
   // Logic
-  const { changeStep, swapTokens, showWalletAddress, setShowWalletAddress, actionButtonHandler, actionButtonStatus } =
-    SelectTokenLogic();
+  const {
+    changeStep,
+    swapTokens,
+    showWalletAddress,
+    setShowWalletAddress,
+    actionButtonHandler,
+    actionButtonStatus,
+  } = SelectTokenLogic();
 
   return (
     <Box
       className={cn(
-        'flex flex-col gap-4 h-full md:h-fit',
-        'md:px-[65px] md:py-[55px] md:max-w-[617px]',
+        'flex h-full flex-col gap-4 md:h-fit',
+        'md:max-w-[617px] md:px-[65px] md:py-[55px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         Number(amount) > 0 &&
-        bridgeOptions.options &&
-        bridgeOptions.options.length > 0 &&
-        'lg:max-w-[1060px] lg:w-[1060px]',
+          bridgeOptions.options &&
+          bridgeOptions.options.length > 0 &&
+          'lg:w-[1060px] lg:max-w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
-      <div className="flex items-center justify-between w-full mb-5 text-white md:text-black md:dark:text-white">
-        <h1 className="text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold">Bridge</h1>
+      <div className="mb-5 flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
+        <h1 className="text-[26px] font-bold leading-7 md:text-[40px] md:leading-10">Bridge</h1>
         <Link href="/transactions-history/bridge" className="flex items-center gap-x-2 text-sm">
           <HistoryIcon width={20} height={20} />
           History
         </Link>
       </div>
 
-      <div className="flex flex-col gap-x-4 flex-1 justify-between lg:flex-row lg:overflow-hidden w-full">
+      <div className="flex w-full flex-1 flex-col justify-between gap-x-4 lg:flex-row lg:overflow-hidden">
         {/* TOKENS AND AMOUNT INPUT */}
-        <div className="flex flex-col justify-between h-full items-center gap-y-4 w-full lg:max-w-[482px] md:overflow-hidden">
-          <div className="flex flex-col gap-y-4 w-full h-full">
+        <div className="flex h-full w-full flex-col items-center justify-between gap-y-4 md:overflow-hidden lg:max-w-[482px]">
+          <div className="flex h-full w-full flex-col gap-y-4">
             {/* TOKENS */}
             <div
               className={cn(
                 'relative flex w-full',
-                fromToken && toToken ? 'flex-col gap-y-4 sm:flex-row sm:gap-x-4' : 'flex-col gap-y-4',
+                fromToken && toToken
+                  ? 'flex-col gap-y-4 sm:flex-row sm:gap-x-4'
+                  : 'flex-col gap-y-4',
               )}
             >
               <TokenCard
@@ -64,18 +74,20 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
                 }}
                 label="From"
                 className={cn(
-                  fromToken && 'py-5 md:py-5 md:rounded-3xl',
+                  fromToken && 'py-5 md:rounded-3xl md:py-5',
                   fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
                 )}
               />
               <div
                 className={cn(
-                  'absolute rounded-full inset-0 w-12 h-12 m-auto z-20 cursor-pointer group',
+                  'group absolute inset-0 z-20 m-auto h-12 w-12 cursor-pointer rounded-full',
                   'flex items-center justify-center',
                   'bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white',
                   'border-2 border-white dark:border-white/30',
                   'transition-transform duration-300',
-                  fromToken && toToken ? 'hover:rotate-180 sm:rotate-90 sm:hover:-rotate-90' : 'hover:rotate-180',
+                  fromToken && toToken
+                    ? 'hover:rotate-180 sm:rotate-90 sm:hover:-rotate-90'
+                    : 'hover:rotate-180',
                 )}
                 onClick={swapTokens}
               >
@@ -89,7 +101,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
                 }}
                 label="To"
                 className={cn(
-                  toToken && 'py-5 md:py-5 md:rounded-3xl',
+                  toToken && 'py-5 md:rounded-3xl md:py-5',
                   fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
                 )}
               />
@@ -108,7 +120,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
             />
           </div>
           {/* DESKTOP ACTION BUTTONS */}
-          <div className={cn('flex items-center gap-x-2 w-full', 'max-lg:hidden')}>
+          <div className={cn('flex w-full items-center gap-x-2', 'max-lg:hidden')}>
             <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
               {actionButtonStatus.text}
             </ActionButton>
@@ -132,7 +144,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         )}
       </div>
       {/* MOBILE ACTION BUTTONS */}
-      <div className={cn('flex items-center gap-x-2 w-full', 'lg:hidden')}>
+      <div className={cn('flex w-full items-center gap-x-2', 'lg:hidden')}>
         <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
           {actionButtonStatus.text}
         </ActionButton>

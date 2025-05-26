@@ -67,43 +67,40 @@ const AutoInvestTransactionCard = ({
   return (
     <Card
       className={cn(
-        'cursor-pointer flex-col items-start justify-center gap-2 md:py-5 px-5 py-5 rounded-2xl md:rounded-[36px]',
+        'cursor-pointer flex-col items-start justify-center gap-2 rounded-2xl px-5 py-5 md:rounded-[36px] md:py-5',
         className,
       )}
     >
       {/* main content */}
-      <div className="flex flex-col md:gap-y-7 gap-y-5 w-full">
+      <div className="flex w-full flex-col gap-y-5 md:gap-y-7">
         {/* top section */}
-        <div className="flex items-center justify-between w-full text-xs md:text-sm text-secondary">
+        <div className="flex w-full items-center justify-between text-xs text-secondary md:text-sm">
           <span>{date}</span>
           <span>{time}</span>
         </div>
         {/* second section */}
-        <div className="flex items-center justify-between w-full">
+        <div className="flex w-full items-center justify-between">
           {/* source token avatar */}
           <div className="relative">
-            <Avatar
-              src={sourceToken?.logo}
-              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
-            />
+            <Avatar src={sourceToken?.logo} className="h-[58px] w-[58px] md:h-[72px] md:w-[72px]" />
             <Avatar
               src={getChainLogo(sourceToken?.chainId)}
-              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+              className="absolute -bottom-1 -right-1 h-6 w-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
           {/* connecting line and bridge icon */}
-          <div className="flex items-center justify-center w-full">
+          <div className="flex w-full items-center justify-center">
             <div className="h-[3px] flex-1 bg-black" />
             <div
               className={cn(
-                'rounded-full p-3 z-10 relative',
+                'relative z-10 rounded-full p-3',
                 'bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
                 status === 'failed' && 'border-2 border-solid border-red-500',
                 status === 'pending' &&
-                "before:absolute before:inset-0 before:rounded-full before:content-[''] before:border-2 before:border-green-500 before:border-t-transparent before:animate-spin",
+                  "before:absolute before:inset-0 before:animate-spin before:rounded-full before:border-2 before:border-green-500 before:border-t-transparent before:content-['']",
               )}
             >
-              <ArrowsUpDownIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
+              <ArrowsUpDownIcon className="h-5 w-5 text-white md:h-6 md:w-6" />
             </div>
             <div
               className={cn(
@@ -118,16 +115,16 @@ const AutoInvestTransactionCard = ({
           <div className="relative">
             <Avatar
               src={destinationToken?.logo}
-              className='w-[58px] h-[58px] md:w-[72px] md:h-[72px]'
+              className="h-[58px] w-[58px] md:h-[72px] md:w-[72px]"
             />
             <Avatar
               src={getChainLogo(destinationToken?.chainId)}
-              className='absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+              className="absolute -bottom-1 -right-1 h-6 w-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
         </div>
         {/* bottom section */}
-        <div className="flex items-center justify-between w-full">
+        <div className="flex w-full items-center justify-between">
           <div className="flex flex-col items-start">
             <div
               className={cn(
@@ -139,7 +136,9 @@ const AutoInvestTransactionCard = ({
               <span>on</span>
               <span>{getChainName(sourceToken.chainId)}</span>
             </div>
-            {showDetails && <span className="text-primary text-xl md:text-2xl">{sourceToken.amount}</span>}
+            {showDetails && (
+              <span className="text-xl text-primary md:text-2xl">{sourceToken.amount}</span>
+            )}
           </div>
           <div className="flex flex-col items-end">
             <div
@@ -152,24 +151,28 @@ const AutoInvestTransactionCard = ({
               <span>on</span>
               <span>{getChainName(destinationToken.chainId)}</span>
             </div>
-            {showDetails && <span className="text-primary text-xl md:text-2xl">{destinationToken.amount}</span>}
+            {showDetails && (
+              <span className="text-xl text-primary md:text-2xl">{destinationToken.amount}</span>
+            )}
           </div>
         </div>
-        <div className="flex flex-col w-full">
+        <div className="flex w-full flex-col">
           {/* end section */}
-          <div className="flex items-center justify-between w-full">
+          <div className="flex w-full items-center justify-between">
             {/* details button */}
             <button
               onClick={() => setShowDetails((prev) => !prev)}
-              className="flex items-center gap-x-1 hover:bg-white hover:bg-opacity-10 rounded-lg p-1"
+              className="flex items-center gap-x-1 rounded-lg p-1 hover:bg-white hover:bg-opacity-10"
             >
-              <span className="text-sm text-secondary">{showDetails ? 'Hide' : 'View'} Transaction Details</span>
-              <div className="p-1 rounded-full bg-black bg-opacity-10 w-min transition-all">
+              <span className="text-sm text-secondary">
+                {showDetails ? 'Hide' : 'View'} Transaction Details
+              </span>
+              <div className="w-min rounded-full bg-black bg-opacity-10 p-1 transition-all">
                 <ChevronDownIcon width={8} height={8} className={cn(showDetails && 'rotate-180')} />
               </div>
             </button>
             {/* time and fee */}
-            <span className="flex items-center gap-x-1 w-max">
+            <span className="flex w-max items-center gap-x-1">
               <p className="text-xs font-thin text-primary">{fee}</p>
               <FireIcon width={19} height={19} className="text-primary" />
             </span>
@@ -177,26 +180,31 @@ const AutoInvestTransactionCard = ({
           {/* details section */}
           <div
             className={cn(
-              'transition-all duration-200 transform',
-              showDetails ? 'opacity-100 mb-4 translate-y-0' : 'opacity-0 h-0 overflow-hidden -translate-y-2',
+              'transform transition-all duration-200',
+              showDetails
+                ? 'mb-4 translate-y-0 opacity-100'
+                : 'h-0 -translate-y-2 overflow-hidden opacity-0',
             )}
           >
-            <p className="text-secondary text-xl my-4">Previous Transactions</p>
+            <p className="my-4 text-xl text-secondary">Previous Transactions</p>
             <div className="flex flex-col gap-y-6">
               {steps.map((step, index) => (
-                <div key={step.message} className="flex w-full justify-between items-center gap-x-6 group/step">
+                <div
+                  key={step.message}
+                  className="group/step flex w-full items-center justify-between gap-x-6"
+                >
                   <div
                     className={cn(
-                      'p-2 rounded-full flex items-center justify-center relative',
+                      'relative flex items-center justify-center rounded-full p-2',
                       'bg-gray-300',
                       index < steps.length - 1 &&
-                      "after:content-[''] after:absolute after:w-[2px] after:h-[50px] after:-bottom-12 after:bg-gray-300",
+                        "after:absolute after:-bottom-12 after:h-[50px] after:w-[2px] after:bg-gray-300 after:content-['']",
                     )}
                   ></div>
 
-                  <div className="flex flex-col gap-y-1 items-start text-xs md:text-[16px] text-secondary text-start w-full">
+                  <div className="flex w-full flex-col items-start gap-y-1 text-start text-xs text-secondary md:text-[16px]">
                     <span className="font-thin">{step.amount}</span>
-                    <div className="overflow-hidden h-4">
+                    <div className="h-4 overflow-hidden">
                       <div className="flex flex-col transition-transform duration-300 group-hover/step:-translate-y-[18px]">
                         <p className="">{step.message}</p>
                         <p className="flex items-center gap-x-2">
@@ -214,7 +222,7 @@ const AutoInvestTransactionCard = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-y-1 items-end font-thin text-xs md:text-[16px] text-secondary text-start">
+                  <div className="flex flex-col items-end gap-y-1 text-start text-xs font-thin text-secondary md:text-[16px]">
                     <span>{step.timestamp}</span>
                     <span
                       className={cn(

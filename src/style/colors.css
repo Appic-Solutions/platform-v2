@@ -13,23 +13,12 @@
     rgb(255, 255, 255) 0%,
     rgba(255, 255, 255, 0.24) 100%
   );
-  --primary-buttons: linear-gradient(
-      90deg,
-      #1c68f8 0%,
-      #1753c5 71.5%,
-      #113d92 100%
-    ),
-    linear-gradient(
-      318.8deg,
-      rgba(255, 255, 255, 0) 35.19%,
-      rgba(255, 255, 255, 0.3) 92.55%
-    );
-  --highlighed-components: linear-gradient(0deg, #ffffff, #ffffff),
-    linear-gradient(
-      154.24deg,
-      rgba(29, 85, 191, 0.3) 9.35%,
-      rgba(255, 255, 255, 0.3) 157.6%
-    );
+  --primary-buttons:
+    linear-gradient(90deg, #1c68f8 0%, #1753c5 71.5%, #113d92 100%),
+    linear-gradient(318.8deg, rgba(255, 255, 255, 0) 35.19%, rgba(255, 255, 255, 0.3) 92.55%);
+  --highlighed-components:
+    linear-gradient(0deg, #ffffff, #ffffff),
+    linear-gradient(154.24deg, rgba(29, 85, 191, 0.3) 9.35%, rgba(255, 255, 255, 0.3) 157.6%);
   --shapes-background: linear-gradient(
     322.44deg,
     rgba(17, 61, 146, 0.21) 14.48%,
@@ -56,11 +45,7 @@
     rgba(255, 255, 255, 0.35) 100%
   );
 
-  --highlighted-card: linear-gradient(
-    160deg,
-    rgb(163, 195, 253) 5%,
-    rgb(255, 255, 255) 157.6%
-  );
+  --highlighted-card: linear-gradient(160deg, rgb(163, 195, 253) 5%, rgb(255, 255, 255) 157.6%);
 
   --box-border: #ffffff3d;
   --card-background: rgba(255, 255, 255, 0.05);
@@ -70,11 +55,7 @@
 .dark {
   --primary: 255, 255, 255;
   --secondary: 137, 137, 137;
-  --input-fields: linear-gradient(
-    180deg,
-    rgba(36, 36, 36, 0.8) 0%,
-    rgba(33, 33, 33, 0.24) 100%
-  );
+  --input-fields: linear-gradient(180deg, rgba(36, 36, 36, 0.8) 0%, rgba(33, 33, 33, 0.24) 100%);
   --input-fields-hover: linear-gradient(
     180deg,
     rgba(66, 66, 66, 0.8) 0%,
@@ -90,11 +71,7 @@
     rgba(29, 85, 191, 0.3) 7.89%,
     rgba(0, 0, 0, 0.3) 114.88%
   );
-  --background-main: radial-gradient(
-    100% 249.45% at 0% 2.78%,
-    #151515 0%,
-    #080808 100%
-  );
+  --background-main: radial-gradient(100% 249.45% at 0% 2.78%, #151515 0%, #080808 100%);
   --background-dark: radial-gradient(
     100% 249.45% at 0% 2.78%,
     rgba(21, 21, 21, 1) 0%,
@@ -102,22 +79,10 @@
   );
   --muted: 141, 141, 141;
 
-  --box-background: radial-gradient(
-    100% 249.45% at 0% 2.78%,
-    #151515 0%,
-    #080808 100%
-  );
+  --box-background: radial-gradient(100% 249.45% at 0% 2.78%, #151515 0%, #080808 100%);
 
-  --highlighted-card: linear-gradient(
-    154.24deg,
-    rgba(0, 33, 94, 0.672) 9.35%,
-    rgb(0, 0, 0) 157.6%
-  );
+  --highlighted-card: linear-gradient(154.24deg, rgba(0, 33, 94, 0.672) 9.35%, rgb(0, 0, 0) 157.6%);
 
   --box-border: #6363633d;
-  --card-background: linear-gradient(
-    180deg,
-    rgba(36, 36, 36, 0.8) 0%,
-    rgba(33, 33, 33, 0.24) 100%
-  );
+  --card-background: linear-gradient(180deg, rgba(36, 36, 36, 0.8) 0%, rgba(33, 33, 33, 0.24) 100%);
 }

@@ -258,7 +258,9 @@ export const idlFactory = ({ IDL }) => {
     smart_contract_address: IDL.Opt(IDL.Text),
     last_eth_scraped_block_number: IDL.Opt(IDL.Nat),
     minimum_withdrawal_amount: IDL.Opt(IDL.Nat),
-    erc20_balances: IDL.Opt(IDL.Vec(IDL.Record({ balance: IDL.Nat, erc20_contract_address: IDL.Text }))),
+    erc20_balances: IDL.Opt(
+      IDL.Vec(IDL.Record({ balance: IDL.Nat, erc20_contract_address: IDL.Text })),
+    ),
     minter_address: IDL.Opt(IDL.Text),
     last_deposit_with_subaccount_scraped_block_number: IDL.Opt(IDL.Nat),
     ethereum_block_height: IDL.Opt(BlockTag),
@@ -367,7 +369,11 @@ export const idlFactory = ({ IDL }) => {
   });
   return IDL.Service({
     add_ckerc20_token: IDL.Func([AddCkErc20Token], [], []),
-    eip_1559_transaction_price: IDL.Func([IDL.Opt(Eip1559TransactionPriceArg)], [Eip1559TransactionPrice], ['query']),
+    eip_1559_transaction_price: IDL.Func(
+      [IDL.Opt(Eip1559TransactionPriceArg)],
+      [Eip1559TransactionPrice],
+      ['query'],
+    ),
     get_canister_status: IDL.Func([], [CanisterStatusResponse], []),
     get_events: IDL.Func(
       [IDL.Record({ start: IDL.Nat64, length: IDL.Nat64 })],
@@ -394,8 +400,16 @@ export const idlFactory = ({ IDL }) => {
       ],
       [],
     ),
-    withdraw_eth: IDL.Func([WithdrawalArg], [IDL.Variant({ Ok: RetrieveEthRequest, Err: WithdrawalError })], []),
-    withdrawal_status: IDL.Func([WithdrawalSearchParameter], [IDL.Vec(WithdrawalDetail)], ['query']),
+    withdraw_eth: IDL.Func(
+      [WithdrawalArg],
+      [IDL.Variant({ Ok: RetrieveEthRequest, Err: WithdrawalError })],
+      [],
+    ),
+    withdrawal_status: IDL.Func(
+      [WithdrawalSearchParameter],
+      [IDL.Vec(WithdrawalDetail)],
+      ['query'],
+    ),
   });
 };
 export const init = ({ IDL }) => {

@@ -37,13 +37,19 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
   };
 
   return (
-    <div className={cn('flex flex-col items-start mb-5', 'lg:w-full md:pr-2', 'animate-slide-in opacity-0')}>
-      <p className="text-primary mb-5 md:hidden text-[26px] leading-7 md:text-[40px] md:leading-10 font-bold">
+    <div
+      className={cn(
+        'mb-5 flex flex-col items-start',
+        'md:pr-2 lg:w-full',
+        'animate-slide-in opacity-0',
+      )}
+    >
+      <p className="mb-5 text-[26px] font-bold leading-7 text-primary md:hidden md:text-[40px] md:leading-10">
         Bridge Options
       </p>
       <div
         className={cn(
-          'flex lg:flex-col gap-4 w-full',
+          'flex w-full gap-4 lg:flex-col',
           'lg:h-full',
           'overflow-x-auto lg:overflow-y-auto',
           'hide-scrollbar',
@@ -60,13 +66,19 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
               key={idx}
               className={cn(
                 'flex-shrink-1 h-fit',
-                bridgeOptions.options && bridgeOptions.options.length < 2 ? 'w-full' : 'md:w-full w-[280px]',
+                bridgeOptions.options && bridgeOptions.options.length < 2
+                  ? 'w-full'
+                  : 'w-[280px] md:w-full',
               )}
             >
               <BridgeOption
                 option={item}
-                isSelected={selectedOption?.deposit_helper_contract === item.deposit_helper_contract}
-                isExpanded={expandedOption?.deposit_helper_contract === item.deposit_helper_contract}
+                isSelected={
+                  selectedOption?.deposit_helper_contract === item.deposit_helper_contract
+                }
+                isExpanded={
+                  expandedOption?.deposit_helper_contract === item.deposit_helper_contract
+                }
                 handleOptionSelect={(option) => handleSelectOption(option)}
                 onExpand={handleExpand}
                 toToken={toToken}

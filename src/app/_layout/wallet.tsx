@@ -12,8 +12,15 @@ import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { check_deposit_status, check_withdraw_status } from '@/blockchain_api/functions/icp/bridge_transactions';
-import { getPendingTransaction, PendingTransaction, removePendingTransaction } from '@/lib/helpers/session';
+import {
+  check_deposit_status,
+  check_withdraw_status,
+} from '@/blockchain_api/functions/icp/bridge_transactions';
+import {
+  getPendingTransaction,
+  PendingTransaction,
+  removePendingTransaction,
+} from '@/lib/helpers/session';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
@@ -205,8 +212,8 @@ const WalletPage = () => {
   return (
     <div
       className={cn(
-        'flex items-center justify-evenly gap-2 relative min-w-fit lg:h-[42px]',
-        'rounded-full bg-[#faf7fd]/50 border border-[#ECE6F5]',
+        'relative flex min-w-fit items-center justify-evenly gap-2 lg:h-[42px]',
+        'rounded-full border border-[#ECE6F5] bg-[#faf7fd]/50',
         'md:col-span-2 md:justify-self-end',
         (icpIdentity || isEvmConnected) && 'px-3',
         '*:rounded-full',
@@ -217,7 +224,7 @@ const WalletPage = () => {
           {/* mobile wallet connection buttons */}
           <div className="md:hidden">
             <Drawer>
-              <DrawerTrigger className="w-full font-medium text-sm text-white py-2 px-3">
+              <DrawerTrigger className="w-full px-3 py-2 text-sm font-medium text-white">
                 {icpIdentity || isEvmConnected ? 'Add Wallet' : 'Connect Wallet'}
               </DrawerTrigger>
               <DrawerContent>
@@ -245,12 +252,12 @@ const WalletPage = () => {
           {/* desktop wallet connection buttons */}
           <div className="hidden md:block">
             <Popover>
-              <PopoverTrigger className="w-full font-medium text-sm text-white py-2 px-3">
+              <PopoverTrigger className="w-full px-3 py-2 text-sm font-medium text-white">
                 {icpIdentity || isEvmConnected ? 'Add Wallet' : 'Connect Wallet'}
               </PopoverTrigger>
-              <PopoverContent className="w-72 translate-y-4 flex flex-col gap-y-4" align="end">
+              <PopoverContent className="flex w-72 translate-y-4 flex-col gap-y-4" align="end">
                 <div className="flex items-center justify-center font-medium text-white">
-                  <PopoverClose className="absolute top-4 right-4">
+                  <PopoverClose className="absolute right-4 top-4">
                     <CloseIcon width={20} height={20} />
                   </PopoverClose>
                   Select Wallet
@@ -278,7 +285,7 @@ const WalletPage = () => {
       )}
 
       {icpIdentity && isEvmConnected && (
-        <span className="w-full font-medium text-sm text-white py-2 px-3">Connected Wallets</span>
+        <span className="w-full px-3 py-2 text-sm font-medium text-white">Connected Wallets</span>
       )}
 
       {/* wallet content */}

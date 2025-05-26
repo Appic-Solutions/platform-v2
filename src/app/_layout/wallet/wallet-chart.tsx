@@ -1,5 +1,10 @@
 import React from 'react';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 import { TokenType } from '@/app/bridge/_store';
 import { WalletBalance } from './wallet-pop';
 import { Pie, PieChart } from 'recharts';
@@ -51,7 +56,10 @@ const WalletChart = ({ balance }: { balance: WalletBalance }) => {
     <div>
       <ChartContainer config={chartConfig} className="relative mx-auto aspect-square max-h-56">
         <PieChart>
-          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="bg-white" />} />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent hideLabel className="bg-white" />}
+          />
           <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} />
         </PieChart>
       </ChartContainer>

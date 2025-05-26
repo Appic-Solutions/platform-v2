@@ -15,4 +15,4 @@ export default function CopyIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
       />
     </svg>
   );
-};
+}

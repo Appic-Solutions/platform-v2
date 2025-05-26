@@ -1,7 +1,7 @@
-import { HttpAgent } from "@dfinity/agent";
-import { useEffect, useState } from "react";
+import { HttpAgent } from '@dfinity/agent';
+import { useEffect, useState } from 'react';
 
-const ICP_API_HOST = "https://icp-api.io/";
+const ICP_API_HOST = 'https://icp-api.io/';
 
 export const useUnAuthenticatedAgent = () => {
   const [unauthenticatedAgent, setUnauthenticatedAgent] = useState<HttpAgent | undefined>();

@@ -1,6 +1,5 @@
 const SwapPage = () => {
-    return <div>SwapPage</div>;
-  };
-  
-  export default SwapPage;
-  
+  return <div>SwapPage</div>;
+};
+
+export default SwapPage;

@@ -1,4 +1,8 @@
-import { DepositTxStatus, TxHash, WithdrawalTxStatus } from '@/blockchain_api/functions/icp/bridge_transactions';
+import {
+  DepositTxStatus,
+  TxHash,
+  WithdrawalTxStatus,
+} from '@/blockchain_api/functions/icp/bridge_transactions';
 import { Response } from '@/blockchain_api/types/response';
 import { WalletClient } from 'viem';
 

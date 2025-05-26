@@ -35,6 +35,5 @@ export default function BlockChainIcon({ ...props }: React.SVGProps<SVGSVGElemen
         </clipPath>
       </defs>
     </svg>
-
   );
 }

@@ -4,40 +4,40 @@ import React from 'react';
 const WalletPopSkeletonMobile = () => {
   return (
     <div className="flex flex-col items-center gap-y-6">
-      <Skeleton className="w-20 h-4" />
+      <Skeleton className="h-4 w-20" />
 
-      <Skeleton className="w-20 h-20 rounded-full" />
-      <Skeleton className="w-16 h-4" />
+      <Skeleton className="h-20 w-20 rounded-full" />
+      <Skeleton className="h-4 w-16" />
 
       <div className="flex w-full flex-col gap-y-5">
         <div className="flex items-center justify-between">
-          <div className="flex gap-2 items-center">
-            <Skeleton className="w-10 h-10 rounded-full" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-10 w-10 rounded-full" />
             <Skeleton className="h-4 w-16" />
           </div>
           <Skeleton className="h-4 w-8" />
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex gap-2 items-center">
-            <Skeleton className="w-10 h-10 rounded-full" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-10 w-10 rounded-full" />
             <Skeleton className="h-4 w-16" />
           </div>
           <Skeleton className="h-4 w-8" />
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex gap-2 items-center">
-            <Skeleton className="w-10 h-10 rounded-full" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-10 w-10 rounded-full" />
             <Skeleton className="h-4 w-16" />
           </div>
           <Skeleton className="h-4 w-8" />
         </div>
       </div>
-      <hr className="bg-[#494949] w-full" />
+      <hr className="w-full bg-[#494949]" />
       <div className="flex w-full items-center justify-between">
         <Skeleton className="h-4 w-8" />
         <Skeleton className="h-4 w-14" />
       </div>
-      <p className="text-center text-primary text-sm">Connecting Your Wallet...</p>
+      <p className="text-center text-sm text-primary">Connecting Your Wallet...</p>
     </div>
   );
 };

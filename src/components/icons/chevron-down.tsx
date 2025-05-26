@@ -17,4 +17,4 @@ export default function ChevronDownIcon({ ...props }: React.SVGProps<SVGSVGEleme
       />
     </svg>
   );
-};
+}

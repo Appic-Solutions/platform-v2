@@ -21,13 +21,13 @@ const config: Config = {
     extend: {
       /* Colors */
       colors: {
-        primary: 'rgb(var(--primary))',
-        secondary: 'rgb(var(--secondary))',
-        tertiary: 'rgb(var(--tertiary))',
-        active: 'rgb(var(--active))',
-        success: 'rgb(var(--success))',
-        fail: 'rgb(var(--fail))',
-        muted: 'rgb(var(--muted))',
+        'primary': 'rgb(var(--primary))',
+        'secondary': 'rgb(var(--secondary))',
+        'tertiary': 'rgb(var(--tertiary))',
+        'active': 'rgb(var(--active))',
+        'success': 'rgb(var(--success))',
+        'fail': 'rgb(var(--fail))',
+        'muted': 'rgb(var(--muted))',
         'box-border': 'var(--box-border)',
         'card-background': 'var(--card-background)',
       },
@@ -55,15 +55,15 @@ const config: Config = {
 
       /* Keyframes */
       keyframes: {
-        slideInFromRight: {
+        'slideInFromRight': {
           '0%': { transform: 'translateX(100%)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
-        slideInFromLeft: {
+        'slideInFromLeft': {
           '0%': { transform: 'translateX(-100%)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
-        slideInFromTop: {
+        'slideInFromTop': {
           '0%': { transform: 'translateY(-10%)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
@@ -77,7 +77,7 @@ const config: Config = {
             transform: 'translateX(0)',
           },
         },
-        slideInFromTopWithHeight: {
+        'slideInFromTopWithHeight': {
           '0%': {
             transform: 'translateY(-10%)',
             opacity: '0',
@@ -93,7 +93,7 @@ const config: Config = {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
-        fadeIn: {
+        'fadeIn': {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
@@ -107,7 +107,7 @@ const config: Config = {
         'slide-in-from-top': 'slideInFromTop 0.2s ease-out',
         'slide-in-with-height': 'slideInFromTopWithHeight 0.3s ease-out forwards',
         'border-spin': 'border-spin 2s linear infinite',
-        fade: 'fadeIn .5s ease-in-out',
+        'fade': 'fadeIn .5s ease-in-out',
       },
     },
   },

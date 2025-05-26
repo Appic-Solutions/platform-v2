@@ -1,6 +1,9 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { idlFactory as AppicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
-import { CandidEvmToken, GetEvmTokenArgs } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import {
+  CandidEvmToken,
+  GetEvmTokenArgs,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { appic_helper_canister_id } from '@/canister_ids.json';
 import { Principal } from '@dfinity/principal';
 import { Response } from '@/blockchain_api/types/response';

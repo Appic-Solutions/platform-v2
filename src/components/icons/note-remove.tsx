@@ -24,4 +24,4 @@ export default function NoteRemoveIcon({ ...props }: React.SVGProps<SVGSVGElemen
       <path d="M21 16L15 22V19C15 17 16 16 18 16H21Z" />
     </svg>
   );
-};
+}

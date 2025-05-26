@@ -1,7 +1,13 @@
 'use client';
 import { CloseIcon, CopyIcon, FireIcon, LinkIcon, ParkOutlineBridgeIcon } from '@/components/icons';
 import CheckIcon from '@/components/icons/check';
-import { cn, copyToClipboard, formatToSignificantFigures, getChainLogo, getChainName } from '@/lib/utils';
+import {
+  cn,
+  copyToClipboard,
+  formatToSignificantFigures,
+  getChainLogo,
+  getChainName,
+} from '@/lib/utils';
 import { ChevronDownIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -39,8 +45,8 @@ export default function BridgeContent() {
     return (
       <div
         className={cn(
-          'flex items-center justify-center h-full text-xl',
-          'text-center max-w-[490px] mx-auto px-6 text-white',
+          'flex h-full items-center justify-center text-xl',
+          'mx-auto max-w-[490px] px-6 text-center text-white',
         )}
       >
         Failed To Get Transaction History
@@ -48,13 +54,13 @@ export default function BridgeContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="flex items-center justify-center absolute my-auto inset-y-0">
+      <div className="absolute inset-y-0 my-auto flex items-center justify-center">
         <Spinner />
       </div>
     );
   } else if (data?.result.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-y-10 text-white text-2xl text-center absolute my-auto inset-y-0">
+      <div className="absolute inset-y-0 my-auto flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white">
         <Image src="/images/empty.png" alt="" width={100} height={100} />
         Empty Bridge History
       </div>
@@ -64,9 +70,9 @@ export default function BridgeContent() {
       <div
         key={idx}
         className={cn(
-          'flex flex-col w-full bg-input-fields bg-center bg-no-repeat bg-cover shadow-md',
+          'flex w-full flex-col bg-input-fields bg-cover bg-center bg-no-repeat shadow-md',
           'rounded-2xl p-5 backdrop-blur-[30px] duration-200 hover:bg-black/75',
-          'md:px-10 md:rounded-[36px]',
+          'md:rounded-[36px] md:px-10',
         )}
       >
         {/* Date & Time */}
@@ -79,7 +85,7 @@ export default function BridgeContent() {
           <p>{item.date}</p>
           <p>{item.time}</p>
         </div>
-        <div className="flex items-center justify-between w-full my-5 *:relative">
+        <div className="my-5 flex w-full items-center justify-between *:relative">
           <div>
             <Avatar src={item.from_token.logo} className="w-[58px] h-[58px] md:w-[72px] md:h-[72px]" />
             <Avatar
@@ -87,7 +93,7 @@ export default function BridgeContent() {
               className="absolute -right-1 -bottom-1 w-6 h-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
-          <div className="flex items-center justify-center w-full">
+          <div className="flex w-full items-center justify-center">
             <div
               className={cn(
                 'flex-1 border-t-[3px] border-black',
@@ -96,15 +102,15 @@ export default function BridgeContent() {
             />
             <div
               className={cn(
-                'rounded-full p-3 z-10 relative',
+                'relative z-10 rounded-full p-3',
                 'bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
                 item.status === 'Failed'
                   ? 'border-2 border-solid border-red-500'
                   : 'before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500',
-                item.status === 'Pending' && 'before:border-t-transparent before:animate-spin',
+                item.status === 'Pending' && 'before:animate-spin before:border-t-transparent',
               )}
             >
-              <ParkOutlineBridgeIcon className="w-5 md:w-6 h-5 md:h-6 text-white" />
+              <ParkOutlineBridgeIcon className="h-5 w-5 text-white md:h-6 md:w-6" />
             </div>
             <div
               className={cn(
@@ -124,19 +130,19 @@ export default function BridgeContent() {
           </div>
         </div>
         {/* Transaction Details */}
-        <div className="flex flex-col gap-y-4 mb-5">
+        <div className="mb-5 flex flex-col gap-y-4">
           <div
             className={cn(
               'flex items-center justify-between gap-x-4 text-xs font-bold',
-              'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989] md:text-sm',
-              '*:flex *:flex-col *:justify-center *:flex-1',
+              'max-md:text-[#898989] md:text-sm md:text-[#333333] md:dark:text-[#898989]',
+              '*:flex *:flex-1 *:flex-col *:justify-center',
             )}
           >
             <div>
               <p>
                 {item.from_token.symbol} on {getChainName(item.from_token.chainId)}
               </p>
-              <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-2xl">
+              <p className="text-2xl leading-7 max-md:text-white md:text-[#333333] md:dark:text-white">
                 {item.human_readable_base_value
                   ? formatToSignificantFigures(item.human_readable_base_value)
                   : 'Calculating'}
@@ -153,7 +159,7 @@ export default function BridgeContent() {
               <p>
                 {item.to_token.symbol} on {getChainName(item.to_token.chainId)}
               </p>
-              <p className="max-md:text-white md:text-[#333333] md:dark:text-white leading-7 text-2xl">
+              <p className="text-2xl leading-7 max-md:text-white md:text-[#333333] md:dark:text-white">
                 {item.human_readable_final_value
                   ? formatToSignificantFigures(item.human_readable_final_value)
                   : 'Calculating'}
@@ -165,7 +171,9 @@ export default function BridgeContent() {
         <div
           className={cn(
             'flex flex-col gap-y-6 duration-300',
-            itemId === idx ? 'opacity-100 mb-8 translate-y-0' : 'opacity-0 h-0 overflow-hidden -translate-y-2',
+            itemId === idx
+              ? 'mb-8 translate-y-0 opacity-100'
+              : 'h-0 -translate-y-2 overflow-hidden opacity-0',
           )}
         >
           {/* Transaction ID */}
@@ -176,7 +184,7 @@ export default function BridgeContent() {
             )}
           >
             {`Transaction ID: ${item.id.slice(0, 10)}`}
-            <span className="rounded-md p-0.5 cursor-pointer hover:bg-white/10">
+            <span className="cursor-pointer rounded-md p-0.5 hover:bg-white/10">
               <CopyIcon width={16} height={16} onClick={() => copyToClipboard(item.id)} />
             </span>
           </div>
@@ -186,14 +194,14 @@ export default function BridgeContent() {
               <div
                 key={idx}
                 className={cn(
-                  'flex items-center justify-between gap-x-4 group',
+                  'group flex items-center justify-between gap-x-4',
                   'text-sm font-semibold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]',
                 )}
               >
                 <div className="flex items-center gap-x-9">
                   <div
                     className={cn(
-                      'relative flex items-center justify-center h-11 w-11 rounded-full',
+                      'relative flex h-11 w-11 items-center justify-center rounded-full',
                       step.status === 'Pending'
                         ? 'bg-blue-600/35'
                         : step.status === 'Successful'
@@ -211,22 +219,27 @@ export default function BridgeContent() {
                       <CloseIcon />
                     )}
                   </div>
-                  <div className={step.link && 'flex flex-col gap-y-5 h-12 overflow-y-hidden *:duration-300'}>
+                  <div
+                    className={
+                      step.link && 'flex h-12 flex-col gap-y-5 overflow-y-hidden *:duration-300'
+                    }
+                  >
                     <span
                       className={
-                        step.link && 'group-hover:-translate-y-10 sm:translate-y-4 sm:group-hover:-translate-y-6'
+                        step.link &&
+                        'group-hover:-translate-y-10 sm:translate-y-4 sm:group-hover:-translate-y-6'
                       }
                     >
                       {step.message}
                     </span>
                     {step.link && (
-                      <div className="flex items-center gap-x-1 translate-y-4 group-hover:-translate-y-12 sm:group-hover:-translate-y-6">
+                      <div className="flex translate-y-4 items-center gap-x-1 group-hover:-translate-y-12 sm:group-hover:-translate-y-6">
                         Details
                         <Link
                           href={step.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="rounded-md p-0.5 cursor-pointer hover:bg-white/10"
+                          className="cursor-pointer rounded-md p-0.5 hover:bg-white/10"
                         >
                           <LinkIcon width={16} height={16} />
                         </Link>
@@ -246,22 +259,25 @@ export default function BridgeContent() {
             'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
           )}
         >
-          <div className="gap-x-1 text-[#0F0F0F] bg-white/60 rounded-full py-1 px-2">
+          <div className="gap-x-1 rounded-full bg-white/60 px-2 py-1 text-[#0F0F0F]">
             via {item.operator}
             <Image
               src="/images/logo/icp-logo.svg"
               alt="Li.FI"
               width={16}
               height={16}
-              className="rounded-full min-h-4 min-w-4"
+              className="min-h-4 min-w-4 rounded-full"
             />
           </div>
-          <div className="gap-x-2 cursor-pointer select-none text-sm" onClick={() => expandHandler(idx)}>
+          <div
+            className="cursor-pointer select-none gap-x-2 text-sm"
+            onClick={() => expandHandler(idx)}
+          >
             {itemId === idx ? 'Hide Details' : 'View Details'}
             <ChevronDownIcon
               width={20}
               height={20}
-              className={cn('duration-300 ease-in-out', itemId === idx && 'transform rotate-180')}
+              className={cn('duration-300 ease-in-out', itemId === idx && 'rotate-180 transform')}
             />
           </div>
           <div className="gap-x-1 text-white">

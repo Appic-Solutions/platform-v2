@@ -1,13 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable */
+/* @typescript-eslint/no-explicit-any */
 import { Actor, Agent, HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
-import { createWalletClient, custom, WalletClient, Chain as ViemChain, createPublicClient, http } from 'viem';
+import {
+  createWalletClient,
+  custom,
+  WalletClient,
+  Chain as ViemChain,
+  createPublicClient,
+  http,
+} from 'viem';
 
 import { idlFactory as IcrcIdlFactory } from '@/blockchain_api/did/ledger/icrc.did';
-import { Account, ApproveArgs, Result_2, Allowance, AllowanceArgs } from '@/blockchain_api/did/ledger/icrc_types';
+import {
+  Account,
+  ApproveArgs,
+  Result_2,
+  Allowance,
+  AllowanceArgs,
+} from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
-import { BridgeOption, encode_approval_function_data, encode_deposit_function_data } from './get_bridge_options';
+import {
+  BridgeOption,
+  encode_approval_function_data,
+  encode_deposit_function_data,
+} from './get_bridge_options';
 import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
   WithdrawalArg as AppicWithdrawalArg,
@@ -123,8 +141,10 @@ export const icrc2_approve = async (
 
       // Check if minter already has enough allowance
       if (
-        BigNumber(allowance.allowance.toString()).isGreaterThanOrEqualTo(
-          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token),
+        new BigNumber(allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          new BigNumber(bridge_option.amount).minus(
+            bridge_option.fees.approval_fee_in_native_token,
+          ),
         )
       ) {
         return { result: 'Successful', success: true, message: '' };
@@ -133,7 +153,9 @@ export const icrc2_approve = async (
       // In case of Native withdrawal
       const native_approval_result = (await native_actor.icrc2_approve({
         amount: BigInt(
-          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
+          new BigNumber(bridge_option.amount)
+            .minus(bridge_option.fees.approval_fee_in_native_token)
+            .toString(),
         ),
         created_at_time: [],
         expected_allowance: [],
@@ -147,7 +169,11 @@ export const icrc2_approve = async (
       if ('Ok' in native_approval_result) {
         return { result: native_approval_result.Ok.toString(), success: true, message: '' };
       } else {
-        return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
+        return {
+          result: '',
+          success: false,
+          message: `Failed to approve allowance:${native_approval_result.Err}`,
+        };
       }
     } else {
       // In case of Erc20
@@ -172,20 +198,24 @@ export const icrc2_approve = async (
       } as AllowanceArgs)) as Allowance;
       console.log(
         native_allowance.allowance.toString(),
-        BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
-          BigNumber(bridge_option.fees.total_native_fee).minus(bridge_option.fees.approval_fee_in_native_token),
+        new BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          new BigNumber(bridge_option.fees.total_native_fee).minus(
+            bridge_option.fees.approval_fee_in_native_token,
+          ),
         ),
       );
       // Check if minter already has enough allowance for native token
       if (
-        BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
-          BigNumber(bridge_option.fees.total_native_fee).minus(bridge_option.fees.approval_fee_in_native_token),
+        new BigNumber(native_allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          new BigNumber(bridge_option.fees.total_native_fee).minus(
+            bridge_option.fees.approval_fee_in_native_token,
+          ),
         )
       ) {
       } else {
         const native_approval_result = (await native_actor.icrc2_approve({
           amount: BigInt(
-            BigNumber(bridge_option.fees.total_native_fee)
+            new BigNumber(bridge_option.fees.total_native_fee)
               .minus(bridge_option.fees.approval_fee_in_native_token)
               .toString(),
           ),
@@ -200,7 +230,11 @@ export const icrc2_approve = async (
 
         if ('Ok' in native_approval_result) {
         } else {
-          return { result: '', success: false, message: `Failed to approve allowance:${native_approval_result.Err}` };
+          return {
+            result: '',
+            success: false,
+            message: `Failed to approve allowance:${native_approval_result.Err}`,
+          };
         }
       }
 
@@ -215,15 +249,19 @@ export const icrc2_approve = async (
 
       // Check if minter already has enough allowance for erc20 token
       if (
-        BigNumber(erc20_allowance.allowance.toString()).isGreaterThanOrEqualTo(
-          BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens),
+        new BigNumber(erc20_allowance.allowance.toString()).isGreaterThanOrEqualTo(
+          new BigNumber(bridge_option.amount).minus(
+            bridge_option.fees.approval_fee_in_erc20_tokens,
+          ),
         )
       ) {
         return { result: 'Successful', success: true, message: '' };
       } else {
         const erc20_approval_result = (await erc20_actor.icrc2_approve({
           amount: BigInt(
-            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+            new BigNumber(bridge_option.amount)
+              .minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+              .toString(),
           ),
           created_at_time: [],
           expected_allowance: [],
@@ -281,7 +319,9 @@ export const request_withdraw = async (
       try {
         const native_withdrawal_result = (await appic_minter_actor.withdraw_native_token({
           amount: BigInt(
-            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
+            new BigNumber(bridge_option.amount)
+              .minus(bridge_option.fees.approval_fee_in_native_token)
+              .toString(),
           ),
           recipient,
         } as AppicWithdrawalArg)) as AppicWithdrawalNativeResult;
@@ -312,7 +352,9 @@ export const request_withdraw = async (
         console.log(appic_minter_actor);
         const erc20_withdrawal_result = (await appic_minter_actor.withdraw_erc20({
           amount: BigInt(
-            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+            new BigNumber(bridge_option.amount)
+              .minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+              .toString(),
           ),
           erc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
           recipient,
@@ -359,7 +401,9 @@ export const request_withdraw = async (
       try {
         const native_withdrawal_result = await dfinity_minter_actor.withdraw_eth({
           amount: BigInt(
-            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_native_token).toString(),
+            new BigNumber(bridge_option.amount)
+              .minus(bridge_option.fees.approval_fee_in_native_token)
+              .toString(),
           ),
           recipient,
           from_subaccount: [],
@@ -390,7 +434,9 @@ export const request_withdraw = async (
       try {
         const erc20_withdrawal_result = await dfinity_minter_actor.withdraw_erc20({
           amount: BigInt(
-            BigNumber(bridge_option.amount).minus(bridge_option.fees.approval_fee_in_erc20_tokens).toString(),
+            new BigNumber(bridge_option.amount)
+              .minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+              .toString(),
           ),
           ckerc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
           recipient,
@@ -529,7 +575,9 @@ export const check_withdraw_status = async (
         agent: unauthenticated_agent,
       });
 
-      const tx_status = (await dfinity_minter.retrieve_eth_status(BigInt(withdrawal_id))) as RetrieveEthStatus;
+      const tx_status = (await dfinity_minter.retrieve_eth_status(
+        BigInt(withdrawal_id),
+      )) as RetrieveEthStatus;
       const parsed_status = parse_retrieve_eth_status_result(tx_status);
       console.log(parsed_status);
       return {
@@ -600,7 +648,9 @@ export const check_withdraw_status = async (
 
 // Step 1
 // create wallet client and switch chain
-export const create_wallet_client = async (bridge_option: BridgeOption): Promise<WalletClient<any>> => {
+export const create_wallet_client = async (
+  bridge_option: BridgeOption,
+): Promise<WalletClient<any>> => {
   console.log(bridge_option);
   const ethereum = (window as any).ethereum;
 
@@ -649,7 +699,7 @@ export const approve_erc20 = async (
         bridge_option.rpc_url,
       );
 
-      if (BigNumber(allowance).isGreaterThanOrEqualTo(bridge_option.amount)) {
+      if (new BigNumber(allowance).isGreaterThanOrEqualTo(bridge_option.amount)) {
         return {
           result: true,
           success: true,
@@ -725,8 +775,12 @@ export const request_deposit = async (
     bridge_option.operator,
     bridge_option.is_native,
     principal_bytes,
-    BigNumber(bridge_option.amount)
-      .minus(BigNumber(bridge_option.fees.max_network_fee).plus(bridge_option.fees.approval_fee_in_native_token))
+    new BigNumber(bridge_option.amount)
+      .minus(
+        new BigNumber(bridge_option.fees.max_network_fee).plus(
+          bridge_option.fees.approval_fee_in_native_token,
+        ),
+      )
       .toFixed(),
   );
 
@@ -735,7 +789,7 @@ export const request_deposit = async (
 
     const value = bridge_option.is_native
       ? BigInt(
-          BigNumber(bridge_option.amount)
+          new BigNumber(bridge_option.amount)
             .minus(bridge_option.fees.total_native_fee)
             .decimalPlaces(0, BigNumber.ROUND_DOWN)
             .toFixed(),
@@ -838,7 +892,8 @@ export const notify_appic_helper_deposit = async (
         agent: unauthenticated_agent,
       });
 
-      const log_scraping_request_result = (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+      const log_scraping_request_result =
+        (await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
       if ('Err' in log_scraping_request_result) {
         if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
           setTimeout(async () => {
@@ -879,7 +934,12 @@ export const notify_appic_helper_deposit = async (
   }
 };
 
-export type DepositTxStatus = 'Invalid' | 'PendingVerification' | 'Minted' | 'Accepted' | 'Quarantined';
+export type DepositTxStatus =
+  | 'Invalid'
+  | 'PendingVerification'
+  | 'Minted'
+  | 'Accepted'
+  | 'Quarantined';
 
 //  Step 5
 // This function should be called on a interval basis until the transaction status is either "Minted" or "Invalid" or "Quarantined"
@@ -925,7 +985,9 @@ export const check_deposit_status = async (
     }
     // Check appic_minter directly for appic minters
     else {
-      const tx_status = (await appic_minter_actor.retrieve_deposit_status(tx_hash)) as [] | [DepositStatus];
+      const tx_status = (await appic_minter_actor.retrieve_deposit_status(tx_hash)) as
+        | []
+        | [DepositStatus];
       if (tx_status.length != 0) {
         const parsed_status = parse_deposit_status_result(tx_status[0]);
         console.log(parsed_status);

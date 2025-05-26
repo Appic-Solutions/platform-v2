@@ -24,8 +24,14 @@ const SelectTokenLogic = () => {
   } = useBridgeStore();
   const { setActiveStep, setFromToken, setToToken } = useBridgeActions();
 
-  const { isEvmBalanceLoading, isIcpBalanceLoading, isEvmConnected, evmBalance, icpBalance, icpIdentity } =
-    useSharedStore();
+  const {
+    isEvmBalanceLoading,
+    isIcpBalanceLoading,
+    isEvmConnected,
+    evmBalance,
+    icpBalance,
+    icpIdentity,
+  } = useSharedStore();
 
   function changeStep(direction: 'next' | 'prev' | number) {
     const currentStep = typeof direction === 'number' ? direction : activeStep;
@@ -91,7 +97,7 @@ const SelectTokenLogic = () => {
       (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
       (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
     ) {
-      if (BigNumber(amount).isGreaterThan(BigNumber(selectedTokenBalance))) {
+      if (new BigNumber(amount).isGreaterThan(new BigNumber(selectedTokenBalance))) {
         return {
           isDisable: true,
           text: 'INSUFFICIENT Funds',
@@ -102,11 +108,13 @@ const SelectTokenLogic = () => {
           // The native token of the transaction chain that the user holds in his wallet
           const userNativeToken = evmBalance?.tokens.find(
             (token) =>
-              token.contractAddress === selectedOption.native_fee_token_id && token.chainId === selectedOption.chain_id,
+              token.contractAddress === selectedOption.native_fee_token_id &&
+              token.chainId === selectedOption.chain_id,
           );
           if (
             !userNativeToken ||
-            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
+            Number(userNativeToken.balance) <
+              Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
             return {
               isDisable: true,
@@ -119,7 +127,8 @@ const SelectTokenLogic = () => {
           );
           if (
             !userNativeToken ||
-            Number(userNativeToken.balance) < Number(selectedOption.fees.human_readable_total_native_fee)
+            Number(userNativeToken.balance) <
+              Number(selectedOption.fees.human_readable_total_native_fee)
           ) {
             return {
               isDisable: true,
@@ -231,7 +240,10 @@ const SelectTokenLogic = () => {
       return;
     }
 
-    if (isWalletConnected('from') && (isWalletConnected('to') || (toWalletAddress && !toWalletValidationError))) {
+    if (
+      isWalletConnected('from') &&
+      (isWalletConnected('to') || (toWalletAddress && !toWalletValidationError))
+    ) {
       changeStep(3);
     }
   };

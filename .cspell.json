@@ -1,0 +1,14 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "ignorePaths": ["node_modules", "*.json"],
+  "dictionaryDefinitions": [
+    {
+      "name": "keywords",
+      "description": "Project keywords",
+      "path": "./keywords.txt"
+    }
+  ],
+  "dictionaries": ["keywords"]
+}

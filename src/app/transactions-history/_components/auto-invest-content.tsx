@@ -1,7 +1,3 @@
 export default function AutoInvestContent() {
-    return (
-        <div>
-            AutoInvestContent
-        </div>
-    )
+  return <div>AutoInvestContent</div>;
 }

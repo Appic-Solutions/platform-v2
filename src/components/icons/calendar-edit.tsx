@@ -21,4 +21,4 @@ export default function CalendarEditIcon({ ...props }: React.SVGProps<SVGSVGElem
       <path d="M8.29431 16.7H8.30329" strokeWidth="2" />
     </svg>
   );
-};
+}

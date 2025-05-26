@@ -26,17 +26,19 @@ export default function BridgeTransactionStepper({ steps, onCloseModal }: Props)
   };
 
   return (
-    <div className="w-full max-w-[691px] justify-start gap-y-9 relative">
+    <div className="relative w-full max-w-[691px] justify-start gap-y-9">
       <div className="text-center text-lg font-bold text-primary">Bridge Transaction</div>
       <DialogClose onClick={closeModal} className="absolute right-5 top-0">
-        <CloseIcon className="text-primary w-6 h-6" />
+        <CloseIcon className="h-6 w-6 text-primary" />
       </DialogClose>
       <div className="flex flex-col items-center justify-center gap-y-16 py-5 md:flex-row md:items-start md:gap-x-16">
         {steps.map((step, index) => (
           <TransactionStep
             key={index}
             onResetTransaction={resetTransaction}
-            currentStep={prevTxStep.count === 0 || prevTxStep.count === txStep.count ? txStep : prevTxStep}
+            currentStep={
+              prevTxStep.count === 0 || prevTxStep.count === txStep.count ? txStep : prevTxStep
+            }
             index={index}
             step={step}
             steps={steps}

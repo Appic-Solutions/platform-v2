@@ -133,7 +133,11 @@ export const idlFactory = ({ IDL }) => {
     all_twins_canister_ids: IDL.Func([], [IDL.Vec(ManagedCanisters)], ['query']),
     get_canister_status: IDL.Func([], [CanisterStatusResponse], []),
     get_lsm_info: IDL.Func([], [LedgerManagerInfo], ['query']),
-    twin_canister_ids_by_contract: IDL.Func([Erc20Contract], [IDL.Opt(ManagedCanisterIds)], ['query']),
+    twin_canister_ids_by_contract: IDL.Func(
+      [Erc20Contract],
+      [IDL.Opt(ManagedCanisterIds)],
+      ['query'],
+    ),
   });
 };
 export const init = ({ IDL }) => {

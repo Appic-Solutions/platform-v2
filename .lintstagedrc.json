@@ -1,0 +1,4 @@
+{
+  "*.{js,ts,tsx}": ["cspell --no-must-find-files", "eslint"],
+  "*.json": ["cspell --no-must-find-files"]
+}

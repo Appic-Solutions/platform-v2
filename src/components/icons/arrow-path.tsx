@@ -17,4 +17,4 @@ export default function ArrowPathIcon({ ...props }: React.SVGProps<SVGSVGElement
       />
     </svg>
   );
-};
+}

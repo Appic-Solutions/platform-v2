@@ -51,13 +51,17 @@ export function ChainTokenListLogic() {
 
         if (icpBalance === undefined) {
           updatedTokenList = updatedTokenList.map((token) =>
-            token.chain_type === 'ICP' ? { ...token, balance: undefined, usdBalance: undefined } : token,
+            token.chain_type === 'ICP'
+              ? { ...token, balance: undefined, usdBalance: undefined }
+              : token,
           );
         }
 
         if (evmBalance === undefined) {
           updatedTokenList = updatedTokenList.map((token) =>
-            token.chain_type === 'EVM' ? { ...token, balance: undefined, usdBalance: undefined } : token,
+            token.chain_type === 'EVM'
+              ? { ...token, balance: undefined, usdBalance: undefined }
+              : token,
           );
         }
 
@@ -67,7 +71,9 @@ export function ChainTokenListLogic() {
               if (token.chain_type === 'ICP' && token.chainId === item.chainId)
                 return item.canisterId === token.canisterId;
             });
-            return foundToken ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance } : token;
+            return foundToken
+              ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance }
+              : token;
           });
         }
 
@@ -81,7 +87,9 @@ export function ChainTokenListLogic() {
                 return true;
               }
             });
-            return foundToken ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance } : token;
+            return foundToken
+              ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance }
+              : token;
           });
         }
 

@@ -14,7 +14,8 @@ import { useSharedStore } from '@/store/store';
 import { Principal } from '@dfinity/principal';
 
 const BridgeReviewLogic = () => {
-  const { fromToken, amount, selectedOption, toWalletAddress, toWalletValidationError } = useBridgeStore();
+  const { fromToken, amount, selectedOption, toWalletAddress, toWalletValidationError } =
+    useBridgeStore();
 
   // Bridge Actions
   const {
@@ -258,6 +259,8 @@ const BridgeReviewLogic = () => {
   return {
     executeTransaction,
     resetTransaction,
+    executeWithdrawal,
+    executeDeposit,
   };
 };
 

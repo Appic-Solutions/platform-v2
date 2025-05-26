@@ -37,11 +37,11 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[100] overflow-hidden',
-        'flex flex-col items-center justify-center gap-y-6 py-6 md:w-full max-w-xl rounded-[22px] backdrop-blur-md',
+        'fixed left-[50%] top-[50%] z-[100] translate-x-[-50%] translate-y-[-50%] overflow-hidden',
+        'flex max-w-xl flex-col items-center justify-center gap-y-6 rounded-[22px] py-6 backdrop-blur-md md:w-full',
         'border-[5px] border-box-border outline-none ring-0 *:z-10',
-        "before:content-[''] before:absolute before:inset-0",
-        'before:bg-box-background before:bg-center before:bg-cover before:bg-no-repeat',
+        "before:absolute before:inset-0 before:content-['']",
+        'before:bg-box-background before:bg-cover before:bg-center before:bg-no-repeat',
         'data-[state=open]:animate-in',
         'data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0',
@@ -63,9 +63,14 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex items-center justify-center px-6', 'text-black dark:text-white', className)} {...props}>
+  <div
+    className={cn('flex items-center justify-center px-6', 'text-black dark:text-white', className)}
+    {...props}
+  >
     {children}
-    <DialogPrimitive.Close className={cn('absolute right-4 rounded-md', 'disabled:pointer-events-none')}>
+    <DialogPrimitive.Close
+      className={cn('absolute right-4 rounded-md', 'disabled:pointer-events-none')}
+    >
       <CloseIcon className="min-h-5 min-w-5" />
     </DialogPrimitive.Close>
   </div>

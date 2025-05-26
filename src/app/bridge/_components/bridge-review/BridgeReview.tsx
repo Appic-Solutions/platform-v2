@@ -25,27 +25,27 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
     return (
       <Box
         className={cn(
-          'justify-normal animate-slide-in opacity-0 h-full',
-          'md:max-w-[612px] md:h-[607px] md:px-9 md:py-8',
+          'h-full animate-slide-in justify-normal opacity-0',
+          'md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
         )}
       >
         <BoxHeader title="Bridge Review" onBack={() => setActiveStep(1)} />
-        <div className="w-full flex flex-col justify-between gap-y-4 h-full">
+        <div className="flex h-full w-full flex-col justify-between gap-y-4">
           <Card
             className={cn(
-              '!py-4 px-4 border min-w-[300px] flex-col gap-3 items-start justify-between overflow-hidden rounded-[20px]',
-              'md:px-6 md:rounded-[36px]',
+              'min-w-[300px] flex-col items-start justify-between gap-3 overflow-hidden rounded-[20px] border !py-4 px-4',
+              'md:rounded-[36px] md:px-6',
               'transition duration-300',
               'bg-highlighted-card',
               'border-blue-600',
             )}
           >
             {/* top section */}
-            <div className="flex items-center justify-between w-full">
+            <div className="flex w-full items-center justify-between">
               <div className="flex-1">
                 <p
                   className={cn(
-                    'text-muted text-xs md:text-sm font-thin py-1 px-2 rounded-[10px] w-fit',
+                    'w-fit rounded-[10px] px-2 py-1 text-xs font-thin text-muted md:text-sm',
                     'bg-primary-buttons text-white',
                   )}
                 >
@@ -54,37 +54,47 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
               </div>
             </div>
             {/* middle section */}
-            <div className="flex items-center justify-between w-full">
+            <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-x-3">
-                <div className="border-2 border-white/50 rounded-full p-2">
-                  <div className={cn('relative w-7 h-7', 'lg:w-10 lg:h-10')}>
-                    <Image src={toToken.logo} alt="btc" className="object-contain rounded-full" fill />
+                <div className="rounded-full border-2 border-white/50 p-2">
+                  <div className={cn('relative h-7 w-7', 'lg:h-10 lg:w-10')}>
+                    <Image
+                      src={toToken.logo}
+                      alt="btc"
+                      className="rounded-full object-contain"
+                      fill
+                    />
                   </div>
                 </div>
                 <p
                   className={cn(
                     'text-base lg:text-xl',
-                    option.human_readable_estimated_return.length > 7 && 'text-ellipsis w-min',
+                    option.human_readable_estimated_return.length > 7 && 'w-min text-ellipsis',
                   )}
                 >
-                  ~ {formatToSignificantFigures(option.human_readable_estimated_return) + ' ' + toToken.symbol}
+                  ~{' '}
+                  {formatToSignificantFigures(option.human_readable_estimated_return) +
+                    ' ' +
+                    toToken.symbol}
                 </p>
               </div>
-              <div className="flex flex-col gap-y-3 items-end">
-                <div className="px-2 md:px-4 py-1 rounded-2xl flex items-center gap-x-1 bg-white">
-                  <span className={cn('text-xs lg:text-sm text-blue-600')}>via {option.via}</span>
+              <div className="flex flex-col items-end gap-y-3">
+                <div className="flex items-center gap-x-1 rounded-2xl bg-white px-2 py-1 md:px-4">
+                  <span className={cn('text-xs text-blue-600 lg:text-sm')}>via {option.via}</span>
                   <Image src="images/logo/icp-logo.svg" alt="logo" width={15} height={15} />
                 </div>
               </div>
             </div>
             {/* bottom section */}
-            <div className="flex items-end w-full justify-end gap-x-4">
-              <span className="flex items-center gap-x-1 w-max">
-                <p className="text-xs font-thin text-primary">${Number(option.fees.total_fee_usd_price).toFixed(2)}</p>
+            <div className="flex w-full items-end justify-end gap-x-4">
+              <span className="flex w-max items-center gap-x-1">
+                <p className="text-xs font-thin text-primary">
+                  ${Number(option.fees.total_fee_usd_price).toFixed(2)}
+                </p>
                 <FireIcon width={15} height={15} className="text-primary" />
               </span>
-              <span className="flex items-center gap-x-1 w-max">
-                <p className="text-primary text-xs font-thin">{option.duration}</p>
+              <span className="flex w-max items-center gap-x-1">
+                <p className="text-xs font-thin text-primary">{option.duration}</p>
                 <ClockIcon width={15} height={15} className="text-primary" />
               </span>
             </div>
@@ -94,8 +104,8 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
             <div
               className={cn(
                 'w-full border-t border-gray-200 dark:border-gray-700',
-                'transition-all duration-300 transform',
-                'opacity-100 mb-4 translate-y-0 pt-4 mt-4',
+                'transform transition-all duration-300',
+                'mb-4 mt-4 translate-y-0 pt-4 opacity-100',
               )}
             >
               <div className="space-y-4">
@@ -116,7 +126,11 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Minter Fee:</span>
-                    <span>{option.fees.human_readable_minter_fee + ' ' + option.fees.native_fee_token_symbol}</span>
+                    <span>
+                      {option.fees.human_readable_minter_fee +
+                        ' ' +
+                        option.fees.native_fee_token_symbol}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Max Fee:</span>
@@ -134,7 +148,7 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
           <DialogTrigger onClick={openModal}>
             <div
               className={cn(
-                'w-full h-14 rounded-[16px] text-white flex items-center justify-center',
+                'flex h-14 w-full items-center justify-center rounded-[16px] text-white',
                 'bg-primary-buttons',
                 'transition-all ease-in-out',
                 'hover:opacity-85',

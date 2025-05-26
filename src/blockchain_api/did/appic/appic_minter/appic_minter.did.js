@@ -422,7 +422,11 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     add_erc20_token: IDL.Func([AddErc20Token], [], []),
     check_new_deposits: IDL.Func([], [], []),
-    eip_1559_transaction_price: IDL.Func([IDL.Opt(Eip1559TransactionPriceArg)], [Eip1559TransactionPrice], ['query']),
+    eip_1559_transaction_price: IDL.Func(
+      [IDL.Opt(Eip1559TransactionPriceArg)],
+      [Eip1559TransactionPrice],
+      ['query'],
+    ),
     get_canister_status: IDL.Func([], [CanisterStatusResponse], []),
     get_events: IDL.Func([GetEventsArg], [GetEventsResult], ['query']),
     get_minter_info: IDL.Func([], [MinterInfo], ['query']),
@@ -434,7 +438,11 @@ export const idlFactory = ({ IDL }) => {
     smart_contract_address: IDL.Func([], [IDL.Text], ['query']),
     withdraw_erc20: IDL.Func([WithdrawErc20Arg], [Result_1], []),
     withdraw_native_token: IDL.Func([WithdrawalArg], [Result_2], []),
-    withdrawal_status: IDL.Func([WithdrawalSearchParameter], [IDL.Vec(WithdrawalDetail)], ['query']),
+    withdrawal_status: IDL.Func(
+      [WithdrawalSearchParameter],
+      [IDL.Vec(WithdrawalDetail)],
+      ['query'],
+    ),
   });
 };
 export const init = ({ IDL }) => {

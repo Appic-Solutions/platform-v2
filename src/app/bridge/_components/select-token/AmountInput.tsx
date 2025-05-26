@@ -22,8 +22,8 @@ const AmountInput = () => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find(
         (t) =>
-          t.contractAddress.toLocaleLowerCase() === fromToken.contractAddress?.toLocaleLowerCase() &&
-          t.chainId === fromToken.chainId,
+          t.contractAddress.toLocaleLowerCase() ===
+            fromToken.contractAddress?.toLocaleLowerCase() && t.chainId === fromToken.chainId,
       );
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
@@ -51,27 +51,26 @@ const AmountInput = () => {
   }, [amount]);
 
   const handleAmountChange = (value: string) => {
-    const usdPrice = BigNumber(value == '' ? '0' : value).multipliedBy(fromToken?.usdPrice || 0);
+    const usdPrice = new BigNumber(value == '' ? '0' : value).multipliedBy(
+      fromToken?.usdPrice || 0,
+    );
     setUsdPrice(usdPrice.toFixed(2));
     setAmount(value);
   };
 
   return (
-    <Card className="max-h-[133px] md:max-h-[155px] flex-col items-start justify-center hover:bg-[#000000]/0 cursor-auto">
+    <Card className="max-h-[133px] cursor-auto flex-col items-start justify-center hover:bg-[#000000]/0 md:max-h-[155px]">
       <p className="text-sm font-semibold">Send</p>
-      <div className="flex items-center gap-4 w-full">
+      <div className="flex w-full items-center gap-4">
         <div className="relative">
-          <Avatar
-            src={fromToken?.logo}
-            className='w-11 h-11'
-          />
+          <Avatar src={fromToken?.logo} className="h-11 w-11" />
           <Avatar
             src={getChainLogo(fromToken?.chainId)}
-            className='absolute -right-1 -bottom-1 w-5 h-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]'
+            className="absolute -bottom-1 -right-1 h-5 w-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
           />
         </div>
-        <div className="flex flex-col w-full relative">
-          <div className="w-full flex items-center">
+        <div className="relative flex w-full flex-col">
+          <div className="flex w-full items-center">
             <input
               type="number"
               maxLength={15}
@@ -83,23 +82,23 @@ const AmountInput = () => {
                 setInputAmount(inputValue);
               }}
               className={cn(
-                'border-[#1C68F8] dark:border-[#000000] rounded-md py-2 outline-none',
+                'rounded-md border-[#1C68F8] py-2 outline-none dark:border-[#000000]',
                 'bg-transparent text-primary',
                 'placeholder:text-primary/50',
                 'w-full',
-                '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
               )}
             />
             {isWalletConnected('from') && (
               <span
                 className={cn(
-                  'px-4 cursor-pointer py-1 ml-3 text-xs md:text-sm text-black rounded-md',
+                  'ml-3 cursor-pointer rounded-md px-4 py-1 text-xs text-black md:text-sm',
                   'bg-gradient-to-r from-white to-white/35',
-                  'hover:bg-white/35 transition-all duration-300',
+                  'transition-all duration-300 hover:bg-white/35',
                 )}
                 onClick={() => {
                   if (Number(selectedTokenBalance) > 0) {
-                    const formattedBalance = BigNumber(selectedTokenBalance)
+                    const formattedBalance = new BigNumber(selectedTokenBalance)
                       .decimalPlaces(8, BigNumber.ROUND_DOWN)
                       .toFixed();
                     setAmount(formattedBalance);
@@ -114,17 +113,19 @@ const AmountInput = () => {
               </span>
             )}
           </div>
-          <div className="flex justify-between items-center w-full">
+          <div className="flex w-full items-center justify-between">
             <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
             {isWalletConnected('from') && (
-              <p className="text-muted text-center text-xs md:text-sm font-semibold text-nowrap">
-                {BigNumber(selectedTokenBalance).decimalPlaces(8, BigNumber.ROUND_DOWN).toFixed()}
+              <p className="text-nowrap text-center text-xs font-semibold text-muted md:text-sm">
+                {new BigNumber(selectedTokenBalance)
+                  .decimalPlaces(8, BigNumber.ROUND_DOWN)
+                  .toFixed()}
               </p>
             )}
           </div>
           {!bridgeOptions.options ||
             (bridgeOptions.options?.length === 0 && bridgeOptions.message && (
-              <p className="text-xs text-yellow-600 absolute -bottom-5 animate-slide-in-from-top">
+              <p className="absolute -bottom-5 animate-slide-in-from-top text-xs text-yellow-600">
                 {bridgeOptions.message}
               </p>
             ))}

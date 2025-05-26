@@ -1,5 +1,5 @@
-import type { ActorMethod } from "@dfinity/agent";
-import type { IDL } from "@dfinity/candid";
+import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export type BoolResult = { ok: boolean } | { err: string };
 export interface Config {

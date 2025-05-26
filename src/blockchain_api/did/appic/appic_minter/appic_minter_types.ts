@@ -37,7 +37,11 @@ export interface DefiniteCanisterSettings {
   memory_allocation: bigint;
   compute_allocation: bigint;
 }
-export type DepositStatus = { Minted: null } | { Accepted: null } | { InvalidDeposit: null } | { Quarantined: null };
+export type DepositStatus =
+  | { Minted: null }
+  | { Accepted: null }
+  | { InvalidDeposit: null }
+  | { Quarantined: null };
 export interface Eip1559TransactionPrice {
   max_priority_fee_per_gas: bigint;
   max_fee_per_gas: bigint;
@@ -436,7 +440,10 @@ export type WithdrawalStatus =
 export interface _SERVICE {
   add_erc20_token: ActorMethod<[AddErc20Token], undefined>;
   check_new_deposits: ActorMethod<[], undefined>;
-  eip_1559_transaction_price: ActorMethod<[[] | [Eip1559TransactionPriceArg]], Eip1559TransactionPrice>;
+  eip_1559_transaction_price: ActorMethod<
+    [[] | [Eip1559TransactionPriceArg]],
+    Eip1559TransactionPrice
+  >;
   get_canister_status: ActorMethod<[], CanisterStatusResponse>;
   get_events: ActorMethod<[GetEventsArg], GetEventsResult>;
   get_minter_info: ActorMethod<[], MinterInfo>;

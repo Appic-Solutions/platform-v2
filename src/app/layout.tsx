@@ -10,7 +10,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <html lang="en" className="dark bg-[#060607] relative h-full">
+    <html lang="en" className="dark relative h-full bg-[#060607]">
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />

@@ -10,13 +10,12 @@ const ChainBoxPage = ({
   selectedChainId: Chain['chainId'];
   onChainSelect: (chainId: Chain['chainId']) => void;
 }) => {
-
   const ChainItemClickHandler = (chain: Chain) => {
     onChainSelect(chain.chainId);
-  }
+  };
 
   return (
-    <div className="grid grid-cols-5 gap-5 place-items-center w-full select-none md:px-4 mb-7">
+    <div className="mb-7 grid w-full select-none grid-cols-5 place-items-center gap-5 md:px-4">
       {chains.map((chain, idx) => (
         <ChainItem
           key={idx}

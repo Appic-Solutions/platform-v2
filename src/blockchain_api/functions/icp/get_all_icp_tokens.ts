@@ -3,7 +3,10 @@ import { Principal } from '@dfinity/principal';
 import { Response } from '@/blockchain_api/types/response';
 // Appic helper types and did
 import { idlFactory as AppicIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
-import { CandidIcpToken, IcpTokenType } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import {
+  CandidIcpToken,
+  IcpTokenType,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 
 import BigNumber from 'bignumber.js';
 
@@ -57,7 +60,7 @@ export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] =
         chainId: 0, // Chain ID for ICP
         chain_type: 'ICP', // Chain type is ICP
         canisterId: token.ledger_id.toString(),
-        fee: BigNumber(token.fee.toString()).toString(),
+        fee: new BigNumber(token.fee.toString()).toString(),
         tokenType: parse_token_type(token.token_type),
         balance: undefined, // Optional, can be added later
         balanceRawInteger: undefined,

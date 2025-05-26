@@ -22,8 +22,13 @@ interface AnkrResponse {
   };
 }
 
-export async function get_evm_token_price(contract_address: string, chain_id: number): Promise<Response<string>> {
-  const blockchain: string | undefined = chains.find((chain) => chain.chainId == chain_id)?.ankr_handle;
+export async function get_evm_token_price(
+  contract_address: string,
+  chain_id: number,
+): Promise<Response<string>> {
+  const blockchain: string | undefined = chains.find(
+    (chain) => chain.chainId == chain_id,
+  )?.ankr_handle;
   const requestParams: AnkrTokenPriceRequest = {
     id: 1,
     jsonrpc: '2.0',

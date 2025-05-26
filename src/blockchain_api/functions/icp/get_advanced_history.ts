@@ -6,7 +6,10 @@ import { appic_helper_canister_id } from '@/canister_ids.json';
 import { CandidLedgerSuiteRequest } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import BigNumber from 'bignumber.js';
-import { parse_candid_evm_token_to_evm_token, parse_candid_icp_token_to_icp_token } from './utils/token_parser';
+import {
+  parse_candid_evm_token_to_evm_token,
+  parse_candid_icp_token_to_icp_token,
+} from './utils/token_parser';
 import { Response } from '@/blockchain_api/types/response';
 export interface NewTwinRequest {
   status: twinLsRequest;
@@ -51,17 +54,19 @@ export const get_advanced_history = async (
 
 const transform_ls_request_response = (requests: CandidLedgerSuiteRequest[]): NewTwinRequest[] => {
   const mapped_results = requests.map((request): NewTwinRequest => {
-    const epoch = Math.floor(BigNumber(request.created_at.toString()).dividedBy(1_000_000).toNumber());
+    const epoch = Math.floor(
+      new BigNumber(request.created_at.toString()).dividedBy(1_000_000).toNumber(),
+    );
     const date_object = new Date(epoch);
     const date = date_object.toLocaleDateString('en-GB');
     const time = date_object.toLocaleTimeString();
     const fee_charged =
-      'Icp' in request.fee_charged ? request.fee_charged.Icp.toString() : request.fee_charged.Appic.toString();
+      'Icp' in request.fee_charged
+        ? request.fee_charged.Icp.toString()
+        : request.fee_charged.Appic.toString();
     const fee_token_symbol = 'Icp' in request.fee_charged ? 'ICP' : 'APPIC';
 
-    const human_readable_fee_charged = BigNumber(fee_charged)
-      .dividedBy(10 ** 8)
-      .toFixed();
+    const human_readable_fee_charged = new BigNumber(fee_charged).dividedBy(10 ** 8).toFixed();
     return {
       chain_id: Number(request.chain_id.toString()),
       creator: request.creator,
@@ -69,11 +74,17 @@ const transform_ls_request_response = (requests: CandidLedgerSuiteRequest[]): Ne
       time,
       date_object,
       erc20_contract: request.erc20_contract,
-      evm_token: request.evm_token.length != 0 ? parse_candid_evm_token_to_evm_token(request.evm_token[0]) : undefined,
+      evm_token:
+        request.evm_token.length != 0
+          ? parse_candid_evm_token_to_evm_token(request.evm_token[0])
+          : undefined,
       fee_charged: fee_charged,
       human_readable_fee_charged,
       fee_token_symbol,
-      icp_token: request.icp_token.length != 0 ? parse_candid_icp_token_to_icp_token(request.icp_token[0]) : undefined,
+      icp_token:
+        request.icp_token.length != 0
+          ? parse_candid_icp_token_to_icp_token(request.icp_token[0])
+          : undefined,
       status: parse_new_twin_request_status(request.status),
       token_id: request.icp_token.length != 0 ? request.icp_token[0].ledger_id.toText() : undefined,
     };

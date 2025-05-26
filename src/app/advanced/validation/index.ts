@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
 export const formSchema = z.object({
-  chain_id: z.string().nonempty('Chain ID is required.').regex(/^\d+$/, 'Chain ID must be a numeric value.'),
+  chain_id: z
+    .string()
+    .min(1, 'Chain ID is required.')
+    .regex(/^\d+$/, 'Chain ID must be a numeric value.'),
   contract_address: z
     .string()
     .nonempty('Contract address is required.')

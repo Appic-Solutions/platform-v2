@@ -1,20 +1,10 @@
-import { SHAPE_SIZES } from "@/lib/constants/layout";
+import { SHAPE_SIZES } from '@/lib/constants/layout';
 
 const ShapesPage = () => {
   return (
-    <div className="hidden absolute inset-0 z-[-1] lg:block">
+    <div className="absolute inset-0 z-[-1] hidden lg:block">
       {SHAPE_SIZES.map(
-        (
-          {
-            width,
-            height,
-            positionTop,
-            positionBottom,
-            positionRight,
-            positionLeft,
-          },
-          idx
-        ) => (
+        ({ width, height, positionTop, positionBottom, positionRight, positionLeft }, idx) => (
           <div
             key={idx}
             className="absolute rounded-full bg-shapes-background opacity-50"
@@ -27,7 +17,7 @@ const ShapesPage = () => {
               left: positionLeft,
             }}
           />
-        )
+        ),
       )}
     </div>
   );

@@ -33,10 +33,7 @@ export const StepperContainer = () => {
           className="h-[350] w-fit min-w-80"
         >
           {steps && (
-            <BridgeTransactionStepper
-              onCloseModal={() => setIsOpen(false)}
-              steps={steps}
-            />
+            <BridgeTransactionStepper onCloseModal={() => setIsOpen(false)} steps={steps} />
           )}
         </DialogContent>
       </DialogOverlay>

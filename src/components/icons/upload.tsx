@@ -17,4 +17,4 @@ export default function UploadIcon({ ...props }: React.SVGProps<SVGSVGElement>) 
       />
     </svg>
   );
-};
+}

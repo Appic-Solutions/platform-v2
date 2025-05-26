@@ -1,4 +1,7 @@
-import { CandidEvmToken, CandidIcpToken } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import {
+  CandidEvmToken,
+  CandidIcpToken,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { parse_token_type } from '../get_all_icp_tokens';
 

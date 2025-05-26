@@ -7,12 +7,14 @@
     "crosschain",
     "dfinity",
     "highlighed",
+    "icrc",
     "identitykit",
     "iefix",
     "nfid",
     "nocompatible",
     "reown",
     "Solana",
+    "vaul",
     "viem",
     "Wagmi"
   ]

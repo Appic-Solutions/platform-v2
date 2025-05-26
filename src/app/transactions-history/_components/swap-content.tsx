@@ -1,7 +1,3 @@
 export default function SwapContent() {
-    return (
-        <div>
-            SwapContent
-        </div>
-    )
+  return <div>SwapContent</div>;
 }

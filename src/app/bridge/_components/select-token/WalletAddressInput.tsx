@@ -65,23 +65,20 @@ const WalletAddressInput = ({
     <div
       className={cn(
         'overflow-hidden transition-[max-height] duration-300 ease-in-out',
-        show ? 'max-h-[155px] mb-4' : 'max-h-0',
+        show ? 'mb-4 max-h-[155px]' : 'max-h-0',
       )}
     >
       <Card
         className={cn(
-          'max-h-[133px] md:max-h-[155px] cursor-auto hover:bg-[#000000]/0 flex-col items-start justify-center gap-y-2',
+          'max-h-[133px] cursor-auto flex-col items-start justify-center gap-y-2 hover:bg-[#000000]/0 md:max-h-[155px]',
         )}
       >
         <p className="text-sm font-semibold">Send To Wallet</p>
-        <div className="flex items-center gap-4 w-full">
+        <div className="flex w-full items-center gap-4">
           <div className="relative">
-            <Avatar
-              src={avatar}
-              className='w-11 h-11 '
-            />
+            <Avatar src={avatar} className="h-11 w-11" />
           </div>
-          <div className="w-full relative">
+          <div className="relative w-full">
             <input
               type="text"
               maxLength={token?.chain_type === 'ICP' ? 64 : 42}
@@ -89,15 +86,17 @@ const WalletAddressInput = ({
               value={address}
               onChange={handleAddressChange}
               className={cn(
-                'border-[#1C68F8] dark:border-[#000000] rounded-md py-4 outline-none w-full',
+                'w-full rounded-md border-[#1C68F8] py-4 outline-none dark:border-[#000000]',
                 'bg-transparent text-primary',
                 'placeholder:text-muted',
-                '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
                 address.length > 30 && 'text-lg',
               )}
             />
             {validationError && (
-              <p className="text-yellow-600 text-xs absolute top-[50px] animate-slide-in-from-top">{validationError}</p>
+              <p className="absolute top-[50px] animate-slide-in-from-top text-xs text-yellow-600">
+                {validationError}
+              </p>
             )}
           </div>
         </div>

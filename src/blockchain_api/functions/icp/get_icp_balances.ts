@@ -32,7 +32,11 @@ export async function get_icp_wallet_tokens_balances(
   let totalBalanceUsd = new BigNumber(0);
 
   try {
-    const tokens_balances = await get_tokens_balances(all_tokens, principal_id, unAuthenticated_agent);
+    const tokens_balances = await get_tokens_balances(
+      all_tokens,
+      principal_id,
+      unAuthenticated_agent,
+    );
 
     const non_zero_balances = tokens_balances.filter((token) => {
       if (token.balance !== undefined && token.balance !== '0') {
@@ -74,11 +78,18 @@ export const get_tokens_balances = async (
 
       try {
         // Fetch token balance
-        const tokenBalance = await get_single_token_balance(canisterId, tokenType, userPrincipal, agent);
+        const tokenBalance = await get_single_token_balance(
+          canisterId,
+          tokenType,
+          userPrincipal,
+          agent,
+        );
 
         if (tokenBalance) {
           // Calculate USD balance
-          const balance = new BigNumber(tokenBalance.toString()).dividedBy(new BigNumber(10).pow(decimals || 0));
+          const balance = new BigNumber(tokenBalance.toString()).dividedBy(
+            new BigNumber(10).pow(decimals || 0),
+          );
           const usdBalance = balance.multipliedBy(usdPrice).toString();
 
           return {
@@ -106,7 +117,8 @@ const get_single_token_balance = async (
   agent: HttpAgent,
 ): Promise<bigint> => {
   let tokenBalance: bigint = BigInt(0);
-  const idleFactory = tokenType === 'DIP20' || tokenType === 'YC' ? dip20IdleFactory : icrcIdlFactory;
+  const idleFactory =
+    tokenType === 'DIP20' || tokenType === 'YC' ? dip20IdleFactory : icrcIdlFactory;
 
   try {
     const tokenActor = Actor.createActor(idleFactory, {

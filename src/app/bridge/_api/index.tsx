@@ -55,7 +55,13 @@ const useGetBridgeOptions = () => {
   return useMutation({
     mutationKey: ['bridge-options'],
     mutationFn: (params: BridgeOptionsListRequest) =>
-      get_bridge_options(params.from_token, params.to_token, params.amount, params.agent, params.bridge_pairs),
+      get_bridge_options(
+        params.from_token,
+        params.to_token,
+        params.amount,
+        params.agent,
+        params.bridge_pairs,
+      ),
   });
 };
 
@@ -117,7 +123,8 @@ const useCreateWalletClient = () => {
 // Step 2: Token Approval
 const useDepositTokenWithApproval = () => {
   return useMutation({
-    mutationFn: (params: DepositTokenWithApprovalRequest) => approve_erc20(params.wallet_client, params.bridgeOption),
+    mutationFn: (params: DepositTokenWithApprovalRequest) =>
+      approve_erc20(params.wallet_client, params.bridgeOption),
     onError: (error) => {
       console.error('Token approval failed:', error);
     },

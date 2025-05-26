@@ -16,7 +16,8 @@ const BridgeHome = () => {
   const { setBridgePairs, setBridgeOptions } = useBridgeActions();
 
   const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
-  const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } = useGetBridgeOptions();
+  const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } =
+    useGetBridgeOptions();
 
   useEffect(() => {
     if (bridgePairsData) setBridgePairs(bridgePairsData);
@@ -35,17 +36,22 @@ const BridgeHome = () => {
         getBridgeOptions(getBridgeOptionsParams).then((res) => {
           console.log(res);
           if (res) {
-            setBridgeOptions({
-              message: res.message,
-              options: res.result,
-            });
+            setBridgeOptions({ message: res.message, options: res.result });
           }
         });
       } catch (error) {
         throw new Error(`Error! ${error}`);
       }
     }
-  }, [amount, bridgePairs, unAuthenticatedAgent, fromToken, toToken, getBridgeOptions, setBridgeOptions]);
+  }, [
+    amount,
+    bridgePairs,
+    unAuthenticatedAgent,
+    fromToken,
+    toToken,
+    getBridgeOptions,
+    setBridgeOptions,
+  ]);
 
   const renderStep = () => {
     switch (activeStep) {

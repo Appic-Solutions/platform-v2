@@ -1,7 +1,7 @@
-"use client";
-import * as React from "react";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { cn } from "@/lib/utils";
+'use client';
+import * as React from 'react';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { cn } from '@/lib/utils';
 
 const Tabs = TabsPrimitive.Root;
 
@@ -12,8 +12,8 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "flex items-center justify-center rounded-lg text-muted-foreground relative",
-      className
+      'text-muted-foreground relative flex items-center justify-center rounded-lg',
+      className,
     )}
     {...props}
   />
@@ -27,12 +27,12 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "relative flex items-center justify-center h-12 w-12 rounded-full z-10",
-      "disabled:pointer-events-none disabled:opacity-50",
-      "data-[state=active]:text-white dark:data-[state=active]:text-black",
-      "data-[state=active]:bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]",
-      "data-[state=active]:dark:bg-[linear-gradient(81.4deg,_#EFEFEF_-15.41%,_#A5A5A5_113.98%)]",
-      className
+      'relative z-10 flex h-12 w-12 items-center justify-center rounded-full',
+      'disabled:pointer-events-none disabled:opacity-50',
+      'data-[state=active]:text-white dark:data-[state=active]:text-black',
+      'data-[state=active]:bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
+      'data-[state=active]:dark:bg-[linear-gradient(81.4deg,_#EFEFEF_-15.41%,_#A5A5A5_113.98%)]',
+      className,
     )}
     {...props}
   />
@@ -43,11 +43,7 @@ const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
 >(({ className, ...props }, ref) => (
-  <TabsPrimitive.Content
-    ref={ref}
-    className={className}
-    {...props}
-  />
+  <TabsPrimitive.Content ref={ref} className={className} {...props} />
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
