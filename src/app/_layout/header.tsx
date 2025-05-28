@@ -1,38 +1,17 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import WalletPage from './wallet';
-import NavbarPage from './navbar';
 import { cn } from '@/lib/utils';
-import ThemeSwitch from './theme-switch';
 
 const HeaderPage = () => {
   return (
     <header
       className={cn(
-        'flex w-full items-center justify-between px-6 pt-3.5',
-        'md:grid md:grid-cols-12 md:place-items-center md:justify-items-center',
-        'md:pt-8 xl:px-16',
+        'w-full flex items-center justify-between',
+        "mb-5 xl:mt-4"
       )}
     >
-      {/* Logo  */}
-      <Link
-        href="/"
-        className={cn(
-          'relative flex min-h-11 min-w-12 items-center justify-center',
-          'md:col-span-2 md:justify-self-start',
-        )}
-      >
-        <Image src={'/images/logo/white-logo.png'} alt="logo" fill />
-      </Link>
-
-      {/* Navbar  */}
-      <NavbarPage />
-
-      {/* Wallet  */}
+      <Image src={'/images/logo/white-logo.png'} alt="logo" width={52} height={43} />
       <WalletPage />
-
-      {/* Theme Switch  */}
-      <ThemeSwitch />
     </header>
   );
 };

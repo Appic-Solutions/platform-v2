@@ -1,8 +1,10 @@
 import {
   ArrowsUpDownIcon,
   BlockchainIcon,
+  ExploreIcon,
   LockIcon,
   ParkOutlineBridgeIcon,
+  PoolIcon,
 } from '@/components/icons';
 
 export interface NavbarItem {
@@ -18,28 +20,35 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: 'Bridge',
     href: '/bridge',
     tooltip: 'Bridge',
-    Icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    Icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-h-6 min-w-6" />,
     active: true,
   },
   {
     label: 'Swap',
     href: '/swap',
     tooltip: 'Coming Soon',
-    Icon: <BlockchainIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    Icon: <BlockchainIcon width={24} height={24} className="min-h-6 min-w-6" />,
     active: false,
   },
   {
-    label: 'Auto Invest',
-    href: '/auto-invest',
+    label: 'Pool',
+    href: '/pool',
+    tooltip: 'Pool',
+    Icon: <PoolIcon width={24} height={24} className="min-h-6 min-w-6" />,
+    active: false,
+  },
+  {
+    label: 'Explore',
+    href: '/explore',
     tooltip: 'Coming Soon',
-    Icon: <ArrowsUpDownIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    Icon: <ExploreIcon width={24} height={24} className="min-h-6 min-w-6" />,
     active: false,
   },
   {
     label: 'Advanced',
     href: '/advanced',
     tooltip: 'Coming Soon',
-    Icon: <LockIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    Icon: <LockIcon width={24} height={24} className="min-h-6 min-w-6" />,
     active: true,
   },
 ];

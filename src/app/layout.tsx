@@ -7,6 +7,9 @@ import { WalletWrapper } from '@/lib/wrappers/wallet/wrapper';
 import Providers from './providers';
 import { UserWalletProvider } from '@/lib/wrappers/wallet/userWalletProvider';
 import { Toaster } from '@/components/ui/toaster';
+import ThemeSwitch from './_layout/theme-switch';
+import { cn } from '@/lib/utils';
+import NavbarPage from './_layout/navbar';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
@@ -14,14 +17,22 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />
-          <body className="!pointer-events-auto !select-auto flex flex-col md:gap-y-10 h-full isolate pb-24 sm:pb-28 md:pb-10">
+          <body className={cn(
+            "!pointer-events-auto !select-auto isolate relative",
+            "flex flex-col items-center justify-center",
+            'px-6 py-3.5 md:py-8',
+          )}>
             <HeaderPage />
             <ShapesPage />
-            {children}
+            <main className='flex items-center justify-center flex-1 w-full'>
+              {children}
+            </main>
+            <NavbarPage />
             <Toaster />
           </body>
         </WalletWrapper>
       </Providers>
+      <ThemeSwitch />
     </html>
   );
 };

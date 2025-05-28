@@ -25,3 +25,5 @@ export { default as TwinTokenIcon } from './twin-token';
 export { default as UploadIcon } from './upload';
 export { default as WalletIcon } from './wallet';
 export { default as ArrowPathIcon } from './arrow-path';
+export { default as PoolIcon } from './pool';
+export { default as ExploreIcon } from './explore';
