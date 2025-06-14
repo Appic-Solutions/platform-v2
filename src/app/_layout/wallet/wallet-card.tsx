@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 
 interface WalletCardProps {
   connectWallet: () => void;

@@ -6,7 +6,7 @@ import { useSharedStore } from '@/store/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import BigNumber from 'bignumber.js';
 import SelectTokenLogic from './_logic';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
@@ -23,7 +23,7 @@ const AmountInput = () => {
       const mainToken = evmBalance.tokens.find(
         (t) =>
           t.contractAddress.toLocaleLowerCase() ===
-            fromToken.contractAddress?.toLocaleLowerCase() && t.chainId === fromToken.chainId,
+          fromToken.contractAddress?.toLocaleLowerCase() && t.chainId === fromToken.chainId,
       );
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }

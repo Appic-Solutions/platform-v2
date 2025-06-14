@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { isValidEvmAddress, isValidIcpAddress } from '@/lib/helpers/validation';
 import { TokenType } from '@/app/bridge/_store';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 
 interface WalletAddressInputProps {
   token: TokenType | undefined;

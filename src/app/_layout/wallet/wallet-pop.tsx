@@ -16,17 +16,17 @@ import { useState } from 'react';
 import WalletChart from './wallet-chart';
 import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
 import WalletPopSkeletonDesktop from './wallet-pop-skeleton-dektop';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 
 export type WalletBalance =
   | {
-      tokens: IcpToken[];
-      totalBalanceUsd: string;
-    }
+    tokens: IcpToken[];
+    totalBalanceUsd: string;
+  }
   | {
-      tokens: EvmToken[];
-      totalBalanceUsd: string;
-    };
+    tokens: EvmToken[];
+    totalBalanceUsd: string;
+  };
 
 interface WalletCardProps {
   logo: string;

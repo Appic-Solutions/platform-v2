@@ -17,7 +17,7 @@ const Box: FC<BoxProps> = ({ children, className, ref }) => {
         'flex flex-col items-center justify-between',
         'md:bg-box-background md:bg-center md:bg-no-repeat',
         'md:m-auto md:rounded-3xl md:ring-8 md:ring-box-border',
-        'md:max-h-[80vh] md:min-w-fit',
+        'md:max-h-[80vh]',
         '*:z-10',
         className,
       )}

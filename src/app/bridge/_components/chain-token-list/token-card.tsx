@@ -3,7 +3,7 @@
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { LinkIcon } from '@/components/icons';
 import { cn, formatToSignificantFigures } from '@/lib/utils';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 import Link from 'next/link';
 const TokenCard = ({
   token,

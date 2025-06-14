@@ -16,7 +16,7 @@ import useLogic from '../_logic';
 import { HttpAgent } from '@dfinity/agent';
 import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
 import { useQuery } from '@tanstack/react-query';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 import Spinner from '@/components/ui/spinner';
 
 export default function BridgeContent() {
@@ -208,7 +208,7 @@ export default function BridgeContent() {
                           ? 'bg-[#12B76A33] text-[#12b76a]'
                           : 'bg-[#FF0000]/35 text-[#FF0000]',
                       idx < item.bridge_steps.length - 1 &&
-                        'after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full',
+                      'after:absolute after:w-[2px] after:h-[26px] after:bg-[#12B76A33] after:top-full',
                     )}
                   >
                     {step.status === 'Pending' ? (

@@ -13,7 +13,7 @@ import NavbarPage from './_layout/navbar';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <html lang="en" className="dark relative h-full bg-[#060607]">
+    <html lang="en" className="dark relative bg-[#060607] md:h-full">
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />

@@ -2,7 +2,7 @@ import { getChainName } from '@/lib/utils';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 
 interface TokenCardProps {
   customOnClick: () => void;

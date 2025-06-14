@@ -1,4 +1,5 @@
 export { default as ArrowDownIcon } from './arrow-down';
+export { default as ArrowLeftIcon } from './arrow-left';
 export { default as ArrowLongLeftIcon } from './arrow-long-left';
 export { default as ArrowsRightLeftIcon } from './arrows-right-left';
 export { default as ArrowsUpDownIcon } from './arrows-up-down';
@@ -27,3 +28,4 @@ export { default as WalletIcon } from './wallet';
 export { default as ArrowPathIcon } from './arrow-path';
 export { default as PoolIcon } from './pool';
 export { default as ExploreIcon } from './explore';
+export { default as PlusIcon } from './plus';

@@ -1,7 +1,7 @@
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { LinkIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 import Link from 'next/link';
 
 const TokenCard = ({

@@ -3,7 +3,7 @@ import { getChainLogo } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { TokenType } from '@/app/bridge/_store';
-import { Avatar } from '@/components/common/avatar';
+import { Avatar } from '@/components/common/ui/avatar';
 
 interface TokenCardProps {
   customOnClick: () => void;
