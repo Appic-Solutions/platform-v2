@@ -42,7 +42,11 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
         )}
       >
         {PAGE_PARAMS_DATA.map((item, idx) => (
-          <TabsTrigger key={idx} value={item.name}>
+          <TabsTrigger
+            key={idx}
+            value={item.name}
+            className="data-[state=active]:text-white dark:data-[state=active]:text-black"
+          >
             {item.icon}
           </TabsTrigger>
         ))}

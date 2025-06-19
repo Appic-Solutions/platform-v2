@@ -45,6 +45,10 @@
     rgba(255, 255, 255, 0.35) 100%
   );
 
+  --box-border-gradient: linear-gradient(124.44deg, #4c4c4c 18.37%, rgba(57, 57, 57, 0.3) 70.34%);
+
+  --box-background-secondary: linear-gradient(180deg, rgb(27, 27, 27) 0%, rgb(19, 19, 19) 100%);
+
   --highlighted-card: linear-gradient(160deg, rgb(163, 195, 253) 5%, rgb(255, 255, 255) 157.6%);
 
   --box-border: #ffffff3d;
@@ -80,6 +84,8 @@
   --muted: 141, 141, 141;
 
   --box-background: radial-gradient(100% 249.45% at 0% 2.78%, #151515 0%, #080808 100%);
+
+  --box-border-gradient: linear-gradient(124.44deg, #4c4c4c 18.37%, rgba(57, 57, 57, 0.3) 70.34%);
 
   --highlighted-card: linear-gradient(154.24deg, rgba(0, 33, 94, 0.672) 9.35%, rgb(0, 0, 0) 157.6%);
 

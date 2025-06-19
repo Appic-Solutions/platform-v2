@@ -1,7 +1,5 @@
-import RemoveLiquidityPage from "./_components/remove-liquidity/page";
+import NewPosition from './_components/new-position';
 
 export default function PoolPage() {
-    return (
-        <RemoveLiquidityPage />
-    )
+  return <NewPosition />;
 }

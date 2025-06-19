@@ -11,13 +11,13 @@ export default function NavbarPage() {
   return (
     <ul
       className={cn(
-        "flex items-center justify-center gap-x-6 xs:gap-x-8 lg:gap-x-1",
+        'flex items-center justify-center gap-x-6 xs:gap-x-8 lg:gap-x-1',
         'bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]',
         'rounded-full border-2 border-white/30 text-white',
-        "mt-5 xl:mt-0",
-        "px-[4%] py-2 sm:px-3",
-        "z-[99] xl:absolute xl:top-8 xl:mx-auto",
-        "w-full max-w-[840px] mx-auto"
+        'mt-5 xl:mt-0',
+        'px-[4%] py-2 sm:px-3',
+        'z-[99] xl:absolute xl:top-8 xl:mx-auto',
+        'mx-auto w-full max-w-[840px]',
       )}
     >
       {NAVBAR_ITEMS.map((item, idx) =>
@@ -26,24 +26,27 @@ export default function NavbarPage() {
             key={idx}
             className={cn(
               path === item.href && 'bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]',
-              path !== item.href && 'lg:hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]',
-              "rounded-full flex-1",
+              path !== item.href &&
+                'lg:hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]',
+              'flex-1 rounded-full',
             )}
           >
             <Link
               href={item.href}
               className={cn(
                 'flex items-center justify-center gap-x-1 md:gap-x-1.5',
-                path === item.href && 'max-sm:py-2.5 max-md:px-4',
-                "sm:py-2.5 md:py-4 md:px-4"
+                path === item.href && 'max-md:px-4 max-sm:py-2.5',
+                'sm:py-2.5 md:px-4 md:py-4',
               )}
             >
               {item.Icon}
-              <span className={cn(
-                path === item.href ? "inline-flex" : "hidden",
-                'md:inline-flex',
-                'whitespace-nowrap lg:text-lg lg:font-bold'
-              )}>
+              <span
+                className={cn(
+                  path === item.href ? 'inline-flex' : 'hidden',
+                  'md:inline-flex',
+                  'whitespace-nowrap lg:text-lg lg:font-bold',
+                )}
+              >
                 {item.label}
               </span>
             </Link>
@@ -54,24 +57,28 @@ export default function NavbarPage() {
               <TooltipTrigger
                 key={idx}
                 className={cn(
-                  path === item.href && 'bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]',
-                  path !== item.href && 'lg:hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]',
-                  "rounded-full flex-1",
+                  path === item.href &&
+                    'bg-[linear-gradient(81.4deg,#000000_-15.41%,#1D1D1D_113.98%)]',
+                  path !== item.href &&
+                    'lg:hover:bg-[linear-gradient(81.4deg,rgba(0,0,0,0.2)_-15.41%,rgba(29,29,29,0.2)_113.98%)]',
+                  'flex-1 rounded-full',
                 )}
               >
                 <div
                   className={cn(
                     'flex items-center justify-center gap-x-1 md:gap-x-1.5',
-                    path === item.href && 'max-sm:py-2.5 max-md:px-4',
-                    "sm:py-2.5 md:py-4 md:px-4"
+                    path === item.href && 'max-md:px-4 max-sm:py-2.5',
+                    'sm:py-2.5 md:px-4 md:py-4',
                   )}
                 >
                   {item.Icon}
-                  <span className={cn(
-                    path === item.href ? "inline-flex" : "hidden",
-                    'md:inline-flex',
-                    'whitespace-nowrap lg:text-lg lg:font-bold'
-                  )}>
+                  <span
+                    className={cn(
+                      path === item.href ? 'inline-flex' : 'hidden',
+                      'md:inline-flex',
+                      'whitespace-nowrap lg:text-lg lg:font-bold',
+                    )}
+                  >
                     {item.label}
                   </span>
                 </div>
@@ -83,4 +90,4 @@ export default function NavbarPage() {
       )}
     </ul>
   );
-};
+}

@@ -29,3 +29,6 @@ export { default as ArrowPathIcon } from './arrow-path';
 export { default as PoolIcon } from './pool';
 export { default as ExploreIcon } from './explore';
 export { default as PlusIcon } from './plus';
+export { default as RefreshIcon } from './refresh';
+export { default as ZoomOutIcon } from './zoom-out';
+export { default as ZoomInIcon } from './zoom-in';

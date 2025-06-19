@@ -23,7 +23,7 @@ const AmountInput = () => {
       const mainToken = evmBalance.tokens.find(
         (t) =>
           t.contractAddress.toLocaleLowerCase() ===
-          fromToken.contractAddress?.toLocaleLowerCase() && t.chainId === fromToken.chainId,
+            fromToken.contractAddress?.toLocaleLowerCase() && t.chainId === fromToken.chainId,
       );
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
