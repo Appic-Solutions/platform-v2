@@ -9,15 +9,15 @@ import Box from '@/components/ui/box';
 const NewPosition = () => {
   const [step, setStep] = React.useState<string>('1');
   const content = () => {
-    if (step === '1') return <PositionStepOne />;
+    if (step === '1') return <PositionStepOne setStep={() => setStep('2')} />;
     return <PositionStepTwo />;
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div
         className={cn(
-          'flex items-center justify-between gap-1.5',
+          'hidden items-center justify-between gap-1.5 lg:flex',
           'rounded-full bg-box-background text-white ring-[5px] ring-box-border',
           'absolute -left-24 top-1/2 h-[185px] -translate-y-1/2 flex-col p-2',
         )}
@@ -40,8 +40,8 @@ const NewPosition = () => {
       </div>
       <Box
         className={cn(
-          '!overflow-visible text-white transition-all md:p-12 md:text-black md:dark:text-white',
-          step === '2' ? 'h-[789px] md:w-[1204px]' : 'md:w-[611px]',
+          'text-white transition-all md:p-12 lg:text-black lg:dark:text-white',
+          step === '2' ? 'md:h-[789px] lg:w-[1204px]' : 'lg:w-[611px]',
         )}
       >
         {content()}

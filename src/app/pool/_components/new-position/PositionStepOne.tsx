@@ -2,7 +2,7 @@ import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowPathIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
-const PositionStepOne = () => {
+const PositionStepOne = ({ setStep }: { setStep: () => void }) => {
   return (
     <div className="flex h-full w-full animate-fade flex-col gap-y-9 md:gap-y-[25px]">
       {/* Header */}
@@ -119,6 +119,7 @@ const PositionStepOne = () => {
 
       {/* Action Button */}
       <button
+        onClick={setStep}
         className={cn(
           'min-h-14 w-full',
           'bg-primary-buttons',
