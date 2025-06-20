@@ -32,3 +32,4 @@ export { default as PlusIcon } from './plus';
 export { default as RefreshIcon } from './refresh';
 export { default as ZoomOutIcon } from './zoom-out';
 export { default as ZoomInIcon } from './zoom-in';
+export { default as ErrorIcon } from './error';
