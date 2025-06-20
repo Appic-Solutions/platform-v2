@@ -1,11 +1,10 @@
 import '@testing-library/jest-dom';
-import { TextEncoder, TextDecoder } from 'util';
+import { TextEncoder, TextDecoder } from 'text-encoding';
 
 Object.defineProperty(global, 'TextEncoder', { value: TextEncoder, writable: true });
 
 Object.defineProperty(global, 'TextDecoder', { value: TextDecoder, writable: true });
 
-// Polyfill TextEncoder and TextDecoder
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
