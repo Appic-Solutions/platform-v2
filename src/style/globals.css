@@ -33,6 +33,12 @@
   }
 }
 
+@layer utilities {
+  .position-detail-chart > svg {
+    overflow: visible !important;
+  }
+}
+
 /* Text overflow */
 .text-ellipsis {
   text-overflow: ellipsis !important;
