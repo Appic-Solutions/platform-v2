@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import ChartDataBox from './ChartDataBox';
 import StepTwoPoolExist from './StepTwoPoolExist';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
+import { Avatar } from '@/components/common/ui/avatar';
 
 const PositionStepTwo = () => {
   const [minPrice, setMinPrice] = useState(1100);
@@ -59,8 +60,20 @@ const PositionStepTwo = () => {
         <div>
           <h3 className="mb-4 text-xl font-bold lg:text-2xl">Set Price range</h3>
           <div className="flex justify-start gap-4 lg:justify-between">
-            <ChartDataBox label="Min price" price={minPrice} underPriceText="USDC = 1 ETH" />
-            <ChartDataBox label="Max price" price={maxPrice} underPriceText="USDC = 1 ETH" />
+            <ChartDataBox>
+              <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
+              <div className="flex flex-col gap-2">
+                <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
+                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
+              </div>
+            </ChartDataBox>
+            <ChartDataBox>
+              <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
+              <div className="flex flex-col gap-2">
+                <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
+                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
+              </div>
+            </ChartDataBox>
           </div>
         </div>
         <div>
@@ -70,8 +83,34 @@ const PositionStepTwo = () => {
             and strategy.
           </p>
           <div className="flex justify-start gap-4 lg:justify-between">
-            <ChartDataBox label="Min price" price={minPrice} underPriceText="USDC = 1 ETH" />
-            <ChartDataBox label="Max price" price={maxPrice} underPriceText="USDC = 1 ETH" />
+            <ChartDataBox>
+              <div className="flex items-center gap-2">
+                <Avatar
+                  // src={token?.logo}
+                  src="/images/logo/chains-logos/ethereum.svg"
+                  className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
+                />
+                <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
+                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
+              </div>
+            </ChartDataBox>
+            <ChartDataBox>
+              <div className="flex items-center gap-2">
+                <Avatar
+                  // src={token?.logo}
+                  src="/images/logo/chains-logos/ethereum.svg"
+                  className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
+                />
+                <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
+                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
+              </div>
+            </ChartDataBox>
           </div>
         </div>
         <button className="h-[50px] rounded-[15px] bg-primary-buttons lg:h-[66px]">Review</button>
