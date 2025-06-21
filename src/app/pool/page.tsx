@@ -1,7 +1,5 @@
-import RemoveLiquidityPage from "./_components/remove-liquidity/page";
+import ReviewPositionPage from './_components/review-position/page';
 
 export default function PoolPage() {
-    return (
-        <RemoveLiquidityPage />
-    )
+  return <ReviewPositionPage />;
 }
