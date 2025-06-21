@@ -17,16 +17,16 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />
-          <body className={cn(
-            "!pointer-events-auto !select-auto isolate relative",
-            "flex flex-col items-center justify-center",
-            'px-6 py-3.5 md:py-8',
-          )}>
+          <body
+            className={cn(
+              '!pointer-events-auto relative isolate !select-auto',
+              'flex flex-col items-center justify-center',
+              'px-6 py-3.5 md:py-8',
+            )}
+          >
             <HeaderPage />
             <ShapesPage />
-            <main className='flex items-center justify-center flex-1 w-full'>
-              {children}
-            </main>
+            <main className="flex w-full flex-1 items-center justify-center">{children}</main>
             <NavbarPage />
             <Toaster />
           </body>

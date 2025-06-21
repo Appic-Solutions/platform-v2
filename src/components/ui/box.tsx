@@ -12,8 +12,8 @@ const Box: FC<BoxProps> = ({ children, className, ref }) => {
     <div
       ref={ref}
       className={cn(
-        'relative overflow-x-hidden overflow-y-auto',
-        'w-full h-fit md:backdrop-blur-md',
+        'relative overflow-y-auto overflow-x-hidden',
+        'h-fit w-full md:backdrop-blur-md',
         'flex flex-col items-center justify-between',
         'md:bg-box-background md:bg-center md:bg-no-repeat',
         'md:m-auto md:rounded-3xl md:ring-8 md:ring-box-border',

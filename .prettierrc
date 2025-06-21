@@ -1,23 +1,23 @@
 {
-  "semi": true,
-  "trailingComma": "all",
-  "singleQuote": true,
-  "tabWidth": 2,
-  "useTabs": false,
-  "arrowParens": "always",
-  "endOfLine": "lf",
-  "bracketSpacing": true,
-  "jsxSingleQuote": false,
-  "quoteProps": "consistent",
-	"plugins": ["prettier-plugin-tailwindcss"],
-	"printWidth": 100,
-	"overrides": [
-		{
-			"files": "*.svg",
-			"options": {
-				"parser": "html"
-			}
-		}
-	],
-  "proseWrap": "preserve"
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "useTabs": false,
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "bracketSpacing": true,
+    "jsxSingleQuote": false,
+    "quoteProps": "consistent",
+    "plugins": ["prettier-plugin-tailwindcss"],
+    "printWidth": 100,
+    "overrides": [
+        {
+            "files": "*.svg",
+            "options": {
+                "parser": "html"
+            }
+        }
+    ],
+    "proseWrap": "preserve"
 }

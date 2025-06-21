@@ -39,9 +39,9 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         Number(amount) > 0 &&
-        bridgeOptions.options &&
-        bridgeOptions.options.length > 0 &&
-        'lg:w-[1060px] lg:max-w-[1060px]',
+          bridgeOptions.options &&
+          bridgeOptions.options.length > 0 &&
+          'lg:w-[1060px] lg:max-w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
@@ -127,8 +127,8 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
             <div
               onClick={() => setShowWalletAddress(!showWalletAddress)}
               className={cn(
-                'rounded-full flex items-center justify-center px-4 min-h-14 min-w-14',
-                'transition-colors duration-300 cursor-pointer',
+                'flex min-h-14 min-w-14 items-center justify-center rounded-full px-4',
+                'cursor-pointer transition-colors duration-300',
                 'bg-primary-buttons hover:opacity-85',
                 'transition-all ease-in-out',
               )}
@@ -151,8 +151,8 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         <div
           onClick={() => setShowWalletAddress(!showWalletAddress)}
           className={cn(
-            'rounded-full flex items-center justify-center px-4 min-h-14 min-w-14',
-            'transition-colors duration-300 cursor-pointer',
+            'flex min-h-14 min-w-14 items-center justify-center rounded-full px-4',
+            'cursor-pointer transition-colors duration-300',
             'bg-primary-buttons hover:opacity-90',
             'transition-all ease-out',
           )}

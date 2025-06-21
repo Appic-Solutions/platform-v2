@@ -33,6 +33,12 @@
   }
 }
 
+@layer utilities {
+  .position-detail-chart > svg {
+    overflow: visible !important;
+  }
+}
+
 /* Text overflow */
 .text-ellipsis {
   text-overflow: ellipsis !important;
@@ -44,4 +50,13 @@
 /* Plug Modal */
 #ik-identity-kit-modal {
   pointer-events: auto !important;
+}
+
+/* chart */
+.chart-background {
+  background-color: transparent;
+  background-image:
+    linear-gradient(to right, #ffffff14 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff14 1px, transparent 1px);
+  background-size: 32px 32px;
 }

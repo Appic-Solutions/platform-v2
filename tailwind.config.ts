@@ -39,6 +39,8 @@ const config: Config = {
         'background-dark': 'var(--background-dark)',
         'shapes-background': 'var(--shapes-background)',
         'card-background': 'var(--card-background)',
+        'box-background-secondary': 'var(--box-background-secondary)',
+        'box-border-gradient': 'var(--box-border-gradient)',
         'box-background': 'var(--box-background)',
         'highlighted-card': 'var(--highlighted-card)',
         'input-fields-hover': 'var(--input-fields-hover)',

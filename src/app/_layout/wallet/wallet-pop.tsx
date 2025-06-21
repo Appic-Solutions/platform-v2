@@ -20,13 +20,13 @@ import { Avatar } from '@/components/common/ui/avatar';
 
 export type WalletBalance =
   | {
-    tokens: IcpToken[];
-    totalBalanceUsd: string;
-  }
+      tokens: IcpToken[];
+      totalBalanceUsd: string;
+    }
   | {
-    tokens: EvmToken[];
-    totalBalanceUsd: string;
-  };
+      tokens: EvmToken[];
+      totalBalanceUsd: string;
+    };
 
 interface WalletCardProps {
   logo: string;

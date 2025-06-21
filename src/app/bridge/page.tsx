@@ -70,7 +70,9 @@ const BridgeHome = () => {
     <>
       {renderStep()}
       {pendingTx && (
-        <MinimizeProgressBarWidget icon={<ParkOutlineBridgeIcon width={24} height={24} className="text-white" />} />
+        <MinimizeProgressBarWidget
+          icon={<ParkOutlineBridgeIcon width={24} height={24} className="text-white" />}
+        />
       )}
     </>
   );
