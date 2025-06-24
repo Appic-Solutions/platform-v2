@@ -6,5 +6,6 @@
   "icp_swap_node_canister_id": "  ",
   "icp_swap_token_list_canister_id": "k37c6-riaaa-aaaag-qcyza-cai",
   "wicp_ledger": "utozz-siaaa-aaaam-qaaxq-cai",
-  "icp_ledger": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+  "icp_ledger": "ryjl3-tyaaa-aaaaa-aaaba-cai",
+	"appic_dex":"nbepk-iyaaa-aaaad-qhlma-cai",
 }
