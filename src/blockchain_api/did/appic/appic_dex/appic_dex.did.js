@@ -116,6 +116,13 @@ export const idlFactory = ({ IDL }) => {
     'InsufficientFunds' : IDL.Record({ 'balance' : IDL.Nat }),
   });
   const Result_4 = IDL.Variant({ 'Ok' : IDL.Null, 'Err' : DepositError });
+  const CandidTickInfo = IDL.Record({
+    'fee_growth_outside_1_x128' : IDL.Nat,
+    'liquidity_gross' : IDL.Nat,
+    'tick' : IDL.Int,
+    'liquidity_net' : IDL.Int,
+    'fee_growth_outside_0_x128' : IDL.Nat,
+  });
   const GetEventsArg = IDL.Record({
     'start' : IDL.Nat64,
     'length' : IDL.Nat64,
@@ -408,6 +415,11 @@ export const idlFactory = ({ IDL }) => {
     'create_pool' : IDL.Func([CreatePoolArgs], [Result_2], []),
     'decrease_liquidity' : IDL.Func([DecreaseLiquidityArgs], [Result_3], []),
     'deposit' : IDL.Func([DepositArgs], [Result_4], []),
+    'get_active_ticks' : IDL.Func(
+        [CandidPoolId],
+        [IDL.Vec(CandidTickInfo)],
+        ['query'],
+      ),
     'get_events' : IDL.Func([GetEventsArg], [GetEventsResult], ['query']),
     'get_pool' : IDL.Func(
         [CandidPoolId],
@@ -443,4 +455,5 @@ export const idlFactory = ({ IDL }) => {
     'withdraw' : IDL.Func([Balance], [Result_9], []),
   });
 };
+
 export const init = ({ IDL }) => { return []; };
