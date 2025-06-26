@@ -5,6 +5,12 @@ export interface BridgePair {
   chain_id: number;
 }
 
+interface TokenAmount {
+  raw: BigNumber;
+  formatted: string;
+}
+
+
 interface Token {
   name: string; // Name of the token (e.g., "Ethereum")
   symbol: string; // Token symbol (e.g., "ETH")
