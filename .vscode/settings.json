@@ -18,5 +18,6 @@
     "viem",
     "Wagmi",
     "OISY"
-  ]
+  ],
+  "prettier.prettierPath": "./node_modules/prettier"
 }
