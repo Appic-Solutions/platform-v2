@@ -154,6 +154,13 @@ export interface CandidSwapSuccess {
   'amount_out' : bigint,
   'amount_in' : bigint,
 }
+export interface CandidTickInfo {
+  'fee_growth_outside_1_x128' : bigint,
+  'liquidity_gross' : bigint,
+  'tick' : bigint,
+  'liquidity_net' : bigint,
+  'fee_growth_outside_0_x128' : bigint,
+}
 export type CollectFeesError = { 'PositionNotFound' : null } |
   { 'FeeOverflow' : null } |
   { 'LockedPrincipal' : null } |
@@ -385,6 +392,7 @@ export interface _SERVICE {
   'create_pool' : ActorMethod<[CreatePoolArgs], Result_2>,
   'decrease_liquidity' : ActorMethod<[DecreaseLiquidityArgs], Result_3>,
   'deposit' : ActorMethod<[DepositArgs], Result_4>,
+  'get_active_ticks' : ActorMethod<[CandidPoolId], Array<CandidTickInfo>>,
   'get_events' : ActorMethod<[GetEventsArg], GetEventsResult>,
   'get_pool' : ActorMethod<[CandidPoolId], [] | [CandidPoolState]>,
   'get_pool_history' : ActorMethod<[CandidPoolId], [] | [CandidPoolHistory]>,
