@@ -34,3 +34,4 @@ export { default as ZoomOutIcon } from './zoom-out';
 export { default as ZoomInIcon } from './zoom-in';
 export { default as ErrorIcon } from './error';
 export { default as ManageSearchIcon } from './manage-search';
+export { default as SwapHorizontalIcon } from './swap-horizontal';
