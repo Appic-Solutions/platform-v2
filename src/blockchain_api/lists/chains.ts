@@ -47,6 +47,7 @@ export const chains: Chain[] = [
     disabled: false,
     logo: '/images/logo/chains-logos/bsc.svg',
     appic_deposit_helper_contract: '0x8f45574222F7372E23b5e9b1900abaeAA7571119',
+		appic_deposit_helper_contract_v2:'0x20F4ad40878A7CC2bcF1a71E0C0eFbBA3DCAC893',
     appic_minter_address: '2ztvj-yaaaa-aaaap-ahiza-cai',
     appic_twin_native_ledger_canister_id: 'n44gr-qyaaa-aaaam-qbuha-cai',
     ankr_handle: 'bsc',
@@ -67,12 +68,12 @@ export const chains: Chain[] = [
     is_advance_supported: false,
     logo: '/images/logo/chains-logos/base.svg',
     appic_deposit_helper_contract: '0x6b3aDc89A0CA462F2aB9FbEf2f25DB6eA3aA1D00',
+		appic_deposit_helper_contract_v2: '0x576849BEA9397fb33a992C7D5a5e1641c94532Fa',
     appic_minter_address: '4ati2-naaaa-aaaad-qg6la-cai',
     appic_twin_native_ledger_canister_id: '3iven-myaaa-aaaai-q3u5q-cai',
     ankr_handle: 'base',
     viem_config: base,
     twin_handle: 'base',
-
     twin_token_support: true,
   },
   {
@@ -135,9 +136,8 @@ export const chains: Chain[] = [
     disabled: true,
     is_advance_supported: false,
     logo: '/images/logo/chains-logos/avalanche.svg',
-    ankr_handle: 'avalanchec',
+    ankr_handle: 'avalanche',
     viem_config: avalanche,
-
     twin_token_support: false,
   },
   {

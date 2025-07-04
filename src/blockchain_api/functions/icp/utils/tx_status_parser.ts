@@ -36,6 +36,7 @@ export const parse_deposit_status_result = (tx_status: DepositStatus): DepositTx
   else if ('Accepted' in tx_status) return 'Accepted';
   else if ('Minted' in tx_status) return 'Minted';
   else if ('Quarantined' in tx_status) return 'Quarantined';
+	else if ('Released' in tx_status) return "Minted";
   else return 'PendingVerification';
 };
 

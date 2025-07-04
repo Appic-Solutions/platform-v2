@@ -10,6 +10,7 @@ export interface Chain {
   dfinity_ck_deposit_helper_contract?: string;
   dfinity_ck_native_ledger_canister_id?: string;
   appic_deposit_helper_contract?: string;
+	appic_deposit_helper_contract_v2?:string;
   appic_twin_native_ledger_canister_id?: string;
   rpc_url: string;
   type: ChainType;

@@ -34,6 +34,7 @@ export type EvmToken = Token & {
   canisterId?: never; // Address of the token's canister id if the token is an ICP token
   fee?: never;
   tokenType?: never;
+  is_wrapped_icrc:boolean;
 };
 
 export type IcpToken = Token & {
