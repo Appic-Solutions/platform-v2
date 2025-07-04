@@ -1,5 +1,5 @@
-import ReviewPositionPage from './_components/review-position/page';
+import PoolDetailPage from './_components/pool-detail/page';
 
 export default function PoolPage() {
-  return <ReviewPositionPage />;
+  return <PoolDetailPage />;
 }
