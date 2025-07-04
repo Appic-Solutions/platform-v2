@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
 import { setStorageItem } from '@/lib/helpers/localstorage';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
+import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 if (!projectId) {
   throw new Error('Project ID is not defined');
@@ -50,11 +51,17 @@ export const WalletWrapper = ({
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
 
-      await get_icp_tokens(unAuthenticatedAgent).then((res) => {
+      let tokens=await get_icp_tokens(unAuthenticatedAgent).then((res) => {
         if (res.result) {
           setStorageItem('icpTokens', JSON.stringify(res.result));
+
         }
+				return res.result;
       });
+
+				let pools=await get_all_pools(unAuthenticatedAgent,tokens);
+					console.log(pools);
+
 
       return [];
     },

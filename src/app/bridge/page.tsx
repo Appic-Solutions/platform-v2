@@ -9,6 +9,7 @@ import { useSharedStore } from '@/store/store';
 import { StepperContainer } from './_components/bridge-review';
 import MinimizeProgressBarWidget from '@/app/_layout/minimize-progress-bar-widget';
 import { ParkOutlineBridgeIcon } from '@/components/icons';
+import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 const BridgeHome = () => {
   const { unAuthenticatedAgent } = useSharedStore();
