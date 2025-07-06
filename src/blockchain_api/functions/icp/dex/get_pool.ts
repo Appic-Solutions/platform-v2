@@ -36,8 +36,8 @@ export interface Pool {
 	generated_swap_fee_all_time_usd?: string,
 	token0_usd_price?: string,
 	token1_usd_price?: string,
-	token_0_price_in_token_1?: string,
-	token_1_price_in_token_0?: string,
+	token0_price_in_token1?: string,
+	token1_price_in_token0?: string,
 }
 
 const CKUSDC_CANISTER_ID = "xevnm-gaaaa-aaaar-qafnq-cai";
@@ -95,9 +95,9 @@ function transformPool(poolId: CandidPoolId, poolState: CandidPoolState, getToke
 	}
 
 	// token_0_price_in_token_1 = P / 10^(d1 - d0)
-	const token_0_price_in_token_1 = P.dividedBy(new BigNumber(10).pow(decimals1 - decimals0));
+	const token0_price_in_token1 = P.dividedBy(new BigNumber(10).pow(decimals1 - decimals0));
 	// token_0_price_in_token_1 = 1 / token_1_price_in_token_0
-	const token_1_price_in_token_0 = new BigNumber(1).div(token_0_price_in_token_1);
+	const token1_price_in_token0 = new BigNumber(1).div(token0_price_in_token1);
 
 	const pool: Pool = {
 		pool_id: poolId,
@@ -119,8 +119,8 @@ function transformPool(poolId: CandidPoolId, poolState: CandidPoolState, getToke
 		tick_spacing: poolState.tick_spacing.toString(),
 		token0_usd_price,
 		token1_usd_price,
-		token_0_price_in_token_1: token_0_price_in_token_1.toString(),
-		token_1_price_in_token_0: token_1_price_in_token_0.toString(),
+		token0_price_in_token1: token0_price_in_token1.toString(),
+		token1_price_in_token0: token1_price_in_token0.toString(),
 	};
 
 	const reserves0 = new BigNumber(pool.pool_reserves0).dividedBy(new BigNumber(10).pow(decimals0));
@@ -186,12 +186,10 @@ export async function get_pool_by_id(
 	});
 
 	try {
-		const principal_a = Principal.fromText(token_a.canisterId);
-		const principal_b = Principal.fromText(token_b.canisterId);
-		const { token0, token1 } = sortTokens(principal_a, principal_b);
+		const { token0, token1 } = sortTokens(token_a, token_b);
 		const pool_id: CandidPoolId = {
-			token0,
-			token1,
+			token0: Principal.fromText(token0.canisterId),
+			token1: Principal.fromText(token1.canisterId),
 			fee: BigInt(pool_fee),
 		};
 
@@ -230,9 +228,7 @@ export async function get_pools_by_tokens(
 	const pools: Pool[] = [];
 
 	try {
-		const principal_a = Principal.fromText(token_a.canisterId);
-		const principal_b = Principal.fromText(token_b.canisterId);
-		const { token0, token1 } = sortTokens(principal_a, principal_b);
+		const { token0, token1 } = sortTokens(token_a, token_b);
 
 		const tokenMap = new Map<string, IcpToken>();
 		[token_a, token_b].forEach(token => {
@@ -243,8 +239,8 @@ export async function get_pools_by_tokens(
 
 		for (const fee of FEE_TIERS) {
 			const poolId: CandidPoolId = {
-				token0,
-				token1,
+				token0:Principal.fromText(token0.canisterId),
+				token1:Principal.fromText(token1.canisterId),
 				fee: BigInt(fee),
 			};
 

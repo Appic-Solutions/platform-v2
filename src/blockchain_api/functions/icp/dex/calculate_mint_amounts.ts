@@ -22,7 +22,7 @@ function formatUnits(amount: BigNumber, decimals: number): string {
 	return amount.dividedBy(scale).toFixed();
 }
 
-export function calculate_mint_amounts(
+export interface CalculateMintAmountsArgs {
 	selected_amount: string,
 	is_token_0_selected: boolean,
 	token0: IcpToken,
@@ -30,7 +30,22 @@ export function calculate_mint_amounts(
 	sqrt_price_x96: string, // sqrt_price_x96 from the pool state
 	min_price: string,
 	max_price: string,
-	tick_spacing:number,
+	tick_spacing: number,
+
+}
+
+export function calculate_mint_amounts(
+	{
+		selected_amount,
+		is_token_0_selected,
+		token0,
+		token1,
+		sqrt_price_x96, // sqrt_price_x96 from the pool state
+		min_price,
+		max_price,
+		tick_spacing,
+	}: CalculateMintAmountsArgs
+
 ): MintAmounts {
 	let liquidity: BigNumber;
 	let amount0: BigNumber;
@@ -42,9 +57,9 @@ export function calculate_mint_amounts(
 
 	let currentsqrtRatioX96 = BigNumber(sqrt_price_x96);
 
-	let amount=BigNumber(selected_amount);
+	let amount = BigNumber(selected_amount);
 
-		// Ensure sqrtRatioAX96 is the lower price and sqrtRatioBX96 is the upper price
+	// Ensure sqrtRatioAX96 is the lower price and sqrtRatioBX96 is the upper price
 	const sqrtPriceX96_lower = sqrtRatioAX96.lt(sqrtRatioBX96) ? sqrtRatioAX96 : sqrtRatioBX96;
 	const sqrtPriceX96_higher = sqrtRatioAX96.lt(sqrtRatioBX96) ? sqrtRatioBX96 : sqrtRatioAX96;
 

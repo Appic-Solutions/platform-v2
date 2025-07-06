@@ -10,7 +10,17 @@ export interface MarketPrice {
 }
 
 
-export function get_market_price(token0: IcpToken, token1: IcpToken, is_token_0_selected: boolean, all_icp_tokens: IcpToken[]): MarketPrice {
+export interface GetMarketPriceArgs {
+	token0: IcpToken,
+	token1: IcpToken,
+	is_token0_selected: boolean,
+	all_icp_tokens: IcpToken[]
+
+}
+export function get_market_price({ token1,
+	token0,
+	all_icp_tokens,
+	is_token0_selected }: GetMarketPriceArgs): MarketPrice {
 	const tokenMap = new Map<string, IcpToken>();
 	all_icp_tokens.forEach(token => {
 		tokenMap.set(token.canisterId, token);
@@ -46,9 +56,9 @@ export function get_market_price(token0: IcpToken, token1: IcpToken, is_token_0_
 	const formatted_price_token0_in_token1 = new BigNumber(price_token0_in_token1).toFixed(6);
 	const formatted_price_token1_in_token0 = new BigNumber(price_token1_in_token0).toFixed(6);
 
-	let text = is_token_0_selected ? `1 ${token0_symbol} = ${formatted_price_token0_in_token1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price_token1_in_token0} ${token0_symbol} (-)`;
+	let text = is_token0_selected ? `1 ${token0_symbol} = ${formatted_price_token0_in_token1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price_token1_in_token0} ${token0_symbol} (-)`;
 
-	let price = is_token_0_selected ? price_token0_in_token1 : price_token0_in_token1;
+	let price = is_token0_selected ? price_token0_in_token1 : price_token0_in_token1;
 
 	return {
 		price,
@@ -58,13 +68,16 @@ export function get_market_price(token0: IcpToken, token1: IcpToken, is_token_0_
 }
 
 
-
-export function calculate_price(
+export interface CalculatePriceArgs {
 	token0: IcpToken,
 	token1: IcpToken,
 	price: string,
-	is_token_0_selected: boolean,
-): MarketPrice {
+	is_token0_selected: boolean,
+
+}
+
+export function calculate_price(
+	{ is_token0_selected, token0, token1, price }: CalculatePriceArgs): MarketPrice {
 
 	const Q96 = new BigNumber(2).pow(96);
 
@@ -77,7 +90,7 @@ export function calculate_price(
 	let price0_in_1: BigNumber;
 	let price1_in_0: BigNumber;
 
-	if (is_token_0_selected) {
+	if (is_token0_selected) {
 		price0_in_1 = new BigNumber(price);
 		price1_in_0 = new BigNumber(1).dividedBy(price);
 	} else {
@@ -95,7 +108,7 @@ export function calculate_price(
 	const formatted_price1_in_0 = new BigNumber(price1_in_0).toFixed(6);
 
 
-	const text = is_token_0_selected ? `1 ${token0_symbol} = ${formatted_price0_in_1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price1_in_0} ${token0_symbol} (-)`;
+	const text = is_token0_selected ? `1 ${token0_symbol} = ${formatted_price0_in_1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price1_in_0} ${token0_symbol} (-)`;
 
 
 	return {

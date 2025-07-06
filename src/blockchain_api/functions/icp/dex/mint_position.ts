@@ -12,8 +12,8 @@ import { calculate_price } from "./utils/price";
 interface GenerateMintPositionArgsParams {
 	min_price: string;
 	max_price: string;
-	token_0: IcpToken;
-	token_1: IcpToken;
+	token0: IcpToken;
+	token1: IcpToken;
 	amount0_max: string;
 	amount1_max: string;
 	is_token0_selected: boolean,
@@ -65,13 +65,13 @@ export  function generate_mint_position_args({
 	tick_spacing,
 	is_token0_selected,
 	pool_id,
-	token_0,
-	token_1
+	token0,
+	token1
 }: GenerateMintPositionArgsParams): MintPositionArgs {
 
 
-	let sqrtRatioAX96 = BigNumber(calculate_price(token_0, token_1, min_price, is_token0_selected).sqrt_price_x96);
-	let sqrtRatioBX96 = BigNumber(calculate_price(token_0, token_1, max_price, is_token0_selected).sqrt_price_x96);
+	let sqrtRatioAX96 = BigNumber(calculate_price({token0, token1, price: min_price, is_token0_selected}).sqrt_price_x96);
+	let sqrtRatioBX96 = BigNumber(calculate_price({token0, token1, price: max_price, is_token0_selected}).sqrt_price_x96);
 
 
 	// Ensure sqrtRatioAX96 is the lower price and sqrtRatioBX96 is the upper price

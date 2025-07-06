@@ -5,20 +5,20 @@ import { CreatePoolArgs, Result_2 as CreatePoolResult, CandidPoolId, MintPositio
 import { appic_dex } from "../../../../canister_ids.json";
 import { Principal } from "@dfinity/principal";
 import { Response } from "@/blockchain_api/types/response";
-import { calculate_price } from "./utils/price";
+import { calculate_price, CalculatePriceArgs } from "./utils/price";
 import { mint_position } from "./mint_position";
 
 export interface CreatePool {
-	token_0: IcpToken,
-	token_1: IcpToken,
+	token0: IcpToken,
+	token1: IcpToken,
 	initial_price: string,
-	is_token0_selcted: boolean,
+	is_token0_selected: boolean,
 	fee_tier: string,
 }
 
 
 async function create_pool(
-	create_pool_args: CreatePool,
+	{ token0, token1, initial_price, fee_tier, is_token0_selected }: CreatePool,
 	authenticated_agent: HttpAgent
 ): Promise<Response<CandidPoolId | undefined>> {
 	const dex_actor = Actor.createActor(idlFactory, {
@@ -26,12 +26,16 @@ async function create_pool(
 		canisterId: appic_dex,
 	});
 
-	const transformed_args: CreatePoolArgs = {
-		token_a: Principal.fromText(create_pool_args.token_0.canisterId),
-		token_b: Principal.fromText(create_pool_args.token_1.canisterId),
-		fee: BigInt(create_pool_args.fee_tier),
-		sqrt_price_x96: BigInt(calculate_price(create_pool_args.token_0, create_pool_args.token_1, create_pool_args.initial_price, create_pool_args.is_token0_selcted).sqrt_price_x96)
+	let sqrt_price_x96 = BigInt(calculate_price({
+		is_token0_selected,
+		token0, token1, price: initial_price
+	} as CalculatePriceArgs).sqrt_price_x96);
 
+	const transformed_args: CreatePoolArgs = {
+		token_a: Principal.fromText(token0.canisterId),
+		token_b: Principal.fromText(token1.canisterId),
+		fee: BigInt(fee_tier),
+		sqrt_price_x96
 	};
 
 	try {
@@ -67,11 +71,6 @@ export async function create_pool_and_mint_position(
 	mint_args: MintPositionArgs,
 	authenticated_agent: HttpAgent
 ): Promise<Response<CandidPoolId | undefined>> {
-	const dex_actor = Actor.createActor(idlFactory, {
-		agent: authenticated_agent,
-		canisterId: appic_dex,
-	});
-
 
 
 	try {
