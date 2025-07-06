@@ -10,7 +10,7 @@ export interface MarketPrice {
 }
 
 
-function get_market_price(token0: IcpToken, token1: IcpToken, is_token0_selected: boolean, all_icp_tokens: IcpToken[]): MarketPrice {
+export function get_market_price(token0: IcpToken, token1: IcpToken, is_token_0_selected: boolean, all_icp_tokens: IcpToken[]): MarketPrice {
 	const tokenMap = new Map<string, IcpToken>();
 	all_icp_tokens.forEach(token => {
 		tokenMap.set(token.canisterId, token);
@@ -46,9 +46,9 @@ function get_market_price(token0: IcpToken, token1: IcpToken, is_token0_selected
 	const formatted_price_token0_in_token1 = new BigNumber(price_token0_in_token1).toFixed(6);
 	const formatted_price_token1_in_token0 = new BigNumber(price_token1_in_token0).toFixed(6);
 
-	let text = is_token0_selected ? `1 ${token0_symbol} = ${formatted_price_token0_in_token1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price_token1_in_token0} ${token0_symbol} (-)`;
+	let text = is_token_0_selected ? `1 ${token0_symbol} = ${formatted_price_token0_in_token1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price_token1_in_token0} ${token0_symbol} (-)`;
 
-	let price = is_token0_selected ? price_token0_in_token1 : price_token0_in_token1;
+	let price = is_token_0_selected ? price_token0_in_token1 : price_token0_in_token1;
 
 	return {
 		price,
@@ -59,7 +59,7 @@ function get_market_price(token0: IcpToken, token1: IcpToken, is_token0_selected
 
 
 
-function calculate_price(
+export function calculate_price(
 	token0: IcpToken,
 	token1: IcpToken,
 	price: string,
