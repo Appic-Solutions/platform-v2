@@ -1,3 +1,4 @@
+import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Principal } from '@dfinity/principal';
 
 /**
@@ -8,14 +9,14 @@ import { Principal } from '@dfinity/principal';
  * @param tokenB The second token principal ID.
  * @returns An object containing token0 and token1 in sorted order.
  */
-export function sortTokens(tokenA: Principal, tokenB: Principal): { token0: Principal; token1: Principal } {
+export function sortTokens(tokenA: IcpToken, tokenB: IcpToken): { token0: IcpToken; token1: IcpToken } {
     // Validate that tokens are different
-    if (tokenA.compareTo(tokenB) == "eq") {
+    if (Principal.fromText(tokenA.canisterId).compareTo(Principal.fromText(tokenB.canisterId)) == "eq") {
         throw new Error('Tokens must be different');
     }
 
     // Use ltEq to determine if tokenA is lexicographically less than or equal to tokenB
-    if (tokenA.ltEq(tokenB)) {
+    if (Principal.fromText(tokenA.canisterId).ltEq(Principal.fromText(tokenB.canisterId))) {
         return { token0: tokenA, token1: tokenB };
     } else {
         return { token0: tokenB, token1: tokenA };
