@@ -1,7 +1,8 @@
 import { Avatar } from '@/components/common/ui/avatar';
-import { ArrowLeftIcon, PlusIcon, PoolIcon } from '@/components/icons';
+import { PlusIcon, PoolIcon } from '@/components/icons';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function YourPositionsPage() {
   return (
@@ -16,7 +17,8 @@ export default function YourPositionsPage() {
       {/* Header */}
       <div className={cn('flex items-center justify-between gap-4', 'w-full')}>
         <h1 className="text-[27px] font-bold md:text-[30px]">Your positions</h1>
-        <button
+        <Link
+          href="/pool/create"
           className={cn(
             'flex items-center justify-center',
             'text-[13px] font-medium md:text-[15px]',
@@ -26,7 +28,7 @@ export default function YourPositionsPage() {
         >
           <PlusIcon className="h-[14px] w-[14px] md:h-[17px] md:w-[17px]" />
           Create position
-        </button>
+        </Link>
       </div>
 
       {/* Main */}
@@ -83,7 +85,7 @@ export default function YourPositionsPage() {
               <div className="flex flex-col gap-y-1">
                 <p className="text-lg font-medium md:text-2xl">USDC/ETH</p>
                 <p className={cn('flex items-center gap-x-1.5', 'text-[13px] text-[#77EF4B]')}>
-                  <div className="h-[9px] w-[9px] rounded-full bg-[#77EF4B]" />
+                  <span className="h-[9px] w-[9px] rounded-full bg-[#77EF4B]" />
                   In range
                 </p>
               </div>

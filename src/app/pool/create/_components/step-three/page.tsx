@@ -2,7 +2,7 @@ import { Avatar } from '@/components/common/ui/avatar';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 
-export default function AcceptPositionPage() {
+export default function CreatePoolStepThree() {
   return (
     <Box
       className={cn(

@@ -6,7 +6,7 @@ import StepTwoPoolExist from './StepTwoPoolExist';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
 import { Avatar } from '@/components/common/ui/avatar';
 
-const PositionStepTwo = () => {
+export default function CreatePoolStepTwo() {
   const [minPrice, setMinPrice] = useState(1100);
   const [maxPrice, setMaxPrice] = useState(1600);
   const [poolExist, setPoolExist] = useState(true);
@@ -117,6 +117,4 @@ const PositionStepTwo = () => {
       </div>
     </div>
   );
-};
-
-export default PositionStepTwo;
+}

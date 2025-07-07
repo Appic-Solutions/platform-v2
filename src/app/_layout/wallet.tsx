@@ -11,7 +11,7 @@ import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   check_deposit_status,
   check_withdraw_status,
@@ -24,6 +24,9 @@ import {
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
+import { getStorageItem } from '@/lib/helpers/localstorage';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 const WalletPage = () => {
   const {
@@ -38,6 +41,7 @@ const WalletPage = () => {
   } = useSharedStore();
   const {
     setIcpBalance,
+    setIcpTokens,
     setEvmBalance,
     setUnAuthenticatedAgent,
     setIsEvmConnected,
@@ -46,6 +50,7 @@ const WalletPage = () => {
     setEvmAddress,
     setIsEvmBalanceLoading,
     setIsIcpBalanceLoading,
+    setPools,
   } = useSharedStoreActions();
 
   const { pendingTx } = useBridgeStore();
@@ -208,6 +213,34 @@ const WalletPage = () => {
       pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
       !!icpIdentity,
   });
+
+  const rawTokens = useMemo(() => {
+    const stored = getStorageItem('icpTokens');
+    return stored ? (JSON.parse(stored) as IcpToken[]) : [];
+  }, []);
+
+  const { data } = useQuery({
+    queryKey: ['icp-pools'],
+    queryFn: async () => {
+      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, rawTokens);
+      if (!response.success) {
+        throw new Error('Failed to fetch all pools');
+      }
+      return response.result;
+    },
+    enabled: !!unAuthenticatedAgent && rawTokens.length > 0,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (data) setPools(data);
+  }, [data, setPools]);
+
+  useEffect(() => {
+    if (rawTokens.length > 0) {
+      setIcpTokens(rawTokens);
+    }
+  }, [rawTokens, setIcpTokens]);
 
   return (
     <div

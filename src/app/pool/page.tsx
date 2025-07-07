@@ -1,5 +1,7 @@
-import PoolDetailPage from './_components/pool-detail/page';
+'use client';
+
+import YourPositionsPage from './_components/your-positions/page';
 
 export default function PoolPage() {
-  return <PoolDetailPage />;
+  return <YourPositionsPage />;
 }

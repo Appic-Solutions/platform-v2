@@ -18,7 +18,7 @@ const PositionStepOne = ({ setStep }: { setStep: () => void }) => {
           )}
         >
           <ArrowPathIcon width={17} height={17} />
-          Rest
+          Reset
         </button>
       </div>
 

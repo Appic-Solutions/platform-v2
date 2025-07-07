@@ -1,4 +1,5 @@
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { HttpAgent, Agent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
@@ -11,6 +12,7 @@ interface SharedState {
         totalBalanceUsd: string;
       }
     | undefined;
+  icpTokens: undefined | IcpToken[];
   evmBalance: EvmTokensBalances | undefined;
   authenticatedAgent: Agent | undefined;
   unAuthenticatedAgent: HttpAgent | undefined;
@@ -20,11 +22,13 @@ interface SharedState {
   isEvmBalanceLoading: boolean;
   evmAddress: string | undefined;
   chainId: number | string | undefined;
+  pools: undefined | Pool[];
 }
 
 type Action = {
   actions: {
     setIcpBalance: (balance: SharedState['icpBalance']) => void;
+    setIcpTokens: (tokens: SharedState['icpTokens']) => void;
     setEvmBalance: (balance: SharedState['evmBalance']) => void;
     setAuthenticatedAgent: (agent: SharedState['authenticatedAgent']) => void;
     setUnAuthenticatedAgent: (agent: SharedState['unAuthenticatedAgent']) => void;
@@ -34,11 +38,13 @@ type Action = {
     setChainId: (chainId: SharedState['chainId']) => void;
     setIsIcpBalanceLoading: (isPending: SharedState['isIcpBalanceLoading']) => void;
     setIsEvmBalanceLoading: (isPending: SharedState['isEvmBalanceLoading']) => void;
+    setPools: (pools: SharedState['pools']) => void;
   };
 };
 
 export const useSharedStore = create<SharedState & Action>()((set) => ({
   icpBalance: undefined,
+  icpTokens: undefined,
   evmBalance: undefined,
   authenticatedAgent: undefined,
   unAuthenticatedAgent: undefined,
@@ -48,8 +54,10 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
   chainId: undefined,
   isIcpBalanceLoading: false,
   isEvmBalanceLoading: false,
+  pools: undefined,
   actions: {
     setIcpBalance: (balance) => set({ icpBalance: balance }),
+    setIcpTokens: (tokens) => set({ icpTokens: tokens }),
     setEvmBalance: (balance) => set({ evmBalance: balance }),
     setAuthenticatedAgent: (agent) => set({ authenticatedAgent: agent }),
     setUnAuthenticatedAgent: (agent) => set({ unAuthenticatedAgent: agent }),
@@ -59,6 +67,7 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
     setChainId: (chainId) => set({ chainId }),
     setIsIcpBalanceLoading: (isIcpPending) => set({ isIcpBalanceLoading: isIcpPending }),
     setIsEvmBalanceLoading: (isEvmPending) => set({ isEvmBalanceLoading: isEvmPending }),
+    setPools: (pools) => set({ pools }),
   },
 }));
 
