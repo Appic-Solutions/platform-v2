@@ -1,7 +1,9 @@
 'use client';
-
-import YourPositionsPage from './_components/your-positions/page';
+import { notFound } from 'next/navigation';
+// import YourPositionsPage from './_components/your-positions/page';
 
 export default function PoolPage() {
-  return <YourPositionsPage />;
+  notFound();
+  return null;
+  // return <YourPositionsPage />;
 }
