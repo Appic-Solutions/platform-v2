@@ -4,6 +4,7 @@ import {
 } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { parse_token_type } from '../get_all_icp_tokens';
+import { tokens } from '@/blockchain_api/lists/sampleToken';
 
 export const parse_candid_evm_token_to_evm_token = (token: CandidEvmToken): EvmToken => {
   return {
@@ -15,6 +16,7 @@ export const parse_candid_evm_token_to_evm_token = (token: CandidEvmToken): EvmT
     name: token.name,
     symbol: token.symbol,
     usdPrice: '0',
+		is_wrapped_icrc:token.is_wrapped_icrc
   };
 };
 

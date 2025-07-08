@@ -42,6 +42,7 @@ export const get_evm_token_and_generate_twin_token_success = async (
         logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
         name: 'USD Tether',
         symbol: 'USDT',
+				is_wrapped_icrc:false
       },
       creation_fee: '3000000000',
       human_readable_creation_fee: '30',
