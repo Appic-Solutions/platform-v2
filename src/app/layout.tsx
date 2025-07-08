@@ -21,12 +21,12 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
             className={cn(
               '!pointer-events-auto relative isolate !select-auto',
               'flex flex-col items-center justify-center',
-              'px-6 py-3.5 md:py-8',
+              'min-h-screen px-6 py-3.5 md:py-8',
             )}
           >
             <HeaderPage />
             <ShapesPage />
-            <main className="flex w-full flex-1 items-center justify-center">{children}</main>
+            <main className="mb-28 flex w-full flex-1 xl:mb-0">{children}</main>
             <NavbarPage />
             <Toaster />
           </body>

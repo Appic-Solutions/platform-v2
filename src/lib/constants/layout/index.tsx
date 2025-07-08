@@ -33,9 +33,9 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
   {
     label: 'Pool',
     href: '/pool',
-    tooltip: 'Pool',
+    tooltip: 'Coming Soon',
     Icon: <PoolIcon width={24} height={24} className="min-h-6 min-w-6" />,
-    active: true,
+    active: false,
   },
   {
     label: 'Explore',

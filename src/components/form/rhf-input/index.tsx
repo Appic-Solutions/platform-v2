@@ -17,7 +17,7 @@ export default function RHFInput({
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <div className={cn('flex flex-col gap-1', wrapperClassName)}>
+        <div className={cn('flex w-full flex-col gap-1', wrapperClassName)}>
           {label && (
             <label htmlFor={name} className="capitalize text-white dark:text-white md:text-black">
               {label}

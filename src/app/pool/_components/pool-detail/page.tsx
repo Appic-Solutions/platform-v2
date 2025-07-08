@@ -3,7 +3,7 @@
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import AvatarGroup from '../new-position/AvatarGroup';
+// import AvatarGroup from '../new-position/AvatarGroup';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ChevronUpIcon, ManageSearchIcon, PlusIcon, SwapHorizontalIcon } from '@/components/icons';
 import PoolDetailChart from './PoolDetailChart';
@@ -31,7 +31,7 @@ const PoolDetailPage = () => {
           <div className="flex w-full items-center">
             <div className="flex w-full items-center justify-between gap-2 lg:gap-4">
               <div className="flex items-center gap-4">
-                <AvatarGroup />
+                {/* <AvatarGroup /> */}
                 <h3 className="text-[27px] font-bold lg:text-[40px]">USDC/ETH</h3>
                 <SwapHorizontalIcon className="w-[20px] cursor-pointer stroke-[#FFFFFF63] text-[#FFFFFF63]" />
               </div>
