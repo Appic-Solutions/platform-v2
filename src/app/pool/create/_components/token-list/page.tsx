@@ -8,7 +8,8 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import TokenCard from '@/app/auto-invest/_components/chain-token-list/token-card';
 import { useSharedStore } from '@/store/store';
-import { CreatePoolFormDefaultValues, TokenListPageProps } from '../../_types';
+import { TokenListPageProps } from '../../_types';
+import { CreatePoolFormDefaultValues } from '../../schema';
 
 export default function TokenListPage({
   stateBackHandler,

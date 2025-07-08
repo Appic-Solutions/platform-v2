@@ -76,11 +76,9 @@ export default function FeeTiersPage({
               )} */}
               {Number(tier.fee) === Fee && <VerifiedIcon width={32} height={32} />}
             </div>
-            <div className="mb-6 text-[17px] text-[#898989] md:mb-8 md:text-xl">
-              Best for very stable pairs.
-            </div>
+            <div className="mb-6 text-[17px] text-[#898989] md:mb-8 md:text-xl">{tier.desc}</div>
             <div className="flex items-center justify-between gap-4 text-white md:text-xl">
-              <span>{tier.tvl} TVL</span>
+              <span>${Number(tier.tvl).toFixed(2)} TVL</span>
               {/* <span>0% select</span> */}
             </div>
           </div>

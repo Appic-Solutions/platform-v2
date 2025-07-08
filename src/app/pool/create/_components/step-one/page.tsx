@@ -1,4 +1,4 @@
-import { CreatePoolFormDefaultValues, CreatePoolStepOneProps } from '@/app/pool/create/_types';
+import { CreatePoolStepOneProps } from '@/app/pool/create/_types';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowPathIcon } from '@/components/icons';
 import Box from '@/components/ui/box';
@@ -8,6 +8,8 @@ import FeeTiersPage from '../fee-tiers/page';
 import TokenListPage from '../token-list/page';
 import { useFormContext, useWatch } from 'react-hook-form';
 import Skeleton from '@/components/ui/skeleton';
+import { CreatePoolFormDefaultValues } from '../../schema';
+import ErrorMessage from '@/components/form/error-message';
 
 export default function CreatePoolStepOne({
   resetFormHandler,
@@ -16,7 +18,10 @@ export default function CreatePoolStepOne({
   selectFeeHandler,
   stateNextHandler,
 }: CreatePoolStepOneProps) {
-  const { control } = useFormContext<CreatePoolFormDefaultValues>();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<CreatePoolFormDefaultValues>();
   // State
   const [activePage, setActivePage] = useState(0);
   const [selectedTokenType, setSelectedTokenType] = useState<1 | 2>(1);
@@ -117,6 +122,7 @@ export default function CreatePoolStepOne({
                 {Token0?.symbol || 'Select Token'}
               </p>
             </div>
+            <ErrorMessage name="token0" />
             <div
               className={cn(
                 'group relative cursor-pointer overflow-clip',
@@ -153,6 +159,7 @@ export default function CreatePoolStepOne({
                 {Token1?.symbol || 'Select Token'}
               </p>
             </div>
+            <ErrorMessage name="token1" />
           </div>
 
           <div className="flex w-full flex-col gap-y-1">
@@ -163,61 +170,46 @@ export default function CreatePoolStepOne({
             </p>
           </div>
 
-          {!Token0 || !Token1 ? (
-            <div
-              className={cn(
-                'flex items-center justify-between gap-4',
-                'w-full',
-                'bg-[#222222]/40',
-                'p-[18px] py-[17px]',
-                'rounded-[10px]',
-              )}
-            >
-              <div className="flex flex-col gap-3">
-                <Skeleton className="h-5 w-32" />
-                <Skeleton className="h-5 w-52" />
+          <div
+            className={cn(
+              'flex items-center justify-between gap-4',
+              'w-full',
+              'bg-[#222222]/40',
+              'p-[18px] py-[17px]',
+              'rounded-[10px]',
+            )}
+          >
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-x-2.5 md:gap-x-3.5">
+                <span className="text-lg font-bold">{Number(Fee) / 10000}% fee tier</span>
+                <span
+                  className={cn(
+                    'text-[10px] font-medium text-[#7DABFF]',
+                    'bg-[#2060D5]/30',
+                    'rounded-full p-1',
+                  )}
+                >
+                  HighestTVL
+                </span>
               </div>
-              <Skeleton className="h-9 w-20" />
+              <p className="text-sm text-white/60">The % you will earn in fees</p>
             </div>
-          ) : (
-            <div
+            <button
               className={cn(
-                'flex items-center justify-between gap-4',
-                'w-full',
-                'bg-[#222222]/40',
-                'p-[18px] py-[17px]',
-                'rounded-[10px]',
+                'flex items-center justify-center gap-x-0.5',
+                'px-4 py-2.5',
+                'rounded-lg',
+                'bg-[#565656]',
+                'text-sm font-medium text-white',
+                (!Token0 || !Token1) && 'opacity-50',
               )}
+              onClick={() => setActivePage(2)}
+              disabled={!Token0 || !Token1}
             >
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-x-2.5 md:gap-x-3.5">
-                  <span className="text-lg font-bold">{Number(Fee) / 10000}% fee tier</span>
-                  <span
-                    className={cn(
-                      'text-[10px] font-medium text-[#7DABFF]',
-                      'bg-[#2060D5]/30',
-                      'rounded-full p-1',
-                    )}
-                  >
-                    HighestTVL
-                  </span>
-                </div>
-                <p className="text-sm text-white/60">The % you will earn in fees</p>
-              </div>
-              <button
-                className={cn(
-                  'flex items-center justify-center gap-x-0.5',
-                  'px-4 py-2.5',
-                  'rounded-lg',
-                  'bg-[#565656]',
-                  'text-sm font-medium text-white',
-                )}
-                onClick={() => setActivePage(2)}
-              >
-                change
-              </button>
-            </div>
-          )}
+              change
+            </button>
+          </div>
+          <ErrorMessage name="fee" />
 
           {/* Action Button */}
           <button

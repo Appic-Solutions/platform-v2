@@ -3,16 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import {
-  CreatePoolFormDefaultValues,
-  SelectFeeHandlerProps,
-  SelectTokenHandlerProps,
-} from '../_types';
+import { SelectFeeHandlerProps, SelectTokenHandlerProps } from '../_types';
 import { sortTokens } from '@/blockchain_api/functions/icp/dex/utils/token_order';
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { useSharedStore } from '@/store/store';
-import { FEE_TIERS } from '@/blockchain_api/functions/icp/dex/constants';
+import { FEE_TIERS, FEE_TIERS_DESC_MAP } from '@/blockchain_api/functions/icp/dex/constants';
 import { Principal } from '@dfinity/principal';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreatePoolFormDefaultValues, CreatePoolSchema } from '../schema';
 
 export default function CreatePoolLogic() {
   // Store
@@ -20,13 +18,13 @@ export default function CreatePoolLogic() {
 
   // States
   const [step, setStep] = useState(0);
-  const [feeTiers, setFeeTiers] = useState<(CandidPoolId & { tvl: string })[]>([]);
+  const [feeTiers, setFeeTiers] = useState<(CandidPoolId & { tvl: string; desc: string })[]>([]);
 
   // Form
   const methods = useForm<CreatePoolFormDefaultValues>({
     defaultValues: {
       searchTokenQuery: '',
-      fee: 10000,
+      fee: 3000,
       // Token 0
       token0: undefined,
       token0InitialPrice: '',
@@ -42,6 +40,7 @@ export default function CreatePoolLogic() {
       token1MinDeposit: '',
       token1MaxDeposit: '',
     },
+    resolver: zodResolver(CreatePoolSchema),
   });
 
   const [Token0, Token1] = useWatch({
@@ -49,11 +48,26 @@ export default function CreatePoolLogic() {
     name: ['token0', 'token1'],
   });
 
-  // Handlers
-  const stepNextHandler = () => {
-    setStep((prev) => prev - 1);
+  const getStepValidationFields = (step: number): (keyof CreatePoolFormDefaultValues)[] => {
+    switch (step) {
+      case 0:
+        return ['fee', 'token0', 'token1'];
+      case 1:
+        return ['token0InitialPrice', 'token1InitialPrice'];
+      case 2:
+        return ['token0MinDeposit', 'token1MinDeposit'];
+      default:
+        return [];
+    }
   };
 
+  // Handlers
+  const stepNextHandler = async () => {
+    const fieldsToValidate = getStepValidationFields(step);
+    const isValid = await methods.trigger(fieldsToValidate);
+    if (!isValid) return;
+    setStep((prev) => prev + 1);
+  };
   const stepBackHandler = () => {
     setStep((prev) => Math.max(prev - 1, 0));
   };
@@ -66,6 +80,7 @@ export default function CreatePoolLogic() {
   // Select & Sort Token Section
   const selectTokenHandler = ({ name, value }: SelectTokenHandlerProps) => {
     methods.setValue(name, value);
+    methods.clearErrors(name);
   };
 
   useEffect(() => {
@@ -81,6 +96,7 @@ export default function CreatePoolLogic() {
       token0: Principal.fromText(token0.canisterId),
       token1: Principal.fromText(token1.canisterId),
       tvl: '0',
+      desc: FEE_TIERS_DESC_MAP.get(fee) || 'Best for very stable pairs.',
     }));
 
     const updatedFeeTiers = feeTiersList.map((feeTier) => {
@@ -98,10 +114,28 @@ export default function CreatePoolLogic() {
     });
 
     setFeeTiers(updatedFeeTiers);
+
+    if (updatedFeeTiers.length > 0) {
+      const feeTiersWithTvl = updatedFeeTiers
+        .map((tier) => ({
+          ...tier,
+          numericTvl: parseFloat(tier.tvl) || 0,
+        }))
+        .filter((tier) => tier.numericTvl > 0);
+
+      if (feeTiersWithTvl.length > 0) {
+        feeTiersWithTvl.sort((a, b) => b.numericTvl - a.numericTvl);
+
+        const highestTvlFee = feeTiersWithTvl[0].fee;
+
+        methods.setValue('fee', Number(highestTvlFee));
+      }
+    }
   }, [Token0, Token1]);
 
   const selectFeeHandler = (value: SelectFeeHandlerProps) => {
     methods.setValue('fee', value);
+    methods.clearErrors('fee');
   };
 
   const submitHandler = (values: CreatePoolFormDefaultValues) => {};
