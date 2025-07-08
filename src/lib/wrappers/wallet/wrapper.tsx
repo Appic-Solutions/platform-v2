@@ -11,70 +11,74 @@ import { useQuery } from '@tanstack/react-query';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
 import { setStorageItem } from '@/lib/helpers/localstorage';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
+import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
+import { Principal } from '@dfinity/principal';
 
 if (!projectId) {
-  throw new Error('Project ID is not defined');
+	throw new Error('Project ID is not defined');
 }
 
 // Set up metadata
 const metadata = {
-  name: 'Appicdao',
-  description: 'Appic crosschain swap on icp',
-  url: 'http://app.appicdao.com', // origin must match your domain & subdomain
-  icons: ['https://assets.reown.com/reown-profile-pic.png'],
-  debug: true,
+	name: 'Appicdao',
+	description: 'Appic crosschain swap on icp',
+	url: 'http://app.appicdao.com', // origin must match your domain & subdomain
+	icons: ['https://assets.reown.com/reown-profile-pic.png'],
+	debug: true,
 };
 
 // Create the modal
 createAppKit({
-  adapters: [wagmiAdapter],
-  projectId,
-  networks: [mainnet, arbitrum, avalanche, base, optimism, polygon, bsc],
-  defaultNetwork: mainnet,
+	adapters: [wagmiAdapter],
+	projectId,
+	networks: [mainnet, arbitrum, avalanche, base, optimism, polygon, bsc],
+	defaultNetwork: mainnet,
 
-  metadata: metadata,
-  features: {
-    analytics: true, // Optional - defaults to your Cloud configuration
-  },
+	metadata: metadata,
+	features: {
+		analytics: true, // Optional - defaults to your Cloud configuration
+	},
 });
 
 export const WalletWrapper = ({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) => {
-  const unAuthenticatedAgent = useUnAuthenticatedAgent();
+	const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
-  useQuery({
-    queryKey: ['IcpTokens'],
-    queryFn: async () => {
-      if (!unAuthenticatedAgent) return [];
+	useQuery({
+		queryKey: ['IcpTokens'],
+		queryFn: async () => {
+			if (!unAuthenticatedAgent) return [];
 
-      let tokens = await get_icp_tokens(unAuthenticatedAgent).then((res) => {
-        if (res.result) {
-          setStorageItem('icpTokens', JSON.stringify(res.result));
-        }
-        return res.result;
-      });
+			let tokens = await get_icp_tokens(unAuthenticatedAgent).then((res) => {
+				if (res.result) {
+					setStorageItem('icpTokens', JSON.stringify(res.result));
+				}
+				return res.result;
+			});
 
-      return [];
-    },
-    enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 60 * 5,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 10,
-  });
 
-  return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
-      <IdentityKitProvider
-        authType={IdentityKitAuthType.ACCOUNTS}
-        signers={[NFIDW, InternetIdentity, Stoic, OISY]}
-      >
-        {children}
-      </IdentityKitProvider>
-    </WagmiProvider>
-  );
+			return [];
+		},
+		enabled: !!unAuthenticatedAgent,
+		refetchInterval: 1000 * 60 * 5,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60,
+		gcTime: 1000 * 60 * 10,
+	});
+
+	return (
+		<WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
+			<IdentityKitProvider
+				authType={IdentityKitAuthType.ACCOUNTS}
+				signers={[NFIDW, InternetIdentity, Stoic, OISY]}
+			>
+				{children}
+			</IdentityKitProvider>
+		</WagmiProvider>
+	);
 };

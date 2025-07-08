@@ -9,8 +9,12 @@ export interface MarketPrice {
 	sqrt_price_x96: string;
 }
 
+export interface CalculatePriceArgs {
+	token0: IcpToken, token1: IcpToken, is_token0_selected: boolean, price: string
+}
 
-export function get_market_price(token0: IcpToken, token1: IcpToken, is_token0_selected: boolean, all_icp_tokens: IcpToken[]): MarketPrice {
+
+export function get_market_price({ token0, token1, is_token0_selected }: CalculatePriceArgs, all_icp_tokens: IcpToken[]): MarketPrice {
 	const tokenMap = new Map<string, IcpToken>();
 	all_icp_tokens.forEach(token => {
 		tokenMap.set(token.canisterId, token);
@@ -60,10 +64,7 @@ export function get_market_price(token0: IcpToken, token1: IcpToken, is_token0_s
 
 
 export function calculate_price(
-	token0: IcpToken,
-	token1: IcpToken,
-	price: string,
-	is_token_0_selected: boolean,
+	{ token0, token1, is_token0_selected, price }: CalculatePriceArgs
 ): MarketPrice {
 
 	const Q96 = new BigNumber(2).pow(96);
@@ -77,7 +78,7 @@ export function calculate_price(
 	let price0_in_1: BigNumber;
 	let price1_in_0: BigNumber;
 
-	if (is_token_0_selected) {
+	if (is_token0_selected) {
 		price0_in_1 = new BigNumber(price);
 		price1_in_0 = new BigNumber(1).dividedBy(price);
 	} else {
@@ -95,7 +96,7 @@ export function calculate_price(
 	const formatted_price1_in_0 = new BigNumber(price1_in_0).toFixed(6);
 
 
-	const text = is_token_0_selected ? `1 ${token0_symbol} = ${formatted_price0_in_1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price1_in_0} ${token0_symbol} (-)`;
+	const text = is_token0_selected ? `1 ${token0_symbol} = ${formatted_price0_in_1} ${token1_symbol} (-)` : `1 ${token1_symbol} = ${formatted_price1_in_0} ${token0_symbol} (-)`;
 
 
 	return {
