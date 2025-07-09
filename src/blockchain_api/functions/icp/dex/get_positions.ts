@@ -11,7 +11,7 @@ import { Principal } from "@dfinity/principal";
 import { arePoolsEqual } from "./utils/pool_comparison";
 import BigNumber from "bignumber.js";
 
-interface Position {
+export interface Position {
 	key: CandidPositionKey;
 	fees_token0_owed: string;
 	fee_growth_inside_1_last_x128: string;
@@ -20,12 +20,16 @@ interface Position {
 	fee_growth_inside_0_last_x128: string;
 	token0_reserves: string;
 	token1_reserves: string;
+	token0_reserves_raw: string;
+	token1_reserves_raw: string;
+
 	token0_reserves_usd: string;
 	token1_reserves_usd: string;
 	fees_token0_owed_usd: string;
 	fees_token1_owed_usd: string;
 	total_reserves_usd: string;
 	total_fees_owed_usd: string;
+	is_in_range: boolean;
 }
 
 // Interface for arguments to getSinglePosition
@@ -158,18 +162,22 @@ export function createPositionObjects(
 		// Calculate reserves using provided functions
 		let amount0: BigNumber;
 		let amount1: BigNumber;
+		let is_in_range: boolean;
 		if (sqrtRatioCurrentX96.lte(sqrtRatioLowerX96)) {
 			// Below range: all in token0
 			amount0 = SqrtPriceMath.getAmount0Delta(sqrtRatioLowerX96, sqrtRatioUpperX96, liquidity, false);
 			amount1 = new BigNumber(0);
+			is_in_range = false;
 		} else if (sqrtRatioCurrentX96.lt(sqrtRatioUpperX96)) {
 			// In range: both tokens
 			amount0 = SqrtPriceMath.getAmount0Delta(sqrtRatioCurrentX96, sqrtRatioUpperX96, liquidity, false);
 			amount1 = SqrtPriceMath.getAmount1Delta(sqrtRatioLowerX96, sqrtRatioCurrentX96, liquidity, false);
+			is_in_range = true;
 		} else {
 			// Above range: all in token1
 			amount0 = new BigNumber(0);
 			amount1 = SqrtPriceMath.getAmount1Delta(sqrtRatioLowerX96, sqrtRatioUpperX96, liquidity, false);
+			is_in_range = false;
 		}
 
 
@@ -201,10 +209,13 @@ export function createPositionObjects(
 			token1_reserves: token1Reserves.toString(),
 			token0_reserves_usd: token0ReservesUsd,
 			token1_reserves_usd: token1ReservesUsd,
+			token0_reserves_raw: amount0.toString(),
+			token1_reserves_raw: amount1.toString(),
 			fees_token0_owed_usd: feesToken0OwedUsd,
 			fees_token1_owed_usd: feesToken1OwedUsd,
 			total_reserves_usd: totalReservesUsd,
 			total_fees_owed_usd: totalFeesOwedUsd,
+			is_in_range,
 		};
 	});
 }

@@ -6,7 +6,6 @@ import { appic_dex } from "../../../../canister_ids.json";
 import { Response } from "@/blockchain_api/types/response";
 import BigNumber from 'bignumber.js';
 import { TickMath } from "./utils/tick_math";
-import { is_native_token } from "../../evm/utils/erc20_helpers";
 import { calculate_price } from "./utils/price";
 
 interface GenerateMintPositionArgsParams {
