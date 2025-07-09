@@ -10,7 +10,10 @@ export default function NavbarPage() {
 
   return (
     <div
-      className={cn('fixed bottom-0 z-[99] w-full pb-5 xl:pb-0', 'xl:absolute xl:top-8 xl:mx-auto')}
+      className={cn(
+        'fixed bottom-0 z-[99] w-full pb-5 xl:pb-0',
+        'h-max md:mx-auto xl:absolute xl:top-8 xl:max-w-[840px]',
+      )}
     >
       <ul
         className={cn(

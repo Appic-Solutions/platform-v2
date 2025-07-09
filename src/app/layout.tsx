@@ -21,7 +21,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
             className={cn(
               '!pointer-events-auto relative isolate !select-auto',
               'flex flex-col items-center justify-center',
-              'min-h-screen px-6 py-3.5 md:py-8',
+              'min-h-screen !px-6 !py-3.5 md:!py-8',
             )}
           >
             <HeaderPage />
