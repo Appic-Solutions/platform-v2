@@ -26,6 +26,7 @@ function formatUnits(amount: BigNumber, decimals: number): string {
 
 export interface CalculateMintAmountsArgs {
   selected_amount: string;
+	is_amount_zero:string;
   is_token0_selected: boolean;
   token0: IcpToken;
   token1: IcpToken;
@@ -37,6 +38,7 @@ export interface CalculateMintAmountsArgs {
 
 export function calculate_mint_amounts({
   selected_amount, // amount that users input in the UI
+	is_amount_zero,
   is_token0_selected,
   token0,
   token1,
@@ -48,6 +50,8 @@ export function calculate_mint_amounts({
   let liquidity: BigNumber;
   let amount0: BigNumber;
   let amount1: BigNumber;
+
+
 
   let sqrtRatioAX96 = BigNumber(
     calculate_price({ token0, token1, price: min_price, is_token0_selected }).sqrt_price_x96,
@@ -75,7 +79,7 @@ export function calculate_mint_amounts({
   const sqrtPriceLower = TickMath.getSqrtRatioAtTick(tick_lower_aligned);
   const sqrtPriceUpper = TickMath.getSqrtRatioAtTick(tick_upper_aligned);
 
-  if (is_token0_selected) {
+  if (is_amount_zero) {
     // User specifies token0 amount
     if (currentsqrtRatioX96.lte(sqrtPriceLower)) {
       // Current price is below the range: only token0 is needed
