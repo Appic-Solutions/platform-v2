@@ -65,6 +65,8 @@ export const get_transaction_history = async (
       return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
     } else if (principal_id) {
       const txs = (await appic_helper_actor.get_txs_by_principal(principal_id)) as Transaction[];
+
+			// console.log(txs);
       return { result: transform_bridge_tx(txs, bridge_tokens), message: '', success: true };
     } else {
       return {
@@ -113,6 +115,8 @@ const transform_bridge_tx = (
             token.canisterId!.toLocaleLowerCase() ==
               transaction.icrc_ledger_id[0]?.toString().toLowerCase(),
         )!;
+				console.log(transaction);
+				console.log(tx.EvmToIcp.erc20_contract_address,tx.EvmToIcp.icrc_ledger_id,to_token,from_token);
 
         const native_currency = bridge_tokens.find(
           (token) =>
@@ -141,7 +145,7 @@ const transform_bridge_tx = (
 
         const final_value = transaction.actual_received[0]?.toString() || '0';
         const human_readable_final_value = new BigNumber(final_value)
-          .dividedBy(new BigNumber(10).pow(to_token.decimals))
+          .dividedBy(new BigNumber(10).pow(to_token.decimals || 0))
           .toString();
         const scanner = chains.find(
           (chain) => chain.chainId.toString() == transaction.chain_id.toString(),
@@ -197,6 +201,10 @@ const transform_bridge_tx = (
             token.contractAddress == transaction.erc20_contract_address &&
             token.chainId == Number(transaction.chain_id.toString()),
         )!;
+
+
+
+				console.log(tx.IcpToEvm.erc20_contract_address,tx.IcpToEvm.icrc_ledger_id,to_token,from_token);
 
         const chain = chains.find(
           (chain) => chain.chainId.toString() == transaction.chain_id.toString(),
