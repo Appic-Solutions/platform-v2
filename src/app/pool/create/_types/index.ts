@@ -1,5 +1,4 @@
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
-import { IcpToken } from '@/blockchain_api/types/tokens';
 import { CreatePoolFormDefaultValues } from '../schema';
 
 export interface SelectTokenHandlerProps {
@@ -23,7 +22,7 @@ export interface TokenListPageProps {
   selectedTokenType: 1 | 2;
 }
 
-export interface FeeTiersPageProps {
+export interface FeeTiersProps {
   stateBackHandler: () => void;
   feeTiers: (CandidPoolId & { tvl: string; desc: string | undefined })[];
   selectFeeHandler: (value: SelectFeeHandlerProps) => void;

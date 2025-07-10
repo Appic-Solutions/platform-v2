@@ -1,6 +1,5 @@
 'use client';
 
-import Box from '@/components/ui/box';
 import BoxHeader from '@/components/ui/box-header';
 import { cn } from '@/lib/utils';
 import RHFInput from '@/components/form/rhf-input';
@@ -48,12 +47,7 @@ export default function TokenListPage({
   };
 
   return (
-    <Box
-      className={cn(
-        'animate-slide-in justify-normal opacity-0',
-        'md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
-      )}
-    >
+    <div className="flex h-full w-full animate-fade flex-col gap-y-4">
       <BoxHeader title={`Select Token ${selectedTokenType}`} onBack={stateBackHandler} />
 
       <RHFInput
@@ -67,7 +61,7 @@ export default function TokenListPage({
         )}
       />
 
-      <div className="mt-4 flex max-h-[400px] w-full flex-col gap-2 overflow-y-auto">
+      <div className="mt-4 flex h-full w-full flex-col gap-2 overflow-y-auto">
         {filteredTokens?.length ? (
           filteredTokens.map((token) => (
             <TokenCard
@@ -81,6 +75,6 @@ export default function TokenListPage({
           <div className="text-muted-foreground text-center text-sm">No tokens found.</div>
         )}
       </div>
-    </Box>
+    </div>
   );
 }

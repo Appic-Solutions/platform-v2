@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import AvatarGroup from './AvatarGroup';
 import { cn } from '@/lib/utils';
-import ChartDataBox from './ChartDataBox';
 import StepTwoPoolExist from './StepTwoPoolExist';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
+import ChartDataBox from './ChartDataBox';
 import { Avatar } from '@/components/common/ui/avatar';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { CreatePoolFormDefaultValues } from '../../schema';
 
-export default function CreatePoolStepTwo() {
+const CreatePositionStepTwo = () => {
   const [minPrice, setMinPrice] = useState(1100);
   const [maxPrice, setMaxPrice] = useState(1600);
   const [poolExist, setPoolExist] = useState(true);
@@ -117,4 +119,6 @@ export default function CreatePoolStepTwo() {
       </div>
     </div>
   );
-}
+};
+
+export default CreatePositionStepTwo;

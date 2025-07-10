@@ -1,17 +1,15 @@
 import { CreatePoolStepOneProps } from '@/app/pool/create/_types';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowPathIcon } from '@/components/icons';
-import Box from '@/components/ui/box';
 import { cn, getChainLogo } from '@/lib/utils';
 import { useState } from 'react';
-import FeeTiersPage from '../fee-tiers/page';
-import TokenListPage from '../token-list/page';
+import FeeTiers from '../fee-tiers';
+import TokenList from '../token-list';
 import { useFormContext, useWatch } from 'react-hook-form';
-import Skeleton from '@/components/ui/skeleton';
 import { CreatePoolFormDefaultValues } from '../../schema';
 import ErrorMessage from '@/components/form/error-message';
 
-export default function CreatePoolStepOne({
+export default function CreatePositionStepOne({
   resetFormHandler,
   selectTokenHandler,
   feeTiers,
@@ -34,7 +32,7 @@ export default function CreatePoolStepOne({
   switch (activePage) {
     case 1:
       return (
-        <TokenListPage
+        <TokenList
           stateBackHandler={() => setActivePage(0)}
           selectTokenHandler={selectTokenHandler}
           selectedTokenType={selectedTokenType}
@@ -42,7 +40,7 @@ export default function CreatePoolStepOne({
       );
     case 2:
       return (
-        <FeeTiersPage
+        <FeeTiers
           stateBackHandler={() => setActivePage(0)}
           feeTiers={feeTiers}
           selectFeeHandler={selectFeeHandler}
@@ -50,14 +48,7 @@ export default function CreatePoolStepOne({
       );
     default:
       return (
-        <Box
-          className={cn(
-            'flex flex-col gap-y-9 md:gap-y-[25px] md:px-12 md:py-8',
-            'h-full w-full lg:w-[611px]',
-            'animate-fade transition-all',
-            'text-white lg:text-black lg:dark:text-white',
-          )}
-        >
+        <div className="flex h-full w-full animate-fade flex-col gap-y-4">
           {/* Header */}
           <div className="flex w-full items-center justify-between gap-4">
             <h1 className="text-[27px] font-bold md:text-[39px]">New position</h1>
@@ -225,7 +216,7 @@ export default function CreatePoolStepOne({
           >
             Continue
           </button>
-        </Box>
+        </div>
       );
   }
 }

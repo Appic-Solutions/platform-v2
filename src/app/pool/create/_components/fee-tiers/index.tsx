@@ -1,14 +1,10 @@
-import { FeeTiersPageProps } from '@/app/pool/create/_types';
+import { FeeTiersProps } from '@/app/pool/create/_types';
 import { ArrowLeftIcon, LockIcon, VerifiedIcon } from '@/components/icons';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-export default function FeeTiersPage({
-  stateBackHandler,
-  feeTiers,
-  selectFeeHandler,
-}: FeeTiersPageProps) {
+export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler }: FeeTiersProps) {
   const { control } = useFormContext();
 
   const Fee = useWatch({
@@ -17,15 +13,7 @@ export default function FeeTiersPage({
   });
 
   return (
-    <Box
-      className={cn(
-        'gap-y-9',
-        'md:w-[611px]',
-        'md:p-12',
-        'text-white md:text-black md:dark:text-white',
-        'animate-fade transition-all',
-      )}
-    >
+    <div className="flex h-full w-full animate-fade flex-col gap-10">
       {/* Header */}
       <div
         className="relative isolate flex w-full items-center justify-between gap-4"
@@ -38,7 +26,7 @@ export default function FeeTiersPage({
       </div>
 
       {/* Main */}
-      <div className="flex max-h-[550px] w-full flex-col gap-3 overflow-y-auto *:w-full">
+      <div className="flex h-full w-full flex-col gap-3 overflow-y-auto *:w-full">
         {feeTiers.map((tier, idx) => (
           <div
             key={idx}
@@ -84,6 +72,6 @@ export default function FeeTiersPage({
           </div>
         ))}
       </div>
-    </Box>
+    </div>
   );
 }

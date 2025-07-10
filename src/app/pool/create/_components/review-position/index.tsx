@@ -1,18 +1,10 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import { InfoCircleIcon } from '@/components/icons';
-import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 
 export default function ReviewPositionPage() {
   return (
-    <Box
-      className={cn(
-        'gap-x-16 gap-y-10 md:flex-row',
-        'md:w-[1204px]',
-        'md:px-12 md:py-9',
-        'text-white md:text-black md:dark:text-white',
-      )}
-    >
+    <div className="flex h-full w-full animate-fade flex-col gap-4">
       <div className="max-w-[606px]">
         <div className={cn('flex items-center justify-between gap-4', 'mb-10 w-full')}>
           <div className="flex items-center gap-x-2.5">
@@ -246,6 +238,6 @@ export default function ReviewPositionPage() {
           Review
         </button>
       </div>
-    </Box>
+    </div>
   );
 }

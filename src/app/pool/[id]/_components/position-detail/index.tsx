@@ -7,7 +7,7 @@ import AvatarGroup from '../../../create/_components/new-position/AvatarGroup';
 import Image from 'next/image';
 import PositionDetailChart from './PositionDetailChart';
 import { ChevronUpIcon, ManageSearchIcon, PlusIcon } from '@/components/icons';
-import { chartShowRanges } from '../../../create/_components/new-position/data';
+import { chartShowRanges } from '../../../create/_components/step-two/data';
 import ChartSelection from './ChartSelection';
 import { Avatar } from '@/components/common/ui/avatar';
 

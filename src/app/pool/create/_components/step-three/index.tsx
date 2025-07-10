@@ -4,14 +4,7 @@ import { cn } from '@/lib/utils';
 
 export default function CreatePoolStepThree() {
   return (
-    <Box
-      className={cn(
-        'gap-y-2 md:gap-y-6',
-        'md:w-[611px]',
-        'md:p-12',
-        'text-white md:text-black md:dark:text-white',
-      )}
-    >
+    <div className="flex h-full w-full animate-fade flex-col gap-5">
       <div className="flex w-full items-center justify-between gap-4">
         <div className="flex items-center gap-x-2.5">
           <div className="relative flex">
@@ -193,6 +186,6 @@ export default function CreatePoolStepThree() {
           Continue
         </button>
       </div>
-    </Box>
+    </div>
   );
 }

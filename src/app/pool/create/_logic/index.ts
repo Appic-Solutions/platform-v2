@@ -143,6 +143,7 @@ export default function CreatePoolLogic() {
   return {
     // Shared
     step,
+    setStep,
     methods,
     stepNextHandler,
     stepBackHandler,
