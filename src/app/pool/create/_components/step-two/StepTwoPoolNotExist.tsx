@@ -3,13 +3,29 @@ import React, { useState } from 'react';
 import { chartTypes } from './data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import SolidCard from '@/components/ui/cards/SolidCard';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { CreatePoolFormDefaultValues } from '../../schema';
+import { useFormContext, useWatch } from 'react-hook-form';
+import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 
 const StepTwoPoolNotExist = () => {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<CreatePoolFormDefaultValues>();
+
+  const [token0, token1, Fee] = useWatch({
+    control,
+    name: ['token0', 'token1', 'fee'],
+  });
   const [selectedChart, setSelectedChart] = useState<string>('usdc');
   const [inputValue, setInputValue] = useState('1234.55');
+  const [selectedToken, setSelectedToken] = useState<IcpToken>(token0);
+  console.log(selectedToken);
   return (
     <>
-      <div className="w-full rounded-[21px] bg-[#222222] px-6 py-5">
+      <SolidCard>
         <div className="flex items-center gap-2">
           <ErrorIcon width={22} height={22} />
           <h3 className="text-lg font-medium md:text-xl">Create new pool</h3>
@@ -19,15 +35,15 @@ const StepTwoPoolNotExist = () => {
           supported networks.. Choose the tokens you want to provide liquidity for. You can select
           tokens on all supported networks.
         </p>
-      </div>
+      </SolidCard>
       <div className="mt-4 md:mt-8">
         <h3 className="mb-4 text-2xl font-bold">Set initial price</h3>
         <p className="mb-4 text-[15px] font-thin">
           Choose the tokens you want to provide liquidity for. You can select tokens on all
           supported networks.
         </p>
-        <div className="h-[148px] w-full rounded-[20px] bg-box-border-gradient p-0.5 backdrop-blur-[30px] lg:h-[196px] lg:rounded-[35px]">
-          <div className="flex h-full w-full flex-col justify-between rounded-[20px] bg-box-background-secondary px-6 py-4 font-semibold lg:rounded-[35px] lg:px-8 lg:py-6">
+        <GradientBorderCard className="h-[148px] lg:h-[196px]">
+          <div className="flex h-full w-full flex-col justify-between font-semibold">
             <div className="flex items-start justify-between">
               <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Initial price</p>
               <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">
@@ -57,12 +73,14 @@ const StepTwoPoolNotExist = () => {
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">1 ICP = 1 ETH</p>
             </div>
           </div>
+        </GradientBorderCard>
+      </div>
+      <SolidCard>
+        <div className="flex w-full flex-col items-start gap-1 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-[17px]">
+          <h3 className="md:text-xl">Market price: 0 ICP = 1 ETH (-)</h3>
+          <button className="text-[#FFFFFFC9]">Use market price</button>
         </div>
-      </div>
-      <div className="flex w-full flex-col items-start gap-1 rounded-[21px] bg-[#222222] px-6 py-5 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-[17px]">
-        <h3 className="md:text-xl">Market price: 0 ICP = 1 ETH (-)</h3>
-        <button className="text-[#FFFFFFC9]">Use market price</button>
-      </div>
+      </SolidCard>
     </>
   );
 };

@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
 import AvatarGroup from './AvatarGroup';
-import { cn } from '@/lib/utils';
 import StepTwoPoolExist from './StepTwoPoolExist';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
-import ChartDataBox from './ChartDataBox';
 import { Avatar } from '@/components/common/ui/avatar';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
+import SolidCard from '@/components/ui/cards/SolidCard';
+import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 
 const CreatePositionStepTwo = () => {
   const [minPrice, setMinPrice] = useState(1100);
   const [maxPrice, setMaxPrice] = useState(1600);
-  const [poolExist, setPoolExist] = useState(true);
+  const [poolExist, setPoolExist] = useState(false);
+
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<CreatePoolFormDefaultValues>();
+
+  const [token0, token1, Fee] = useWatch({
+    control,
+    name: ['token0', 'token1', 'fee'],
+  });
 
   return (
     <div className="flex w-full animate-fade select-none flex-col gap-8 lg:flex-row lg:gap-12">
@@ -20,35 +30,18 @@ const CreatePositionStepTwo = () => {
         {/* header */}
         <div className="flex w-full items-center justify-between">
           <div className="flex w-full items-center gap-2 lg:gap-4">
-            <AvatarGroup />
-            <h3 className="text-[27px] font-bold lg:text-[40px]">USDC/ETH</h3>
+            <AvatarGroup token0={token0} token1={token1} />
+            <h3 className="text-[27px] font-bold lg:text-[40px]">
+              {token0.symbol}/{token1.symbol}
+            </h3>
           </div>
           <div className="flex items-center gap-x-1">
-            {/* TODO: remove this */}
-            <button
-              onClick={() => setPoolExist(!poolExist)}
-              className="bg-white/10 px-1.5 py-px text-[10px]"
-            >
-              switch
-            </button>
-            <div
-              className={cn(
-                'rounded-[6px] bg-white/10',
-                'px-1.5 py-px',
-                'text-xs leading-5 text-white/60',
-              )}
-            >
-              V3
-            </div>
-            <div
-              className={cn(
-                'rounded-[6px] bg-white/10',
-                'px-1.5 py-px',
-                'text-xs leading-5 text-white/60',
-              )}
-            >
-              1%
-            </div>
+            <SolidCard size="sm">
+              <span className="text-xs leading-5 text-white/60">V3</span>
+            </SolidCard>
+            <SolidCard size="sm">
+              <span className="text-xs leading-5 text-white/60">1%</span>
+            </SolidCard>
           </div>
         </div>
         {poolExist ? (
@@ -62,20 +55,24 @@ const CreatePositionStepTwo = () => {
         <div>
           <h3 className="mb-4 text-xl font-bold lg:text-2xl">Set Price range</h3>
           <div className="flex justify-start gap-4 lg:justify-between">
-            <ChartDataBox>
-              <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
-              <div className="flex flex-col gap-2">
-                <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
-                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
+            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
+              <div className="flex h-full flex-col justify-between font-semibold">
+                <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
+                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
+                </div>
               </div>
-            </ChartDataBox>
-            <ChartDataBox>
-              <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
-              <div className="flex flex-col gap-2">
-                <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
-                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
+            </GradientBorderCard>
+            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
+              <div className="flex h-full flex-col justify-between font-semibold">
+                <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
+                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
+                </div>
               </div>
-            </ChartDataBox>
+            </GradientBorderCard>
           </div>
         </div>
         <div>
@@ -85,34 +82,38 @@ const CreatePositionStepTwo = () => {
             and strategy.
           </p>
           <div className="flex justify-start gap-4 lg:justify-between">
-            <ChartDataBox>
-              <div className="flex items-center gap-2">
-                <Avatar
-                  // src={token?.logo}
-                  src="/images/logo/chains-logos/ethereum.svg"
-                  className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
-                />
-                <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
+            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
+              <div className="flex h-full flex-col justify-between font-semibold">
+                <div className="flex items-center gap-2">
+                  <Avatar
+                    // src={token?.logo}
+                    src="/images/logo/chains-logos/ethereum.svg"
+                    className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
+                  />
+                  <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
+                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
+                </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
-                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
+            </GradientBorderCard>
+            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
+              <div className="flex h-full flex-col justify-between font-semibold">
+                <div className="flex items-center gap-2">
+                  <Avatar
+                    // src={token?.logo}
+                    src="/images/logo/chains-logos/ethereum.svg"
+                    className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
+                  />
+                  <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
+                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
+                </div>
               </div>
-            </ChartDataBox>
-            <ChartDataBox>
-              <div className="flex items-center gap-2">
-                <Avatar
-                  // src={token?.logo}
-                  src="/images/logo/chains-logos/ethereum.svg"
-                  className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
-                />
-                <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
-                <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
-              </div>
-            </ChartDataBox>
+            </GradientBorderCard>
           </div>
         </div>
         <button className="h-[50px] rounded-[15px] bg-primary-buttons lg:h-[66px]">Review</button>
