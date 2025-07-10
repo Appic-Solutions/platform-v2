@@ -10,7 +10,7 @@ export const CreatePoolSchema = z.object({
   token0: z.custom<IcpToken>((val) => !!val, {
     message: 'Token 0 is required',
   }),
-  token0InitialPrice: z.string().optional(),
+  token0InitialPrice: z.string(),
   token0MinPrice: z.string().optional(),
   token0MaxPrice: z.string().optional(),
   token0MinDeposit: z.string().optional(),
@@ -19,7 +19,7 @@ export const CreatePoolSchema = z.object({
   token1: z.custom<IcpToken>((val) => !!val, {
     message: 'Token 1 is required',
   }),
-  token1InitialPrice: z.string().optional(),
+  token1InitialPrice: z.string(),
   token1MinPrice: z.string().optional(),
   token1MaxPrice: z.string().optional(),
   token1MinDeposit: z.string().optional(),

@@ -3,10 +3,9 @@
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
-import AvatarGroup from '../../../create/_components/new-position/AvatarGroup';
 import Image from 'next/image';
 import PositionDetailChart from './PositionDetailChart';
-import { ChevronUpIcon, ManageSearchIcon, PlusIcon } from '@/components/icons';
+import { PlusIcon } from '@/components/icons';
 import { chartShowRanges } from '../../../create/_components/step-two/data';
 import ChartSelection from './ChartSelection';
 import { Avatar } from '@/components/common/ui/avatar';
@@ -27,7 +26,7 @@ const PositionDetail = () => {
           {/* header */}
           <div className="flex w-full items-center">
             <div className="flex items-center gap-2 lg:gap-4">
-              <AvatarGroup />
+              {/* <AvatarGroup /> */}
               <div>
                 <div className="flex items-center gap-4">
                   <h3 className="text-[27px] font-bold lg:text-[40px]">USDC/ETH</h3>

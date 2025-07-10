@@ -44,12 +44,14 @@ const CreatePositionStepTwo = () => {
             </SolidCard>
           </div>
         </div>
+
         {poolExist ? (
           <StepTwoPoolExist setMaxPrice={setMaxPrice} setMinPrice={setMinPrice} />
         ) : (
           <StepTwoPoolNotExist />
         )}
       </div>
+
       {/* boxes */}
       <div className="flex h-full w-full select-none flex-col gap-10 text-white lg:w-[41%]">
         <div>
