@@ -143,7 +143,10 @@ function transformPool(poolId: CandidPoolId, poolState: CandidPoolState, getToke
 	pool.generated_swap_fee_all_time_usd = generatedSwapFee0.multipliedBy(token0UsdPriceBN).plus(generatedSwapFee1.multipliedBy(token1UsdPriceBN)).toString();
 
 	return pool;
-} export async function get_all_pools(
+}
+
+
+export async function get_all_pools(
 	unAuthenticated_agent: HttpAgent,
 	all_icp_tokens: IcpToken[]
 ): Promise<Response<Pool[]>> {

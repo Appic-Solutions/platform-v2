@@ -14,6 +14,7 @@ import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { Principal } from '@dfinity/principal';
+import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 
 if (!projectId) {
 	throw new Error('Project ID is not defined');
@@ -58,7 +59,15 @@ export const WalletWrapper = ({
 					setStorageItem('icpTokens', JSON.stringify(res.result));
 				}
 				return res.result;
+
 			});
+
+			let pools = await get_all_pools(unAuthenticatedAgent, tokens);
+
+			let dex_data = await get_dex_data(unAuthenticatedAgent, tokens, pools.result);
+
+			console.log(dex_data);
+
 
 
 			return [];
