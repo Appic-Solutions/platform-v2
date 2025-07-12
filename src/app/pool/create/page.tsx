@@ -16,12 +16,19 @@ export default function PoolCreatePage() {
     methods,
     stepNextHandler,
     stepBackHandler,
+    getStepValidationFields,
     // Step One
     resetFormHandler,
     selectTokenHandler,
     feeTiers,
     selectFeeHandler,
     // Step Two
+    handleMaxPriceInput,
+    handleMinPriceInput,
+    isToken0Selected,
+    setIsToken0Selected,
+    handleInputChange,
+    handleSetMarketPrice,
     // Step Three
     submitHandler,
   } = CreatePoolLogic();
@@ -47,6 +54,7 @@ export default function PoolCreatePage() {
           )}
           {step === 0 ? (
             <CreatePositionStepOne
+              getStepValidationFields={getStepValidationFields}
               resetFormHandler={resetFormHandler}
               selectTokenHandler={selectTokenHandler}
               feeTiers={feeTiers}
@@ -54,7 +62,15 @@ export default function PoolCreatePage() {
               stateNextHandler={stepNextHandler}
             />
           ) : step === 1 ? (
-            <CreatePositionStepTwo />
+            <CreatePositionStepTwo
+              handleMaxPriceInput={handleMaxPriceInput}
+              handleMinPriceInput={handleMinPriceInput}
+              isToken0Selected={isToken0Selected}
+              feeTiers={feeTiers}
+              setIsToken0Selected={setIsToken0Selected}
+              handleInputChange={handleInputChange}
+              handleSetMarketPrice={handleSetMarketPrice}
+            />
           ) : (
             <CreatePoolStepThree />
           )}

@@ -1,44 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { SelectFeeHandlerProps, SelectTokenHandlerProps } from '../_types';
+import { FeeTier, SelectFeeHandlerProps, SelectTokenHandlerProps } from '../_types';
 import { sortTokens } from '@/blockchain_api/functions/icp/dex/utils/token_order';
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { useSharedStore } from '@/store/store';
-import { FEE_TIERS, FEE_TIERS_DESC_MAP } from '@/blockchain_api/functions/icp/dex/constants';
+import {
+  FEE_TIERS,
+  FEE_TIERS_DESC_MAP,
+  getTickSpacing,
+} from '@/blockchain_api/functions/icp/dex/constants';
 import { Principal } from '@dfinity/principal';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreatePoolFormDefaultValues, CreatePoolSchema } from '../schema';
+import { CreatePoolFormDefaultValues, CreatePoolFormKeys, CreatePoolSchema } from '../schema';
+import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 
 export default function CreatePoolLogic() {
   // Store
-  const { pools } = useSharedStore();
+  const { pools, icpTokens } = useSharedStore();
 
   // States
   const [step, setStep] = useState(0);
-  const [feeTiers, setFeeTiers] = useState<(CandidPoolId & { tvl: string; desc: string })[]>([]);
+  const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
+  const [isToken0Selected, setIsToken0Selected] = useState(true);
 
   // Form
   const methods = useForm<CreatePoolFormDefaultValues>({
     defaultValues: {
       searchTokenQuery: '',
       fee: 3000,
+      tickSpacing: undefined,
+      sqrtPriceX96: '',
       // Token 0
       token0: undefined,
       token0InitialPrice: '',
       token0MinPrice: '',
       token0MaxPrice: '',
-      token0MinDeposit: '',
-      token0MaxDeposit: '',
+      token0DepositAmount: '',
       // Token 1
       token1: undefined,
       token1InitialPrice: '',
       token1MinPrice: '',
       token1MaxPrice: '',
-      token1MinDeposit: '',
-      token1MaxDeposit: '',
+      token1DepositAmount: '',
     },
     resolver: zodResolver(CreatePoolSchema),
   });
@@ -55,7 +61,7 @@ export default function CreatePoolLogic() {
       case 1:
         return ['token0InitialPrice', 'token1InitialPrice'];
       case 2:
-        return ['token0MinDeposit', 'token1MinDeposit'];
+        return ['token0DepositAmount', 'token1DepositAmount'];
       default:
         return [];
     }
@@ -68,6 +74,7 @@ export default function CreatePoolLogic() {
     if (!isValid) return;
     setStep((prev) => prev + 1);
   };
+
   const stepBackHandler = () => {
     setStep((prev) => Math.max(prev - 1, 0));
   };
@@ -75,6 +82,36 @@ export default function CreatePoolLogic() {
   const resetFormHandler = () => {
     methods.reset();
     setFeeTiers([]);
+  };
+
+  const handleMinPriceInput = (value: string) => {
+    const field: CreatePoolFormKeys = isToken0Selected ? 'token0MinPrice' : 'token1MinPrice';
+    const parsedValue = value === '' ? '' : parseFloat(value) >= 0 ? value : '0';
+    methods.setValue(field, parsedValue, { shouldValidate: true, shouldDirty: true });
+    methods.trigger(field);
+  };
+
+  const handleMaxPriceInput = (value: string) => {
+    const field: CreatePoolFormKeys = isToken0Selected ? 'token0MaxPrice' : 'token1MaxPrice';
+    const parsedValue = value === '' ? '' : parseFloat(value) >= 0 ? value : '0';
+    methods.setValue(field, parsedValue, { shouldValidate: true, shouldDirty: true });
+    methods.trigger(field);
+  };
+
+  const handleInputChange = (value: string) => {
+    const field = isToken0Selected ? 'token0InitialPrice' : 'token1InitialPrice';
+    const parsedValue = value === '' ? '' : parseFloat(value) >= 0 ? value : '0';
+    methods.setValue(field, parsedValue, { shouldValidate: true, shouldDirty: true });
+    methods.trigger(field);
+  };
+
+  const handleSetMarketPrice = () => {
+    if (!Token0 || !Token1 || !icpTokens) return;
+    const { price } = get_market_price(
+      { is_token0_selected: isToken0Selected, token0: Token0, token1: Token1, price: '0' },
+      icpTokens,
+    );
+    handleInputChange(price);
   };
 
   // Select & Sort Token Section
@@ -85,6 +122,7 @@ export default function CreatePoolLogic() {
 
   useEffect(() => {
     if (!Token0 || !Token1 || !Token0.canisterId || !Token1.canisterId) return;
+    getTickSpacingHandler(methods.getValues('fee'));
     const { token0, token1 } = sortTokens(Token0, Token1);
     if (token0.canisterId !== Token0.canisterId || token1.canisterId !== Token1.canisterId) {
       methods.setValue('token0', token0);
@@ -97,6 +135,7 @@ export default function CreatePoolLogic() {
       token1: Principal.fromText(token1.canisterId),
       tvl: '0',
       desc: FEE_TIERS_DESC_MAP.get(fee) || 'Best for very stable pairs.',
+      isExist: false,
     }));
 
     const updatedFeeTiers = feeTiersList.map((feeTier) => {
@@ -107,6 +146,11 @@ export default function CreatePoolLogic() {
           pool.pool_id.token1.toText() === feeTier.token1.toText(),
       );
 
+      if (matchingPool) {
+        feeTier.isExist = true;
+      } else {
+        feeTier.isExist = false;
+      }
       return {
         ...feeTier,
         tvl: matchingPool?.tvl_usd || '0',
@@ -114,7 +158,6 @@ export default function CreatePoolLogic() {
     });
 
     setFeeTiers(updatedFeeTiers);
-
     if (updatedFeeTiers.length > 0) {
       const feeTiersWithTvl = updatedFeeTiers
         .map((tier) => ({
@@ -129,6 +172,7 @@ export default function CreatePoolLogic() {
         const highestTvlFee = feeTiersWithTvl[0].fee;
 
         methods.setValue('fee', Number(highestTvlFee));
+        getTickSpacingHandler(Number(highestTvlFee));
       }
     }
   }, [Token0, Token1]);
@@ -136,6 +180,13 @@ export default function CreatePoolLogic() {
   const selectFeeHandler = (value: SelectFeeHandlerProps) => {
     methods.setValue('fee', value);
     methods.clearErrors('fee');
+    getTickSpacingHandler(value);
+  };
+
+  const getTickSpacingHandler = (fee: number) => {
+    const tickSpacing = getTickSpacing(fee);
+    methods.setValue('tickSpacing', tickSpacing ?? 0);
+    console.log('tickSpacing', tickSpacing);
   };
 
   const submitHandler = (values: CreatePoolFormDefaultValues) => {};
@@ -147,12 +198,19 @@ export default function CreatePoolLogic() {
     methods,
     stepNextHandler,
     stepBackHandler,
+    getStepValidationFields,
     // Step One
     resetFormHandler,
     selectTokenHandler,
     feeTiers,
     selectFeeHandler,
     // Step Two
+    isToken0Selected,
+    setIsToken0Selected,
+    handleMinPriceInput,
+    handleMaxPriceInput,
+    handleSetMarketPrice,
+    handleInputChange,
     // Step Three
     submitHandler,
   };

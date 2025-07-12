@@ -1,26 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AvatarGroup from './AvatarGroup';
-import StepTwoPoolExist from './StepTwoPoolExist';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
-import { Avatar } from '@/components/common/ui/avatar';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
 import SolidCard from '@/components/ui/cards/SolidCard';
-import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import PriceRangeInputs from './PriceRangeInputs';
+import DepositTokenInputs from './DepositTokenInputs';
+import StepTwoPoolExist from './StepTwoPoolExist';
+import { CreatePositionStepTwoProps } from '../../_types';
 
-const CreatePositionStepTwo = () => {
-  const [minPrice, setMinPrice] = useState(1100);
-  const [maxPrice, setMaxPrice] = useState(1600);
-  const [poolExist, setPoolExist] = useState(false);
-
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<CreatePoolFormDefaultValues>();
-
-  const [token0, token1, Fee] = useWatch({
+const CreatePositionStepTwo = ({
+  isToken0Selected,
+  setIsToken0Selected,
+  handleMaxPriceInput,
+  handleMinPriceInput,
+  handleInputChange,
+  handleSetMarketPrice,
+  feeTiers,
+}: CreatePositionStepTwoProps) => {
+  const { control } = useFormContext<CreatePoolFormDefaultValues>();
+  const [token0, token1, fee] = useWatch({
     control,
     name: ['token0', 'token1', 'fee'],
+  });
+  const [selectedToken, setSelectedToken] = useState<IcpToken | null>(token0);
+  const [isPoolExist, setIsPoolExist] = useState(false);
+
+  useEffect(() => {
+    if (token0 && !selectedToken) {
+      setSelectedToken(token0);
+    }
+  }, [token0, selectedToken]);
+
+  useEffect(() => {
+    const selectedFee = feeTiers.find((tier) => Number(tier.fee) === fee);
+    if (selectedFee && selectedFee.isExist) {
+      setIsPoolExist(true);
+    } else {
+      setIsPoolExist(false);
+    }
   });
 
   return (
@@ -45,79 +64,29 @@ const CreatePositionStepTwo = () => {
           </div>
         </div>
 
-        {poolExist ? (
-          <StepTwoPoolExist setMaxPrice={setMaxPrice} setMinPrice={setMinPrice} />
+        {isPoolExist ? (
+          <StepTwoPoolExist setMaxPrice={handleMaxPriceInput} setMinPrice={handleMinPriceInput} />
         ) : (
-          <StepTwoPoolNotExist />
+          <StepTwoPoolNotExist
+            selectedToken={selectedToken}
+            setSelectedToken={setSelectedToken}
+            isToken0Selected={isToken0Selected}
+            setIsToken0Selected={setIsToken0Selected}
+            handleInputChange={handleInputChange}
+            handleSetMarketPrice={handleSetMarketPrice}
+          />
         )}
       </div>
 
       {/* boxes */}
-      <div className="flex h-full w-full select-none flex-col gap-10 text-white lg:w-[41%]">
-        <div>
-          <h3 className="mb-4 text-xl font-bold lg:text-2xl">Set Price range</h3>
-          <div className="flex justify-start gap-4 lg:justify-between">
-            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
-              <div className="flex h-full flex-col justify-between font-semibold">
-                <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
-                <div className="flex flex-col gap-2">
-                  <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
-                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
-                </div>
-              </div>
-            </GradientBorderCard>
-            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
-              <div className="flex h-full flex-col justify-between font-semibold">
-                <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
-                <div className="flex flex-col gap-2">
-                  <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
-                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">USDC = 1 ETH</p>
-                </div>
-              </div>
-            </GradientBorderCard>
-          </div>
-        </div>
-        <div>
-          <h3 className="mb-4 text-2xl font-bold">Deposit tokens</h3>
-          <p className="mb-4 text-[15px] font-normal">
-            The amount earned providing liquidity. Choose an amount that suits your risk tolerance
-            and strategy.
-          </p>
-          <div className="flex justify-start gap-4 lg:justify-between">
-            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
-              <div className="flex h-full flex-col justify-between font-semibold">
-                <div className="flex items-center gap-2">
-                  <Avatar
-                    // src={token?.logo}
-                    src="/images/logo/chains-logos/ethereum.svg"
-                    className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
-                  />
-                  <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-[22px] lg:text-[27px]">{minPrice.toFixed(2)}</p>
-                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
-                </div>
-              </div>
-            </GradientBorderCard>
-            <GradientBorderCard className="h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]">
-              <div className="flex h-full flex-col justify-between font-semibold">
-                <div className="flex items-center gap-2">
-                  <Avatar
-                    // src={token?.logo}
-                    src="/images/logo/chains-logos/ethereum.svg"
-                    className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
-                  />
-                  <p className="text-base text-[#FFFFFF] lg:text-[21px]">ETH</p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-[22px] lg:text-[27px]">{maxPrice.toFixed(2)}</p>
-                  <p className="text-xs text-[#FFFFFF7A] lg:text-sm">$110.0M</p>
-                </div>
-              </div>
-            </GradientBorderCard>
-          </div>
-        </div>
+      <div className="flex h-full w-full select-none flex-col gap-9 text-white lg:w-[41%]">
+        <PriceRangeInputs
+          isToken0Selected={isToken0Selected}
+          handleMaxPriceInput={handleMaxPriceInput}
+          handleMinPriceInput={handleMinPriceInput}
+        />
+        {/* deposit tokens boxes */}
+        <DepositTokenInputs isToken0Selected={isToken0Selected} />
         <button className="h-[50px] rounded-[15px] bg-primary-buttons lg:h-[66px]">Review</button>
       </div>
     </div>

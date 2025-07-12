@@ -1,47 +1,42 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import { ErrorIcon } from '@/components/icons';
-import { IcpToken } from '@/blockchain_api/types/tokens';
 import { CreatePoolFormDefaultValues } from '../../schema';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { calculate_price, get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import { useSharedStore } from '@/store/store';
+import { StepTwoPoolNotExistProps } from '../../_types';
 
-const StepTwoPoolNotExist: React.FC = () => {
+const StepTwoPoolNotExist = ({
+  setIsToken0Selected,
+  isToken0Selected,
+  handleInputChange,
+  handleSetMarketPrice,
+  selectedToken,
+  setSelectedToken,
+}: StepTwoPoolNotExistProps) => {
   const { icpTokens } = useSharedStore();
-  const { control, setValue, trigger } = useFormContext<CreatePoolFormDefaultValues>();
-
+  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
   const [token0, token1, token0InitialPrice, token1InitialPrice] = useWatch({
     control,
     name: ['token0', 'token1', 'token0InitialPrice', 'token1InitialPrice'],
   });
 
-  const [selectedToken, setSelectedToken] = useState<IcpToken | null>(null);
-
-  const isToken0Selected = useMemo(
-    () => selectedToken?.canisterId === token0?.canisterId,
-    [selectedToken, token0],
-  );
-
-  useEffect(() => {
-    if (token0 && !selectedToken) {
-      setSelectedToken(token0);
-    }
-  }, [token0, selectedToken]);
-
   const priceText = useMemo(() => {
     if (!token0 || !token1) return 'Select tokens to set price';
     const price = isToken0Selected ? token0InitialPrice : token1InitialPrice;
     if (!price || parseFloat(price) <= 0) return 'Enter a valid price';
-    return calculate_price({
+    const result = calculate_price({
       token0,
       token1,
       is_token0_selected: isToken0Selected,
       price,
-    }).text;
+    });
+    setValue('sqrtPriceX96', result.sqrt_price_x96);
+    return result.text;
   }, [token0, token1, isToken0Selected, token0InitialPrice, token1InitialPrice]);
 
   const marketPriceText = useMemo(() => {
@@ -57,21 +52,6 @@ const StepTwoPoolNotExist: React.FC = () => {
     ).text;
   }, [token0, token1, isToken0Selected, icpTokens, token0InitialPrice, token1InitialPrice]);
 
-  const handleInputChange = (value: string) => {
-    const field = isToken0Selected ? 'token0InitialPrice' : 'token1InitialPrice';
-    const parsedValue = value === '' ? '' : parseFloat(value) >= 0 ? value : '0';
-    setValue(field, parsedValue, { shouldValidate: true, shouldDirty: true });
-    trigger(field);
-  };
-
-  const handleSetMarketPrice = () => {
-    if (!token0 || !token1 || !icpTokens) return;
-    const { price } = get_market_price(
-      { is_token0_selected: isToken0Selected, token0, token1, price: '0' },
-      icpTokens,
-    );
-    handleInputChange(price);
-  };
   return (
     <>
       <SolidCard>
@@ -108,7 +88,10 @@ const StepTwoPoolNotExist: React.FC = () => {
                             ? 'bg-[#1E53B8] text-white'
                             : 'bg-[#222222] text-white/70',
                         )}
-                        onClick={() => setSelectedToken(t)}
+                        onClick={() => {
+                          setSelectedToken(t);
+                          setIsToken0Selected(idx === 0);
+                        }}
                         disabled={!t}
                       >
                         <Image

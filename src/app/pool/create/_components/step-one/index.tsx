@@ -2,12 +2,11 @@ import { CreatePoolStepOneProps } from '@/app/pool/create/_types';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowPathIcon } from '@/components/icons';
 import { cn, getChainLogo } from '@/lib/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FeeTiers from '../fee-tiers';
 import TokenList from '../token-list';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
-import ErrorMessage from '@/components/form/error-message';
 
 export default function CreatePositionStepOne({
   resetFormHandler,
@@ -18,16 +17,26 @@ export default function CreatePositionStepOne({
 }: CreatePoolStepOneProps) {
   const {
     control,
+    trigger,
     formState: { errors },
   } = useFormContext<CreatePoolFormDefaultValues>();
   // State
   const [activePage, setActivePage] = useState(0);
+  const [isFormValid, setIsFormValid] = useState(false);
   const [selectedTokenType, setSelectedTokenType] = useState<1 | 2>(1);
 
   const [Token0, Token1, Fee] = useWatch({
     control,
     name: ['token0', 'token1', 'fee'],
   });
+
+  useEffect(() => {
+    if (Token0 && Token1 && Fee) {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  }, [Token0, Token1, Fee]);
 
   switch (activePage) {
     case 1:
@@ -113,7 +122,7 @@ export default function CreatePositionStepOne({
                 {Token0?.symbol || 'Select Token'}
               </p>
             </div>
-            <ErrorMessage name="token0" />
+            {/* <ErrorMessage name="token0" /> */}
             <div
               className={cn(
                 'group relative cursor-pointer overflow-clip',
@@ -150,7 +159,7 @@ export default function CreatePositionStepOne({
                 {Token1?.symbol || 'Select Token'}
               </p>
             </div>
-            <ErrorMessage name="token1" />
+            {/* <ErrorMessage name="token1" /> */}
           </div>
 
           <div className="flex w-full flex-col gap-y-1">
@@ -200,19 +209,19 @@ export default function CreatePositionStepOne({
               change
             </button>
           </div>
-          <ErrorMessage name="fee" />
 
           {/* Action Button */}
           <button
             className={cn(
               'min-h-14 w-full',
-              'bg-primary-buttons',
+              'cursor-pointer bg-primary-buttons',
               'text-white',
               'mt-auto md:mt-0',
               'select-none rounded-[16px] duration-200',
-              'hover:opacity-85',
+              'hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50',
             )}
             onClick={stateNextHandler}
+            disabled={!isFormValid}
           >
             Continue
           </button>

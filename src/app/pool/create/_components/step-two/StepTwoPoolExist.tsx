@@ -9,8 +9,8 @@ const StepTwoPoolExist = ({
   setMinPrice,
   setMaxPrice,
 }: {
-  setMinPrice: (price: number) => void;
-  setMaxPrice: (price: number) => void;
+  setMinPrice: (price: string) => void;
+  setMaxPrice: (price: string) => void;
 }) => {
   const [selectedTab, setSelectedTab] = useState<Charts>(tabs[0].value);
   const [selectedChart, setSelectedChart] = useState<string>('usdc');
@@ -60,8 +60,8 @@ const StepTwoPoolExist = ({
           </div>
         </div>
         <PriceRangeBarChart
-          setMaxPrice={(price) => setMaxPrice(price)}
-          setMinPrice={(price) => setMinPrice(price)}
+          setMaxPrice={(price) => setMaxPrice(`${price}`)}
+          setMinPrice={(price) => setMinPrice(`${price}`)}
           selectedTab={selectedTab}
         />
       </div>
