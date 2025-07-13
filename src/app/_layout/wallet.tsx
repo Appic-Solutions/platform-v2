@@ -1,32 +1,54 @@
 'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { HttpAgent } from '@dfinity/agent';
+
 import { cn, getChainLogo } from '@/lib/utils';
-import { useAuth } from '@nfid/identitykit/react';
-import { useAppKit, useDisconnect } from '@reown/appkit/react';
-import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
-import { CloseIcon } from '@/components/icons';
-import WalletCard from './wallet/wallet-card';
-import { WalletPop } from './wallet/wallet-pop';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
-import { useSharedStore, useSharedStoreActions } from '@/store/store';
+import { getStorageItem } from '@/lib/helpers/localstorage';
 import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '@nfid/identitykit/react';
+import { useAppKit, useDisconnect } from '@reown/appkit/react';
+
 import {
   check_deposit_status,
   check_withdraw_status,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import {
+  get_all_pools,
+  Pool,
+} from '@/blockchain_api/functions/icp/dex/get_pool';
+import {
+  get_dex_data,
+} from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
+import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+
+import {
   getPendingTransaction,
   PendingTransaction,
   removePendingTransaction,
 } from '@/lib/helpers/session';
+
+import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
-import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
-import { HttpAgent } from '@dfinity/agent';
-import { getStorageItem } from '@/lib/helpers/localstorage';
-import { IcpToken } from '@/blockchain_api/types/tokens';
-import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
+
+import WalletCard from './wallet/wallet-card';
+import { WalletPop } from './wallet/wallet-pop';
+import { CloseIcon } from '@/components/icons';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverClose,
+} from '@/components/ui/popover';
 
 const WalletPage = () => {
   const {
@@ -39,6 +61,7 @@ const WalletPage = () => {
     isEvmBalanceLoading,
     isIcpBalanceLoading,
   } = useSharedStore();
+
   const {
     setIcpBalance,
     setIcpTokens,
@@ -51,28 +74,24 @@ const WalletPage = () => {
     setIsEvmBalanceLoading,
     setIsIcpBalanceLoading,
     setPools,
+    setDexData,
   } = useSharedStoreActions();
 
   const { pendingTx } = useBridgeStore();
   const { setPendingTx } = useBridgeActions();
 
   const queryClient = useQueryClient();
-
-  // ICP Wallet Hooks
   const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
-
-  // EVM Wallet Hooks
   const { open: openEvmModal } = useAppKit();
   const { disconnect: disconnectEvm } = useDisconnect();
-
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   const [isFetching, setIsFetching] = useState(false);
+
   const fetchBalances = async () => {
     if (isFetching) return null;
     setIsFetching(true);
 
-    // Fetch EVM balance
     if (evmAddress) {
       setIsEvmBalanceLoading(true);
       try {
@@ -83,7 +102,6 @@ const WalletPage = () => {
       }
     }
 
-    // Fetch ICP balance
     if (icpIdentity && unAuthenticatedAgent) {
       setUnAuthenticatedAgent(unAuthenticatedAgent);
       setIsIcpBalanceLoading(true);
@@ -99,21 +117,19 @@ const WalletPage = () => {
     return null;
   };
 
-  // Fetch balances on dependency change
   useEffect(() => {
     if (evmAddress || icpIdentity) {
       fetchBalances();
     }
   }, [evmAddress, icpIdentity]);
 
-  // Fetch balances every 1.5 minutes
   useQuery({
     queryKey: ['fetch-wallet-balances'],
     queryFn: fetchBalances,
     refetchInterval: 1000 * 90,
     gcTime: 1000 * 60,
     staleTime: 1000 * 60,
-    enabled: !!(evmAddress || icpIdentity), // Enable only if wallets are connected
+    enabled: !!(evmAddress || icpIdentity),
   });
 
   const handleDisconnectIcp = () => {
@@ -130,21 +146,15 @@ const WalletPage = () => {
     setEvmAddress(undefined);
   };
 
-  // [{bridge_option: BridgeOption, id: TxHash | string}]
-  // get pending tx on reload
   useEffect(() => {
-    const pendingTxFromSession = getPendingTransaction() as PendingTransaction;
-    if (pendingTxFromSession) {
-      if (pendingTxFromSession.bridge_option.bridge_tx_type === TxType.Deposit && evmAddress) {
-        setPendingTx(pendingTxFromSession);
-      }
-      if (pendingTxFromSession.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
-        setPendingTx(pendingTxFromSession);
-      }
+    const pending = getPendingTransaction() as PendingTransaction;
+    if (pending?.bridge_option.bridge_tx_type === TxType.Deposit && evmAddress) {
+      setPendingTx(pending);
+    } else if (pending?.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
+      setPendingTx(pending);
     }
   }, [evmAddress, icpIdentity, setPendingTx]);
 
-  // check pending deposit tx status
   useQuery({
     queryKey: ['check-pending-deposit-status'],
     queryFn: async () => {
@@ -153,32 +163,24 @@ const WalletPage = () => {
         pendingTx?.bridge_option as BridgeOption,
         unAuthenticatedAgent as HttpAgent,
       );
-      if (res.success) {
-        if (res.result === 'Minted') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else {
-          setPendingTx(pendingTx);
-        }
-      } else if (!res.success) {
+
+      if (!res.success || ['Minted', 'Invalid', 'Quarantined'].includes(res.result)) {
         setPendingTx(undefined);
         removePendingTransaction();
       }
+
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchBalances();
       return res;
     },
-    refetchInterval: 1000 * 5,
+    refetchInterval: 5000,
     enabled:
       !!pendingTx &&
       !!unAuthenticatedAgent &&
       pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
       !!evmAddress,
   });
-  // check pending withdrawal tx status
+
   useQuery({
     queryKey: ['check-pending-withdrawal-status'],
     queryFn: async () => {
@@ -188,25 +190,16 @@ const WalletPage = () => {
         unAuthenticatedAgent as HttpAgent,
       );
 
-      if (res.success) {
-        if (res.result === 'Successful') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else {
-          setPendingTx(pendingTx);
-        }
-      } else if (!res.success) {
+      if (!res.success || ['Successful', 'QuarantinedReimbursement', 'Reimbursed'].includes(res.result)) {
         setPendingTx(undefined);
         removePendingTransaction();
       }
+
       queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
       fetchBalances();
       return res;
     },
-    refetchInterval: 1000 * 5,
+    refetchInterval: 5000,
     enabled:
       !!pendingTx &&
       !!unAuthenticatedAgent &&
@@ -214,33 +207,50 @@ const WalletPage = () => {
       !!icpIdentity,
   });
 
-  const rawTokens = useMemo(() => {
+  const rawIcpTokens = useMemo(() => {
     const stored = getStorageItem('icpTokens');
     return stored ? (JSON.parse(stored) as IcpToken[]) : [];
   }, []);
 
-  const { data } = useQuery({
+  const { data: allPools } = useQuery({
     queryKey: ['icp-pools'],
     queryFn: async () => {
-      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, rawTokens);
-      if (!response.success) {
-        throw new Error('Failed to fetch all pools');
-      }
+      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, rawIcpTokens);
+      if (!response.success) throw new Error('Failed to fetch all pools');
       return response.result;
     },
-    enabled: !!unAuthenticatedAgent && rawTokens.length > 0,
+    enabled: !!unAuthenticatedAgent && rawIcpTokens.length > 0,
+    retry: false,
+  });
+
+  const { data: dexData } = useQuery({
+    queryKey: ['dex-data'],
+    queryFn: async () => {
+      const response = await get_dex_data(
+        unAuthenticatedAgent as HttpAgent,
+        rawIcpTokens,
+        allPools as Pool[],
+      );
+      if (!response.success) throw new Error('Failed to fetch dex data');
+      return response.result;
+    },
+    enabled: !!unAuthenticatedAgent && rawIcpTokens.length > 0 && !!allPools?.length,
     retry: false,
   });
 
   useEffect(() => {
-    if (data) setPools(data);
-  }, [data, setPools]);
+    if (allPools) setPools(allPools);
+  }, [allPools, setPools]);
 
   useEffect(() => {
-    if (rawTokens.length > 0) {
-      setIcpTokens(rawTokens);
+    if (dexData) setDexData(dexData);
+  }, [dexData, setDexData]);
+
+  useEffect(() => {
+    if (rawIcpTokens.length > 0) {
+      setIcpTokens(rawIcpTokens);
     }
-  }, [rawTokens, setIcpTokens]);
+  }, [rawIcpTokens, setIcpTokens]);
 
   return (
     <div
@@ -254,7 +264,7 @@ const WalletPage = () => {
     >
       {(!icpIdentity || !isEvmConnected) && (
         <>
-          {/* mobile wallet connection buttons */}
+          {/* Mobile wallet connection */}
           <div className="md:hidden">
             <Drawer>
               <DrawerTrigger className="w-full px-3 py-2 text-sm font-medium text-white">
@@ -265,14 +275,14 @@ const WalletPage = () => {
                 <div className="flex flex-col gap-4">
                   {!icpIdentity && (
                     <WalletCard
-                      connectWallet={() => connectIcp()}
+                      connectWallet={connectIcp}
                       walletLogo="/images/logo/wallet_logos/icp.svg"
                       walletTitle="Connect ICP Wallet"
                     />
                   )}
                   {!isEvmConnected && (
                     <WalletCard
-                      connectWallet={() => openEvmModal()}
+                      connectWallet={openEvmModal}
                       walletLogo={getChainLogo(chainId)}
                       walletTitle="Connect EVM Wallet"
                     />
@@ -282,7 +292,7 @@ const WalletPage = () => {
             </Drawer>
           </div>
 
-          {/* desktop wallet connection buttons */}
+          {/* Desktop wallet connection */}
           <div className="hidden md:block">
             <Popover>
               <PopoverTrigger className="w-full px-3 py-2 text-sm font-medium text-white">
@@ -298,15 +308,15 @@ const WalletPage = () => {
                 <div className="flex flex-col gap-4">
                   {!icpIdentity && (
                     <WalletCard
-                      connectWallet={() => connectIcp()}
+                      connectWallet={connectIcp}
                       walletLogo="/images/logo/wallet_logos/icp.svg"
                       walletTitle="Connect ICP Wallet"
                     />
                   )}
                   {!isEvmConnected && (
                     <WalletCard
-                      connectWallet={() => openEvmModal()}
-                      walletLogo={'/images/logo/chains-logos/ethereum.svg'}
+                      connectWallet={openEvmModal}
+                      walletLogo="/images/logo/chains-logos/ethereum.svg"
                       walletTitle="Connect EVM Wallet"
                     />
                   )}
@@ -321,23 +331,21 @@ const WalletPage = () => {
         <span className="w-full px-3 py-2 text-sm font-medium text-white">Connected Wallets</span>
       )}
 
-      {/* wallet content */}
       <div className="flex items-center gap-x-2">
-        {icpIdentity ? (
+        {icpIdentity && (
           <WalletPop
             logo="/images/logo/wallet_logos/icp.svg"
             title="Your ICP Wallet"
             balance={icpBalance}
             disconnect={handleDisconnectIcp}
             isLoading={isIcpBalanceLoading}
-            address={icpIdentity?.toString() || ''}
+            address={icpIdentity.toString()}
             refetchBalance={fetchBalances}
           />
-        ) : null}
-
-        {isEvmConnected ? (
+        )}
+        {isEvmConnected && (
           <WalletPop
-            logo={'/images/logo/chains-logos/ethereum.svg'}
+            logo="/images/logo/chains-logos/ethereum.svg"
             title="Your EVM Wallet"
             balance={evmBalance}
             disconnect={handleDisconnectEvm}
@@ -345,7 +353,7 @@ const WalletPage = () => {
             address={evmAddress || ''}
             refetchBalance={fetchBalances}
           />
-        ) : null}
+        )}
       </div>
     </div>
   );
