@@ -15,6 +15,9 @@ import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { Principal } from '@dfinity/principal';
 import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
+import { TickMath } from '@/blockchain_api/functions/icp/dex/utils/tick_math';
 
 if (!projectId) {
 	throw new Error('Project ID is not defined');
@@ -62,11 +65,6 @@ export const WalletWrapper = ({
 
 			});
 
-			let pools = await get_all_pools(unAuthenticatedAgent, tokens);
-
-			let dex_data = await get_dex_data(unAuthenticatedAgent, tokens, pools.result);
-
-			console.log(dex_data);
 
 
 

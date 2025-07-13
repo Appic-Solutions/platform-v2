@@ -79,8 +79,8 @@ export  function generate_mint_position_args({
 
 
 	// Get raw ticks (placeholder functions)
-	const tick_lower_raw = TickMath.getTickAtSqrtRatio(sqrtPriceX96_lower);
-	const tick_upper_raw = TickMath.getTickAtSqrtRatio(sqrtPriceX96_higher);
+	const tick_lower_raw = TickMath.getTickAtSqrtRatio(BigInt(sqrtPriceX96_lower.toString()));
+	const tick_upper_raw = TickMath.getTickAtSqrtRatio(BigInt(sqrtPriceX96_higher.toString()));
 
 	// Align ticks with tick_spacing
 	const tick_lower_aligned = Math.floor(tick_lower_raw / tick_spacing) * tick_spacing;

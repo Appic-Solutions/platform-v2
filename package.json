@@ -46,6 +46,7 @@
     "eslint-define-config": "2.1.0",
     "framer-motion": "12.10.5",
     "globals": "16.1.0",
+    "jsbi": "^1.0.0",
     "lucide-react": "0.509.0",
     "next": "14.2.17",
     "react": "18",
