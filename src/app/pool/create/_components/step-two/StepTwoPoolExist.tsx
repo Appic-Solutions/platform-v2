@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { Charts, chartShowRanges, chartTypes, tabs } from './data';
 import { cn } from '@/lib/utils';
+import { useSharedStore } from '@/store/store';
 
 const StepTwoPoolExist = ({
   setMinPrice,
@@ -12,6 +13,8 @@ const StepTwoPoolExist = ({
   setMinPrice: (price: string) => void;
   setMaxPrice: (price: string) => void;
 }) => {
+  const { pools } = useSharedStore();
+  console.log(pools);
   const [selectedTab, setSelectedTab] = useState<Charts>(tabs[0].value);
   const [selectedChart, setSelectedChart] = useState<string>('usdc');
   const [selectedChartShowRange, setSelectedChartShowRange] =

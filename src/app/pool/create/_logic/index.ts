@@ -16,6 +16,7 @@ import { Principal } from '@dfinity/principal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CreatePoolFormDefaultValues, CreatePoolFormKeys, CreatePoolSchema } from '../schema';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
+import { get_active_liquidity } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 
 export default function CreatePoolLogic() {
   // Store
@@ -114,10 +115,47 @@ export default function CreatePoolLogic() {
     handleInputChange(price);
   };
 
+  // const getActiveLiquidityHandler = () => {
+  //   get_active_liquidity({
+  //     is_token0_selected: isToken0Selected,
+  //     pool_id
+  //   })
+  // }
+
   // Select & Sort Token Section
   const selectTokenHandler = ({ name, value }: SelectTokenHandlerProps) => {
+    resetFieldsOnSelectToken(name);
     methods.setValue(name, value);
     methods.clearErrors(name);
+  };
+
+  const resetFieldsOnSelectToken = (fieldName: string) => {
+    if (
+      methods.getValues('token0') &&
+      methods.getValues('token0').canisterId &&
+      methods.getValues('token1') &&
+      methods.getValues('token1').canisterId
+    ) {
+      console.log('here');
+      if (fieldName === 'token0') {
+        console.log('here2, field name is token0');
+        methods.setValue('token1', undefined as any);
+      } else if (fieldName === 'token1') {
+        console.log('here3, field name is token1');
+        methods.setValue('token0', undefined as any);
+      }
+    }
+    methods.setValue('token0InitialPrice', '');
+    methods.setValue('token1InitialPrice', '');
+    methods.setValue('token0MinPrice', '');
+    methods.setValue('token1MinPrice', '');
+    methods.setValue('token0MaxPrice', '');
+    methods.setValue('token1MaxPrice', '');
+    methods.setValue('token0DepositAmount', '');
+    methods.setValue('token1DepositAmount', '');
+    setFeeTiers([]);
+    methods.trigger();
+    console.log('methods.getValues', methods.getValues('token0'), methods.getValues('token1'));
   };
 
   useEffect(() => {
@@ -145,6 +183,8 @@ export default function CreatePoolLogic() {
           pool.pool_id.token0.toText() === feeTier.token0.toText() &&
           pool.pool_id.token1.toText() === feeTier.token1.toText(),
       );
+
+      console.log('matchingPool', matchingPool);
 
       if (matchingPool) {
         feeTier.isExist = true;
