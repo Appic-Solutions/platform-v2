@@ -10,6 +10,7 @@ import ExplorePageLogic from './_logic';
 import { FormProvider } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Avatar } from '@/components/common/ui/avatar';
 
 export default function ExplorePage() {
   const router = useRouter();
@@ -85,7 +86,9 @@ export default function ExplorePage() {
               >
                 <tr>
                   <th className="w-20">#</th>
-                  <th className="text-left">Pool</th>
+                  <th colSpan={2} className="text-left">
+                    Pool
+                  </th>
                   <th>Fee</th>
                   <th>TVL</th>
                   <th>APR</th>
@@ -125,7 +128,15 @@ export default function ExplorePage() {
                       }}
                     >
                       <td>{idx + 1}</td>
-                      <td className="text-left">{`${item.token0.symbol}/${item.token1.symbol}`}</td>
+                      <td colSpan={2} className="text-left">
+                        <div className="flex items-center gap-x-1.5">
+                          <div className="flex">
+                            <Avatar src={item.token0.logo} className="h-5 w-5" />
+                            <Avatar src={item.token1.logo} className="-ml-2 h-5 w-5" />
+                          </div>
+                          {`${item.token0.symbol}/${item.token1.symbol}`}
+                        </div>
+                      </td>
                       <td>{(Number(item.pool.pool_id.fee) / 10000).toFixed(2)}%</td>
                       <td>${Number(item.pool.tvl_usd).toFixed(2)}</td>
                       <td>{item.apr ? `${Number(item.apr).toFixed(2)}%` : '0%'}</td>
