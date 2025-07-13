@@ -8,6 +8,7 @@ import { Principal } from "@dfinity/principal";
 import { sortTokens } from "./utils/token_order";
 import BigNumber from 'bignumber.js';
 import { IcpToken } from "@/blockchain_api/types/tokens";
+import { TickMath } from "./utils/tick_math";
 
 export interface Pool {
 	pool_id: CandidPoolId,
@@ -156,6 +157,9 @@ export async function get_all_pools(
 	});
 
 	try {
+
+
+
 		let pools = await dex_actor.get_pools() as [CandidPoolId, CandidPoolState][];
 
 		const tokenMap = new Map<string, IcpToken>();

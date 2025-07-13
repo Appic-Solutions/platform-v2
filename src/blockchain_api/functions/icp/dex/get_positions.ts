@@ -154,8 +154,8 @@ export function createPositionObjects(
 
 		// Calculate sqrt ratios using BigNumber
 		const sqrtRatioCurrentX96 = new BigNumber(pool.sqrt_price_x96);
-		const sqrtRatioLowerX96 = TickMath.getSqrtRatioAtTick(Number(positionKey.tick_lower));
-		const sqrtRatioUpperX96 = TickMath.getSqrtRatioAtTick(Number(positionKey.tick_upper));
+		const sqrtRatioLowerX96 = BigNumber(TickMath.getSqrtRatioAtTick(Number(positionKey.tick_lower)).toString());
+		const sqrtRatioUpperX96 = BigNumber(TickMath.getSqrtRatioAtTick(Number(positionKey.tick_upper)).toString());
 
 		const liquidity = new BigNumber(positionInfo.liquidity);
 

@@ -197,7 +197,7 @@ function generateDexData(
 		const yearlyData = processBuckets(history[1].yearly_frame);
 
 		// Calculate 24h totals using nanoseconds
-		const last24hStart = currentTimestamp - BigInt(86400 );
+		const last24hStart = currentTimestamp - BigInt(86400);
 		const last24hBuckets = history[1].hourly_frame.filter(
 			(bucket) => bucket.start_timestamp >= last24hStart
 		);
