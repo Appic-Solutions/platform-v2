@@ -27,6 +27,7 @@ interface PoolHistory {
 	monthly_price_token0_in_token1: string[];
 	yearly_price_token0_in_token1: string[];
 	total_24h_volume_usd: string;
+	total_30d_volume_usd: string;
 	total_24h_collected_fees_usd: string;
 	apr: string;
 }
@@ -202,7 +203,11 @@ function generateDexData(
 			(bucket) => bucket.start_timestamp >= last24hStart
 		);
 
+		const last30dStart = currentTimestamp - BigInt(86400 * 30);
+		const last30DdBuckets = history[1].daily_frame.filter((bucket) => bucket.start_timestamp >= last30dStart);
+
 		let total_24h_volume_usd = new BigNumber(0);
+		let toatal_30d_volume_usd = new BigNumber(0);
 		let total_24h_collected_fees_usd = new BigNumber(0);
 
 		last24hBuckets.forEach((bucket) => {
@@ -229,6 +234,21 @@ function generateDexData(
 			total_24h_volume_usd = total_24h_volume_usd.plus(volumeUsd);
 			total_24h_collected_fees_usd = total_24h_collected_fees_usd.plus(feesUsd);
 		});
+
+		last30DdBuckets.forEach((bucket)=>{
+				const volumeToken0 = new BigNumber(bucket.swap_volume_token0_during_bucket.toString()).dividedBy(
+				new BigNumber(10).pow(token0.decimals)
+			);
+			const volumeToken1 = new BigNumber(bucket.swap_volume_token1_during_bucket.toString()).dividedBy(
+				new BigNumber(10).pow(token1.decimals)
+			);
+			const volumeUsd = volumeToken0
+				.multipliedBy(new BigNumber(token0.usdPrice))
+				.plus(volumeToken1.multipliedBy(new BigNumber(token1.usdPrice)));
+
+
+			toatal_30d_volume_usd=toatal_30d_volume_usd.plus(volumeUsd);
+		})
 
 		// Calculate APR
 		const tvl_usd = new BigNumber(pool.tvl_usd || '0');
@@ -261,6 +281,7 @@ function generateDexData(
 
 			total_24h_volume_usd: total_24h_volume_usd.toString(),
 			total_24h_collected_fees_usd: total_24h_collected_fees_usd.toString(),
+			total_30d_volume_usd:toatal_30d_volume_usd.toString(),
 
 			apr,
 		};
