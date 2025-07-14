@@ -7,17 +7,6 @@ import { wagmiAdapter, projectId } from '@/lib/configs/wagmi';
 import { createAppKit } from '@reown/appkit/react';
 import { mainnet, arbitrum, avalanche, base, optimism, polygon, bsc } from '@reown/appkit/networks';
 import { WagmiProvider, type Config } from 'wagmi';
-import { useQuery } from '@tanstack/react-query';
-import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
-import { setStorageItem } from '@/lib/helpers/localstorage';
-import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
-import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
-import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
-import { Principal } from '@dfinity/principal';
-import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
-import { IcpToken } from '@/blockchain_api/types/tokens';
-import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
-import { TickMath } from '@/blockchain_api/functions/icp/dex/utils/tick_math';
 
 if (!projectId) {
 	throw new Error('Project ID is not defined');
@@ -50,34 +39,6 @@ export const WalletWrapper = ({
 }: Readonly<{
 	children: React.ReactNode;
 }>) => {
-	const unAuthenticatedAgent = useUnAuthenticatedAgent();
-
-	useQuery({
-		queryKey: ['IcpTokens'],
-		queryFn: async () => {
-			if (!unAuthenticatedAgent) return [];
-
-			let tokens = await get_icp_tokens(unAuthenticatedAgent).then((res) => {
-				if (res.result) {
-					setStorageItem('icpTokens', JSON.stringify(res.result));
-				}
-				return res.result;
-
-			});
-
-
-
-
-			return [];
-		},
-		enabled: !!unAuthenticatedAgent,
-		refetchInterval: 1000 * 60 * 5,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false,
-		staleTime: 1000 * 60,
-		gcTime: 1000 * 60 * 10,
-	});
-
 	return (
 		<WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
 			<IdentityKitProvider
