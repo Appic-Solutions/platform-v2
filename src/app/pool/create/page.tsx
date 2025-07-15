@@ -27,7 +27,7 @@ export default function PoolCreatePage() {
     handleMinPriceInput,
     isToken0Selected,
     setIsToken0Selected,
-    handleInputChange,
+    handleInitialPriceInput,
     handleSetMarketPrice,
     // Step Three
     submitHandler,
@@ -68,7 +68,7 @@ export default function PoolCreatePage() {
               isToken0Selected={isToken0Selected}
               feeTiers={feeTiers}
               setIsToken0Selected={setIsToken0Selected}
-              handleInputChange={handleInputChange}
+              handleInitialPriceInput={handleInitialPriceInput}
               handleSetMarketPrice={handleSetMarketPrice}
             />
           ) : (

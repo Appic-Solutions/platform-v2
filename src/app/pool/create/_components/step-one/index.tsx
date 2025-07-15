@@ -1,4 +1,4 @@
-import { CreatePoolStepOneProps } from '@/app/pool/create/_types';
+import { CreatePoolStepOneProps, FeeTier } from '@/app/pool/create/_types';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowPathIcon } from '@/components/icons';
 import { cn, getChainLogo } from '@/lib/utils';
@@ -15,15 +15,12 @@ export default function CreatePositionStepOne({
   selectFeeHandler,
   stateNextHandler,
 }: CreatePoolStepOneProps) {
-  const {
-    control,
-    trigger,
-    formState: { errors },
-  } = useFormContext<CreatePoolFormDefaultValues>();
+  const { control } = useFormContext<CreatePoolFormDefaultValues>();
   // State
   const [activePage, setActivePage] = useState(0);
   const [isFormValid, setIsFormValid] = useState(false);
   const [selectedTokenType, setSelectedTokenType] = useState<1 | 2>(1);
+  const [selectedFeeTier, setSelectedFeeTier] = useState<FeeTier>();
 
   const [Token0, Token1, Fee] = useWatch({
     control,
@@ -33,10 +30,18 @@ export default function CreatePositionStepOne({
   useEffect(() => {
     if (Token0 && Token1 && Fee) {
       setIsFormValid(true);
+      setSelectedFeeTier(feeTiers.find((tier) => Number(tier.fee) === Fee));
     } else {
       setIsFormValid(false);
     }
   }, [Token0, Token1, Fee]);
+
+  const isSelectedHighestTvl = (selectedTvl: string) => {
+    feeTiers.map((tier) => {
+      if (Number(tier.tvl) && Number(tier.tvl) > Number(selectedTvl)) return false;
+    });
+    return true;
+  };
 
   switch (activePage) {
     case 1:
@@ -84,7 +89,7 @@ export default function CreatePositionStepOne({
               supported networks.
             </p>
           </div>
-
+          {/* First Token Selection */}
           <div className="flex w-full flex-col gap-2 md:gap-3">
             <div
               className={cn(
@@ -122,7 +127,7 @@ export default function CreatePositionStepOne({
                 {Token0?.symbol || 'Select Token'}
               </p>
             </div>
-            {/* <ErrorMessage name="token0" /> */}
+
             <div
               className={cn(
                 'group relative cursor-pointer overflow-clip',
@@ -159,9 +164,8 @@ export default function CreatePositionStepOne({
                 {Token1?.symbol || 'Select Token'}
               </p>
             </div>
-            {/* <ErrorMessage name="token1" /> */}
           </div>
-
+          {/* Second Token Selection */}
           <div className="flex w-full flex-col gap-y-1">
             <p className="text-xl font-bold md:text-2xl">Fee tier</p>
             <p className="max-w-[424px] text-[13px] md:text-[15px]">
@@ -169,7 +173,7 @@ export default function CreatePositionStepOne({
               and strategy.
             </p>
           </div>
-
+          {/* Fee Tier Box */}
           <div
             className={cn(
               'flex items-center justify-between gap-4',
@@ -182,15 +186,19 @@ export default function CreatePositionStepOne({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-x-2.5 md:gap-x-3.5">
                 <span className="text-lg font-bold">{Number(Fee) / 10000}% fee tier</span>
-                <span
-                  className={cn(
-                    'text-[10px] font-medium text-[#7DABFF]',
-                    'bg-[#2060D5]/30',
-                    'rounded-full p-1',
+                {selectedFeeTier &&
+                  Number(selectedFeeTier.tvl) > 0 &&
+                  isSelectedHighestTvl(selectedFeeTier.tvl) && (
+                    <span
+                      className={cn(
+                        'text-[10px] font-medium text-[#7DABFF]',
+                        'bg-[#2060D5]/30',
+                        'rounded-full p-1',
+                      )}
+                    >
+                      HighestTVL
+                    </span>
                   )}
-                >
-                  HighestTVL
-                </span>
               </div>
               <p className="text-sm text-white/60">The % you will earn in fees</p>
             </div>

@@ -99,10 +99,9 @@ export default function CreatePoolLogic() {
     methods.trigger(field);
   };
 
-  const handleInputChange = (value: string) => {
+  const handleInitialPriceInput = (value: string) => {
     const field = isToken0Selected ? 'token0InitialPrice' : 'token1InitialPrice';
-    const parsedValue = value === '' ? '' : parseFloat(value) >= 0 ? value : '0';
-    methods.setValue(field, parsedValue, { shouldValidate: true, shouldDirty: true });
+    methods.setValue(field, value, { shouldValidate: true, shouldDirty: true });
     methods.trigger(field);
   };
 
@@ -112,7 +111,7 @@ export default function CreatePoolLogic() {
       { is_token0_selected: isToken0Selected, token0: Token0, token1: Token1, price: '0' },
       icpTokens,
     );
-    handleInputChange(price);
+    handleInitialPriceInput(price);
   };
 
   // const getActiveLiquidityHandler = () => {
@@ -130,21 +129,6 @@ export default function CreatePoolLogic() {
   };
 
   const resetFieldsOnSelectToken = (fieldName: string) => {
-    if (
-      methods.getValues('token0') &&
-      methods.getValues('token0').canisterId &&
-      methods.getValues('token1') &&
-      methods.getValues('token1').canisterId
-    ) {
-      console.log('here');
-      if (fieldName === 'token0') {
-        console.log('here2, field name is token0');
-        methods.setValue('token1', undefined as any);
-      } else if (fieldName === 'token1') {
-        console.log('here3, field name is token1');
-        methods.setValue('token0', undefined as any);
-      }
-    }
     methods.setValue('token0InitialPrice', '');
     methods.setValue('token1InitialPrice', '');
     methods.setValue('token0MinPrice', '');
@@ -155,7 +139,6 @@ export default function CreatePoolLogic() {
     methods.setValue('token1DepositAmount', '');
     setFeeTiers([]);
     methods.trigger();
-    console.log('methods.getValues', methods.getValues('token0'), methods.getValues('token1'));
   };
 
   useEffect(() => {
@@ -183,8 +166,6 @@ export default function CreatePoolLogic() {
           pool.pool_id.token0.toText() === feeTier.token0.toText() &&
           pool.pool_id.token1.toText() === feeTier.token1.toText(),
       );
-
-      console.log('matchingPool', matchingPool);
 
       if (matchingPool) {
         feeTier.isExist = true;
@@ -226,7 +207,6 @@ export default function CreatePoolLogic() {
   const getTickSpacingHandler = (fee: number) => {
     const tickSpacing = getTickSpacing(fee);
     methods.setValue('tickSpacing', tickSpacing ?? 0);
-    console.log('tickSpacing', tickSpacing);
   };
 
   const submitHandler = (values: CreatePoolFormDefaultValues) => {};
@@ -250,7 +230,7 @@ export default function CreatePoolLogic() {
     handleMinPriceInput,
     handleMaxPriceInput,
     handleSetMarketPrice,
-    handleInputChange,
+    handleInitialPriceInput,
     // Step Three
     submitHandler,
   };

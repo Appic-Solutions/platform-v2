@@ -1,6 +1,5 @@
 import { FeeTiersProps } from '@/app/pool/create/_types';
 import { ArrowLeftIcon, LockIcon, VerifiedIcon } from '@/components/icons';
-import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import { useFormContext, useWatch } from 'react-hook-form';
 
@@ -40,6 +39,8 @@ export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler 
               'border-2 border-[#4C4C4C]/30',
             )}
             onClick={() => {
+              console.log('selecting fee tier', tier);
+              console.log('selecting fee tier to number', Number(tier.fee));
               selectFeeHandler(Number(tier.fee));
               stateBackHandler();
             }}

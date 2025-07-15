@@ -15,7 +15,7 @@ const CreatePositionStepTwo = ({
   setIsToken0Selected,
   handleMaxPriceInput,
   handleMinPriceInput,
-  handleInputChange,
+  handleInitialPriceInput,
   handleSetMarketPrice,
   feeTiers,
 }: CreatePositionStepTwoProps) => {
@@ -56,10 +56,7 @@ const CreatePositionStepTwo = ({
           </div>
           <div className="flex items-center gap-x-1">
             <SolidCard size="sm">
-              <span className="text-xs leading-5 text-white/60">V3</span>
-            </SolidCard>
-            <SolidCard size="sm">
-              <span className="text-xs leading-5 text-white/60">1%</span>
+              <span className="text-xs leading-5 text-white/60">{Number(fee) / 10000}%</span>
             </SolidCard>
           </div>
         </div>
@@ -72,7 +69,7 @@ const CreatePositionStepTwo = ({
             setSelectedToken={setSelectedToken}
             isToken0Selected={isToken0Selected}
             setIsToken0Selected={setIsToken0Selected}
-            handleInputChange={handleInputChange}
+            handleInitialPriceInput={handleInitialPriceInput}
             handleSetMarketPrice={handleSetMarketPrice}
           />
         )}

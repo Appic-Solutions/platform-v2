@@ -41,7 +41,7 @@ export interface CreatePositionStepTwoProps {
   setIsToken0Selected: (value: boolean) => void;
   handleMaxPriceInput: (value: string) => void;
   handleMinPriceInput: (value: string) => void;
-  handleInputChange: (value: string) => void;
+  handleInitialPriceInput: (value: string) => void;
   handleSetMarketPrice: () => void;
   feeTiers: FeeTier[];
 }
@@ -51,7 +51,7 @@ export interface StepTwoPoolNotExistProps {
   setSelectedToken: (value: IcpToken | null) => void;
   isToken0Selected: boolean;
   setIsToken0Selected: (value: boolean) => void;
-  handleInputChange: (value: string) => void;
+  handleInitialPriceInput: (value: string) => void;
   handleSetMarketPrice: () => void;
 }
 

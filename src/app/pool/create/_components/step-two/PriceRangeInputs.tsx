@@ -38,7 +38,7 @@ const PriceRangeInputs = ({
   });
 
   useEffect(() => {
-    if (Number(token0InitialPrice) > 0 && Number(token1InitialPrice) > 0) {
+    if (Number(token0InitialPrice) > 0 || Number(token1InitialPrice) > 0) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
@@ -52,8 +52,8 @@ const PriceRangeInputs = ({
         {/* min price */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]',
-            isDisabled && 'opacity-50',
+            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            isDisabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
@@ -77,8 +77,8 @@ const PriceRangeInputs = ({
         {/* max price */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]',
-            isDisabled && 'opacity-50',
+            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            isDisabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">

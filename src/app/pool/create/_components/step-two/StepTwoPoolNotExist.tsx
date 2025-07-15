@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import SolidCard from '@/components/ui/cards/SolidCard';
@@ -13,7 +13,7 @@ import { StepTwoPoolNotExistProps } from '../../_types';
 const StepTwoPoolNotExist = ({
   setIsToken0Selected,
   isToken0Selected,
-  handleInputChange,
+  handleInitialPriceInput,
   handleSetMarketPrice,
   selectedToken,
   setSelectedToken,
@@ -24,6 +24,11 @@ const StepTwoPoolNotExist = ({
     control,
     name: ['token0', 'token1', 'token0InitialPrice', 'token1InitialPrice'],
   });
+  const [localInputValue, setLocalInputValue] = useState<string>('');
+  useEffect(() => {
+    const newValue = isToken0Selected ? token0InitialPrice : token1InitialPrice;
+    setLocalInputValue(newValue || '');
+  }, [isToken0Selected, token0InitialPrice, token1InitialPrice]);
 
   const priceText = useMemo(() => {
     if (!token0 || !token1) return 'Select tokens to set price';
@@ -51,6 +56,44 @@ const StepTwoPoolNotExist = ({
       icpTokens,
     ).text;
   }, [token0, token1, isToken0Selected, icpTokens, token0InitialPrice, token1InitialPrice]);
+
+  const isValidNumberInput = (value: string): boolean => {
+    const trimmed = value.trim();
+
+    if (trimmed === '') return true;
+
+    if (trimmed.length > 24) return false;
+
+    const parts = trimmed.split('.');
+    if (parts.length > 2) return false;
+
+    const [integerPart, decimalPart] = parts;
+
+    if (!/^\d*$/.test(integerPart)) return false;
+    if (decimalPart && !/^\d*$/.test(decimalPart)) return false;
+
+    if (decimalPart && decimalPart.length > 18) return false;
+
+    return true;
+  };
+
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (!isValidNumberInput(value)) return;
+
+    setLocalInputValue(value);
+
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      handleInitialPriceInput(value); // updates the state
+    }, 500);
+  };
 
   return (
     <>
@@ -111,8 +154,9 @@ const StepTwoPoolNotExist = ({
               <input
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={isToken0Selected ? token0InitialPrice || '' : token1InitialPrice || ''}
-                onChange={(e) => handleInputChange(e.target.value)}
+                maxLength={24}
+                value={localInputValue}
+                onChange={handleInputChange}
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">{priceText}</p>

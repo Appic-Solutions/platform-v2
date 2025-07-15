@@ -14,6 +14,8 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
   const [
     token0,
     token1,
+    token0InitialPrice,
+    token1InitialPrice,
     token0MaxPrice,
     token1MaxPrice,
     token0MinPrice,
@@ -27,6 +29,8 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
     name: [
       'token0',
       'token1',
+      'token0InitialPrice',
+      'token1InitialPrice',
       'token0MaxPrice',
       'token1MaxPrice',
       'token0MinPrice',
@@ -37,13 +41,15 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
       'sqrtPriceX96',
     ],
   });
+
   useEffect(() => {
-    if (token0MinPrice && token0MaxPrice && token1MinPrice && token1MaxPrice) {
+    if (Number(token0InitialPrice) > 0 || Number(token1InitialPrice) > 0) {
       setIsDisabled(false);
     } else {
       setIsDisabled(true);
     }
-  }, [token0MinPrice, token0MaxPrice, token1MinPrice, token0MaxPrice]);
+  }, [token0InitialPrice, token1InitialPrice]);
+
   const calculateDepositAmountsHandler = (amount: string, isAmountZero: boolean) => {
     console.log({
       is_token0_selected: isToken0Selected,
@@ -51,8 +57,8 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
       token0,
       token1,
       sqrt_price_x96: sqrtPriceX96 ?? '',
-      min_price: isToken0Selected ? token0MinPrice! : token1MinPrice!,
-      max_price: isToken0Selected ? token0MaxPrice! : token1MaxPrice!,
+      min_price: isAmountZero ? token0MinPrice! : token1MinPrice!,
+      max_price: isAmountZero ? token0MaxPrice! : token1MaxPrice!,
       tick_spacing: tickSpacing,
       is_amount_zero: isAmountZero,
     });
@@ -63,8 +69,8 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
       token0,
       token1,
       sqrt_price_x96: sqrtPriceX96 ?? '',
-      min_price: isToken0Selected ? token0MinPrice! : token1MinPrice!,
-      max_price: isToken0Selected ? token0MaxPrice! : token1MaxPrice!,
+      min_price: isAmountZero ? token0MinPrice! : token1MinPrice!,
+      max_price: isAmountZero ? token0MaxPrice! : token1MaxPrice!,
       tick_spacing: tickSpacing,
       is_amount_zero: isAmountZero,
     });
@@ -82,8 +88,8 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
         {/* token0 */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]',
-            isDisabled && 'opacity-50',
+            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            isDisabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
@@ -112,8 +118,8 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
         {/* token1 */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] lg:h-[188px] lg:w-[210px]',
-            isDisabled && 'opacity-50',
+            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            isDisabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
