@@ -32,7 +32,6 @@ export interface CalculateMintAmountsArgs {
 	sqrt_price_x96: string; // sqrt_price_x96 from the pool state, get from calculate_price function
 	min_tick: string; // min tick from align price function
 	max_tick: string; // max tick from align price function
-	tick_spacing: number; // tick spacing from getTickSpacing function
 }
 
 export function calculate_mint_amounts({
@@ -43,14 +42,12 @@ export function calculate_mint_amounts({
 	sqrt_price_x96, // sqrt_price_x96 from the pool state
 	min_tick,
 	max_tick,
-	tick_spacing,
 }: CalculateMintAmountsArgs): MintAmounts {
 	let liquidity: BigNumber;
 	let amount0: BigNumber;
 	let amount1: BigNumber;
 
 	if (BigNumber(selected_amount).lte(0)) throw new Error("Amount must be positive");
-	if (tick_spacing <= 0) throw new Error("tick_spacing must be positive");
 
 	let tickA = BigNumber(min_tick);
 	let tickB = BigNumber(max_tick);
