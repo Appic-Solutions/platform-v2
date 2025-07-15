@@ -9,7 +9,7 @@ import { calculate_price } from './utils/price';
 import { TickMath } from './utils/tick_math';
 
 interface TokenAmount {
-	raw: BigNumber;
+	raw: string;
 	formatted: string;
 }
 
@@ -27,24 +27,22 @@ function formatUnits(amount: BigNumber, decimals: number): string {
 export interface CalculateMintAmountsArgs {
 	selected_amount: string;
 	is_amount_zero: boolean;
-	is_token0_selected: boolean;
 	token0: IcpToken;
 	token1: IcpToken;
 	sqrt_price_x96: string; // sqrt_price_x96 from the pool state, get from calculate_price function
-	min_price: string; // min price from ui
-	max_price: string; // max price from ui
+	min_tick: string; // min tick from align price function
+	max_tick: string; // max tick from align price function
 	tick_spacing: number; // tick spacing from getTickSpacing function
 }
 
 export function calculate_mint_amounts({
 	selected_amount, // amount that users input in the UI
 	is_amount_zero, // token0 or token1
-	is_token0_selected,
 	token0,
 	token1,
 	sqrt_price_x96, // sqrt_price_x96 from the pool state
-	min_price,
-	max_price,
+	min_tick,
+	max_tick,
 	tick_spacing,
 }: CalculateMintAmountsArgs): MintAmounts {
 	let liquidity: BigNumber;
@@ -52,36 +50,22 @@ export function calculate_mint_amounts({
 	let amount1: BigNumber;
 
 	if (BigNumber(selected_amount).lte(0)) throw new Error("Amount must be positive");
-	if (min_price >= max_price) throw new Error("min_price must be less than max_price");
 	if (tick_spacing <= 0) throw new Error("tick_spacing must be positive");
 
-	let sqrtRatioAX96 = BigNumber(
-		calculate_price({ token0, token1, price: min_price, is_token0_selected }).sqrt_price_x96,
-	);
-	let sqrtRatioBX96 = BigNumber(
-		calculate_price({ token0, token1, price: max_price, is_token0_selected }).sqrt_price_x96,
-	);
+	let tickA = BigNumber(min_tick);
+	let tickB = BigNumber(max_tick);
 
 	let currentsqrtRatioX96 = BigNumber(sqrt_price_x96);
 
-	let amount = BigNumber(selected_amount);
+	let amount = BigNumber(selected_amount).multipliedBy(BigNumber(10).pow(is_amount_zero ? token0.decimals : token1.decimals));
 
 	// Ensure sqrtRatioAX96 is the lower price and sqrtRatioBX96 is the upper price
-	const sqrtPriceX96_lower = sqrtRatioAX96.lt(sqrtRatioBX96) ? sqrtRatioAX96 : sqrtRatioBX96;
-	const sqrtPriceX96_higher = sqrtRatioAX96.lt(sqrtRatioBX96) ? sqrtRatioBX96 : sqrtRatioAX96;
-
-	// Get raw ticks (placeholder functions)
-	const tick_lower_raw = TickMath.getTickAtSqrtRatio(BigInt(sqrtPriceX96_lower.toFixed()));
-	const tick_upper_raw = TickMath.getTickAtSqrtRatio(BigInt(sqrtPriceX96_higher.toFixed()));
+	const tick_lower = tickA.lt(tickB) ? tickA : tickB;
+	const tick_higer = tickA.lt(tickB) ? tickB : tickA;
 
 
-
-	// Align ticks with tick_spacing
-	const tick_lower_aligned = Math.ceil(tick_lower_raw / tick_spacing) * tick_spacing;
-	const tick_upper_aligned = Math.floor(tick_upper_raw / tick_spacing) * tick_spacing;
-
-	const sqrtPriceLower = BigNumber(TickMath.getSqrtRatioAtTick(tick_lower_aligned).toString());
-	const sqrtPriceUpper = BigNumber(TickMath.getSqrtRatioAtTick(tick_upper_aligned).toString());
+	const sqrtPriceLower = BigNumber(TickMath.getSqrtRatioAtTick(tick_lower.toNumber()).toString());
+	const sqrtPriceUpper = BigNumber(TickMath.getSqrtRatioAtTick(tick_higer.toNumber()).toString());
 
 	if (is_amount_zero) {
 		// User specifies token0 amount
@@ -94,7 +78,7 @@ export function calculate_mint_amounts({
 			// Current price is within the range: both tokens are needed
 			liquidity = maxLiquidityForAmount0Precise(currentsqrtRatioX96, sqrtPriceUpper, amount);
 			amount0 = amount;
-			amount1 = SqrtPriceMath.getAmount1Delta(sqrtPriceLower, currentsqrtRatioX96, liquidity, true);
+			amount1 = SqrtPriceMath.getAmount1Delta(sqrtPriceLower, currentsqrtRatioX96, liquidity, false);
 		} else {
 			// Current price is above the range: only token1 is needed, so token0 alone can't mint
 			amount0 = new BigNumber(0);
@@ -110,7 +94,7 @@ export function calculate_mint_amounts({
 		} else if (currentsqrtRatioX96.gt(sqrtPriceLower)) {
 			// Current price is within the range: both tokens are needed
 			liquidity = maxLiquidityForAmount1(sqrtPriceLower, currentsqrtRatioX96, amount);
-			amount0 = SqrtPriceMath.getAmount0Delta(currentsqrtRatioX96, sqrtPriceUpper, liquidity, true);
+			amount0 = SqrtPriceMath.getAmount0Delta(currentsqrtRatioX96, sqrtPriceUpper, liquidity, false);
 			amount1 = amount;
 		} else {
 			// Current price is below the range: only token0 is needed, so token1 alone can't mint
@@ -125,25 +109,15 @@ export function calculate_mint_amounts({
 
 	return {
 		token0: {
-			raw: amount0,
+			raw: amount0.toFixed(),
 			formatted: formattedAmount0,
 		},
 		token1: {
-			raw: amount1,
+			raw: amount1.toFixed(),
 			formatted: formattedAmount1,
 		},
 	};
 
 
-	return {
-		token0: {
-			raw: BigNumber(0),
-			formatted: "0",
-		},
-		token1: {
-			raw: BigNumber(0),
-			formatted: "0",
-		},
-	};
 
 }

@@ -42,7 +42,7 @@ export interface Pool {
 }
 
 const CKUSDC_CANISTER_ID = "xevnm-gaaaa-aaaar-qafnq-cai";
-const Q96 = new BigNumber(2).pow(96);
+export const Q96 = new BigNumber(2).pow(96);
 
 function transformPool(poolId: CandidPoolId, poolState: CandidPoolState, getTokenInfo: (principal: Principal) => IcpToken | undefined): Pool {
 	const token0Info = getTokenInfo(poolId.token0);
