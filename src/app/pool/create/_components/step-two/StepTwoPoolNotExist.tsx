@@ -110,6 +110,7 @@ const StepTwoPoolNotExist = ({
                   (t, idx) =>
                     t && (
                       <button
+                        type="button"
                         key={idx}
                         className={cn(
                           'flex items-center gap-1 rounded-md px-[10px] py-[4px] text-xs font-semibold transition-all',
@@ -150,6 +151,7 @@ const StepTwoPoolNotExist = ({
         <div className="flex w-full flex-col items-start gap-1 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-[17px]">
           <h3 className="md:text-xl">Market Price: {marketPriceText}</h3>
           <button
+            type="button"
             className="text-[#FFFFFFC9] disabled:opacity-50"
             onClick={handleSetMarketPrice}
             disabled={!token0 || !token1 || !icpTokens}
