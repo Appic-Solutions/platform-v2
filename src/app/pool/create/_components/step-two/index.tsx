@@ -13,25 +13,40 @@ import { CreatePositionStepTwoProps } from '../../_types';
 const CreatePositionStepTwo = ({
   isToken0Selected,
   setIsToken0Selected,
-  handleMaxPriceInput,
-  handleMinPriceInput,
+  handlePriceInput,
   handleInitialPriceInput,
   handleSetMarketPrice,
   feeTiers,
+  methods,
+  stepNextHandler,
 }: CreatePositionStepTwoProps) => {
-  const { control } = useFormContext<CreatePoolFormDefaultValues>();
-  const [token0, token1, fee] = useWatch({
+  const {
     control,
-    name: ['token0', 'token1', 'fee'],
+    formState: { isValid },
+  } = useFormContext<CreatePoolFormDefaultValues>();
+  const [
+    token0,
+    token1,
+    fee,
+    initialPrice,
+    minPrice,
+    maxPrice,
+    token0DepositAmount,
+    token1DepositAmount,
+  ] = useWatch({
+    control,
+    name: [
+      'token0',
+      'token1',
+      'fee',
+      'initialPrice',
+      'minPrice',
+      'maxPrice',
+      'token0DepositAmount',
+      'token1DepositAmount',
+    ],
   });
-  const [selectedToken, setSelectedToken] = useState<IcpToken | null>(token0);
   const [isPoolExist, setIsPoolExist] = useState(false);
-
-  useEffect(() => {
-    if (token0 && !selectedToken) {
-      setSelectedToken(token0);
-    }
-  }, [token0, selectedToken]);
 
   useEffect(() => {
     const selectedFee = feeTiers.find((tier) => Number(tier.fee) === fee);
@@ -62,11 +77,10 @@ const CreatePositionStepTwo = ({
         </div>
 
         {isPoolExist ? (
-          <StepTwoPoolExist setMaxPrice={handleMaxPriceInput} setMinPrice={handleMinPriceInput} />
+          <StepTwoPoolExist handlePriceInput={handlePriceInput} />
         ) : (
           <StepTwoPoolNotExist
-            selectedToken={selectedToken}
-            setSelectedToken={setSelectedToken}
+            methods={methods}
             isToken0Selected={isToken0Selected}
             setIsToken0Selected={setIsToken0Selected}
             handleInitialPriceInput={handleInitialPriceInput}
@@ -78,13 +92,20 @@ const CreatePositionStepTwo = ({
       {/* boxes */}
       <div className="flex h-full w-full select-none flex-col gap-9 text-white lg:w-[41%]">
         <PriceRangeInputs
+          methods={methods}
           isToken0Selected={isToken0Selected}
-          handleMaxPriceInput={handleMaxPriceInput}
-          handleMinPriceInput={handleMinPriceInput}
+          handlePriceInput={handlePriceInput}
         />
         {/* deposit tokens boxes */}
         <DepositTokenInputs isToken0Selected={isToken0Selected} />
-        <button className="h-[50px] rounded-[15px] bg-primary-buttons lg:h-[66px]">Review</button>
+        <button
+          onClick={stepNextHandler}
+          disabled={!isValid}
+          type="button"
+          className="h-[50px] rounded-[15px] bg-primary-buttons disabled:cursor-not-allowed disabled:opacity-50 lg:h-[66px]"
+        >
+          Review
+        </button>
       </div>
     </div>
   );

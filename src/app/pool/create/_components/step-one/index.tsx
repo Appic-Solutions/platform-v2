@@ -67,6 +67,7 @@ export default function CreatePositionStepOne({
           <div className="flex w-full items-center justify-between gap-4">
             <h1 className="text-[27px] font-bold md:text-[39px]">New position</h1>
             <button
+              type="button"
               className={cn(
                 'flex items-center justify-center gap-x-0.5',
                 'px-3.5 py-2.5',
@@ -220,6 +221,7 @@ export default function CreatePositionStepOne({
 
           {/* Action Button */}
           <button
+            type="button"
             className={cn(
               'min-h-14 w-full',
               'cursor-pointer bg-primary-buttons',

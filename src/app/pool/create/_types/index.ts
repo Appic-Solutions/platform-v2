@@ -1,6 +1,7 @@
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { CreatePoolFormDefaultValues } from '../schema';
 import { IcpToken } from '@/blockchain_api/types/tokens';
+import { UseFormReturn } from 'react-hook-form';
 
 export interface SelectTokenHandlerProps {
   name: 'token0' | 'token1';
@@ -39,24 +40,29 @@ export interface FeeTiersProps {
 export interface CreatePositionStepTwoProps {
   isToken0Selected: boolean;
   setIsToken0Selected: (value: boolean) => void;
-  handleMaxPriceInput: (value: string) => void;
-  handleMinPriceInput: (value: string) => void;
+  handlePriceInput: (props: HandlePriceProps) => void;
   handleInitialPriceInput: (value: string) => void;
   handleSetMarketPrice: () => void;
+  stepNextHandler: () => void;
   feeTiers: FeeTier[];
+  methods: UseFormReturn<CreatePoolFormDefaultValues>;
 }
 
 export interface StepTwoPoolNotExistProps {
-  selectedToken: IcpToken | null;
-  setSelectedToken: (value: IcpToken | null) => void;
   isToken0Selected: boolean;
   setIsToken0Selected: (value: boolean) => void;
   handleInitialPriceInput: (value: string) => void;
   handleSetMarketPrice: () => void;
+  methods: UseFormReturn<CreatePoolFormDefaultValues>;
 }
 
 export interface PriceRangeInputsProps {
   isToken0Selected: boolean;
-  handleMaxPriceInput: (value: string) => void;
-  handleMinPriceInput: (value: string) => void;
+  handlePriceInput: (props: HandlePriceProps) => void;
+  methods: UseFormReturn<CreatePoolFormDefaultValues>;
+}
+
+export interface HandlePriceProps {
+  value: string;
+  minOrMax: 'min' | 'max';
 }

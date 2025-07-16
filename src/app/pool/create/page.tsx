@@ -1,13 +1,14 @@
 'use client';
 
 import { FormProvider } from 'react-hook-form';
-import CreatePoolLogic from './_logic';
+
 import CreatePositionStepOne from './_components/step-one';
 import CreatePositionStepTwo from './_components/step-two';
 import CreatePoolStepThree from './_components/step-three';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import StepNavigator from './_components/StepNavigator';
+import useCreatePoolLogic from './_logic/useCreatePoolLogic';
 
 export default function PoolCreatePage() {
   const {
@@ -23,15 +24,14 @@ export default function PoolCreatePage() {
     feeTiers,
     selectFeeHandler,
     // Step Two
-    handleMaxPriceInput,
-    handleMinPriceInput,
+    handlePriceInput,
     isToken0Selected,
     setIsToken0Selected,
     handleInitialPriceInput,
     handleSetMarketPrice,
     // Step Three
     submitHandler,
-  } = CreatePoolLogic();
+  } = useCreatePoolLogic();
 
   return (
     <FormProvider {...methods}>
@@ -63,10 +63,11 @@ export default function PoolCreatePage() {
             />
           ) : step === 1 ? (
             <CreatePositionStepTwo
-              handleMaxPriceInput={handleMaxPriceInput}
-              handleMinPriceInput={handleMinPriceInput}
+              stepNextHandler={stepNextHandler}
+              handlePriceInput={handlePriceInput}
               isToken0Selected={isToken0Selected}
               feeTiers={feeTiers}
+              methods={methods}
               setIsToken0Selected={setIsToken0Selected}
               handleInitialPriceInput={handleInitialPriceInput}
               handleSetMarketPrice={handleSetMarketPrice}

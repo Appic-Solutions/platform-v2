@@ -5,16 +5,15 @@ import { useState } from 'react';
 import { Charts, chartShowRanges, chartTypes, tabs } from './data';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
+import { HandlePriceProps } from '../../_types';
 
 const StepTwoPoolExist = ({
-  setMinPrice,
-  setMaxPrice,
+  handlePriceInput,
 }: {
-  setMinPrice: (price: string) => void;
-  setMaxPrice: (price: string) => void;
+  handlePriceInput: (props: HandlePriceProps) => void;
 }) => {
   const { pools } = useSharedStore();
-  console.log(pools);
+
   const [selectedTab, setSelectedTab] = useState<Charts>(tabs[0].value);
   const [selectedChart, setSelectedChart] = useState<string>('usdc');
   const [selectedChartShowRange, setSelectedChartShowRange] =
@@ -63,8 +62,13 @@ const StepTwoPoolExist = ({
           </div>
         </div>
         <PriceRangeBarChart
-          setMaxPrice={(price) => setMaxPrice(`${price}`)}
-          setMinPrice={(price) => setMinPrice(`${price}`)}
+          setMaxPrice={(price) => handlePriceInput({ value: price.toString(), minOrMax: 'max' })}
+          setMinPrice={(price) =>
+            handlePriceInput({
+              minOrMax: 'min',
+              value: price.toString(),
+            })
+          }
           selectedTab={selectedTab}
         />
       </div>

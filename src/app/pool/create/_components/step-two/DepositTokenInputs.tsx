@@ -9,17 +9,16 @@ import { CreatePoolFormDefaultValues } from '../../schema';
 import { cn } from '@/lib/utils';
 
 const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean }) => {
-  const [isDisabled, setIsDisabled] = useState(true);
-  const { control } = useFormContext<CreatePoolFormDefaultValues>();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<CreatePoolFormDefaultValues>();
   const [
     token0,
     token1,
-    token0InitialPrice,
-    token1InitialPrice,
-    token0MaxPrice,
-    token1MaxPrice,
-    token0MinPrice,
-    token1MinPrice,
+    initialPrice,
+    minPrice,
+    maxPrice,
     token0DepositAmount,
     token1DepositAmount,
     tickSpacing,
@@ -29,12 +28,9 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
     name: [
       'token0',
       'token1',
-      'token0InitialPrice',
-      'token1InitialPrice',
-      'token0MaxPrice',
-      'token1MaxPrice',
-      'token0MinPrice',
-      'token1MinPrice',
+      'initialPrice',
+      'minPrice',
+      'maxPrice',
       'token0DepositAmount',
       'token1DepositAmount',
       'tickSpacing',
@@ -42,40 +38,32 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
     ],
   });
 
-  useEffect(() => {
-    if (Number(token0InitialPrice) > 0 || Number(token1InitialPrice) > 0) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [token0InitialPrice, token1InitialPrice]);
+  const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
 
   const calculateDepositAmountsHandler = (amount: string, isAmountZero: boolean) => {
-    console.log({
+    console.log('calculate mint arguments =======>', {
       is_token0_selected: isToken0Selected,
       selected_amount: amount,
       token0,
       token1,
       sqrt_price_x96: sqrtPriceX96 ?? '',
-      min_price: isAmountZero ? token0MinPrice! : token1MinPrice!,
-      max_price: isAmountZero ? token0MaxPrice! : token1MaxPrice!,
+      min_price: minPrice,
+      max_price: maxPrice,
       tick_spacing: tickSpacing,
       is_amount_zero: isAmountZero,
     });
 
     const result = calculate_mint_amounts({
-      is_token0_selected: isToken0Selected,
       selected_amount: amount,
       token0,
       token1,
-      sqrt_price_x96: sqrtPriceX96 ?? '',
-      min_price: isAmountZero ? token0MinPrice! : token1MinPrice!,
-      max_price: isAmountZero ? token0MaxPrice! : token1MaxPrice!,
-      tick_spacing: tickSpacing,
+      sqrt_price_x96: sqrtPriceX96,
+      min_tick: minPrice,
+      max_tick: maxPrice,
       is_amount_zero: isAmountZero,
     });
 
-    console.log('result', result);
+    console.log('calculate mint amounts result =========>', result);
   };
   return (
     <div>

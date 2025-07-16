@@ -1,6 +1,5 @@
 'use client';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
-import React, { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
 import { cn } from '@/lib/utils';
@@ -8,47 +7,32 @@ import { PriceRangeInputsProps } from '../../_types';
 
 const PriceRangeInputs = ({
   isToken0Selected,
-  handleMaxPriceInput,
-  handleMinPriceInput,
+  handlePriceInput,
+  methods,
 }: PriceRangeInputsProps) => {
-  const [isDisabled, setIsDisabled] = useState(true);
-
-  const { control } = useFormContext<CreatePoolFormDefaultValues>();
-  const [
-    token0,
-    token1,
-    token0MaxPrice,
-    token1MaxPrice,
-    token0MinPrice,
-    token1MinPrice,
-    token0InitialPrice,
-    token1InitialPrice,
-  ] = useWatch({
+  const {
     control,
-    name: [
-      'token0',
-      'token1',
-      'token0MaxPrice',
-      'token1MaxPrice',
-      'token0MinPrice',
-      'token1MinPrice',
-      'token0InitialPrice',
-      'token1InitialPrice',
-    ],
+    formState: { errors },
+  } = useFormContext<CreatePoolFormDefaultValues>();
+  const [token0, token1, minPrice, maxPrice, initialPrice] = useWatch({
+    control,
+    name: ['token0', 'token1', 'minPrice', 'maxPrice', 'initialPrice'],
   });
 
-  useEffect(() => {
-    if (Number(token0InitialPrice) > 0 || Number(token1InitialPrice) > 0) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [token0InitialPrice, token1InitialPrice]);
+  const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
+
+  const handleDecimalInput = (value: string) => {
+    if (!value.includes('.')) return value;
+
+    const [intPart, decimalPart] = value.split('.');
+    const trimmedDecimal = decimalPart.slice(0, 6);
+    return `${intPart}.${trimmedDecimal}`;
+  };
 
   return (
     <div>
       <h3 className="mb-4 text-xl font-bold lg:text-2xl">Set Price range</h3>
-      <div className="flex justify-start gap-4 lg:justify-between">
+      <div className="relative flex justify-start gap-4 lg:justify-between">
         {/* min price */}
         <GradientBorderCard
           className={cn(
@@ -63,8 +47,14 @@ const PriceRangeInputs = ({
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={isToken0Selected ? token0MinPrice : token1MinPrice || ''}
-                onChange={(e) => handleMinPriceInput(e.target.value)}
+                value={minPrice === '0' ? '' : minPrice}
+                onChange={(e) => methods.setValue('minPrice', handleDecimalInput(e.target.value))}
+                onBlur={(e) =>
+                  handlePriceInput({
+                    minOrMax: 'min',
+                    value: e.target.value,
+                  })
+                }
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
@@ -88,8 +78,14 @@ const PriceRangeInputs = ({
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={isToken0Selected ? token0MaxPrice : token1MaxPrice}
-                onChange={(e) => handleMaxPriceInput(e.target.value)}
+                value={maxPrice === 'max' ? '' : maxPrice}
+                onChange={(e) => methods.setValue('maxPrice', handleDecimalInput(e.target.value))}
+                onBlur={(e) =>
+                  handlePriceInput({
+                    minOrMax: 'max',
+                    value: e.target.value,
+                  })
+                }
                 placeholder={'\u221E'}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
@@ -99,6 +95,11 @@ const PriceRangeInputs = ({
             </div>
           </div>
         </GradientBorderCard>
+        {errors.maxPrice || errors.minPrice ? (
+          <p className="absolute bottom-[-12%] text-[10px] text-[#e07f00] lg:text-sm">
+            {errors.maxPrice?.message ?? errors.minPrice?.message}
+          </p>
+        ) : null}
       </div>
     </div>
   );

@@ -13,36 +13,31 @@ import { StepTwoPoolNotExistProps } from '../../_types';
 const StepTwoPoolNotExist = ({
   setIsToken0Selected,
   isToken0Selected,
-  handleInitialPriceInput,
   handleSetMarketPrice,
-  selectedToken,
-  setSelectedToken,
+  methods,
 }: StepTwoPoolNotExistProps) => {
   const { icpTokens } = useSharedStore();
   const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
-  const [token0, token1, token0InitialPrice, token1InitialPrice] = useWatch({
+  const [token0, token1, initialPrice] = useWatch({
     control,
-    name: ['token0', 'token1', 'token0InitialPrice', 'token1InitialPrice'],
+    name: ['token0', 'token1', 'initialPrice'],
   });
-  const [localInputValue, setLocalInputValue] = useState<string>('');
-  useEffect(() => {
-    const newValue = isToken0Selected ? token0InitialPrice : token1InitialPrice;
-    setLocalInputValue(newValue || '');
-  }, [isToken0Selected, token0InitialPrice, token1InitialPrice]);
 
   const priceText = useMemo(() => {
     if (!token0 || !token1) return 'Select tokens to set price';
-    const price = isToken0Selected ? token0InitialPrice : token1InitialPrice;
-    if (!price || parseFloat(price) <= 0) return 'Enter a valid price';
+    const price = initialPrice;
+    if (!price || parseFloat(price) <= 0 || isNaN(Number(initialPrice)))
+      return 'Enter a valid price';
     const result = calculate_price({
       token0,
       token1,
       is_token0_selected: isToken0Selected,
       price,
     });
+    console.log('calculate price result ===============>', result);
     setValue('sqrtPriceX96', result.sqrt_price_x96);
     return result.text;
-  }, [token0, token1, isToken0Selected, token0InitialPrice, token1InitialPrice]);
+  }, [token0, token1, isToken0Selected, initialPrice]);
 
   const marketPriceText = useMemo(() => {
     if (!token0 || !token1 || !icpTokens) return 'Market price unavailable';
@@ -51,48 +46,37 @@ const StepTwoPoolNotExist = ({
         is_token0_selected: isToken0Selected,
         token0,
         token1,
-        price: isToken0Selected ? token0InitialPrice : token1InitialPrice,
+        price: initialPrice || '0',
       },
       icpTokens,
     ).text;
-  }, [token0, token1, isToken0Selected, icpTokens, token0InitialPrice, token1InitialPrice]);
+  }, [token0, token1, isToken0Selected, icpTokens, initialPrice]);
 
-  const isValidNumberInput = (value: string): boolean => {
-    const trimmed = value.trim();
+  const {
+    register,
+    formState: { errors },
+    resetField,
+  } = useFormContext<CreatePoolFormDefaultValues>();
 
-    if (trimmed === '') return true;
+  const handleSelectedTokenChange = () => {
+    const price = parseFloat(initialPrice);
 
-    if (trimmed.length > 24) return false;
-
-    const parts = trimmed.split('.');
-    if (parts.length > 2) return false;
-
-    const [integerPart, decimalPart] = parts;
-
-    if (!/^\d*$/.test(integerPart)) return false;
-    if (decimalPart && !/^\d*$/.test(decimalPart)) return false;
-
-    if (decimalPart && decimalPart.length > 18) return false;
-
-    return true;
-  };
-
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (!isValidNumberInput(value)) return;
-
-    setLocalInputValue(value);
-
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
+    if (!price || price <= 0 || isNaN(price)) {
+      resetField('initialPrice');
+      setIsToken0Selected(!isToken0Selected);
+      return;
     }
 
-    debounceTimeout.current = setTimeout(() => {
-      handleInitialPriceInput(value); // updates the state
-    }, 500);
+    const newValue = (1 / price).toFixed(18).replace(/\.?0+$/, '');
+
+    setIsToken0Selected(!isToken0Selected);
+
+    methods.setValue('initialPrice', newValue, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    methods.trigger('initialPrice');
   };
 
   return (
@@ -119,7 +103,9 @@ const StepTwoPoolNotExist = ({
           <div className="flex h-full w-full flex-col justify-between font-semibold">
             <div className="flex items-start justify-between">
               <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Initial price</p>
+
               <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">
+                {/* token pairs */}
                 {[token0, token1].map(
                   (t, idx) =>
                     t && (
@@ -127,14 +113,11 @@ const StepTwoPoolNotExist = ({
                         key={idx}
                         className={cn(
                           'flex items-center gap-1 rounded-md px-[10px] py-[4px] text-xs font-semibold transition-all',
-                          t.canisterId === selectedToken?.canisterId
+                          (isToken0Selected && idx === 0) || (!isToken0Selected && idx === 1)
                             ? 'bg-[#1E53B8] text-white'
                             : 'bg-[#222222] text-white/70',
                         )}
-                        onClick={() => {
-                          setSelectedToken(t);
-                          setIsToken0Selected(idx === 0);
-                        }}
+                        onClick={() => handleSelectedTokenChange()}
                         disabled={!t}
                       >
                         <Image
@@ -153,10 +136,8 @@ const StepTwoPoolNotExist = ({
             <div className="flex flex-col gap-2">
               <input
                 type="text"
+                {...register('initialPrice')}
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                maxLength={24}
-                value={localInputValue}
-                onChange={handleInputChange}
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">{priceText}</p>

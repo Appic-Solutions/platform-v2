@@ -11,6 +11,7 @@ export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler 
     name: 'fee',
   });
 
+  console.log('Fee =========>', Fee);
   return (
     <div className="flex h-full w-full animate-fade flex-col gap-10">
       {/* Header */}
