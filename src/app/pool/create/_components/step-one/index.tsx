@@ -1,4 +1,3 @@
-import { CreatePoolStepOneProps, FeeTier } from '@/app/pool/create/_types';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowPathIcon } from '@/components/icons';
 import { cn, getChainLogo } from '@/lib/utils';
@@ -7,14 +6,12 @@ import FeeTiers from '../fee-tiers';
 import TokenList from '../token-list';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
+import { useCreatePoolStore } from '../../useCreatePoolStore';
+import { FeeTier } from '../../_types';
 
-export default function CreatePositionStepOne({
-  resetFormHandler,
-  selectTokenHandler,
-  feeTiers,
-  selectFeeHandler,
-  stateNextHandler,
-}: CreatePoolStepOneProps) {
+export default function CreatePositionStepOne() {
+  const { resetFormHandler, selectTokenHandler, feeTiers, selectFeeHandler, stepNextHandler } =
+    useCreatePoolStore();
   const { control } = useFormContext<CreatePoolFormDefaultValues>();
   // State
   const [activePage, setActivePage] = useState(0);
@@ -230,7 +227,7 @@ export default function CreatePositionStepOne({
               'select-none rounded-[16px] duration-200',
               'hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50',
             )}
-            onClick={stateNextHandler}
+            onClick={stepNextHandler}
             disabled={!isFormValid}
           >
             Continue

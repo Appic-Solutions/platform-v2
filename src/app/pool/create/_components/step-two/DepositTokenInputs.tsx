@@ -13,12 +13,22 @@ const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsPr
     control,
     formState: { errors },
   } = useFormContext<CreatePoolFormDefaultValues>();
-  const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount] = useWatch({
-    control,
-    name: ['token0', 'token1', 'initialPrice', 'token0DepositAmount', 'token1DepositAmount'],
-  });
+  const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount, minTick, maxTick] =
+    useWatch({
+      control,
+      name: [
+        'token0',
+        'token1',
+        'initialPrice',
+        'token0DepositAmount',
+        'token1DepositAmount',
+        'minTick',
+        'maxTick',
+      ],
+    });
 
-  const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
+  const isDisabled =
+    !(initialPrice && parseFloat(initialPrice) > 0) || !minTick?.length || !maxTick?.length;
 
   return (
     <div>

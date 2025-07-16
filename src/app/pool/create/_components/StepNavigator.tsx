@@ -2,16 +2,10 @@
 
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { useCreatePoolStore } from '../useCreatePoolStore';
 
-const StepNavigator = ({
-  step,
-  stepNextHandler,
-  stepBackHandler,
-}: {
-  step: number;
-  stepNextHandler: () => void;
-  stepBackHandler: () => void;
-}) => {
+const StepNavigator = () => {
+  const { stepNextHandler, stepBackHandler, step } = useCreatePoolStore();
   return (
     <div
       className={cn(

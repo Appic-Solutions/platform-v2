@@ -2,7 +2,7 @@ import { Avatar } from '@/components/common/ui/avatar';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 
-export default function CreatePoolStepThree() {
+export default function CreatePositionStepThree() {
   return (
     <div className="flex h-full w-full animate-fade flex-col gap-5">
       <div className="flex w-full items-center justify-between gap-4">

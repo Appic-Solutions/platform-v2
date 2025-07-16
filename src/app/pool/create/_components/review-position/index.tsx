@@ -2,7 +2,7 @@ import { Avatar } from '@/components/common/ui/avatar';
 import { InfoCircleIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
-export default function ReviewPositionPage() {
+export default function ReviewPosition() {
   return (
     <div className="flex h-full w-full animate-fade flex-col gap-4">
       <div className="max-w-[606px]">
