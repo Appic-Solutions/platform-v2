@@ -34,13 +34,25 @@ export function alignMinOrMaxPrice({
 		throw new Error("Tokens must be provided");
 	}
 
-	// Calculate sqrt price from input
-	const sqrtRatioX96 = new BigNumber(
-		calculate_price({ token0, token1, price, is_token0_selected }).sqrt_price_x96
-	);
+	let tick: number;
 
-	// Get corresponding tick
-	const tick = TickMath.getTickAtSqrtRatio(BigInt(sqrtRatioX96.toFixed()));
+	if (price == "min") {
+
+		tick = is_token0_selected ? -887272 : 887272;
+	} else if (price == "max") {
+		tick = is_token0_selected ? 887272 : -887272;
+	}
+	else {
+		// Calculate sqrt price from input
+		const sqrtRatioX96 = new BigNumber(
+			calculate_price({ token0, token1, price, is_token0_selected }).sqrt_price_x96
+		);
+
+		// Get corresponding tick
+		tick = TickMath.getTickAtSqrtRatio(BigInt(sqrtRatioX96.toFixed()));
+
+	}
+
 
 	// Find closest aligned tick
 	const tickAligned = Math.round(tick / tick_spacing) * tick_spacing;
