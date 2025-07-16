@@ -29,6 +29,7 @@ export default function PoolCreatePage() {
     setIsToken0Selected,
     handleInitialPriceInput,
     handleSetMarketPrice,
+    handleDepositAmountInput,
     // Step Three
     submitHandler,
   } = useCreatePoolLogic();
@@ -63,6 +64,7 @@ export default function PoolCreatePage() {
             />
           ) : step === 1 ? (
             <CreatePositionStepTwo
+              handleDepositAmountInput={handleDepositAmountInput}
               stepNextHandler={stepNextHandler}
               handlePriceInput={handlePriceInput}
               isToken0Selected={isToken0Selected}

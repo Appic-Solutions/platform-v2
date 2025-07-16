@@ -42,6 +42,13 @@ export interface CreatePositionStepTwoProps {
   setIsToken0Selected: (value: boolean) => void;
   handlePriceInput: (props: HandlePriceProps) => void;
   handleInitialPriceInput: (value: string) => void;
+  handleDepositAmountInput: ({
+    amount,
+    isAmountZero,
+  }: {
+    isAmountZero: boolean;
+    amount: string;
+  }) => void;
   handleSetMarketPrice: () => void;
   stepNextHandler: () => void;
   feeTiers: FeeTier[];
@@ -60,6 +67,16 @@ export interface PriceRangeInputsProps {
   isToken0Selected: boolean;
   handlePriceInput: (props: HandlePriceProps) => void;
   methods: UseFormReturn<CreatePoolFormDefaultValues>;
+}
+
+export interface DepositAmountsInputsProps {
+  handleDepositAmountInput: ({
+    amount,
+    isAmountZero,
+  }: {
+    isAmountZero: boolean;
+    amount: string;
+  }) => void;
 }
 
 export interface HandlePriceProps {

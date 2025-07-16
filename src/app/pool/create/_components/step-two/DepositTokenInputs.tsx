@@ -1,70 +1,25 @@
 'use client';
 
-import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { Avatar } from '@/components/common/ui/avatar';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import React, { useEffect, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
-import { cn } from '@/lib/utils';
+import { cn, limitDecimalPlaces } from '@/lib/utils';
+import { DepositAmountsInputsProps } from '../../_types';
 
-const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean }) => {
+const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsProps) => {
   const {
     control,
     formState: { errors },
   } = useFormContext<CreatePoolFormDefaultValues>();
-  const [
-    token0,
-    token1,
-    initialPrice,
-    minPrice,
-    maxPrice,
-    token0DepositAmount,
-    token1DepositAmount,
-    tickSpacing,
-    sqrtPriceX96,
-  ] = useWatch({
+  const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount] = useWatch({
     control,
-    name: [
-      'token0',
-      'token1',
-      'initialPrice',
-      'minPrice',
-      'maxPrice',
-      'token0DepositAmount',
-      'token1DepositAmount',
-      'tickSpacing',
-      'sqrtPriceX96',
-    ],
+    name: ['token0', 'token1', 'initialPrice', 'token0DepositAmount', 'token1DepositAmount'],
   });
 
   const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
 
-  const calculateDepositAmountsHandler = (amount: string, isAmountZero: boolean) => {
-    console.log('calculate mint arguments =======>', {
-      is_token0_selected: isToken0Selected,
-      selected_amount: amount,
-      token0,
-      token1,
-      sqrt_price_x96: sqrtPriceX96 ?? '',
-      min_price: minPrice,
-      max_price: maxPrice,
-      tick_spacing: tickSpacing,
-      is_amount_zero: isAmountZero,
-    });
-
-    const result = calculate_mint_amounts({
-      selected_amount: amount,
-      token0,
-      token1,
-      sqrt_price_x96: sqrtPriceX96,
-      min_tick: minPrice,
-      max_tick: maxPrice,
-      is_amount_zero: isAmountZero,
-    });
-
-    console.log('calculate mint amounts result =========>', result);
-  };
   return (
     <div>
       <h3 className="mb-4 text-2xl font-bold">Deposit tokens</h3>
@@ -92,13 +47,17 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
               <input
                 type="text"
                 disabled={isDisabled}
+                inputMode="decimal"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                 value={token0DepositAmount}
-                onChange={(e) => calculateDepositAmountsHandler(e.target.value, true)}
+                onChange={(e) => {
+                  const value = limitDecimalPlaces(e.target.value);
+                  handleDepositAmountInput({ amount: value, isAmountZero: true });
+                }}
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
-                ${Number(token1DepositAmount) * Number(token0.usdPrice)}
+                ${(Number(token0DepositAmount) * Number(token0.usdPrice)).toFixed(2)}
               </p>
             </div>
           </div>
@@ -122,13 +81,17 @@ const DepositTokenInputs = ({ isToken0Selected }: { isToken0Selected: boolean })
               <input
                 type="text"
                 disabled={isDisabled}
+                inputMode="decimal"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                 value={token1DepositAmount}
-                onChange={(e) => calculateDepositAmountsHandler(e.target.value, false)}
+                onChange={(e) => {
+                  const value = limitDecimalPlaces(e.target.value);
+                  handleDepositAmountInput({ amount: value, isAmountZero: false });
+                }}
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
-                ${Number(token1DepositAmount) * Number(token1.usdPrice)}
+                ${(Number(token1DepositAmount) * Number(token1.usdPrice)).toFixed(2)}
               </p>
             </div>
           </div>

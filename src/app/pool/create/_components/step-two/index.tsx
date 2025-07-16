@@ -4,7 +4,6 @@ import StepTwoPoolNotExist from './StepTwoPoolNotExist';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
 import SolidCard from '@/components/ui/cards/SolidCard';
-import { IcpToken } from '@/blockchain_api/types/tokens';
 import PriceRangeInputs from './PriceRangeInputs';
 import DepositTokenInputs from './DepositTokenInputs';
 import StepTwoPoolExist from './StepTwoPoolExist';
@@ -15,6 +14,7 @@ const CreatePositionStepTwo = ({
   setIsToken0Selected,
   handlePriceInput,
   handleInitialPriceInput,
+  handleDepositAmountInput,
   handleSetMarketPrice,
   feeTiers,
   methods,
@@ -24,27 +24,9 @@ const CreatePositionStepTwo = ({
     control,
     formState: { isValid },
   } = useFormContext<CreatePoolFormDefaultValues>();
-  const [
-    token0,
-    token1,
-    fee,
-    initialPrice,
-    minPrice,
-    maxPrice,
-    token0DepositAmount,
-    token1DepositAmount,
-  ] = useWatch({
+  const [token0, token1, fee] = useWatch({
     control,
-    name: [
-      'token0',
-      'token1',
-      'fee',
-      'initialPrice',
-      'minPrice',
-      'maxPrice',
-      'token0DepositAmount',
-      'token1DepositAmount',
-    ],
+    name: ['token0', 'token1', 'fee'],
   });
   const [isPoolExist, setIsPoolExist] = useState(false);
 
@@ -97,7 +79,7 @@ const CreatePositionStepTwo = ({
           handlePriceInput={handlePriceInput}
         />
         {/* deposit tokens boxes */}
-        <DepositTokenInputs isToken0Selected={isToken0Selected} />
+        <DepositTokenInputs handleDepositAmountInput={handleDepositAmountInput} />
         <button
           onClick={stepNextHandler}
           disabled={!isValid}

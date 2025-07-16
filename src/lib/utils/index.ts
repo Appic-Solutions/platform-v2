@@ -75,3 +75,9 @@ export const formatToSignificantFigures = (
   const trimmedDecimal = decimalPart.slice(0, significantDecimals);
   return `${integerPart}.${trimmedDecimal}`;
 };
+
+export const limitDecimalPlaces = (value: string, maxDecimals = 6) => {
+  if (!value.includes('.')) return value;
+  const [intPart, decimalPart] = value.split('.');
+  return `${intPart}.${decimalPart.slice(0, maxDecimals)}`;
+};

@@ -34,7 +34,7 @@ const StepTwoPoolNotExist = ({
       is_token0_selected: isToken0Selected,
       price,
     });
-    console.log('calculate price result ===============>', result);
+
     setValue('sqrtPriceX96', result.sqrt_price_x96);
     return result.text;
   }, [token0, token1, isToken0Selected, initialPrice]);

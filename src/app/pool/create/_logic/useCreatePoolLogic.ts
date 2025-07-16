@@ -21,6 +21,8 @@ import type {
   SelectTokenHandlerProps,
 } from '../_types';
 import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min_max';
+import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
+import { limitDecimalPlaces } from '@/lib/utils';
 
 export default function useCreatePoolLogic() {
   const { pools, icpTokens } = useSharedStore();
@@ -41,6 +43,8 @@ export default function useCreatePoolLogic() {
       token1: undefined,
       minPrice: '0',
       maxPrice: 'max',
+      minTick: undefined,
+      maxTick: undefined,
       token0DepositAmount: '',
       token1DepositAmount: '',
     },
@@ -48,9 +52,9 @@ export default function useCreatePoolLogic() {
     mode: 'onChange',
   });
 
-  const [Token0, Token1] = useWatch({
+  const [Token0, Token1, sqrtPriceX96, minTick, maxTick] = useWatch({
     control: methods.control,
-    name: ['token0', 'token1'],
+    name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick'],
   });
 
   const getStepValidationFields = (step: number): (keyof CreatePoolFormDefaultValues)[] => {
@@ -87,10 +91,11 @@ export default function useCreatePoolLogic() {
 
   const handlePriceInput = ({ minOrMax, value }: HandlePriceProps) => {
     const field: CreatePoolFormKeys = minOrMax === 'min' ? 'minPrice' : 'maxPrice';
+    const tickField: CreatePoolFormKeys = minOrMax === 'min' ? 'minTick' : 'maxTick';
 
-    if (value.trim() === '') {
+    if (value.trim() === '' || value === '0') {
       if (field === 'minPrice') {
-        methods.setValue('minPrice', '0', {
+        methods.setValue('minPrice', 'min', {
           shouldValidate: false,
           shouldDirty: true,
         });
@@ -117,6 +122,8 @@ export default function useCreatePoolLogic() {
 
     if (!alignedPrice) return;
 
+    methods.setValue(tickField, alignedPrice.tick.toString());
+
     const fixedPrice = Number(alignedPrice.price)
       .toFixed(6)
       .replace(/\.?0+$/, '');
@@ -134,6 +141,66 @@ export default function useCreatePoolLogic() {
     } else {
       methods.trigger(field);
     }
+  };
+
+  const handleDepositAmountInput = ({
+    amount,
+    isAmountZero,
+  }: {
+    isAmountZero: boolean;
+    amount: string;
+  }) => {
+    if (!Token0 || !Token1 || !sqrtPriceX96 || !minTick || !maxTick) return;
+
+    const trimmed = amount.trim();
+
+    if (!trimmed || trimmed === '0') {
+      methods.setValue('token0DepositAmount', '', {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      methods.setValue('token1DepositAmount', '', {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      methods.trigger(['token0DepositAmount', 'token1DepositAmount']);
+      return;
+    }
+
+    const validAmount = limitDecimalPlaces(trimmed);
+    const parsed = parseFloat(validAmount);
+    if (isNaN(parsed) || parsed <= 0) return;
+
+    console.log('args', {
+      selected_amount: validAmount,
+      token0: Token0,
+      token1: Token1,
+      sqrt_price_x96: sqrtPriceX96,
+      min_tick: minTick,
+      max_tick: maxTick,
+      is_amount_zero: isAmountZero,
+    });
+    const result = calculate_mint_amounts({
+      selected_amount: validAmount,
+      token0: Token0,
+      token1: Token1,
+      sqrt_price_x96: sqrtPriceX96,
+      min_tick: minTick,
+      max_tick: maxTick,
+      is_amount_zero: isAmountZero,
+    });
+    console.log(result);
+
+    methods.setValue('token0DepositAmount', result.token0.formatted, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    methods.setValue('token1DepositAmount', result.token1.formatted, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    methods.trigger(['token0DepositAmount', 'token1DepositAmount']);
   };
 
   const handleSetMarketPrice = () => {
@@ -250,6 +317,7 @@ export default function useCreatePoolLogic() {
     handlePriceInput,
     handleSetMarketPrice,
     handleInitialPriceInput,
+    handleDepositAmountInput,
     // Step Three
     submitHandler: (values: CreatePoolFormDefaultValues) => {},
   };

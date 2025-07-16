@@ -37,11 +37,25 @@ export const CreatePoolFormSchema = z
       message: 'Token 1 is required',
     }),
 
-    token0DepositAmount: z.string().min(1, 'required'),
-    token1DepositAmount: z.string().min(1, 'required'),
+    token0DepositAmount: z
+      .string()
+      .min(1, 'Amount required')
+      .refine((val) => parseFloat(val) > 0, {
+        message: 'Must be greater than 0',
+      }),
+
+    token1DepositAmount: z
+      .string()
+      .min(1, 'Amount required')
+      .refine((val) => parseFloat(val) > 0, {
+        message: 'Must be greater than 0',
+      }),
 
     minPrice: z.string().min(1, 'required'),
     maxPrice: z.string().min(1, 'required'),
+
+    minTick: z.string().min(1, 'required'),
+    maxTick: z.string().min(1, 'required'),
   })
   .superRefine((data, ctx) => {
     const min = parseFloat(data.minPrice);

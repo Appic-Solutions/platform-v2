@@ -42,12 +42,13 @@ const PriceRangeInputs = ({
         >
           <div className="flex h-full flex-col justify-between font-semibold">
             <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
+
             <div className="flex flex-col gap-2">
               <input
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={minPrice === '0' ? '' : minPrice}
+                value={minPrice === 'min' ? '' : minPrice}
                 onChange={(e) => methods.setValue('minPrice', handleDecimalInput(e.target.value))}
                 onBlur={(e) =>
                   handlePriceInput({
