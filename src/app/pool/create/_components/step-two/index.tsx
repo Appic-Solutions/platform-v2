@@ -7,20 +7,19 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import PriceRangeInputs from './PriceRangeInputs';
 import DepositTokenInputs from './DepositTokenInputs';
 import StepTwoPoolExist from './StepTwoPoolExist';
-import { useCreatePoolStore } from '../../useCreatePoolStore';
+import { CreatePositionStepTwoProps } from '../../_types';
 
-const CreatePositionStepTwo = () => {
-  const {
-    isToken0Selected,
-    setIsToken0Selected,
-    handlePriceInput,
-    handleInitialPriceInput,
-    handleDepositAmountInput,
-    handleSetMarketPrice,
-    feeTiers,
-    methods,
-    stepNextHandler,
-  } = useCreatePoolStore();
+const CreatePositionStepTwo = ({
+  isToken0Selected,
+  setIsToken0Selected,
+  handlePriceInput,
+  handleInitialPriceInput,
+  handleDepositAmountInput,
+  handleSetMarketPrice,
+  feeTiers,
+  methods,
+  stepNextHandler,
+}: CreatePositionStepTwoProps) => {
   const {
     control,
     formState: { isValid },

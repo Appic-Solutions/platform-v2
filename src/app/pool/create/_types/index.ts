@@ -1,5 +1,6 @@
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
-import { CreatePoolFormDefaultValues } from './schema';
+import { CreatePoolFormDefaultValues } from '../schema';
+import { IcpToken } from '@/blockchain_api/types/tokens';
 import { UseFormReturn } from 'react-hook-form';
 
 export interface SelectTokenHandlerProps {
@@ -15,6 +16,15 @@ export type FeeTier = CandidPoolId & {
 
 export type SelectFeeHandlerProps = CreatePoolFormDefaultValues['fee'];
 
+export interface CreatePoolStepOneProps {
+  resetFormHandler: () => void;
+  selectTokenHandler: ({ name, value }: SelectTokenHandlerProps) => void;
+  feeTiers: FeeTier[];
+  selectFeeHandler: (value: SelectFeeHandlerProps) => void;
+  stateNextHandler: () => void;
+  getStepValidationFields: (step: number) => (keyof CreatePoolFormDefaultValues)[];
+}
+
 export interface TokenListPageProps {
   stateBackHandler: () => void;
   selectTokenHandler: ({ name, value }: SelectTokenHandlerProps) => void;
@@ -25,6 +35,24 @@ export interface FeeTiersProps {
   stateBackHandler: () => void;
   feeTiers: FeeTier[];
   selectFeeHandler: (value: SelectFeeHandlerProps) => void;
+}
+
+export interface CreatePositionStepTwoProps {
+  isToken0Selected: boolean;
+  setIsToken0Selected: (value: boolean) => void;
+  handlePriceInput: (props: HandlePriceProps) => void;
+  handleInitialPriceInput: (value: string) => void;
+  handleDepositAmountInput: ({
+    amount,
+    isAmountZero,
+  }: {
+    isAmountZero: boolean;
+    amount: string;
+  }) => void;
+  handleSetMarketPrice: () => void;
+  stepNextHandler: () => void;
+  feeTiers: FeeTier[];
+  methods: UseFormReturn<CreatePoolFormDefaultValues>;
 }
 
 export interface StepTwoPoolNotExistProps {
