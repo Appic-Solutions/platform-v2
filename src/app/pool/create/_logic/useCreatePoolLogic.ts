@@ -41,7 +41,7 @@ export default function useCreatePoolLogic() {
       initialPrice: '',
       token0: undefined,
       token1: undefined,
-      minPrice: '0',
+      minPrice: 'min',
       maxPrice: 'max',
       minTick: undefined,
       maxTick: undefined,
@@ -89,35 +89,53 @@ export default function useCreatePoolLogic() {
     methods.trigger('initialPrice');
   };
 
-  // Helper functions for price and deposit amount handling
-  const getPriceField = (minOrMax: 'min' | 'max'): CreatePoolFormKeys =>
-    minOrMax === 'min' ? 'minPrice' : 'maxPrice';
+  const handlePriceInput = ({ minOrMax, value }: HandlePriceProps) => {
+    const field: CreatePoolFormKeys = minOrMax === 'min' ? 'minPrice' : 'maxPrice';
+    const tickField: CreatePoolFormKeys = minOrMax === 'min' ? 'minTick' : 'maxTick';
 
-  const getTickField = (minOrMax: 'min' | 'max'): CreatePoolFormKeys =>
-    minOrMax === 'min' ? 'minTick' : 'maxTick';
+    const price = () => {
+      if (minOrMax === 'min' && (value === '0' || value === '')) return 'min';
+      if (minOrMax === 'max' && (value === '0' || value === '')) return 'max';
+      return value;
+    };
 
-  const normalizePrice = (value: string, field: CreatePoolFormKeys) => {
-    const trimmed = value.trim();
-    if (field === 'minPrice' && (value === 'min' || trimmed === '' || value === '0')) return 'min';
-    if (field === 'maxPrice' && (value === 'max' || trimmed === '' || value === '0')) return 'max';
-    return trimmed;
-  };
-
-  const isEmptyOrZero = (value: string) => value.trim() === '' || value === '0';
-
-  const setDefaultPrice = (field: CreatePoolFormKeys) => {
-    const defaultVal = field === 'minPrice' ? 'min' : 'max';
-    methods.setValue(field, defaultVal, {
-      shouldValidate: false,
-      shouldDirty: true,
+    console.log('alignedPriceArgs', {
+      is_token0_selected: isToken0Selected,
+      token0: Token0,
+      token1: Token1,
+      price: price(),
+      tick_spacing: methods.getValues('tickSpacing'),
     });
-  };
 
-  const updateAlignedValues = (
-    field: CreatePoolFormKeys,
-    tickField: CreatePoolFormKeys,
-    alignedPrice: { tick: number; price: string },
-  ) => {
+    const alignedPrice = alignMinOrMaxPrice({
+      is_token0_selected: isToken0Selected,
+      token0: Token0,
+      token1: Token1,
+      price: price(),
+      tick_spacing: methods.getValues('tickSpacing'),
+    });
+
+    if (value.trim() === '' || value === '0') {
+      if (field === 'minPrice') {
+        methods.setValue('minPrice', 'min', {
+          shouldValidate: false,
+          shouldDirty: true,
+        });
+        return;
+      } else {
+        methods.setValue('maxPrice', 'max', {
+          shouldValidate: false,
+          shouldDirty: true,
+        });
+        return;
+      }
+    }
+
+    const floatValue = parseFloat(value);
+    if (isNaN(floatValue)) return;
+
+    if (!alignedPrice) return;
+
     methods.setValue(tickField, alignedPrice.tick.toString());
 
     const fixedPrice = Number(alignedPrice.price)
@@ -128,42 +146,15 @@ export default function useCreatePoolLogic() {
       shouldValidate: true,
       shouldDirty: true,
     });
-  };
 
-  const triggerRelevantValidation = (field: CreatePoolFormKeys) => {
-    const dirty = methods.formState.dirtyFields;
-    const bothDirty = dirty.minPrice && dirty.maxPrice;
+    const dirtyFields = methods.formState.dirtyFields;
+    const bothFieldsDirty = dirtyFields.minPrice && dirtyFields.maxPrice;
 
-    if (bothDirty) {
+    if (bothFieldsDirty) {
       methods.trigger(['minPrice', 'maxPrice']);
     } else {
       methods.trigger(field);
     }
-  };
-
-  const handlePriceInput = ({ minOrMax, value }: HandlePriceProps) => {
-    const field = getPriceField(minOrMax);
-    const tickField = getTickField(minOrMax);
-    const normalized = normalizePrice(value, field);
-
-    const alignedPrice = alignMinOrMaxPrice({
-      is_token0_selected: isToken0Selected,
-      token0: Token0,
-      token1: Token1,
-      price: normalized,
-      tick_spacing: methods.getValues('tickSpacing'),
-    });
-
-    if (isEmptyOrZero(value)) {
-      setDefaultPrice(field);
-      return;
-    }
-
-    const floatValue = parseFloat(value);
-    if (isNaN(floatValue) || !alignedPrice) return;
-
-    updateAlignedValues(field, tickField, alignedPrice);
-    triggerRelevantValidation(field);
   };
 
   const handleDepositAmountInput = ({
