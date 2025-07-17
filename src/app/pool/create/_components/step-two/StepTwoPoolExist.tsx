@@ -1,18 +1,52 @@
 import PriceRangeBarChart from './PriceRangeBarChart';
 import { RefreshIcon, ZoomInIcon, ZoomOutIcon } from '@/components/icons';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Charts, chartShowRanges, chartTypes, tabs } from './data';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
 import { HandlePriceProps } from '../../_types';
+import { get_active_liquidity } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { CreatePoolFormDefaultValues } from '../../schema';
 
 const StepTwoPoolExist = ({
   handlePriceInput,
 }: {
   handlePriceInput: (props: HandlePriceProps) => void;
 }) => {
+  const { unAuthenticatedAgent } = useSharedStore();
   const { pools } = useSharedStore();
+  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
+  const [token0, token1, initialPrice] = useWatch({
+    control,
+    name: ['token0', 'token1', 'initialPrice'],
+  });
+
+  const getChartData = async () => {
+    if (!pools || pools.length === 0 || !unAuthenticatedAgent) return;
+    console.log({
+      is_token0_selected: true,
+      pool_id: pools[0].pool_id,
+      token0: token0,
+      token1: token1,
+    });
+    const data = await get_active_liquidity(
+      {
+        is_token0_selected: true,
+        pool_id: pools[0].pool_id,
+        token0: token0,
+        token1: token1,
+      },
+      unAuthenticatedAgent,
+    );
+    console.log('Chart data:', data);
+    return data;
+  };
+
+  useEffect(() => {
+    getChartData();
+  }, [token0, token1, unAuthenticatedAgent]);
 
   const [selectedTab, setSelectedTab] = useState<Charts>(tabs[0].value);
   const [selectedChart, setSelectedChart] = useState<string>('usdc');
