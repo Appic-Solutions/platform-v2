@@ -40,6 +40,47 @@ export interface DexData {
 	poolHistories: PoolHistory[];
 }
 
+
+export async function get_single_pool_data(
+	unAuthenticated_agent: HttpAgent,
+	pool_id: CandidPoolId,
+	all_icp_tokens: IcpToken[],
+	pools: Pool[]
+): Promise<Response<PoolHistory | undefined>> {
+	const dex_actor = Actor.createActor(idlFactory, {
+		agent: unAuthenticated_agent,
+		canisterId: appic_dex,
+	});
+
+	try {
+		// Fetch history for the single pool
+		const historyResult = await dex_actor.get_pool_history(pool_id) as [] | [CandidPoolHistory];
+
+		if (historyResult.length === 0) {
+			return { message: 'No history found for the specified pool', result: undefined, success: false };
+		}
+
+		// Find the corresponding pool
+		const pool = pools.find((p) => arePoolsEqual(p.pool_id, pool_id));
+		if (!pool) {
+			return { message: 'Pool not found in provided pools list', result: undefined, success: false };
+		}
+
+		// Prepare data for generateDexData
+		const poolHistories: [CandidPoolId, CandidPoolHistory][] = [[pool_id, historyResult[0]]];
+
+		// Use generateDexData to process the single pool's history
+		const dexData = generateDexData([pool], poolHistories, all_icp_tokens);
+
+		// Extract the single PoolHistory from the result
+		const poolHistory = dexData.poolHistories[0];
+
+		return { result: poolHistory, success: true, message: '' };
+	} catch (error) {
+		return { message: `Failed to get single pool data: ${error}`, result: undefined, success: false };
+	}
+}
+
 export async function get_dex_data(
 	unAuthenticated_agent: HttpAgent,
 	all_icp_tokens: IcpToken[],
@@ -71,6 +112,8 @@ export async function get_dex_data(
 		return { message: `Failed to get dex data ${error}`, result: undefined, success: false };
 	}
 }
+
+
 
 
 
@@ -235,8 +278,8 @@ function generateDexData(
 			total_24h_collected_fees_usd = total_24h_collected_fees_usd.plus(feesUsd);
 		});
 
-		last30DdBuckets.forEach((bucket)=>{
-				const volumeToken0 = new BigNumber(bucket.swap_volume_token0_during_bucket.toString()).dividedBy(
+		last30DdBuckets.forEach((bucket) => {
+			const volumeToken0 = new BigNumber(bucket.swap_volume_token0_during_bucket.toString()).dividedBy(
 				new BigNumber(10).pow(token0.decimals)
 			);
 			const volumeToken1 = new BigNumber(bucket.swap_volume_token1_during_bucket.toString()).dividedBy(
@@ -247,7 +290,7 @@ function generateDexData(
 				.plus(volumeToken1.multipliedBy(new BigNumber(token1.usdPrice)));
 
 
-			toatal_30d_volume_usd=toatal_30d_volume_usd.plus(volumeUsd);
+			toatal_30d_volume_usd = toatal_30d_volume_usd.plus(volumeUsd);
 		})
 
 		// Calculate APR
@@ -281,7 +324,7 @@ function generateDexData(
 
 			total_24h_volume_usd: total_24h_volume_usd.toString(),
 			total_24h_collected_fees_usd: total_24h_collected_fees_usd.toString(),
-			total_30d_volume_usd:toatal_30d_volume_usd.toString(),
+			total_30d_volume_usd: toatal_30d_volume_usd.toString(),
 
 			apr,
 		};
