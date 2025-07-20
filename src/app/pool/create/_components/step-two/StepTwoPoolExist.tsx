@@ -1,144 +1,180 @@
-import PriceRangeBarChart from './PriceRangeBarChart';
 import { RefreshIcon, ZoomInIcon, ZoomOutIcon } from '@/components/icons';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { Charts, chartShowRanges, chartTypes, tabs } from './data';
+import { act, useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
 import { HandlePriceProps } from '../../_types';
-import { get_active_liquidity } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
+import {
+  ActiveTick,
+  get_active_liquidity,
+} from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePoolFormDefaultValues } from '../../schema';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
+import PriceRangeBarChart, { ChartType } from './PriceRangeBarChart';
+
+const tabs: ChartType[] = [
+  { label: 'Full range', value: 'fullRange' },
+  { label: 'Custom range', value: 'customRange' },
+];
 
 const StepTwoPoolExist = ({
   handlePriceInput,
+  isToken0Selected,
+  handleSelectedTokenChange,
+  matchedPool,
 }: {
   handlePriceInput: (props: HandlePriceProps) => void;
+  isToken0Selected: boolean;
+  handleSelectedTokenChange: () => void;
+  matchedPool: Pool;
 }) => {
+  const [selectedTab, setSelectedTab] = useState<ChartType>(tabs[0]);
   const { unAuthenticatedAgent } = useSharedStore();
-  const { pools } = useSharedStore();
-  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
-  const [token0, token1, initialPrice] = useWatch({
-    control,
-    name: ['token0', 'token1', 'initialPrice'],
-  });
+  const { icpTokens } = useSharedStore();
 
-  const getChartData = async () => {
-    if (!pools || pools.length === 0 || !unAuthenticatedAgent) return;
-    console.log({
-      is_token0_selected: true,
-      pool_id: pools[0].pool_id,
-      token0: token0,
-      token1: token1,
-    });
-    const data = await get_active_liquidity(
-      {
-        is_token0_selected: true,
-        pool_id: pools[0].pool_id,
-        token0: token0,
-        token1: token1,
-      },
-      unAuthenticatedAgent,
-    );
-    console.log('Chart data:', data);
-    return data;
-  };
+  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
+  const [token0, token1] = useWatch({
+    control,
+    name: ['token0', 'token1'],
+  });
+  const [chartData, setChartData] = useState<ActiveTick[]>();
+
+  const initialPrice = useMemo(() => {
+    return isToken0Selected && matchedPool.token0_price_in_token1
+      ? matchedPool.token0_price_in_token1
+      : matchedPool.token1_price_in_token0
+        ? matchedPool.token1_price_in_token0
+        : '0';
+  }, [matchedPool, isToken0Selected, selectedTab]);
 
   useEffect(() => {
+    const getChartData = async () => {
+      if (!unAuthenticatedAgent) return;
+      const data = await get_active_liquidity(
+        {
+          is_token0_selected: true,
+          pool_id: matchedPool.pool_id,
+          token0: token0,
+          token1: token1,
+        },
+        unAuthenticatedAgent,
+      );
+
+      if (!data) return;
+
+      setChartData(data.result);
+    };
     getChartData();
+    setValue('initialPrice', initialPrice);
   }, [token0, token1, unAuthenticatedAgent]);
 
-  const [selectedTab, setSelectedTab] = useState<Charts>(tabs[0].value);
-  const [selectedChart, setSelectedChart] = useState<string>('usdc');
-  const [selectedChartShowRange, setSelectedChartShowRange] =
-    useState<(typeof chartShowRanges)[number]['value']>('1d');
+  const marketPrice = useMemo(() => {
+    if (!token0 || !token1 || !icpTokens) return 'Market price unavailable';
+    return get_market_price(
+      {
+        is_token0_selected: isToken0Selected,
+        token0,
+        token1,
+        price: initialPrice,
+      },
+      icpTokens,
+    ).text;
+  }, [token0, token1, isToken0Selected, icpTokens]);
+
+  const resetToFullRange = () => {
+    handlePriceInput({ value: '0', minOrMax: 'min' });
+    handlePriceInput({ value: '0', minOrMax: 'max' });
+    setSelectedTab(tabs[0]);
+  };
+
+  const handleSelectPositionRangeType = (tab: ChartType) => {
+    if (tab.value === 'fullRange') {
+      resetToFullRange();
+    } else {
+      setSelectedTab(tabs[1]);
+    }
+  };
+
   return (
     <>
       {/* tabs */}
       <div className="flex w-full rounded-[10px] bg-[#222222] px-[10px] py-[6px] lg:mb-6">
+        {/* TODO: Handle tab selection, change prices when custom range selected and when full range selected */}
         {tabs.map((tab) => (
           <button
+            type="button"
             key={tab.value}
             className={cn(
               'w-full select-none rounded-md py-[6px] text-sm font-semibold transition-all',
-              tab.value === selectedTab ? 'bg-[#1E53B8] text-white' : 'bg-[#222222] text-white/70',
+              tab.value === selectedTab.value
+                ? 'bg-[#1E53B8] text-white'
+                : 'bg-[#222222] text-white/70',
             )}
-            onClick={() => setSelectedTab(tab.value)}
+            onClick={() => handleSelectPositionRangeType(tab)}
           >
             {tab.label}
           </button>
         ))}
       </div>
       {/* chart */}
-      <div className="chart-background flex w-full flex-col gap-6 lg:gap-16">
+      <div className="chart-background mb-28 flex w-full flex-col gap-6 lg:mb-0 lg:gap-16">
         <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 lg:flex-row-reverse lg:items-center">
+          {/* token0 & token1 switcher */}
           <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">
-            {chartTypes.map((chart) => (
-              <button
-                key={chart.value}
-                className={cn(
-                  'flex w-full items-center gap-1 rounded-md px-[10px] py-[4px] text-xs font-semibold transition-all',
-                  chart.value === selectedChart
-                    ? 'bg-[#1E53B8] text-white'
-                    : 'bg-[#222222] text-white/70',
-                )}
-                onClick={() => setSelectedChart(chart.value)}
-              >
-                <Image src={chart.icon} alt="" width={17} height={17} />
-                {chart.label}
-              </button>
-            ))}
+            {[token0, token1].map(
+              (t, idx) =>
+                t && (
+                  <button
+                    type="button"
+                    key={idx}
+                    className={cn(
+                      'flex items-center gap-1 rounded-md px-[10px] py-[4px] text-xs font-semibold transition-all',
+                      (isToken0Selected && idx === 0) || (!isToken0Selected && idx === 1)
+                        ? 'bg-[#1E53B8] text-white'
+                        : 'bg-[#222222] text-white/70',
+                    )}
+                    onClick={() => handleSelectedTokenChange()}
+                    disabled={!t}
+                  >
+                    <Image
+                      src={t.logo}
+                      alt={t.symbol}
+                      width={17}
+                      height={17}
+                      className="rounded-full"
+                    />
+                    {t.symbol}
+                  </button>
+                ),
+            )}
           </div>
+          {/* market price */}
           <div className="text-[14px] font-bold">
             <span className="text-[#9F9F9F]">Market price:</span>
-            <span className="ml-1">1,827.91 USDC = 1</span>
-            <p className="text-[#9F9F9F]">ETH($1,827.91)</p>
+            <span className="ml-1">{marketPrice}</span>
+            <p className="text-[#9F9F9F]">
+              {isToken0Selected ? token0.symbol : token1.symbol}($
+              {Number(isToken0Selected ? token0.usdPrice : token1.usdPrice).toFixed(2)})
+            </p>
           </div>
         </div>
-        <PriceRangeBarChart
-          setMaxPrice={(price) => handlePriceInput({ value: price.toString(), minOrMax: 'max' })}
-          setMinPrice={(price) =>
-            handlePriceInput({
-              minOrMax: 'min',
-              value: price.toString(),
-            })
-          }
-          selectedTab={selectedTab}
-        />
-      </div>
-      {/* gap */}
-      <div className="flex-1" />
-      {/* chart controls */}
-      <div className="flex w-full flex-col items-start justify-start gap-4 lg:flex-row-reverse lg:items-center lg:justify-between">
-        <div className="flex items-center justify-end gap-[10px]">
-          {chartShowRanges.map((chartRange) => (
-            <button
-              key={chartRange.value}
-              className={cn(
-                'flex items-center justify-center rounded-full border text-sm font-medium transition-colors',
-                selectedChartShowRange === chartRange.value
-                  ? 'border-[#E9DDF9] bg-[#565656] dark:bg-[#FFFFFFBA] dark:text-black'
-                  : 'border-[#565656] bg-[#565656]',
-                chartRange.value === 'all' ? 'w-max p-2' : 'h-[37px] w-[37px]',
-              )}
-              onClick={() => setSelectedChartShowRange(chartRange.value)}
-            >
-              {chartRange.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center justify-start gap-[10px]">
-          <button className="flex h-[36px] w-[81px] items-center justify-center gap-2 rounded-[10px] bg-[#565656]">
-            <RefreshIcon className="h-3 w-3" strokeWidth={0} />
-            Reset
-          </button>
-          <button className="flex h-[36px] w-[40px] items-center justify-center rounded-[10px] bg-[#565656]">
-            <ZoomInIcon />
-          </button>
-          <button className="flex h-[36px] w-[40px] items-center justify-center rounded-[10px] bg-[#565656]">
-            <ZoomOutIcon />
-          </button>
-        </div>
+        {chartData && (
+          <PriceRangeBarChart
+            resetToFullRange={resetToFullRange}
+            initialPrice={initialPrice}
+            chartData={chartData}
+            setMaxPrice={(price) => handlePriceInput({ value: price.toString(), minOrMax: 'max' })}
+            setMinPrice={(price) =>
+              handlePriceInput({
+                minOrMax: 'min',
+                value: price.toString(),
+              })
+            }
+            selectedTab={selectedTab}
+          />
+        )}
       </div>
     </>
   );

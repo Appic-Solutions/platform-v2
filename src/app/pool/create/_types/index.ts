@@ -2,6 +2,7 @@ import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_typ
 import { CreatePoolFormDefaultValues } from '../schema';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { UseFormReturn } from 'react-hook-form';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 export interface SelectTokenHandlerProps {
   name: 'token0' | 'token1';
@@ -11,7 +12,7 @@ export interface SelectTokenHandlerProps {
 export type FeeTier = CandidPoolId & {
   tvl: string;
   desc: string;
-  isExist: boolean;
+  matchedPool: Pool | undefined;
 };
 
 export type SelectFeeHandlerProps = CreatePoolFormDefaultValues['fee'];
@@ -53,6 +54,7 @@ export interface CreatePositionStepTwoProps {
   stepNextHandler: () => void;
   feeTiers: FeeTier[];
   methods: UseFormReturn<CreatePoolFormDefaultValues>;
+  handleSelectedTokenChange: () => void;
 }
 
 export interface StepTwoPoolNotExistProps {

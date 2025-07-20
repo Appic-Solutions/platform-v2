@@ -48,7 +48,7 @@ export default function TokenListPage({
 
   return (
     <div className="flex h-full w-full animate-fade flex-col gap-y-4">
-      <BoxHeader title={`Select Token ${selectedTokenType}`} onBack={stateBackHandler} />
+      <BoxHeader title="Select Token" onBack={stateBackHandler} />
 
       <RHFInput
         name="searchTokenQuery"

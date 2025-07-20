@@ -8,6 +8,7 @@ import PriceRangeInputs from './PriceRangeInputs';
 import DepositTokenInputs from './DepositTokenInputs';
 import StepTwoPoolExist from './StepTwoPoolExist';
 import { CreatePositionStepTwoProps } from '../../_types';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 const CreatePositionStepTwo = ({
   isToken0Selected,
@@ -15,6 +16,7 @@ const CreatePositionStepTwo = ({
   handlePriceInput,
   handleInitialPriceInput,
   handleDepositAmountInput,
+  handleSelectedTokenChange,
   handleSetMarketPrice,
   feeTiers,
   methods,
@@ -28,14 +30,15 @@ const CreatePositionStepTwo = ({
     control,
     name: ['token0', 'token1', 'fee'],
   });
-  const [isPoolExist, setIsPoolExist] = useState(false);
+
+  const [existPool, setExistPool] = useState<Pool>();
 
   useEffect(() => {
     const selectedFee = feeTiers.find((tier) => Number(tier.fee) === fee);
-    if (selectedFee && selectedFee.isExist) {
-      setIsPoolExist(true);
+    if (selectedFee && selectedFee.matchedPool) {
+      setExistPool(selectedFee.matchedPool);
     } else {
-      setIsPoolExist(false);
+      setExistPool(undefined);
     }
   });
 
@@ -58,8 +61,13 @@ const CreatePositionStepTwo = ({
           </div>
         </div>
 
-        {isPoolExist ? (
-          <StepTwoPoolExist handlePriceInput={handlePriceInput} />
+        {existPool ? (
+          <StepTwoPoolExist
+            isToken0Selected={isToken0Selected}
+            handlePriceInput={handlePriceInput}
+            handleSelectedTokenChange={handleSelectedTokenChange}
+            matchedPool={existPool}
+          />
         ) : (
           <StepTwoPoolNotExist
             methods={methods}

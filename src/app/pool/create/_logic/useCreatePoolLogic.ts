@@ -52,9 +52,9 @@ export default function useCreatePoolLogic() {
     mode: 'onChange',
   });
 
-  const [Token0, Token1, sqrtPriceX96, minTick, maxTick] = useWatch({
+  const [Token0, Token1, sqrtPriceX96, minTick, maxTick, initialPrice] = useWatch({
     control: methods.control,
-    name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick'],
+    name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick', 'initialPrice'],
   });
 
   const getStepValidationFields = (step: number): (keyof CreatePoolFormDefaultValues)[] => {
@@ -82,6 +82,27 @@ export default function useCreatePoolLogic() {
   const resetFormHandler = () => {
     methods.reset();
     setFeeTiers([]);
+  };
+
+  const handleSelectedTokenChange = () => {
+    const price = parseFloat(initialPrice);
+
+    if (!price || price <= 0 || isNaN(price)) {
+      methods.resetField('initialPrice');
+      setIsToken0Selected(!isToken0Selected);
+      return;
+    }
+
+    const newValue = (1 / price).toFixed(18).replace(/\.?0+$/, '');
+
+    setIsToken0Selected(!isToken0Selected);
+
+    methods.setValue('initialPrice', newValue, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    methods.trigger('initialPrice');
   };
 
   const handleInitialPriceInput = (value: string) => {
@@ -233,7 +254,7 @@ export default function useCreatePoolLogic() {
         is_token0_selected: isToken0Selected,
         token0: Token0,
         token1: Token1,
-        price: '0',
+        price: initialPrice,
       },
       icpTokens,
     );
@@ -281,7 +302,7 @@ export default function useCreatePoolLogic() {
       token1: Principal.fromText(token1.canisterId),
       tvl: '0',
       desc: FEE_TIERS_DESC_MAP.get(fee) || 'Best for very stable pairs.',
-      isExist: false,
+      matchedPool: undefined,
     }));
 
     const updatedFeeTiers = feeTiersList.map((feeTier) => {
@@ -294,7 +315,7 @@ export default function useCreatePoolLogic() {
 
       return {
         ...feeTier,
-        isExist: Boolean(matchingPool),
+        matchedPool: matchingPool,
         tvl: matchingPool?.tvl_usd || '0',
       };
     });
@@ -329,6 +350,7 @@ export default function useCreatePoolLogic() {
     stepNextHandler,
     stepBackHandler,
     getStepValidationFields,
+    handleSelectedTokenChange,
     // Step One
     resetFormHandler,
     selectTokenHandler,

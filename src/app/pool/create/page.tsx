@@ -18,6 +18,7 @@ export default function PoolCreatePage() {
     stepNextHandler,
     stepBackHandler,
     getStepValidationFields,
+    handleSelectedTokenChange,
     // Step One
     resetFormHandler,
     selectTokenHandler,
@@ -64,6 +65,7 @@ export default function PoolCreatePage() {
             />
           ) : step === 1 ? (
             <CreatePositionStepTwo
+              handleSelectedTokenChange={handleSelectedTokenChange}
               handleDepositAmountInput={handleDepositAmountInput}
               stepNextHandler={stepNextHandler}
               handlePriceInput={handlePriceInput}
