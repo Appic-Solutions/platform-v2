@@ -124,7 +124,9 @@ export default function ExplorePage() {
                         const token0Id = item.token0.canisterId;
                         const token1Id = item.token1.canisterId;
                         const fee = Number(item.pool.pool_id.fee);
-                        router.push(`/edit/${token0Id}-${token1Id}-${fee}`);
+                        router.push(
+                          `/explore/detail?token0=${token0Id}&token1=${token1Id}&fee=${fee}`,
+                        );
                       }}
                     >
                       <td>{idx + 1}</td>
