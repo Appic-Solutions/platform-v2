@@ -10,7 +10,7 @@ import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { appic_dex } from "../../../../../canister_ids.json";
 
 // Output interface for individual pool history
-interface PoolHistory {
+export interface PoolHistory {
 	pool: Pool;
 	token0: IcpToken;
 	token1: IcpToken;
