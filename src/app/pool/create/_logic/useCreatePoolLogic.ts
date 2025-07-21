@@ -73,6 +73,7 @@ export default function useCreatePoolLogic() {
   const stepNextHandler = async () => {
     const fields = getStepValidationFields(step);
     const isValid = await methods.trigger(fields);
+
     if (!isValid) return;
     setStep((prev) => prev + 1);
   };
@@ -82,6 +83,7 @@ export default function useCreatePoolLogic() {
   const resetFormHandler = () => {
     methods.reset();
     setFeeTiers([]);
+    setStep(0);
   };
 
   const handleSelectedTokenChange = () => {
@@ -106,6 +108,9 @@ export default function useCreatePoolLogic() {
   };
 
   const handleInitialPriceInput = (value: string) => {
+    console.log('here');
+    handlePriceInput({ value: '', minOrMax: 'min' });
+    handlePriceInput({ value: '', minOrMax: 'max' });
     methods.setValue('initialPrice', value, { shouldValidate: true, shouldDirty: true });
     methods.trigger('initialPrice');
   };
@@ -227,7 +232,6 @@ export default function useCreatePoolLogic() {
 
       console.log('Mint amounts calculated', result);
 
-      // Update both fields only if calculation is successful
       methods.setValue('token0DepositAmount', result.token0.formatted, {
         shouldValidate: true,
         shouldDirty: true,
@@ -338,7 +342,6 @@ export default function useCreatePoolLogic() {
     }
     getTickSpacingHandler(methods.getValues('fee'));
 
-    // Reset manual flag after token change
     feeManuallySelected.current = false;
   }, [Token0, Token1]);
 

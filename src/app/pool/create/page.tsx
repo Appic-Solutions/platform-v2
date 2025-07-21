@@ -77,7 +77,10 @@ export default function PoolCreatePage() {
               handleSetMarketPrice={handleSetMarketPrice}
             />
           ) : (
-            <CreatePoolStepThree />
+            <CreatePoolStepThree
+              isToken0Selected={isToken0Selected}
+              resetFormHandler={resetFormHandler}
+            />
           )}
         </Box>
       </form>

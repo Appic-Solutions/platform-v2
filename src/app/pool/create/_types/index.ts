@@ -62,6 +62,7 @@ export interface StepTwoPoolNotExistProps {
   setIsToken0Selected: (value: boolean) => void;
   handleInitialPriceInput: (value: string) => void;
   handleSetMarketPrice: () => void;
+  handlePriceInput: (props: HandlePriceProps) => void;
   methods: UseFormReturn<CreatePoolFormDefaultValues>;
 }
 

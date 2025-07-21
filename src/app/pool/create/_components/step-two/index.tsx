@@ -114,6 +114,7 @@ const CreatePositionStepTwo = ({
         ) : (
           <StepTwoPoolNotExist
             methods={methods}
+            handlePriceInput={handlePriceInput}
             isToken0Selected={isToken0Selected}
             setIsToken0Selected={setIsToken0Selected}
             handleInitialPriceInput={handleInitialPriceInput}

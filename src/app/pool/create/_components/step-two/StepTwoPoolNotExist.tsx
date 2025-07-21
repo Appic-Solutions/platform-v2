@@ -15,6 +15,7 @@ const StepTwoPoolNotExist = ({
   isToken0Selected,
   handleSetMarketPrice,
   methods,
+  handlePriceInput,
 }: StepTwoPoolNotExistProps) => {
   const { icpTokens } = useSharedStore();
   const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
@@ -28,6 +29,10 @@ const StepTwoPoolNotExist = ({
     const price = initialPrice;
     if (!price || parseFloat(price) <= 0 || isNaN(Number(initialPrice)))
       return 'Enter a valid price';
+
+    handlePriceInput({ value: '', minOrMax: 'min' });
+    handlePriceInput({ value: '', minOrMax: 'max' });
+
     const result = calculate_price({
       token0,
       token1,

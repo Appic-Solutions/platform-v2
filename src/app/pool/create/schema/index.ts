@@ -19,6 +19,13 @@ export const CreatePoolFormSchema = z
       })
       .min(1, 'Initial price is required')
       .max(24, 'Initial price must be less than 24 characters')
+      .transform((val) => {
+        if (val.includes('.')) {
+          const num = parseFloat(val);
+          return num.toFixed(18);
+        }
+        return val;
+      })
       .refine((val) => DECIMAL_REGEX.test(val), {
         message: 'Enter a valid number with up to 18 decimals',
       })

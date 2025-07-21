@@ -67,8 +67,10 @@ const StepTwoPoolExist = ({
       setChartData(data.result);
     };
     getChartData();
+    handlePriceInput({ value: '', minOrMax: 'min' });
+    handlePriceInput({ value: '', minOrMax: 'max' });
     setValue('initialPrice', initialPrice);
-  }, [token0, token1, unAuthenticatedAgent]);
+  }, [token0, token1, unAuthenticatedAgent, initialPrice]);
 
   const marketPrice = useMemo(() => {
     if (!token0 || !token1 || !icpTokens) return 'Market price unavailable';
