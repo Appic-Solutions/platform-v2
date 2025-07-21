@@ -39,14 +39,14 @@ export const CreatePoolFormSchema = z
 
     token0DepositAmount: z
       .string()
-      .min(1, 'Amount required')
+      .min(1, 'Invalid amount')
       .refine((val) => parseFloat(val) > 0, {
         message: 'Must be greater than 0',
       }),
 
     token1DepositAmount: z
       .string()
-      .min(1, 'Amount required')
+      .min(1, 'Invalid amount')
       .refine((val) => parseFloat(val) > 0, {
         message: 'Must be greater than 0',
       }),

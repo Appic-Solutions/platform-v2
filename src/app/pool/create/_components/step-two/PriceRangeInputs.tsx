@@ -97,7 +97,7 @@ const PriceRangeInputs = ({
           </div>
         </GradientBorderCard>
         {errors.maxPrice || errors.minPrice ? (
-          <p className="absolute bottom-[-12%] text-[10px] text-[#e07f00] lg:text-sm">
+          <p className="absolute bottom-[-12%] text-[10px] text-[#EE5D5D] lg:text-sm">
             {errors.maxPrice?.message ?? errors.minPrice?.message}
           </p>
         ) : null}

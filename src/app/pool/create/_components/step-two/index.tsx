@@ -22,16 +22,32 @@ const CreatePositionStepTwo = ({
   methods,
   stepNextHandler,
 }: CreatePositionStepTwoProps) => {
-  const {
+  const { control } = useFormContext<CreatePoolFormDefaultValues>();
+  const [
+    token0,
+    token1,
+    fee,
+    minPrice,
+    maxPrice,
+    initialPrice,
+    token0DepositAmount,
+    token1DepositAmount,
+  ] = useWatch({
     control,
-    formState: { isValid },
-  } = useFormContext<CreatePoolFormDefaultValues>();
-  const [token0, token1, fee] = useWatch({
-    control,
-    name: ['token0', 'token1', 'fee'],
+    name: [
+      'token0',
+      'token1',
+      'fee',
+      'minPrice',
+      'maxPrice',
+      'initialPrice',
+      'token0DepositAmount',
+      'token1DepositAmount',
+    ],
   });
 
   const [existPool, setExistPool] = useState<Pool>();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
     const selectedFee = feeTiers.find((tier) => Number(tier.fee) === fee);
@@ -40,7 +56,34 @@ const CreatePositionStepTwo = ({
     } else {
       setExistPool(undefined);
     }
-  });
+  }, [fee, feeTiers]);
+
+  useEffect(() => {
+    console.log({
+      minPrice,
+      maxPrice,
+      initialPrice,
+      fee,
+      token0DepositAmount,
+      token1DepositAmount,
+      token0,
+      token1,
+    });
+    if (
+      token0 &&
+      token1 &&
+      minPrice &&
+      maxPrice &&
+      initialPrice &&
+      fee &&
+      token0DepositAmount &&
+      token1DepositAmount
+    ) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [minPrice, maxPrice, initialPrice, fee, token0DepositAmount, token1DepositAmount]);
 
   return (
     <div className="flex w-full animate-fade select-none flex-col gap-8 lg:flex-row lg:gap-12">
@@ -90,7 +133,7 @@ const CreatePositionStepTwo = ({
         <DepositTokenInputs handleDepositAmountInput={handleDepositAmountInput} />
         <button
           onClick={stepNextHandler}
-          disabled={!isValid}
+          disabled={isButtonDisabled}
           type="button"
           className="h-[50px] rounded-[15px] bg-primary-buttons disabled:cursor-not-allowed disabled:opacity-50 lg:h-[66px]"
         >

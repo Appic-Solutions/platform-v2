@@ -120,14 +120,6 @@ export default function useCreatePoolLogic() {
       return value;
     };
 
-    console.log('alignedPriceArgs', {
-      is_token0_selected: isToken0Selected,
-      token0: Token0,
-      token1: Token1,
-      price: price(),
-      tick_spacing: methods.getValues('tickSpacing'),
-    });
-
     const alignedPrice = alignMinOrMaxPrice({
       is_token0_selected: isToken0Selected,
       token0: Token0,
@@ -185,66 +177,74 @@ export default function useCreatePoolLogic() {
     isAmountZero: boolean;
     amount: string;
   }) => {
-    console.log('before if');
-    console.log({
-      Token0,
-      Token1,
-      sqrtPriceX96,
-      minTick,
-      maxTick,
-    });
-    if (!Token0 || !Token1 || !sqrtPriceX96 || !minTick || !maxTick) return;
-    console.log('after if');
     const trimmed = amount.trim();
+    const fieldToUpdate = isAmountZero ? 'token0DepositAmount' : 'token1DepositAmount';
+    const otherField = isAmountZero ? 'token1DepositAmount' : 'token0DepositAmount';
 
-    if (!trimmed || trimmed === '0') {
-      console.log('resetting amounts');
-      methods.setValue('token0DepositAmount', '', {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-      methods.setValue('token1DepositAmount', '', {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-      methods.trigger(['token0DepositAmount', 'token1DepositAmount']);
+    const validAmount = limitDecimalPlaces(trimmed);
+    methods.setValue(fieldToUpdate, validAmount, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    if (!trimmed) {
+      console.log('Empty input, skipping calculation');
+      methods.trigger([fieldToUpdate]);
       return;
     }
 
-    const validAmount = limitDecimalPlaces(trimmed);
     const parsed = parseFloat(validAmount);
-    if (isNaN(parsed) || parsed <= 0) return;
+    if (isNaN(parsed) || parsed < 0) {
+      console.log('Invalid or negative amount, skipping calculation');
+      methods.setValue(fieldToUpdate, '', {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      return;
+    }
 
-    console.log('args', {
-      selected_amount: validAmount,
-      token0: Token0,
-      token1: Token1,
-      sqrt_price_x96: sqrtPriceX96,
-      min_tick: minTick,
-      max_tick: maxTick,
-      is_amount_zero: isAmountZero,
-    });
-    const result = calculate_mint_amounts({
-      selected_amount: validAmount,
-      token0: Token0,
-      token1: Token1,
-      sqrt_price_x96: sqrtPriceX96,
-      min_tick: minTick,
-      max_tick: maxTick,
-      is_amount_zero: isAmountZero,
-    });
-    console.log(result);
+    if (!Token0 || !Token1 || !sqrtPriceX96 || !minTick || !maxTick) {
+      console.log('Missing prerequisites for calculation', {
+        Token0,
+        Token1,
+        sqrtPriceX96,
+        minTick,
+        maxTick,
+      });
+      return;
+    }
 
-    methods.setValue('token0DepositAmount', result.token0.formatted, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    methods.setValue('token1DepositAmount', result.token1.formatted, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    try {
+      const result = calculate_mint_amounts({
+        selected_amount: validAmount,
+        token0: Token0,
+        token1: Token1,
+        sqrt_price_x96: sqrtPriceX96,
+        min_tick: minTick,
+        max_tick: maxTick,
+        is_amount_zero: isAmountZero,
+      });
 
-    methods.trigger(['token0DepositAmount', 'token1DepositAmount']);
+      console.log('Mint amounts calculated', result);
+
+      // Update both fields only if calculation is successful
+      methods.setValue('token0DepositAmount', result.token0.formatted, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      methods.setValue('token1DepositAmount', result.token1.formatted, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+
+      methods.trigger(['token0DepositAmount', 'token1DepositAmount']);
+    } catch (error) {
+      console.error('Error calculating mint amounts:', error);
+      methods.setError(fieldToUpdate, {
+        type: 'manual',
+        message: 'Failed to calculate deposit amounts',
+      });
+    }
   };
 
   const handleSetMarketPrice = () => {
