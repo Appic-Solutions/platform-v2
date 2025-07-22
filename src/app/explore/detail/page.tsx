@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { PlusIcon, SwapHorizontalIcon } from '@/components/icons';
 import { Avatar } from '@/components/common/ui/avatar';
 import { CopyIcon } from 'lucide-react';
+import ChartSection from '../_components/chart-section';
 
 export default function ExploreDetailPage() {
   const { unAuthenticatedAgent, icpTokens, pools } = useSharedStore();
@@ -59,6 +60,10 @@ export default function ExploreDetailPage() {
       !!token1 &&
       !!feeBigInt,
   });
+
+  console.log('🚀 -----------------------------------🚀');
+  console.log('🚀 ~ ExploreDetailPage ~ data:', data);
+  console.log('🚀 -----------------------------------🚀');
 
   const value0 = Number(data?.result?.pool?.reserves0_usd ?? 0);
   const value1 = Number(data?.result?.pool?.reserves1_usd ?? 0);
@@ -124,7 +129,7 @@ export default function ExploreDetailPage() {
           <div className="text-sm font-medium text-[#898989] md:text-base">Tell Me What !</div>
         </div>
         {/* Chart Section */}
-        <div></div>
+        <ChartSection data={data.result} />
       </div>
 
       {/* Stats Section */}
