@@ -608,7 +608,7 @@ const get_bridge_metadata = (
 
 
 	let is_wrapped_icrc = false;
-	if ((is_deposit && (from_token as EvmToken).is_wrapped_icrc) || (!is_deposit || (to_token as EvmToken).is_wrapped_icrc)) {
+	if ((is_deposit && (from_token as EvmToken).is_wrapped_icrc) || (!is_deposit && (to_token as EvmToken).is_wrapped_icrc)) {
 		is_wrapped_icrc = true;
 	}
 
