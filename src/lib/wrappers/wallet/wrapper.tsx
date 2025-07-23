@@ -34,6 +34,15 @@ createAppKit({
 	},
 });
 
+
+const IdentityKitCustomSignerAuthType = {
+	[NFIDW.id]: IdentityKitAuthType.DELEGATION,
+	["Plug"]: IdentityKitAuthType.ACCOUNTS,
+	[OISY.id]: IdentityKitAuthType.ACCOUNTS, // does not support icrc34_delegation
+	[InternetIdentity.id]: IdentityKitAuthType.DELEGATION, // does not support icrc27_accounts
+	[Stoic.id]: IdentityKitAuthType.DELEGATION // does not support icrc27_accounts
+};
+
 export const WalletWrapper = ({
 	children,
 }: Readonly<{
@@ -41,12 +50,11 @@ export const WalletWrapper = ({
 }>) => {
 	return (
 		<WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
-			<IdentityKitProvider
-				authType={IdentityKitAuthType.ACCOUNTS}
-				signers={[NFIDW, InternetIdentity, Stoic, OISY]}
-			>
+			<IdentityKitProvider authType={IdentityKitAuthType.ACCOUNTS} signers={[OISY, NFIDW, InternetIdentity, Stoic]} signerClientOptions={{
+				targets: []
+			}}>
 				{children}
 			</IdentityKitProvider>
-		</WagmiProvider>
+		</WagmiProvider >
 	);
 };
