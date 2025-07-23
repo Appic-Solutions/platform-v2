@@ -32,7 +32,7 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
   },
   {
     label: 'Pool',
-    href: '/pool',
+    href: '/positions',
     tooltip: 'Pool',
     Icon: <PoolIcon width={24} height={24} className="min-h-6 min-w-6" />,
     active: true,

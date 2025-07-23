@@ -8,6 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { PoolDetailChartTypes } from './data';
 
 export const description = 'A line chart with dots and colors';
 
@@ -26,7 +27,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const PositionDetailChart = () => {
+const PoolDetailChart = ({ selectedChartType }: { selectedChartType: PoolDetailChartTypes }) => {
   return (
     <div className="relative mb-12 w-[85%] sm:w-full">
       <div className="absolute bottom-0 left-0 right-0 h-1/2 w-full bg-gradient-to-t from-[#11326f41] to-[#205fd500]"></div>
@@ -82,4 +83,4 @@ const PositionDetailChart = () => {
   );
 };
 
-export default PositionDetailChart;
+export default PoolDetailChart;
