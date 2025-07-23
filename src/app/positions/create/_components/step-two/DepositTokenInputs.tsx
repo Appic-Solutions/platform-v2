@@ -3,28 +3,19 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import React from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
-import { CreatePositionFormDefaultValues } from '../../schema';
+import { Controller, useWatch } from 'react-hook-form';
 import { cn, limitDecimalPlaces } from '@/lib/utils';
-import { DepositAmountsInputsProps } from '../../_types';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 
-const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsProps) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<CreatePositionFormDefaultValues>();
+const DepositTokenInputs = () => {
+  const { handleDepositAmountInput, createPositionForm } = useCreatePosition();
+
   const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount] = useWatch({
-    control,
+    control: createPositionForm.control,
     name: ['token0', 'token1', 'initialPrice', 'token0DepositAmount', 'token1DepositAmount'],
   });
 
   const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
-
-  // Handle input change with debouncing to prevent rapid updates
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, isAmountZero: boolean) => {
-    const value = limitDecimalPlaces(e.target.value);
-    handleDepositAmountInput({ amount: value, isAmountZero });
-  };
 
   return (
     <div>
@@ -51,7 +42,7 @@ const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsPr
             </div>
             <div className="flex flex-col gap-2">
               <Controller
-                control={control}
+                control={createPositionForm.control}
                 name="token0DepositAmount"
                 render={({ field }) => (
                   <input
@@ -91,14 +82,24 @@ const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsPr
               <p className="text-base text-[#FFFFFF] lg:text-[21px]">{token1?.symbol || 'N/A'}</p>
             </div>
             <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                disabled={isDisabled}
-                inputMode="decimal"
-                className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={token1DepositAmount || ''}
-                onChange={(e) => handleInputChange(e, false)}
-                placeholder="0"
+              <Controller
+                control={createPositionForm.control}
+                name="token1DepositAmount"
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    disabled={isDisabled}
+                    inputMode="decimal"
+                    className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = limitDecimalPlaces(e.target.value);
+                      field.onChange(value);
+                      handleDepositAmountInput({ amount: value, isAmountZero: false });
+                    }}
+                    placeholder="0"
+                  />
+                )}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 ${(Number(token1DepositAmount || 0) * Number(token1?.usdPrice || 0)).toFixed(2)}
@@ -106,9 +107,11 @@ const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsPr
             </div>
           </div>
         </GradientBorderCard>
-        {errors.token0DepositAmount || errors.token1DepositAmount ? (
+        {createPositionForm.formState.errors.token0DepositAmount ||
+        createPositionForm.formState.errors.token1DepositAmount ? (
           <p className="absolute bottom-[-12%] text-[10px] text-[#EE5D5D] lg:text-sm">
-            {errors.token0DepositAmount?.message ?? errors.token1DepositAmount?.message}
+            {createPositionForm.formState.errors.token0DepositAmount?.message ??
+              createPositionForm.formState.errors.token1DepositAmount?.message}
           </p>
         ) : null}
       </div>

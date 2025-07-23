@@ -9,34 +9,31 @@ import {
   get_active_liquidity,
 } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePoolFormDefaultValues } from '../../schema';
+import { CreatePositionFormDefaultValues } from '../../schema';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import PriceRangeBarChart, { ChartType } from './PriceRangeBarChart';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 
 const tabs: ChartType[] = [
   { label: 'Full range', value: 'fullRange' },
   { label: 'Custom range', value: 'customRange' },
 ];
 
-const StepTwoPoolExist = ({
-  handlePriceInput,
-  isToken0Selected,
-  handleSelectedTokenChange,
-  matchedPool,
-}: {
-  handlePriceInput: (props: HandlePriceProps) => void;
-  isToken0Selected: boolean;
-  handleSelectedTokenChange: () => void;
-  matchedPool: Pool;
-}) => {
+const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
+  const {
+    handlePriceInput,
+    isToken0Selected,
+    handleSelectedTokenChange,
+    createPositionForm,
+    handleInitialPriceInput,
+  } = useCreatePosition();
   const [selectedTab, setSelectedTab] = useState<ChartType>(tabs[0]);
   const { unAuthenticatedAgent } = useSharedStore();
   const { icpTokens } = useSharedStore();
 
-  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
   const [token0, token1] = useWatch({
-    control,
+    control: createPositionForm.control,
     name: ['token0', 'token1'],
   });
   const [chartData, setChartData] = useState<ActiveTick[]>();
@@ -66,10 +63,13 @@ const StepTwoPoolExist = ({
 
       setChartData(data.result);
     };
-    getChartData();
-    handlePriceInput({ value: '', minOrMax: 'min' });
-    handlePriceInput({ value: '', minOrMax: 'max' });
-    setValue('initialPrice', initialPrice);
+    getChartData().then(() => {
+      handlePriceInput({ value: '', minOrMax: 'min' });
+      handlePriceInput({ value: '', minOrMax: 'max' });
+      createPositionForm.setValue('initialPrice', initialPrice);
+      handleInitialPriceInput(initialPrice);
+      createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
+    });
   }, [token0, token1, unAuthenticatedAgent, initialPrice]);
 
   const marketPrice = useMemo(() => {

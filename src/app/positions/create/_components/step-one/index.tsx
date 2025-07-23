@@ -4,15 +4,20 @@ import { cn, getChainLogo } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import FeeTiers from '../fee-tiers';
 import TokenList from '../token-list';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePositionFormDefaultValues } from '../../schema';
+import { useWatch } from 'react-hook-form';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import { FeeTier } from '../../_types';
 
 export default function CreatePositionStepOne() {
-  const { resetFormHandler, selectTokenHandler, feeTiers, selectFeeHandler, stepNextHandler } =
-    useCreatePosition();
-  const { control } = useFormContext<CreatePositionFormDefaultValues>();
+  const {
+    resetFormHandler,
+    selectTokenHandler,
+    feeTiers,
+    selectFeeHandler,
+    stepNextHandler,
+    createPositionForm,
+  } = useCreatePosition();
+
   // State
   const [activePage, setActivePage] = useState(0);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -20,7 +25,7 @@ export default function CreatePositionStepOne() {
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeTier>();
 
   const [Token0, Token1, Fee] = useWatch({
-    control,
+    control: createPositionForm.control,
     name: ['token0', 'token1', 'fee'],
   });
 

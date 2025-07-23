@@ -1,26 +1,28 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import { ErrorIcon } from '@/components/icons';
-import { CreatePoolFormDefaultValues } from '../../schema';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useWatch } from 'react-hook-form';
 import { calculate_price, get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import { useSharedStore } from '@/store/store';
-import { StepTwoPoolNotExistProps } from '../../_types';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 
-const StepTwoPoolNotExist = ({
-  setIsToken0Selected,
-  isToken0Selected,
-  handleSetMarketPrice,
-  methods,
-  handlePriceInput,
-}: StepTwoPoolNotExistProps) => {
+const StepTwoPoolNotExist = () => {
+  const {
+    setIsToken0Selected,
+    isToken0Selected,
+    handleSetMarketPrice,
+    createPositionForm,
+    handlePriceInput,
+  } = useCreatePosition();
+  const hasResetPrices = useRef(false);
+
   const { icpTokens } = useSharedStore();
-  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
+
   const [token0, token1, initialPrice] = useWatch({
-    control,
+    control: createPositionForm.control,
     name: ['token0', 'token1', 'initialPrice'],
   });
 
@@ -29,9 +31,11 @@ const StepTwoPoolNotExist = ({
     const price = initialPrice;
     if (!price || parseFloat(price) <= 0 || isNaN(Number(initialPrice)))
       return 'Enter a valid price';
-
-    handlePriceInput({ value: '', minOrMax: 'min' });
-    handlePriceInput({ value: '', minOrMax: 'max' });
+    if (!hasResetPrices.current) {
+      handlePriceInput({ value: '', minOrMax: 'min' });
+      handlePriceInput({ value: '', minOrMax: 'max' });
+      hasResetPrices.current = true;
+    }
 
     const result = calculate_price({
       token0,
@@ -40,7 +44,7 @@ const StepTwoPoolNotExist = ({
       price,
     });
 
-    setValue('sqrtPriceX96', result.sqrt_price_x96);
+    createPositionForm.setValue('sqrtPriceX96', result.sqrt_price_x96);
     return result.text;
   }, [token0, token1, isToken0Selected, initialPrice]);
 
@@ -57,17 +61,11 @@ const StepTwoPoolNotExist = ({
     ).text;
   }, [token0, token1, isToken0Selected, icpTokens, initialPrice]);
 
-  const {
-    register,
-    formState: { errors },
-    resetField,
-  } = useFormContext<CreatePoolFormDefaultValues>();
-
   const handleSelectedTokenChange = () => {
     const price = parseFloat(initialPrice);
 
     if (!price || price <= 0 || isNaN(price)) {
-      resetField('initialPrice');
+      createPositionForm.resetField('initialPrice');
       setIsToken0Selected(!isToken0Selected);
       return;
     }
@@ -76,12 +74,12 @@ const StepTwoPoolNotExist = ({
 
     setIsToken0Selected(!isToken0Selected);
 
-    methods.setValue('initialPrice', newValue, {
+    createPositionForm.setValue('initialPrice', newValue, {
       shouldValidate: true,
       shouldDirty: true,
     });
 
-    methods.trigger('initialPrice');
+    createPositionForm.trigger('initialPrice');
   };
 
   return (
@@ -142,7 +140,7 @@ const StepTwoPoolNotExist = ({
             <div className="flex flex-col gap-2">
               <input
                 type="text"
-                {...register('initialPrice')}
+                {...createPositionForm.register('initialPrice')}
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                 placeholder="0"
               />

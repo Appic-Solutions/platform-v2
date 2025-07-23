@@ -1,7 +1,7 @@
 'use client';
 
 import { FormProvider } from 'react-hook-form';
-import { CreatePositionProvider, useCreatePosition } from './_context/CreatePositionContext';
+import { useCreatePosition } from './_context/CreatePositionContext';
 import StepNavigator from './_components/StepNavigator';
 import CreatePositionStepOne from './_components/step-one';
 import CreatePositionStepTwo from './_components/step-two';
@@ -10,12 +10,12 @@ import { cn } from '@/lib/utils';
 import CreatePositionStepThree from './_components/step-three';
 
 export default function PoolCreatePage() {
-  const { step, methods, submitHandler } = useCreatePosition();
+  const { step, createPositionForm, submitHandler } = useCreatePosition();
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider {...createPositionForm}>
       <form
-        onSubmit={methods.handleSubmit(submitHandler)}
+        onSubmit={createPositionForm.handleSubmit(submitHandler)}
         className="flex h-full w-full items-center justify-center"
       >
         <Box

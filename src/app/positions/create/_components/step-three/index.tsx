@@ -3,36 +3,27 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePositionFormDefaultValues } from '../../schema';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import AvatarGroup from '../step-two/AvatarGroup';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 
 export default function CreatePositionStepThree() {
-  const { isToken0Selected, resetFormHandler } = useCreatePosition();
-  const { control } = useFormContext<CreatePositionFormDefaultValues>();
-  const [
-    token0,
-    token1,
-    fee,
-    minPrice,
-    maxPrice,
-    initialPrice,
-    token0DepositAmount,
-    token1DepositAmount,
-  ] = useWatch({
-    control,
-    name: [
-      'token0',
-      'token1',
-      'fee',
-      'minPrice',
-      'maxPrice',
-      'initialPrice',
-      'token0DepositAmount',
-      'token1DepositAmount',
-    ],
-  });
+  const { isToken0Selected, resetFormHandler, createPositionForm } = useCreatePosition();
+
+  const [token0, token1, fee, minPrice, maxPrice, token0DepositAmount, token1DepositAmount] =
+    useWatch({
+      control: createPositionForm.control,
+      name: [
+        'token0',
+        'token1',
+        'fee',
+        'minPrice',
+        'maxPrice',
+        'initialPrice',
+        'token0DepositAmount',
+        'token1DepositAmount',
+      ],
+    });
   const token0DepositAmountInUsd = parseFloat(token0DepositAmount) * parseFloat(token0.usdPrice);
   const token1DepositAmountInUsd = parseFloat(token1DepositAmount) * parseFloat(token1.usdPrice);
 

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AvatarGroup from './AvatarGroup';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePositionFormDefaultValues } from '../../schema';
+import { useWatch } from 'react-hook-form';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import PriceRangeInputs from './PriceRangeInputs';
 import DepositTokenInputs from './DepositTokenInputs';
@@ -11,36 +10,28 @@ import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 
 const CreatePositionStepTwo = () => {
-  const {
-    isToken0Selected,
-    setIsToken0Selected,
-    handlePriceInput,
-    handleInitialPriceInput,
-    handleDepositAmountInput,
-    handleSelectedTokenChange,
-    handleSetMarketPrice,
-    feeTiers,
-    methods,
-    stepNextHandler,
-  } = useCreatePosition();
-  const { control } = useFormContext<CreatePositionFormDefaultValues>();
+  const { feeTiers, stepNextHandler, createPositionForm } = useCreatePosition();
   const [
     token0,
     token1,
     fee,
     minPrice,
     maxPrice,
+    minTick,
+    maxTick,
     initialPrice,
     token0DepositAmount,
     token1DepositAmount,
   ] = useWatch({
-    control,
+    control: createPositionForm.control,
     name: [
       'token0',
       'token1',
       'fee',
       'minPrice',
       'maxPrice',
+      'minTick',
+      'maxTick',
       'initialPrice',
       'token0DepositAmount',
       'token1DepositAmount',
@@ -65,6 +56,8 @@ const CreatePositionStepTwo = () => {
       token1 &&
       minPrice &&
       maxPrice &&
+      minTick &&
+      maxTick &&
       initialPrice &&
       fee &&
       token0DepositAmount &&
@@ -95,34 +88,14 @@ const CreatePositionStepTwo = () => {
           </div>
         </div>
 
-        {existPool ? (
-          <StepTwoPoolExist
-            isToken0Selected={isToken0Selected}
-            handlePriceInput={handlePriceInput}
-            handleSelectedTokenChange={handleSelectedTokenChange}
-            matchedPool={existPool}
-          />
-        ) : (
-          <StepTwoPoolNotExist
-            methods={methods}
-            handlePriceInput={handlePriceInput}
-            isToken0Selected={isToken0Selected}
-            setIsToken0Selected={setIsToken0Selected}
-            handleInitialPriceInput={handleInitialPriceInput}
-            handleSetMarketPrice={handleSetMarketPrice}
-          />
-        )}
+        {existPool ? <StepTwoPoolExist matchedPool={existPool} /> : <StepTwoPoolNotExist />}
       </div>
 
       {/* boxes */}
       <div className="flex h-full w-full select-none flex-col gap-9 text-white lg:w-[41%]">
-        <PriceRangeInputs
-          methods={methods}
-          isToken0Selected={isToken0Selected}
-          handlePriceInput={handlePriceInput}
-        />
+        <PriceRangeInputs />
         {/* deposit tokens boxes */}
-        <DepositTokenInputs handleDepositAmountInput={handleDepositAmountInput} />
+        <DepositTokenInputs />
         <button
           onClick={stepNextHandler}
           disabled={isButtonDisabled}

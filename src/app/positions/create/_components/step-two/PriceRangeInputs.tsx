@@ -1,21 +1,15 @@
 'use client';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePoolFormDefaultValues } from '../../schema';
+import { CreatePositionFormDefaultValues } from '../../schema';
 import { cn } from '@/lib/utils';
-import { PriceRangeInputsProps } from '../../_types';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 
-const PriceRangeInputs = ({
-  isToken0Selected,
-  handlePriceInput,
-  methods,
-}: PriceRangeInputsProps) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<CreatePoolFormDefaultValues>();
+const PriceRangeInputs = () => {
+  const { isToken0Selected, handlePriceInput, createPositionForm } = useCreatePosition();
+
   const [token0, token1, minPrice, maxPrice, initialPrice] = useWatch({
-    control,
+    control: createPositionForm.control,
     name: ['token0', 'token1', 'minPrice', 'maxPrice', 'initialPrice'],
   });
 
@@ -49,7 +43,9 @@ const PriceRangeInputs = ({
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                 value={minPrice === 'min' ? '' : minPrice}
-                onChange={(e) => methods.setValue('minPrice', handleDecimalInput(e.target.value))}
+                onChange={(e) =>
+                  createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
+                }
                 onBlur={(e) =>
                   handlePriceInput({
                     minOrMax: 'min',
@@ -80,7 +76,9 @@ const PriceRangeInputs = ({
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                 value={maxPrice === 'max' ? '' : maxPrice}
-                onChange={(e) => methods.setValue('maxPrice', handleDecimalInput(e.target.value))}
+                onChange={(e) =>
+                  createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
+                }
                 onBlur={(e) =>
                   handlePriceInput({
                     minOrMax: 'max',
@@ -96,9 +94,11 @@ const PriceRangeInputs = ({
             </div>
           </div>
         </GradientBorderCard>
-        {errors.maxPrice || errors.minPrice ? (
+        {createPositionForm.formState.errors.maxPrice ||
+        createPositionForm.formState.errors.minPrice ? (
           <p className="absolute bottom-[-12%] text-[10px] text-[#EE5D5D] lg:text-sm">
-            {errors.maxPrice?.message ?? errors.minPrice?.message}
+            {createPositionForm.formState.errors.maxPrice?.message ??
+              createPositionForm.formState.errors.minPrice?.message}
           </p>
         ) : null}
       </div>
