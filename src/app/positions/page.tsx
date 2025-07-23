@@ -46,7 +46,7 @@ export default function PositionsPage() {
       <div className={cn('flex items-center justify-between gap-4', 'w-full')}>
         <h1 className="text-[27px] font-bold md:text-[30px]">Your positions</h1>
         <Link
-          href="/pool/create"
+          href="/positions/create"
           className={cn(
             'flex items-center justify-center',
             'text-[13px] font-medium md:text-[15px]',

@@ -3,8 +3,8 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import React from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePoolFormDefaultValues } from '../../schema';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { CreatePositionFormDefaultValues } from '../../schema';
 import { cn, limitDecimalPlaces } from '@/lib/utils';
 import { DepositAmountsInputsProps } from '../../_types';
 
@@ -12,8 +12,7 @@ const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsPr
   const {
     control,
     formState: { errors },
-    setValue,
-  } = useFormContext<CreatePoolFormDefaultValues>();
+  } = useFormContext<CreatePositionFormDefaultValues>();
   const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount] = useWatch({
     control,
     name: ['token0', 'token1', 'initialPrice', 'token0DepositAmount', 'token1DepositAmount'],
@@ -51,14 +50,24 @@ const DepositTokenInputs = ({ handleDepositAmountInput }: DepositAmountsInputsPr
               <p className="text-base text-[#FFFFFF] lg:text-[21px]">{token0?.symbol || 'N/A'}</p>
             </div>
             <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                disabled={isDisabled}
-                inputMode="decimal"
-                className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={token0DepositAmount || ''}
-                onChange={(e) => handleInputChange(e, true)}
-                placeholder="0"
+              <Controller
+                control={control}
+                name="token0DepositAmount"
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    disabled={isDisabled}
+                    inputMode="decimal"
+                    className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const value = limitDecimalPlaces(e.target.value);
+                      field.onChange(value);
+                      handleDepositAmountInput({ amount: value, isAmountZero: true });
+                    }}
+                    placeholder="0"
+                  />
+                )}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 ${(Number(token0DepositAmount || 0) * Number(token0?.usdPrice || 0)).toFixed(2)}

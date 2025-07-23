@@ -2,27 +2,28 @@ import React, { useEffect, useState } from 'react';
 import AvatarGroup from './AvatarGroup';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePoolFormDefaultValues } from '../../schema';
+import { CreatePositionFormDefaultValues } from '../../schema';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import PriceRangeInputs from './PriceRangeInputs';
 import DepositTokenInputs from './DepositTokenInputs';
 import StepTwoPoolExist from './StepTwoPoolExist';
-import { CreatePositionStepTwoProps } from '../../_types';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 
-const CreatePositionStepTwo = ({
-  isToken0Selected,
-  setIsToken0Selected,
-  handlePriceInput,
-  handleInitialPriceInput,
-  handleDepositAmountInput,
-  handleSelectedTokenChange,
-  handleSetMarketPrice,
-  feeTiers,
-  methods,
-  stepNextHandler,
-}: CreatePositionStepTwoProps) => {
-  const { control } = useFormContext<CreatePoolFormDefaultValues>();
+const CreatePositionStepTwo = () => {
+  const {
+    isToken0Selected,
+    setIsToken0Selected,
+    handlePriceInput,
+    handleInitialPriceInput,
+    handleDepositAmountInput,
+    handleSelectedTokenChange,
+    handleSetMarketPrice,
+    feeTiers,
+    methods,
+    stepNextHandler,
+  } = useCreatePosition();
+  const { control } = useFormContext<CreatePositionFormDefaultValues>();
   const [
     token0,
     token1,
@@ -59,16 +60,6 @@ const CreatePositionStepTwo = ({
   }, [fee, feeTiers]);
 
   useEffect(() => {
-    console.log({
-      minPrice,
-      maxPrice,
-      initialPrice,
-      fee,
-      token0DepositAmount,
-      token1DepositAmount,
-      token0,
-      token1,
-    });
     if (
       token0 &&
       token1 &&

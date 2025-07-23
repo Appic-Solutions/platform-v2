@@ -3,7 +3,7 @@ import { IcpToken } from '@/blockchain_api/types/tokens';
 
 const DECIMAL_REGEX = /^\d+(\.\d{0,18})?$/;
 
-export const CreatePoolFormSchema = z
+export const CreatePositionFormSchema = z
   .object({
     searchTokenQuery: z.string().optional(),
 
@@ -113,5 +113,5 @@ export const CreatePoolFormSchema = z
     }
   });
 
-export type CreatePoolFormDefaultValues = z.infer<typeof CreatePoolFormSchema>;
-export type CreatePoolFormKeys = keyof CreatePoolFormDefaultValues;
+export type CreatePositionFormDefaultValues = z.infer<typeof CreatePositionFormSchema>;
+export type CreatePositionFormKeys = keyof CreatePositionFormDefaultValues;

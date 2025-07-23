@@ -1,39 +1,16 @@
 'use client';
 
 import { FormProvider } from 'react-hook-form';
-
+import { CreatePositionProvider, useCreatePosition } from './_context/CreatePositionContext';
+import StepNavigator from './_components/StepNavigator';
 import CreatePositionStepOne from './_components/step-one';
 import CreatePositionStepTwo from './_components/step-two';
-import CreatePoolStepThree from './_components/step-three';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
-import StepNavigator from './_components/StepNavigator';
-import useCreatePoolLogic from './_logic/useCreatePoolLogic';
+import CreatePositionStepThree from './_components/step-three';
 
 export default function PoolCreatePage() {
-  const {
-    // Shared
-    step,
-    methods,
-    stepNextHandler,
-    stepBackHandler,
-    getStepValidationFields,
-    handleSelectedTokenChange,
-    // Step One
-    resetFormHandler,
-    selectTokenHandler,
-    feeTiers,
-    selectFeeHandler,
-    // Step Two
-    handlePriceInput,
-    isToken0Selected,
-    setIsToken0Selected,
-    handleInitialPriceInput,
-    handleSetMarketPrice,
-    handleDepositAmountInput,
-    // Step Three
-    submitHandler,
-  } = useCreatePoolLogic();
+  const { step, methods, submitHandler } = useCreatePosition();
 
   return (
     <FormProvider {...methods}>
@@ -47,40 +24,13 @@ export default function PoolCreatePage() {
             step === 1 ? 'md:h-[789px] lg:w-[1204px]' : 'lg:h-[716px] lg:w-[611px]',
           )}
         >
-          {step < 2 && (
-            <StepNavigator
-              step={step}
-              stepNextHandler={stepNextHandler}
-              stepBackHandler={stepBackHandler}
-            />
-          )}
+          {step < 2 && <StepNavigator />}
           {step === 0 ? (
-            <CreatePositionStepOne
-              getStepValidationFields={getStepValidationFields}
-              resetFormHandler={resetFormHandler}
-              selectTokenHandler={selectTokenHandler}
-              feeTiers={feeTiers}
-              selectFeeHandler={selectFeeHandler}
-              stateNextHandler={stepNextHandler}
-            />
+            <CreatePositionStepOne />
           ) : step === 1 ? (
-            <CreatePositionStepTwo
-              handleSelectedTokenChange={handleSelectedTokenChange}
-              handleDepositAmountInput={handleDepositAmountInput}
-              stepNextHandler={stepNextHandler}
-              handlePriceInput={handlePriceInput}
-              isToken0Selected={isToken0Selected}
-              feeTiers={feeTiers}
-              methods={methods}
-              setIsToken0Selected={setIsToken0Selected}
-              handleInitialPriceInput={handleInitialPriceInput}
-              handleSetMarketPrice={handleSetMarketPrice}
-            />
+            <CreatePositionStepTwo />
           ) : (
-            <CreatePoolStepThree
-              isToken0Selected={isToken0Selected}
-              resetFormHandler={resetFormHandler}
-            />
+            <CreatePositionStepThree />
           )}
         </Box>
       </form>

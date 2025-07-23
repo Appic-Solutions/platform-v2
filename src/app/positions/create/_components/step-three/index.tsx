@@ -3,18 +3,14 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePoolFormDefaultValues } from '../../schema';
+import { CreatePositionFormDefaultValues } from '../../schema';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import AvatarGroup from '../step-two/AvatarGroup';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 
-export default function CreatePoolStepThree({
-  isToken0Selected,
-  resetFormHandler,
-}: {
-  isToken0Selected: boolean;
-  resetFormHandler: () => void;
-}) {
-  const { control } = useFormContext<CreatePoolFormDefaultValues>();
+export default function CreatePositionStepThree() {
+  const { isToken0Selected, resetFormHandler } = useCreatePosition();
+  const { control } = useFormContext<CreatePositionFormDefaultValues>();
   const [
     token0,
     token1,

@@ -13,7 +13,11 @@ import {
 } from '@/blockchain_api/functions/icp/dex/constants';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import { sortTokens } from '@/blockchain_api/functions/icp/dex/utils/token_order';
-import { CreatePoolFormDefaultValues, CreatePoolFormKeys, CreatePoolFormSchema } from '../schema';
+import {
+  CreatePositionFormDefaultValues,
+  CreatePositionFormKeys,
+  CreatePositionFormSchema,
+} from '../schema';
 import type {
   FeeTier,
   HandlePriceProps,
@@ -24,7 +28,7 @@ import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
 
-export default function useCreatePoolLogic() {
+export default function useCreatePositionLogic() {
   const { pools, icpTokens } = useSharedStore();
 
   const [step, setStep] = useState(0);
@@ -32,7 +36,7 @@ export default function useCreatePoolLogic() {
   const [isToken0Selected, setIsToken0Selected] = useState(true);
   const feeManuallySelected = useRef(false);
 
-  const methods = useForm<CreatePoolFormDefaultValues>({
+  const methods = useForm<CreatePositionFormDefaultValues>({
     defaultValues: {
       searchTokenQuery: '',
       fee: 3000,
@@ -48,7 +52,7 @@ export default function useCreatePoolLogic() {
       token0DepositAmount: '',
       token1DepositAmount: '',
     },
-    resolver: zodResolver(CreatePoolFormSchema),
+    resolver: zodResolver(CreatePositionFormSchema),
     mode: 'onChange',
   });
 
@@ -57,7 +61,8 @@ export default function useCreatePoolLogic() {
     name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick', 'initialPrice'],
   });
 
-  const getStepValidationFields = (step: number): (keyof CreatePoolFormDefaultValues)[] => {
+  // we don't use it
+  const getStepValidationFields = (step: number): (keyof CreatePositionFormDefaultValues)[] => {
     switch (step) {
       case 0:
         return ['fee', 'token0', 'token1'];
@@ -116,8 +121,8 @@ export default function useCreatePoolLogic() {
   };
 
   const handlePriceInput = ({ minOrMax, value }: HandlePriceProps) => {
-    const field: CreatePoolFormKeys = minOrMax === 'min' ? 'minPrice' : 'maxPrice';
-    const tickField: CreatePoolFormKeys = minOrMax === 'min' ? 'minTick' : 'maxTick';
+    const field: CreatePositionFormKeys = minOrMax === 'min' ? 'minPrice' : 'maxPrice';
+    const tickField: CreatePositionFormKeys = minOrMax === 'min' ? 'minTick' : 'maxTick';
 
     const price = () => {
       if (minOrMax === 'min' && (value === '0' || value === '')) return 'min';
@@ -169,7 +174,8 @@ export default function useCreatePoolLogic() {
     const bothFieldsDirty = dirtyFields.minPrice && dirtyFields.maxPrice;
 
     if (bothFieldsDirty) {
-      methods.trigger(['minPrice', 'maxPrice']);
+      methods.trigger('minPrice');
+      methods.trigger('maxPrice');
     } else {
       methods.trigger(field);
     }
@@ -182,6 +188,7 @@ export default function useCreatePoolLogic() {
     isAmountZero: boolean;
     amount: string;
   }) => {
+    debugger;
     const trimmed = amount.trim();
     const fieldToUpdate = isAmountZero ? 'token0DepositAmount' : 'token1DepositAmount';
     const otherField = isAmountZero ? 'token1DepositAmount' : 'token0DepositAmount';
@@ -194,7 +201,7 @@ export default function useCreatePoolLogic() {
 
     if (!trimmed) {
       console.log('Empty input, skipping calculation');
-      methods.trigger([fieldToUpdate]);
+      methods.trigger(fieldToUpdate);
       return;
     }
 
@@ -241,7 +248,8 @@ export default function useCreatePoolLogic() {
         shouldDirty: true,
       });
 
-      methods.trigger(['token0DepositAmount', 'token1DepositAmount']);
+      methods.trigger('token0DepositAmount');
+      methods.trigger('token1DepositAmount');
     } catch (error) {
       console.error('Error calculating mint amounts:', error);
       methods.setError(fieldToUpdate, {
@@ -346,7 +354,6 @@ export default function useCreatePoolLogic() {
   }, [Token0, Token1]);
 
   return {
-    // Shared
     step,
     setStep,
     methods,
@@ -367,6 +374,6 @@ export default function useCreatePoolLogic() {
     handleInitialPriceInput,
     handleDepositAmountInput,
     // Step Three
-    submitHandler: (values: CreatePoolFormDefaultValues) => {},
+    submitHandler: (values: CreatePositionFormDefaultValues) => {},
   };
 }

@@ -2,16 +2,10 @@
 
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { useCreatePosition } from '../_context/CreatePositionContext';
 
-const StepNavigator = ({
-  step,
-  stepNextHandler,
-  stepBackHandler,
-}: {
-  step: number;
-  stepNextHandler: () => void;
-  stepBackHandler: () => void;
-}) => {
+const StepNavigator = () => {
+  const { step, stepBackHandler, stepNextHandler } = useCreatePosition();
   return (
     <div
       className={cn(
