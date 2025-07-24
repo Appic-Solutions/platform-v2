@@ -25,18 +25,23 @@ export interface Position {
   liquidity: string;
   fees_token1_owed: string;
   fee_growth_inside_0_last_x128: string;
-  token0_reserves: string; // left of bar
-  token1_reserves: string; // right of bar
+  token0_reserves: string;
+  token1_reserves: string;
   token0_reserves_raw: string;
   token1_reserves_raw: string;
 
-  token0_reserves_usd: string; // first coin dolar
-  token1_reserves_usd: string; // second coin dolor
-  fees_token0_owed_usd: string; // first coin dolar second box
-  fees_token1_owed_usd: string; //  second coin dolor second box
-  total_reserves_usd: string; //position
-  total_fees_owed_usd: string; // fees earned
+  pool: Pool;
+
+  token0_reserves_usd: string;
+  token1_reserves_usd: string;
+  fees_token0_owed_usd: string;
+  fees_token1_owed_usd: string;
+  total_reserves_usd: string;
+  total_fees_owed_usd: string;
   is_in_range: boolean;
+
+  fees_token1_owed_raw: string;
+  fees_token0_owed_raw: string;
 }
 
 // Interface for arguments to getSinglePosition
@@ -243,6 +248,10 @@ export function createPositionObjects(
       total_reserves_usd: totalReservesUsd,
       total_fees_owed_usd: totalFeesOwedUsd,
       is_in_range,
+
+      fees_token1_owed_raw: positionInfo.fees_token1_owed.toString(),
+      fees_token0_owed_raw: positionInfo.fees_token0_owed.toString(),
+      pool,
     };
   });
 }
