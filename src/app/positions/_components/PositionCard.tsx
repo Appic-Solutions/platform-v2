@@ -2,12 +2,20 @@ import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { Avatar } from '@/components/common/ui/avatar';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import React from 'react';
 
-const PositionCard = ({ position }: { position: Position }) => {
+const PositionCard = ({
+  position,
+  setSelectedPosition,
+}: {
+  position: Position;
+  setSelectedPosition: React.Dispatch<React.SetStateAction<Position | null>>;
+}) => {
   return (
-    <Link href="positions/detail" className={cn('bg-[#222222]', 'rounded-[21px]')}>
+    <div
+      className={cn('cursor-pointer rounded-[21px] bg-[#222222]')}
+      onClick={() => setSelectedPosition(position)}
+    >
       <div className={cn('flex items-start justify-between', 'px-6 pb-5 pt-5 md:px-8 md:pt-6')}>
         <div className="flex items-center gap-x-2.5">
           <div className="relative flex">
@@ -18,7 +26,7 @@ const PositionCard = ({ position }: { position: Position }) => {
             />
             <Avatar
               // src={token?.logo}
-              src="/images/logo/"
+              src="/images/logo/icp-logo.svg"
               className={cn('h-[34px] w-[34px] md:h-[46px] md:w-[46px]', '-ml-4')}
             />
             <Avatar
@@ -31,7 +39,7 @@ const PositionCard = ({ position }: { position: Position }) => {
             />
           </div>
           <div className="flex flex-col gap-y-1">
-            <p className="text-lg font-medium md:text-2xl">USDC/ETH</p>
+            <p className="text-lg font-medium md:text-2xl">What/What</p>
             <p
               className={cn(
                 'flex items-center gap-x-1.5 text-[13px]',
@@ -48,11 +56,9 @@ const PositionCard = ({ position }: { position: Position }) => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-x-1">
-          <SolidCard size="sm">
-            <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
-          </SolidCard>
-        </div>
+        <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
+          <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
+        </SolidCard>
       </div>
 
       <div
@@ -79,7 +85,7 @@ const PositionCard = ({ position }: { position: Position }) => {
           <span className="text-[13px] font-semibold text-white/50">Full range</span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

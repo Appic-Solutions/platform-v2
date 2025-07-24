@@ -8,14 +8,14 @@ import { IcpToken } from '@/blockchain_api/types/tokens';
 import TokenCard from '@/app/auto-invest/_components/chain-token-list/token-card';
 import { useSharedStore } from '@/store/store';
 import { TokenListPageProps } from '../../_types';
-import { CreatePoolFormDefaultValues } from '../../schema';
+import { CreatePositionFormDefaultValues } from '../../schema';
 
 export default function TokenListPage({
   stateBackHandler,
   selectTokenHandler,
   selectedTokenType,
 }: TokenListPageProps) {
-  const { control, setValue } = useFormContext<CreatePoolFormDefaultValues>();
+  const { control, setValue } = useFormContext<CreatePositionFormDefaultValues>();
   const [query, token0, token1] = useWatch({
     control,
     name: ['searchTokenQuery', 'token0', 'token1'],

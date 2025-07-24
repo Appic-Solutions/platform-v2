@@ -14,6 +14,10 @@ import { Principal } from '@dfinity/principal';
 import { arePoolsEqual } from './utils/pool_comparison';
 import BigNumber from 'bignumber.js';
 
+// chart => set blur and "coming soon" on it
+
+// the blue and pink colors changes based on token0usdreserves and token1usdreserves
+// the second box bar should be based on fees_token0_owed_usd and fees_token1_owed_usd
 export interface Position {
   key: CandidPositionKey;
   fees_token0_owed: string;
@@ -21,17 +25,17 @@ export interface Position {
   liquidity: string;
   fees_token1_owed: string;
   fee_growth_inside_0_last_x128: string;
-  token0_reserves: string;
-  token1_reserves: string;
+  token0_reserves: string; // left of bar
+  token1_reserves: string; // right of bar
   token0_reserves_raw: string;
   token1_reserves_raw: string;
 
-  token0_reserves_usd: string;
-  token1_reserves_usd: string;
-  fees_token0_owed_usd: string;
-  fees_token1_owed_usd: string;
-  total_reserves_usd: string;
-  total_fees_owed_usd: string;
+  token0_reserves_usd: string; // first coin dolar
+  token1_reserves_usd: string; // second coin dolor
+  fees_token0_owed_usd: string; // first coin dolar second box
+  fees_token1_owed_usd: string; //  second coin dolor second box
+  total_reserves_usd: string; //position
+  total_fees_owed_usd: string; // fees earned
   is_in_range: boolean;
 }
 

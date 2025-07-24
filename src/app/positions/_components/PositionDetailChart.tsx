@@ -8,7 +8,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { PoolDetailChartTypes } from './data';
 
 export const description = 'A line chart with dots and colors';
 
@@ -27,20 +26,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const PoolDetailChart = ({ selectedChartType }: { selectedChartType: PoolDetailChartTypes }) => {
+const PositionDetailChart = () => {
   return (
     <div className="relative mb-12 w-[85%] sm:w-full">
       <div className="absolute bottom-0 left-0 right-0 h-1/2 w-full bg-gradient-to-t from-[#11326f41] to-[#205fd500]"></div>
-      <ChartContainer className="h-full min-h-[370px] w-full" config={chartConfig}>
+      <ChartContainer className="h-full min-h-[370px] w-full blur-sm" config={chartConfig}>
         <LineChart
           className="chart-background position-detail-chart"
           accessibilityLayer
           data={chartData}
         >
-          <ChartTooltip
+          {/* <ChartTooltip
             cursor={false}
             content={<ChartTooltipContent indicator="line" nameKey="key" hideLabel />}
-          />
+          /> */}
 
           <XAxis
             dataKey="key"
@@ -79,8 +78,11 @@ const PoolDetailChart = ({ selectedChartType }: { selectedChartType: PoolDetailC
           />
         </LineChart>
       </ChartContainer>
+      <h3 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl">
+        Coming soon!
+      </h3>
     </div>
   );
 };
 
-export default PoolDetailChart;
+export default PositionDetailChart;
