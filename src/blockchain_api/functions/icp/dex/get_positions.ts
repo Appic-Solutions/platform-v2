@@ -23,6 +23,8 @@ export interface Position {
 	token0_reserves_raw: string;
 	token1_reserves_raw: string;
 
+	pool: Pool,
+
 	token0_reserves_usd: string;
 	token1_reserves_usd: string;
 	fees_token0_owed_usd: string;
@@ -30,6 +32,9 @@ export interface Position {
 	total_reserves_usd: string;
 	total_fees_owed_usd: string;
 	is_in_range: boolean;
+
+	fees_token1_owed_raw: string;
+	fees_token0_owed_raw: string;
 }
 
 // Interface for arguments to getSinglePosition
@@ -216,6 +221,13 @@ export function createPositionObjects(
 			total_reserves_usd: totalReservesUsd,
 			total_fees_owed_usd: totalFeesOwedUsd,
 			is_in_range,
+
+
+
+
+			fees_token1_owed_raw: positionInfo.fees_token1_owed.toString(),
+			fees_token0_owed_raw: positionInfo.fees_token0_owed.toString(),
+			pool,
 		};
 	});
 }
