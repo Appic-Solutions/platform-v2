@@ -199,6 +199,8 @@ export default function useCreatePositionLogic() {
     if (!trimmed) {
       console.log('Empty input, skipping calculation');
       createPositionForm.trigger(field);
+      createPositionForm.setValue('token0DepositAmount', '');
+      createPositionForm.setValue('token1DepositAmount', '');
       return;
     }
 
