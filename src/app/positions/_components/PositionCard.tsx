@@ -3,18 +3,19 @@ import { Avatar } from '@/components/common/ui/avatar';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { FormattedPosition } from '../page';
 
 const PositionCard = ({
   position,
-  setSelectedPosition,
+  onSelectHandler,
 }: {
-  position: Position;
-  setSelectedPosition: React.Dispatch<React.SetStateAction<Position | null>>;
+  position: FormattedPosition;
+  onSelectHandler: (position: FormattedPosition) => void;
 }) => {
   return (
     <div
       className={cn('cursor-pointer rounded-[21px] bg-[#222222]')}
-      onClick={() => setSelectedPosition(position)}
+      onClick={() => onSelectHandler(position)}
     >
       <div className={cn('flex items-start justify-between', 'px-6 pb-5 pt-5 md:px-8 md:pt-6')}>
         <div className="flex items-center gap-x-2.5">

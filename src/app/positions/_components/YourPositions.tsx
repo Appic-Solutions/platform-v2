@@ -4,37 +4,15 @@ import { PlusIcon, PoolIcon } from '@/components/icons';
 import PositionCard from '../_components/PositionCard';
 import Spinner from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
+import { FormattedPosition } from '../page';
 
-import { useSharedStore } from '@/store/store';
-import { Principal } from '@dfinity/principal';
-import { useEffect, useState } from 'react';
+interface YourPositionsProps {
+  formattedPositions: FormattedPosition[] | undefined;
+  onSelectHandler: (position: FormattedPosition) => void;
+  selectedPosition: FormattedPosition | undefined;
+}
 
-import { useGetPositions } from '../_api';
-import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
-
-const YourPositions = ({
-  setSelectedPosition,
-}: {
-  setSelectedPosition: React.Dispatch<React.SetStateAction<Position | null>>;
-}) => {
-  const { icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
-  const { mutateAsync: getPositions, isError, data: positionsData } = useGetPositions();
-
-  useEffect(() => {
-    const getPositionsHandler = async () => {
-      if (!icpTokens || !pools || !unAuthenticatedAgent) return console.log('no data');
-      const res = await getPositions({
-        icpTokens,
-        pools,
-        owner: Principal.fromText(
-          '7qi53-mqll3-zmsxo-p4vf5-x3wye-nwsca-oag7a-s4tfq-6htqy-3c3zq-bqe',
-        ),
-        unAuthenticatedAgent,
-      });
-    };
-    getPositionsHandler();
-  }, [icpTokens, pools, unAuthenticatedAgent]);
-
+const YourPositions = ({ formattedPositions, onSelectHandler }: YourPositionsProps) => {
   return (
     <>
       {/* Header */}
@@ -82,18 +60,14 @@ const YourPositions = ({
           'max-h-96 overflow-y-auto',
         )}
       >
-        {positionsData?.result && positionsData.result.length > 0 ? (
-          positionsData.result?.map((position) => (
+        {formattedPositions?.length ? (
+          formattedPositions.map((position) => (
             <PositionCard
-              setSelectedPosition={setSelectedPosition}
+              onSelectHandler={onSelectHandler}
               key={position.liquidity}
               position={position}
             />
           ))
-        ) : positionsData?.result && positionsData.result.length === 0 ? (
-          <p>You have not any position</p>
-        ) : isError ? (
-          <p>Something went wrong</p>
         ) : (
           <Spinner className="my-16" />
         )}

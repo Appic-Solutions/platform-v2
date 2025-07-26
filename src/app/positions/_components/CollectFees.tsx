@@ -1,21 +1,24 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowLeftIcon } from '@/components/icons';
-import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
+import { FormattedPosition, Step } from '../page';
 
-export default function CollectFeesPage() {
+interface CollectFeesProps {
+  position: FormattedPosition;
+  setCurrentStep: React.Dispatch<React.SetStateAction<Step>>;
+}
+
+export default function CollectFeesPage({ position, setCurrentStep }: CollectFeesProps) {
   return (
-    <Box
-      className={cn(
-        'gap-y-9',
-        'md:w-[611px]',
-        'md:p-12',
-        'text-white md:text-black md:dark:text-white',
-      )}
-    >
+    <>
       {/* Header */}
       <div className={cn('relative isolate', 'flex items-center justify-between gap-4', 'w-full')}>
-        <ArrowLeftIcon className="z-10 hidden cursor-pointer md:inline-block" />
+        <ArrowLeftIcon
+          onClick={() => {
+            setCurrentStep('positionDetail');
+          }}
+          className="z-10 hidden cursor-pointer md:inline-block"
+        />
         <h1
           className={cn(
             'text-[27px] font-bold md:text-[30px]',
@@ -76,6 +79,9 @@ export default function CollectFeesPage() {
       {/* Action Button */}
       <div className={cn('flex items-center justify-center gap-x-3', 'w-full')}>
         <button
+          onClick={() => {
+            setCurrentStep('positionDetail');
+          }}
           className={cn(
             'min-h-14 w-full',
             'bg-white/35',
@@ -101,6 +107,6 @@ export default function CollectFeesPage() {
           Collect
         </button>
       </div>
-    </Box>
+    </>
   );
 }
