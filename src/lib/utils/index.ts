@@ -81,3 +81,20 @@ export const limitDecimalPlaces = (value: string, maxDecimals = 6) => {
   const [intPart, decimalPart] = value.split('.');
   return `${intPart}.${decimalPart.slice(0, maxDecimals)}`;
 };
+
+export const calculatePercent = ({
+  num1,
+  num2,
+}: {
+  num1: number;
+  num2: number;
+}): {
+  num1Percentage: number;
+  num2Percentage: number;
+} => {
+  const sum = num1 + num2;
+  return {
+    num1Percentage: (num1 * 100) / sum,
+    num2Percentage: (num2 * 100) / sum,
+  };
+};

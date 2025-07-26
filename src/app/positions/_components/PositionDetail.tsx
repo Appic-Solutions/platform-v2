@@ -1,11 +1,12 @@
 'use client';
-import { cn, getChainLogo } from '@/lib/utils';
+import { calculatePercent, cn } from '@/lib/utils';
 import { Avatar } from '@/components/common/ui/avatar';
 import { ChevronUpIcon, ExpandLeftIcon, SwapHorizontalIcon } from '@/components/icons';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { FormattedPosition, Step } from '../page';
 import PositionDetailChart from './PositionDetailChart';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import BigNumber from 'bignumber.js';
 
 interface PositionDetailProps {
   position: FormattedPosition;
@@ -14,6 +15,36 @@ interface PositionDetailProps {
 }
 
 const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: PositionDetailProps) => {
+  const [positionPercentage, setPositionPercentage] = useState<{
+    token0Percent: number;
+    token1Percent: number;
+  }>({ token0Percent: 0, token1Percent: 0 });
+
+  const [feesPercentage, setFeesPercentage] = useState<{
+    token0Percent: number;
+    token1Percent: number;
+  }>({ token0Percent: 0, token1Percent: 0 });
+
+  useEffect(() => {
+    // calculate percentage of position range
+    const positionPercentageCalcRes = calculatePercent({
+      num1: parseFloat(position.token0_reserves),
+      num2: parseFloat(position.token1_reserves),
+    });
+    const feesPercentageCalcRes = calculatePercent({
+      num1: parseFloat(position.fees_token0_owed),
+      num2: parseFloat(position.fees_token1_owed),
+    });
+    setPositionPercentage({
+      token0Percent: positionPercentageCalcRes.num1Percentage,
+      token1Percent: positionPercentageCalcRes.num2Percentage,
+    });
+    setFeesPercentage({
+      token0Percent: feesPercentageCalcRes.num1Percentage,
+      token1Percent: feesPercentageCalcRes.num2Percentage,
+    });
+  }, []);
+
   return (
     <div className="flex w-full animate-fade select-none flex-col gap-8 lg:flex-row lg:gap-12">
       {/* Left */}
@@ -73,15 +104,31 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
             <div>
               <div className="flex w-full items-center justify-between text-base text-[#FFFFFFCF]">
                 <span>
-                  {position.token0_reserves} {position.token0.symbol}
+                  {new BigNumber(position.token0_reserves).toFixed(6)} {position.token0.symbol}
                 </span>
                 <span>
-                  {position.token1_reserves} {position.token1.symbol}
+                  {new BigNumber(position.token1_reserves).toFixed(6)} {position.token1.symbol}
                 </span>
               </div>
-              <div className="mb-4 flex h-[10px] w-full rounded-full">
-                <div className="h-full w-3/4 rounded-l-full bg-[#FF2C8BB2]"></div>
-                <div className="h-full w-1/4 rounded-r-full bg-[#1C68F8B2]"></div>
+              <div className="mb-4 flex h-[10px] w-full overflow-hidden rounded-full">
+                {positionPercentage.token0Percent || positionPercentage.token1Percent ? (
+                  <>
+                    <div
+                      className="h-full bg-[#FF2C8BB2] transition-all"
+                      style={{
+                        width: `${positionPercentage.token0Percent.toFixed()}%`,
+                      }}
+                    />
+                    <div
+                      className="h-full bg-[#1C68F8B2] transition-all"
+                      style={{
+                        width: `${positionPercentage.token1Percent.toFixed()}%`,
+                      }}
+                    />
+                  </>
+                ) : (
+                  <div className="h-full w-full bg-[#9c9c9cb2] transition-all" />
+                )}
               </div>
             </div>
             <div className="mt-6 flex items-center justify-between">
@@ -133,15 +180,31 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
             <div>
               <div className="flex w-full items-center justify-between text-base text-[#FFFFFFCF]">
                 <span>
-                  {position.fees_token0_owed} {position.token0.symbol}
+                  {parseFloat(position.fees_token0_owed).toFixed(6)} {position.token0.symbol}
                 </span>
                 <span>
-                  {position.fees_token1_owed} {position.token1.symbol}
+                  {parseFloat(position.fees_token1_owed).toFixed(6)} {position.token1.symbol}
                 </span>
               </div>
-              <div className="mb-4 flex h-[10px] w-full rounded-full">
-                <div className="h-full w-3/4 rounded-l-full bg-[#FF2C8BB2]"></div>
-                <div className="h-full w-1/4 rounded-r-full bg-[#1C68F8B2]"></div>
+              <div className="mb-4 flex h-[10px] w-full overflow-hidden rounded-full">
+                {feesPercentage.token0Percent || feesPercentage.token1Percent ? (
+                  <>
+                    <div
+                      className="h-full bg-[#FF2C8BB2] transition-all"
+                      style={{
+                        width: `${feesPercentage.token0Percent.toFixed()}%`,
+                      }}
+                    />
+                    <div
+                      className="h-full bg-[#1C68F8B2] transition-all"
+                      style={{
+                        width: `${feesPercentage.token1Percent.toFixed()}%`,
+                      }}
+                    />
+                  </>
+                ) : (
+                  <div className="h-full w-full bg-[#9c9c9cb2] transition-all" />
+                )}
               </div>
             </div>
             <div className="mt-6 flex items-center justify-between">
