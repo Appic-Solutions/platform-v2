@@ -9,6 +9,12 @@ import { Response } from '@/blockchain_api/types/response';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { appic_dex } from "../../../../../canister_ids.json";
 
+export interface Price {
+	token0_in_token1: string;
+	token1_in_token0: string;
+	timestamp: string;
+}
+
 // Output interface for individual pool history
 export interface PoolHistory {
 	pool: Pool;
@@ -22,10 +28,10 @@ export interface PoolHistory {
 	weekly_generated_fees_usd: string[];
 	monthly_generated_fees_usd: string[];
 	yearly_generated_fees_usd: string[];
-	daily_price_token0_in_token1: string[];
-	weekly_price_token0_in_token1: string[];
-	monthly_price_token0_in_token1: string[];
-	yearly_price_token0_in_token1: string[];
+	daily_price_token0_in_token1: Price[];
+	weekly_price_token0_in_token1: Price[];
+	monthly_price_token0_in_token1: Price[];
+	yearly_price_token0_in_token1: Price[];
 	total_24h_volume_usd: string;
 	total_30d_volume_usd: string;
 	total_24h_collected_fees_usd: string;
@@ -193,8 +199,7 @@ function generateDexData(
 		const processBuckets = (buckets: CandidHistoryBucket[]) => {
 			const volumes: string[] = [];
 			const fees: string[] = [];
-			const prices: string[] = [];
-			const prices_inverse: string[] = [];
+			const prices: Price[] = [];
 
 			buckets.forEach((bucket) => {
 				// Volume in USD
@@ -228,11 +233,10 @@ function generateDexData(
 
 				volumes.push(volumeUsd);
 				fees.push(feesUsd);
-				prices.push(price);
-				prices_inverse.push(price_inverse);
+				prices.push({ token0_in_token1: price, token1_in_token0: price_inverse, timestamp: bucket.start_timestamp.toString() });
 			});
 
-			return { volumes, fees, prices, prices_inverse };
+			return { volumes, fees, prices };
 		};
 
 		const dailyData = processBuckets(history[1].daily_frame);
@@ -317,10 +321,6 @@ function generateDexData(
 			monthly_price_token0_in_token1: monthlyData.prices,
 			yearly_price_token0_in_token1: yearlyData.prices,
 
-			daily_price_token1_in_token0: dailyData.prices_inverse, // Note: actually token0/token1, see below
-			weekly_price_token1_in_token: weeklyData.prices_inverse,
-			monthly_price_token1_in_token0: monthlyData.prices_inverse,
-			yearly_price_token1_in_token0: yearlyData.prices_inverse,
 
 			total_24h_volume_usd: total_24h_volume_usd.toString(),
 			total_24h_collected_fees_usd: total_24h_collected_fees_usd.toString(),
