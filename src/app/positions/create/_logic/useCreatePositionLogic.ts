@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Principal } from '@dfinity/principal';
@@ -11,7 +11,7 @@ import {
   FEE_TIERS_DESC_MAP,
   getTickSpacing,
 } from '@/blockchain_api/functions/icp/dex/constants';
-import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
+
 import { sortTokens } from '@/blockchain_api/functions/icp/dex/utils/token_order';
 import {
   CreatePositionFormDefaultValues,
@@ -27,7 +27,6 @@ import type {
 import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min_max';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
-import BigNumber from 'bignumber.js';
 
 export default function useCreatePositionLogic() {
   const { pools, icpTokens } = useSharedStore();
@@ -35,6 +34,10 @@ export default function useCreatePositionLogic() {
   const [step, setStep] = useState(0);
   const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
   const [isToken0Selected, setIsToken0Selected] = useState(true);
+  const [depositAmountInputsActiveStatus, setDepositAmountInputsActiveStatus] = useState<{
+    isToken0Active: boolean;
+    isToken1Active: boolean;
+  }>();
   const feeManuallySelected = useRef(false);
 
   const createPositionForm = useForm<CreatePositionFormDefaultValues>({
@@ -57,9 +60,9 @@ export default function useCreatePositionLogic() {
     mode: 'onChange',
   });
 
-  const [Token0, Token1, sqrtPriceX96, minTick, maxTick, initialPrice] = useWatch({
+  const [Token0, Token1, sqrtPriceX96, minTick, maxTick, initialPrice, tickSpacing] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick', 'initialPrice'],
+    name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick', 'initialPrice', 'tickSpacing'],
   });
 
   // we don't use it
@@ -124,16 +127,35 @@ export default function useCreatePositionLogic() {
 
     const price = () => {
       if (minOrMax === 'min' && (value === '0' || value === '')) return 'min';
-      if (minOrMax === 'max' && (value === '0' || value === '')) return 'max';
+      if (minOrMax === 'max' && (value === '0' || value === '' || value === '\u221E')) return 'max';
       return value;
     };
 
-    const alignedPrice = alignMinOrMaxPrice({
+    console.log({
+      is_min_price: minOrMax === 'min',
       is_token0_selected: isToken0Selected,
+      pool_sqrt_x98_price: sqrtPriceX96,
+      price: price(),
+      tick_spacing: tickSpacing,
       token0: Token0,
       token1: Token1,
+    });
+
+    const alignedPrice = alignMinOrMaxPrice({
+      is_min_price: minOrMax === 'min',
+      is_token0_selected: isToken0Selected,
+      pool_sqrt_x98_price: sqrtPriceX96,
       price: price(),
-      tick_spacing: createPositionForm.getValues('tickSpacing'),
+      tick_spacing: tickSpacing,
+      token0: Token0,
+      token1: Token1,
+    });
+
+    console.log('here');
+
+    setDepositAmountInputsActiveStatus({
+      isToken0Active: alignedPrice.is_token0_active,
+      isToken1Active: alignedPrice.is_token1_active,
     });
 
     console.log('alignedPrice calculated ==========>', alignedPrice);
@@ -179,6 +201,8 @@ export default function useCreatePositionLogic() {
     } else {
       createPositionForm.trigger(field);
     }
+
+    return alignedPrice;
   };
 
   const handleDepositAmountInput = ({
@@ -258,17 +282,20 @@ export default function useCreatePositionLogic() {
         isAmountZero,
       });
 
-      createPositionForm.setValue('token0DepositAmount', result.token0.formatted, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-      createPositionForm.setValue('token1DepositAmount', result.token1.formatted, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-
-      createPositionForm.trigger('token0DepositAmount');
-      createPositionForm.trigger('token1DepositAmount');
+      if (depositAmountInputsActiveStatus?.isToken0Active) {
+        createPositionForm.setValue('token0DepositAmount', result.token0.formatted, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+        createPositionForm.trigger('token0DepositAmount');
+      }
+      if (depositAmountInputsActiveStatus?.isToken1Active) {
+        createPositionForm.setValue('token1DepositAmount', result.token1.formatted, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+        createPositionForm.trigger('token1DepositAmount');
+      }
     } catch (error) {
       console.error('Error calculating mint amounts:', error);
       createPositionForm.setError(field, {
@@ -299,8 +326,12 @@ export default function useCreatePositionLogic() {
   };
 
   const getTickSpacingHandler = (fee: number) => {
-    const tickSpacing = getTickSpacing(fee);
-    createPositionForm.setValue('tickSpacing', tickSpacing ?? 0);
+    const tickSpacing = getTickSpacing(fee) ?? 0;
+    const current = createPositionForm.getValues('tickSpacing');
+
+    if (current !== tickSpacing) {
+      createPositionForm.setValue('tickSpacing', tickSpacing);
+    }
   };
 
   useEffect(() => {
@@ -353,9 +384,9 @@ export default function useCreatePositionLogic() {
         createPositionForm.setValue('fee', Number(highestTvlFee));
       }
     }
-    getTickSpacingHandler(createPositionForm.getValues('fee'));
-
     feeManuallySelected.current = false;
+
+    getTickSpacingHandler(createPositionForm.getValues('fee'));
   }, [Token0, Token1]);
 
   return {
@@ -377,6 +408,8 @@ export default function useCreatePositionLogic() {
     handlePriceInput,
     handleInitialPriceInput,
     handleDepositAmountInput,
+    depositAmountInputsActiveStatus,
+    setDepositAmountInputsActiveStatus,
     // Step Three
     submitHandler: (values: CreatePositionFormDefaultValues) => {},
   };

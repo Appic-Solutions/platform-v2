@@ -5,12 +5,13 @@ import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import React, { useEffect, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { cn, limitDecimalPlaces } from '@/lib/utils';
-import { useCreatePosition } from '../../../_context/CreatePositionContext';
+import { useCreatePosition } from '../../_context/CreatePositionContext';
 import { useSharedStore } from '@/store/store';
-import SetUserWalletBalanceButton from './SetUserWalletBalanceButton';
+import SetUserWalletBalanceButton from '../SetUserWalletBalanceButton';
 
 const DepositTokenInputs = () => {
-  const { handleDepositAmountInput, createPositionForm } = useCreatePosition();
+  const { handleDepositAmountInput, createPositionForm, depositAmountInputsActiveStatus } =
+    useCreatePosition();
   const { icpBalance, icpIdentity } = useSharedStore();
   const [userTokenBalances, setUserTokenBalances] = useState<{
     token0Balance: string;
@@ -36,7 +37,12 @@ const DepositTokenInputs = () => {
     name: ['token0', 'token1', 'initialPrice', 'token0DepositAmount', 'token1DepositAmount'],
   });
 
-  const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
+  const isToken0Disabled =
+    !(initialPrice && parseFloat(initialPrice) > 0) ||
+    !depositAmountInputsActiveStatus?.isToken0Active;
+  const isToken1Disabled =
+    !(initialPrice && parseFloat(initialPrice) > 0) ||
+    !depositAmountInputsActiveStatus?.isToken1Active;
 
   return (
     <div>
@@ -50,7 +56,7 @@ const DepositTokenInputs = () => {
         <GradientBorderCard
           className={cn(
             'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
-            isDisabled && 'opacity-30',
+            isToken0Disabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
@@ -79,7 +85,7 @@ const DepositTokenInputs = () => {
                 render={({ field }) => (
                   <input
                     type="text"
-                    disabled={isDisabled}
+                    disabled={isToken0Disabled}
                     inputMode="decimal"
                     className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                     value={field.value || ''}
@@ -102,7 +108,7 @@ const DepositTokenInputs = () => {
         <GradientBorderCard
           className={cn(
             'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
-            isDisabled && 'opacity-30',
+            isToken1Disabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
@@ -131,7 +137,7 @@ const DepositTokenInputs = () => {
                 render={({ field }) => (
                   <input
                     type="text"
-                    disabled={isDisabled}
+                    disabled={isToken1Disabled}
                     inputMode="decimal"
                     className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
                     value={field.value || ''}

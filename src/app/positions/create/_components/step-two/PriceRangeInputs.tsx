@@ -74,7 +74,7 @@ const PriceRangeInputs = () => {
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={maxPrice === 'max' ? '∞' : maxPrice}
+                value={maxPrice === 'max' ? '\u221E' : maxPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
                 }
