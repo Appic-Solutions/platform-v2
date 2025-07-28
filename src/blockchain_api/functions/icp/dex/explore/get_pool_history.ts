@@ -15,6 +15,11 @@ export interface Price {
 	timestamp: string;
 }
 
+export interface TimeValue {
+	timestamp: string;
+	value: string;
+}
+
 // Output interface for individual pool history
 export interface PoolHistory {
 	pool: Pool;
@@ -24,10 +29,10 @@ export interface PoolHistory {
 	weekly_volume_usd: string[];
 	monthly_volume_usd: string[];
 	yearly_volume_usd: string[];
-	daily_generated_fees_usd: string[];
-	weekly_generated_fees_usd: string[];
-	monthly_generated_fees_usd: string[];
-	yearly_generated_fees_usd: string[];
+	daily_generated_fees_usd: TimeValue[];
+	weekly_generated_fees_usd: TimeValue[];
+	monthly_generated_fees_usd: TimeValue[];
+	yearly_generated_fees_usd: TimeValue[];
 	daily_price_token0_in_token1: Price[];
 	weekly_price_token0_in_token1: Price[];
 	monthly_price_token0_in_token1: Price[];
@@ -198,7 +203,7 @@ function generateDexData(
 		// Process buckets for a time frame
 		const processBuckets = (buckets: CandidHistoryBucket[]) => {
 			const volumes: string[] = [];
-			const fees: string[] = [];
+			const fees: TimeValue[] = [];
 			const prices: Price[] = [];
 
 			buckets.forEach((bucket) => {
@@ -232,7 +237,7 @@ function generateDexData(
 				const price_inverse = BigNumber(1).dividedBy(price).toString();
 
 				volumes.push(volumeUsd);
-				fees.push(feesUsd);
+				fees.push({ timestamp: bucket.start_timestamp.toString(), value: feesUsd });
 				prices.push({ token0_in_token1: price, token1_in_token0: price_inverse, timestamp: bucket.start_timestamp.toString() });
 			});
 
