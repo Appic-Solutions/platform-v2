@@ -47,7 +47,7 @@ export function get_market_price(
 	const P = new BigNumber(price_token0_in_token1).multipliedBy(
 		new BigNumber(10).pow(token1_decimals - token0_decimals),
 	);
-	const sqrtPriceX96 = P.sqrt().multipliedBy(new BigNumber(2).pow(96)).decimalPlaces(0).toFixed();
+	const sqrtPriceX96 = P.sqrt().multipliedBy(new BigNumber(2).pow(96)).decimalPlaces(0).toString();
 
 	// Format price to 6 decimal places for display
 	const formatted_price_token0_in_token1 = new BigNumber(price_token0_in_token1).toFixed(6);
