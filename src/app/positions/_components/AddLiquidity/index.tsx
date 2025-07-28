@@ -9,7 +9,7 @@ import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { AddLiquidityFormDefaultValues, addLiquidityFormSchema } from '../../create/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
-import SetUserWalletBalanceButton from '../../create/_components/step-two/DepositTokenInputs/SetUserWalletBalanceButton';
+import SetUserWalletBalanceButton from '../../create/_components/SetUserWalletBalanceButton';
 import { useEffect, useState } from 'react';
 
 interface AddLiquidityProps {

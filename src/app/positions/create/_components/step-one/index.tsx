@@ -30,6 +30,7 @@ export default function CreatePositionStepOne() {
   });
 
   useEffect(() => {
+    console.log('here');
     if (Token0 && Token1 && Fee) {
       setIsFormValid(true);
       setSelectedFeeTier(feeTiers.find((tier) => Number(tier.fee) === Fee));
