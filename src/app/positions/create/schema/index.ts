@@ -115,3 +115,22 @@ export const CreatePositionFormSchema = z
 
 export type CreatePositionFormDefaultValues = z.infer<typeof CreatePositionFormSchema>;
 export type CreatePositionFormKeys = keyof CreatePositionFormDefaultValues;
+
+export const addLiquidityFormSchema = z.object({
+  token0DepositAmount: z
+    .string()
+    .min(1, 'Invalid amount')
+    .refine((val) => parseFloat(val) > 0, {
+      message: 'Must be greater than 0',
+    }),
+
+  token1DepositAmount: z
+    .string()
+    .min(1, 'Invalid amount')
+    .refine((val) => parseFloat(val) > 0, {
+      message: 'Must be greater than 0',
+    }),
+});
+
+export type AddLiquidityFormDefaultValues = z.infer<typeof addLiquidityFormSchema>;
+export type addLiquidityFormKeys = keyof AddLiquidityFormDefaultValues;

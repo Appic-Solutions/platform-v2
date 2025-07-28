@@ -2,13 +2,34 @@
 
 import { Avatar } from '@/components/common/ui/avatar';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { cn, limitDecimalPlaces } from '@/lib/utils';
-import { useCreatePosition } from '../../_context/CreatePositionContext';
+import { useCreatePosition } from '../../../_context/CreatePositionContext';
+import { useSharedStore } from '@/store/store';
+import SetUserWalletBalanceButton from './SetUserWalletBalanceButton';
 
 const DepositTokenInputs = () => {
   const { handleDepositAmountInput, createPositionForm } = useCreatePosition();
+  const { icpBalance, icpIdentity } = useSharedStore();
+  const [userTokenBalances, setUserTokenBalances] = useState<{
+    token0Balance: string;
+    token1Balance: string;
+  }>();
+
+  useEffect(() => {
+    if (!icpBalance || !icpIdentity) return;
+
+    const userToken0 = icpBalance.tokens.find((t) => t.canisterId === token0?.canisterId);
+    const userToken1 = icpBalance.tokens.find((t) => t.canisterId === token1?.canisterId);
+
+    if (userToken0?.balance && userToken1?.balance) {
+      setUserTokenBalances({
+        token0Balance: userToken0?.balance,
+        token1Balance: userToken1?.balance,
+      });
+    }
+  }, [icpBalance, icpIdentity]);
 
   const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount] = useWatch({
     control: createPositionForm.control,
@@ -33,6 +54,7 @@ const DepositTokenInputs = () => {
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
+            {/* token name and logo */}
             <div className="flex items-center gap-2">
               <Avatar
                 src={token0?.logo}
@@ -40,7 +62,17 @@ const DepositTokenInputs = () => {
               />
               <p className="text-base text-[#FFFFFF] lg:text-[21px]">{token0?.symbol || 'N/A'}</p>
             </div>
-            <div className="flex flex-col gap-2">
+
+            {icpIdentity && icpBalance && (
+              <SetUserWalletBalanceButton
+                isAmountZero={true}
+                token={token0}
+                userTokenBalance={userTokenBalances?.token0Balance}
+              />
+            )}
+
+            {/* input and usd price */}
+            <div className="flex flex-col">
               <Controller
                 control={createPositionForm.control}
                 name="token0DepositAmount"
@@ -74,6 +106,7 @@ const DepositTokenInputs = () => {
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
+            {/* token name and logo */}
             <div className="flex items-center gap-2">
               <Avatar
                 src={token1?.logo}
@@ -81,7 +114,17 @@ const DepositTokenInputs = () => {
               />
               <p className="text-base text-[#FFFFFF] lg:text-[21px]">{token1?.symbol || 'N/A'}</p>
             </div>
-            <div className="flex flex-col gap-2">
+
+            {/* user wallet balance */}
+            {icpIdentity && icpBalance && (
+              <SetUserWalletBalanceButton
+                isAmountZero={false}
+                token={token1}
+                userTokenBalance={userTokenBalances?.token1Balance}
+              />
+            )}
+            {/* input and usd price */}
+            <div className="flex flex-col">
               <Controller
                 control={createPositionForm.control}
                 name="token1DepositAmount"

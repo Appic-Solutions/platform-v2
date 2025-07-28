@@ -27,6 +27,7 @@ import type {
 import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min_max';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
+import BigNumber from 'bignumber.js';
 
 export default function useCreatePositionLogic() {
   const { pools, icpTokens } = useSharedStore();
@@ -277,20 +278,6 @@ export default function useCreatePositionLogic() {
     }
   };
 
-  const handleSetMarketPrice = () => {
-    if (!Token0 || !Token1 || !icpTokens) return;
-    const { price } = get_market_price(
-      {
-        is_token0_selected: isToken0Selected,
-        token0: Token0,
-        token1: Token1,
-        price: initialPrice,
-      },
-      icpTokens,
-    );
-    handleInitialPriceInput(price);
-  };
-
   const selectTokenHandler = ({ name, value }: SelectTokenHandlerProps) => {
     createPositionForm.setValue('token0DepositAmount', '');
     createPositionForm.setValue('token1DepositAmount', '');
@@ -388,7 +375,6 @@ export default function useCreatePositionLogic() {
     isToken0Selected,
     setIsToken0Selected,
     handlePriceInput,
-    handleSetMarketPrice,
     handleInitialPriceInput,
     handleDepositAmountInput,
     // Step Three

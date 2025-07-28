@@ -4,41 +4,41 @@ import { PlusIcon, PoolIcon } from '@/components/icons';
 import PositionCard from '../_components/PositionCard';
 import Spinner from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
+import { FormattedPosition } from '../page';
+import Image from 'next/image';
 
-import { useSharedStore } from '@/store/store';
-import { Principal } from '@dfinity/principal';
-import { useEffect, useState } from 'react';
+interface YourPositionsProps {
+  formattedPositions: FormattedPosition[] | undefined;
+  onSelectHandler: (position: FormattedPosition) => void;
+  selectedPosition: FormattedPosition | undefined;
+  error:
+    | {
+        text: string;
+        type: 'walletConnection' | 'network';
+      }
+    | undefined;
+}
 
-import { useGetPositions } from '../_api';
-import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
-
-const YourPositions = ({
-  setSelectedPosition,
-}: {
-  setSelectedPosition: React.Dispatch<React.SetStateAction<Position | null>>;
-}) => {
-  const { icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
-  const { mutateAsync: getPositions, isError, data: positionsData } = useGetPositions();
-
-  useEffect(() => {
-    const getPositionsHandler = async () => {
-      if (!icpTokens || !pools || !unAuthenticatedAgent) return console.log('no data');
-      const res = await getPositions({
-        icpTokens,
-        pools,
-        owner: Principal.fromText(
-          '7qi53-mqll3-zmsxo-p4vf5-x3wye-nwsca-oag7a-s4tfq-6htqy-3c3zq-bqe',
-        ),
-        unAuthenticatedAgent,
-      });
-    };
-    getPositionsHandler();
-  }, [icpTokens, pools, unAuthenticatedAgent]);
-
+const NeedConnectWallet = ({ title, description }: { title: string; description: string }) => {
   return (
-    <>
+    <div
+      className={cn(
+        'm-auto flex flex-col items-center justify-center gap-y-5',
+        'h-full max-w-[490px] px-6 text-center text-white',
+      )}
+    >
+      <Image src="/images/wallet.svg" alt="wallet-Image" width={210} height={210} quality={100} />
+      <p className="text-xl">{title}</p>
+      <p className="mb-24 text-sm leading-6">{description}</p>
+    </div>
+  );
+};
+
+const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPositionsProps) => {
+  return (
+    <div className="w-full">
       {/* Header */}
-      <div className={cn('flex items-center justify-between gap-4', 'w-full')}>
+      <div className={cn('mb-8 flex items-center justify-between gap-4', 'w-full')}>
         <h1 className="text-[27px] font-bold md:text-[30px]">Your positions</h1>
         <Link
           href="/positions/create"
@@ -59,7 +59,7 @@ const YourPositions = ({
         className={cn(
           'relative isolate',
           'flex w-full flex-col gap-2.5',
-          'px-6 py-5 md:p-8',
+          'mb-8 px-6 py-5 md:p-8',
           'bg-gradient-to-b from-[#1D55BF]/30 to-[#000000]/30',
           'rounded-[20px] md:rounded-[30px]',
           'border border-[#4982EF]/40',
@@ -76,29 +76,29 @@ const YourPositions = ({
 
       <div
         className={cn(
-          'flex min-h-20 w-full flex-col gap-3',
+          'flex h-full w-full flex-col gap-3',
           'pt-3',
           'border-t border-white/20',
-          'max-h-96 overflow-y-auto',
+          'overflow-y-auto lg:max-h-96',
         )}
       >
-        {positionsData?.result && positionsData.result.length > 0 ? (
-          positionsData.result?.map((position) => (
+        {formattedPositions?.length ? (
+          formattedPositions.map((position) => (
             <PositionCard
-              setSelectedPosition={setSelectedPosition}
+              onSelectHandler={onSelectHandler}
               key={position.liquidity}
               position={position}
             />
           ))
-        ) : positionsData?.result && positionsData.result.length === 0 ? (
-          <p>You have not any position</p>
-        ) : isError ? (
-          <p>Something went wrong</p>
+        ) : error && error.type === 'walletConnection' ? (
+          <NeedConnectWallet title={error.text} description="" />
+        ) : error && error.type === 'network' ? (
+          <p className="w-full text-center">{error.text}</p>
         ) : (
           <Spinner className="my-16" />
         )}
       </div>
-    </>
+    </div>
   );
 };
 

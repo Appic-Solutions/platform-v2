@@ -42,7 +42,7 @@ const PriceRangeInputs = () => {
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={minPrice === 'min' ? '' : minPrice}
+                value={minPrice === 'min' ? '0' : minPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
                 }
@@ -52,7 +52,6 @@ const PriceRangeInputs = () => {
                     value: e.target.value,
                   })
                 }
-                placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}
@@ -75,7 +74,7 @@ const PriceRangeInputs = () => {
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
-                value={maxPrice === 'max' ? '' : maxPrice}
+                value={maxPrice === 'max' ? '∞' : maxPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
                 }
@@ -85,7 +84,6 @@ const PriceRangeInputs = () => {
                     value: e.target.value,
                   })
                 }
-                placeholder={'\u221E'}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}

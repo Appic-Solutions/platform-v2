@@ -3,43 +3,36 @@ import { Avatar } from '@/components/common/ui/avatar';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { FormattedPosition } from '../page';
 
 const PositionCard = ({
   position,
-  setSelectedPosition,
+  onSelectHandler,
 }: {
-  position: Position;
-  setSelectedPosition: React.Dispatch<React.SetStateAction<Position | null>>;
+  position: FormattedPosition;
+  onSelectHandler: (position: FormattedPosition) => void;
 }) => {
   return (
     <div
       className={cn('cursor-pointer rounded-[21px] bg-[#222222]')}
-      onClick={() => setSelectedPosition(position)}
+      onClick={() => onSelectHandler(position)}
     >
       <div className={cn('flex items-start justify-between', 'px-6 pb-5 pt-5 md:px-8 md:pt-6')}>
         <div className="flex items-center gap-x-2.5">
           <div className="relative flex">
             <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
+              src={position.token0.logo}
               className="h-[34px] w-[34px] md:h-[46px] md:w-[46px]"
             />
             <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
+              src={position.token1.logo}
               className={cn('h-[34px] w-[34px] md:h-[46px] md:w-[46px]', '-ml-4')}
-            />
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className={cn(
-                'h-[13px] w-[13px] md:h-[17px] md:w-[17px]',
-                'absolute bottom-1 right-0',
-              )}
             />
           </div>
           <div className="flex flex-col gap-y-1">
-            <p className="text-lg font-medium md:text-2xl">What/What</p>
+            <p className="text-lg font-medium md:text-2xl">
+              {position.token0.symbol}/{position.token1.symbol}
+            </p>
             <p
               className={cn(
                 'flex items-center gap-x-1.5 text-[13px]',

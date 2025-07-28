@@ -8,15 +8,11 @@ import { useWatch } from 'react-hook-form';
 import { calculate_price, get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import { useSharedStore } from '@/store/store';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
+import BigNumber from 'bignumber.js';
 
 const StepTwoPoolNotExist = () => {
-  const {
-    setIsToken0Selected,
-    isToken0Selected,
-    handleSetMarketPrice,
-    createPositionForm,
-    handlePriceInput,
-  } = useCreatePosition();
+  const { setIsToken0Selected, isToken0Selected, createPositionForm, handlePriceInput } =
+    useCreatePosition();
   const hasResetPrices = useRef(false);
 
   const { icpTokens } = useSharedStore();
@@ -62,19 +58,44 @@ const StepTwoPoolNotExist = () => {
   }, [token0, token1, isToken0Selected, icpTokens, initialPrice]);
 
   const handleSelectedTokenChange = () => {
-    const price = parseFloat(initialPrice);
+    const price = initialPrice;
 
-    if (!price || price <= 0 || isNaN(price)) {
+    if (!price || price === '0' || isNaN(Number(price))) {
       createPositionForm.resetField('initialPrice');
       setIsToken0Selected(!isToken0Selected);
       return;
     }
 
-    const newValue = (1 / price).toFixed(18).replace(/\.?0+$/, '');
+    const factor = Math.pow(10, 18);
+
+    const prevInitialPriceFormatted = Number(initialPrice) * factor;
+
+    const newInitialPriceFormatted = (1 * factor) / prevInitialPriceFormatted;
 
     setIsToken0Selected(!isToken0Selected);
 
-    createPositionForm.setValue('initialPrice', newValue, {
+    createPositionForm.setValue('initialPrice', newInitialPriceFormatted.toString(), {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    createPositionForm.trigger('initialPrice');
+  };
+
+  const handleSetMarketPrice = () => {
+    if (!token0 || !token1 || !icpTokens) return;
+    const { price } = get_market_price(
+      {
+        is_token0_selected: isToken0Selected,
+        token0,
+        token1,
+        price: initialPrice,
+      },
+      icpTokens,
+    );
+    const formattedPrice = BigNumber(price).toFixed(18, BigNumber.ROUND_DOWN);
+
+    createPositionForm.setValue('initialPrice', formattedPrice, {
       shouldValidate: true,
       shouldDirty: true,
     });
