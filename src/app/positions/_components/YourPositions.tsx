@@ -5,18 +5,40 @@ import PositionCard from '../_components/PositionCard';
 import Spinner from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import { FormattedPosition } from '../page';
+import Image from 'next/image';
 
 interface YourPositionsProps {
   formattedPositions: FormattedPosition[] | undefined;
   onSelectHandler: (position: FormattedPosition) => void;
   selectedPosition: FormattedPosition | undefined;
+  error:
+    | {
+        text: string;
+        type: 'walletConnection' | 'network';
+      }
+    | undefined;
 }
 
-const YourPositions = ({ formattedPositions, onSelectHandler }: YourPositionsProps) => {
+const NeedConnectWallet = ({ title, description }: { title: string; description: string }) => {
   return (
-    <>
+    <div
+      className={cn(
+        'm-auto flex flex-col items-center justify-center gap-y-5',
+        'h-full max-w-[490px] px-6 text-center text-white',
+      )}
+    >
+      <Image src="/images/wallet.svg" alt="wallet-Image" width={210} height={210} quality={100} />
+      <p className="text-xl">{title}</p>
+      <p className="mb-24 text-sm leading-6">{description}</p>
+    </div>
+  );
+};
+
+const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPositionsProps) => {
+  return (
+    <div className="w-full">
       {/* Header */}
-      <div className={cn('flex items-center justify-between gap-4', 'w-full')}>
+      <div className={cn('mb-8 flex items-center justify-between gap-4', 'w-full')}>
         <h1 className="text-[27px] font-bold md:text-[30px]">Your positions</h1>
         <Link
           href="/positions/create"
@@ -37,7 +59,7 @@ const YourPositions = ({ formattedPositions, onSelectHandler }: YourPositionsPro
         className={cn(
           'relative isolate',
           'flex w-full flex-col gap-2.5',
-          'px-6 py-5 md:p-8',
+          'mb-8 px-6 py-5 md:p-8',
           'bg-gradient-to-b from-[#1D55BF]/30 to-[#000000]/30',
           'rounded-[20px] md:rounded-[30px]',
           'border border-[#4982EF]/40',
@@ -54,10 +76,10 @@ const YourPositions = ({ formattedPositions, onSelectHandler }: YourPositionsPro
 
       <div
         className={cn(
-          'flex min-h-20 w-full flex-col gap-3',
+          'flex h-full w-full flex-col gap-3',
           'pt-3',
           'border-t border-white/20',
-          'max-h-96 overflow-y-auto',
+          'overflow-y-auto lg:max-h-96',
         )}
       >
         {formattedPositions?.length ? (
@@ -68,11 +90,15 @@ const YourPositions = ({ formattedPositions, onSelectHandler }: YourPositionsPro
               position={position}
             />
           ))
+        ) : error && error.type === 'walletConnection' ? (
+          <NeedConnectWallet title={error.text} description="" />
+        ) : error && error.type === 'network' ? (
+          <p className="w-full text-center">{error.text}</p>
         ) : (
           <Spinner className="my-16" />
         )}
       </div>
-    </>
+    </div>
   );
 };
 

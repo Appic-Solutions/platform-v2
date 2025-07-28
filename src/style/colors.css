@@ -16,6 +16,7 @@
   --primary-buttons:
     linear-gradient(90deg, #1c68f8 0%, #1753c5 71.5%, #113d92 100%),
     linear-gradient(318.8deg, rgba(255, 255, 255, 0) 35.19%, rgba(255, 255, 255, 0.3) 92.55%);
+  --primary-buttons-hover: linear-gradient(90deg, rgb(86, 86, 86));
   --highlighed-components:
     linear-gradient(0deg, #ffffff, #ffffff),
     linear-gradient(154.24deg, rgba(29, 85, 191, 0.3) 9.35%, rgba(255, 255, 255, 0.3) 157.6%);
@@ -85,7 +86,7 @@
 
   --box-background: radial-gradient(100% 249.45% at 0% 2.78%, #151515 0%, #080808 100%);
 
-  --box-border-gradient: linear-gradient(124.44deg, #4c4c4c 18.37%, rgba(57, 57, 57, 0.3) 70.34%);
+  --box-border-gradient: linear-gradient(170deg, #414141 18.37%, rgba(41, 41, 41, 0.3) 70.34%);
 
   --highlighted-card: linear-gradient(154.24deg, rgba(0, 33, 94, 0.672) 9.35%, rgb(0, 0, 0) 157.6%);
 

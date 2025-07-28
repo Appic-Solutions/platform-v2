@@ -21,26 +21,18 @@ const PositionCard = ({
         <div className="flex items-center gap-x-2.5">
           <div className="relative flex">
             <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
+              src={position.token0.logo}
               className="h-[34px] w-[34px] md:h-[46px] md:w-[46px]"
             />
             <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
+              src={position.token1.logo}
               className={cn('h-[34px] w-[34px] md:h-[46px] md:w-[46px]', '-ml-4')}
-            />
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className={cn(
-                'h-[13px] w-[13px] md:h-[17px] md:w-[17px]',
-                'absolute bottom-1 right-0',
-              )}
             />
           </div>
           <div className="flex flex-col gap-y-1">
-            <p className="text-lg font-medium md:text-2xl">What/What</p>
+            <p className="text-lg font-medium md:text-2xl">
+              {position.token0.symbol}/{position.token1.symbol}
+            </p>
             <p
               className={cn(
                 'flex items-center gap-x-1.5 text-[13px]',

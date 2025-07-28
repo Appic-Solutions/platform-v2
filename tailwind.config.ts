@@ -35,6 +35,7 @@ const config: Config = {
       backgroundImage: {
         'input-fields': 'var(--input-fields)',
         'primary-buttons': 'var(--primary-buttons)',
+        'primary-buttons-hover': 'var(--primary-buttons-hover)',
         'highlighed-components': 'var(--highlighed-components)',
         'background-dark': 'var(--background-dark)',
         'shapes-background': 'var(--shapes-background)',

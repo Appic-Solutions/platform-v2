@@ -46,7 +46,7 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
   }, []);
 
   return (
-    <div className="flex w-full animate-fade select-none flex-col gap-8 lg:flex-row lg:gap-12">
+    <div className="flex w-full animate-fade flex-col gap-8 overflow-hidden lg:flex-row lg:gap-12">
       {/* Left */}
       <div className="flex h-full w-full flex-col lg:w-[55%] lg:gap-6">
         <button
@@ -54,14 +54,17 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
             setSelectedPosition(undefined);
             setCurrentStep('yourPositions');
           }}
-          className={cn('flex items-center justify-center gap-x-1 self-start', 'font-semibold')}
+          className={cn(
+            'mb-4 flex items-center justify-center gap-x-1 self-start md:mb-0',
+            'font-semibold',
+          )}
         >
           <ExpandLeftIcon width={18} height={18} />
           Back
         </button>
         {/* Header */}
         <div className="flex w-full items-center">
-          <div className="flex w-full items-center justify-between gap-2 lg:gap-4">
+          <div className="mb-4 flex w-full items-center justify-between gap-2 lg:gap-4">
             <div className="flex items-center gap-4">
               <div className="relative flex">
                 <Avatar
@@ -74,7 +77,6 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
                 />
               </div>
               <h3 className="text-[27px] font-bold lg:text-[40px]">{`${position.token0.symbol}/${position.token1.symbol}`}</h3>
-              <SwapHorizontalIcon className="w-[20px] cursor-pointer stroke-[#FFFFFF63] text-[#FFFFFF63]" />
             </div>
             <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
               <span className="text-xs leading-5 text-white/60">
@@ -138,13 +140,6 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
                     src={position.token0.logo || '/images/logo/icp-logo.svg'}
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
-                  {/* <Avatar
-                    src="/images/logo/chains-logos/icp.svg"
-                    className={cn(
-                      'h-[12px] w-[12px] md:h-[14px] md:w-[14px]',
-                      'absolute bottom-0 right-0',
-                    )}
-                  /> */}
                 </div>
                 <p className="font-bold">${position.token0_reserves_usd}</p>
               </div>
@@ -159,13 +154,6 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
                     src={position.token1.logo || '/images/logo/icp-logo.svg'}
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
-                  {/* <Avatar
-                    src="/images/logo/chains-logos/icp.svg"
-                    className={cn(
-                      'h-[12px] w-[12px] md:h-[14px] md:w-[14px]',
-                      'absolute bottom-0 right-0',
-                    )}
-                  /> */}
                 </div>
                 <p className="font-bold">${position.token1_reserves_usd}</p>
               </div>
@@ -214,13 +202,6 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
                     src={position.token0.logo || '/images/logo/icp-logo.svg'}
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
-                  {/* <Avatar
-                    src="/images/logo/chains-logos/icp.svg"
-                    className={cn(
-                      'h-[12px] w-[12px] md:h-[14px] md:w-[14px]',
-                      'absolute bottom-0 right-0',
-                    )}
-                  /> */}
                 </div>
                 <p className="font-bold">${position.fees_token0_owed_usd}</p>
               </div>
@@ -252,21 +233,21 @@ const PositionDetail = ({ position, setSelectedPosition, setCurrentStep }: Posit
           </SolidCard>
         </div>
         {/* Buttons */}
-        <div className="flex w-full justify-center gap-2 text-[15px] lg:gap-4">
+        <div className="flex w-full justify-between gap-1 text-sm lg:gap-4 lg:text-[15px]">
           <button
-            className="flex h-[36px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#565656] font-medium text-white md:h-[38px]"
+            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('addLiquidity')}
           >
             <span>Add liquidity</span>
           </button>
           <button
-            className="flex h-[36px] w-full items-center justify-center gap-2 rounded-[10px] bg-primary-buttons font-medium text-white md:h-[38px]"
+            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('removeLiquidity')}
           >
             <span>Remove liquidity</span>
           </button>
           <button
-            className="flex h-[36px] w-full items-center justify-center gap-2 rounded-[10px] bg-primary-buttons font-medium text-white md:h-[38px]"
+            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('collectFees')}
           >
             <span>Collect fees</span>

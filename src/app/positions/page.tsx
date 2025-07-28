@@ -19,6 +19,7 @@ export type Step =
   | 'collectFees'
   | 'positionDetail'
   | 'yourPositions';
+
 export type FormattedPosition = Position & {
   token0: IcpToken;
   token1: IcpToken;
@@ -26,15 +27,32 @@ export type FormattedPosition = Position & {
 
 export default function PositionsPage() {
   const [selectedPosition, setSelectedPosition] = useState<FormattedPosition | undefined>();
+  const [error, setError] = useState<{
+    text: string;
+    type: 'walletConnection' | 'network';
+  }>();
+  const { icpIdentity } = useSharedStore();
   const [currentStep, setCurrentStep] = useState<Step>('yourPositions');
   const [formattedPositions, setFormattedPositions] = useState<FormattedPosition[]>([]);
 
   const { icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
-  const { mutateAsync: getPositions, isError, data: positionsData } = useGetPositions();
+  const { mutateAsync: getPositions, data: positionsData } = useGetPositions();
 
   useEffect(() => {
     const getPositionsHandler = async () => {
+      // if (!icpIdentity) {
+      //   setError({
+      //     type: 'walletConnection',
+      //     text: 'To view your positions and rewards you must connect your wallet.',
+      //   });
+      //   return;
+      // }
+      // if (!icpTokens || !pools || !unAuthenticatedAgent || !icpIdentity) {
       if (!icpTokens || !pools || !unAuthenticatedAgent) {
+        setError({
+          type: 'network',
+          text: 'Missing required data.',
+        });
         console.log('Missing required data');
         return;
       }
@@ -62,10 +80,11 @@ export default function PositionsPage() {
           };
         });
         setFormattedPositions(formattedPositionsArray);
+        setError(undefined);
       }
     };
     getPositionsHandler();
-  }, [icpTokens, pools, unAuthenticatedAgent, getPositions]);
+  }, [icpTokens, pools, unAuthenticatedAgent, getPositions, icpIdentity]);
 
   const onSelectHandler = (position: FormattedPosition) => {
     setSelectedPosition(position);
@@ -76,6 +95,7 @@ export default function PositionsPage() {
     if (!selectedPosition) {
       return (
         <YourPositions
+          error={error}
           formattedPositions={formattedPositions}
           onSelectHandler={onSelectHandler}
           selectedPosition={selectedPosition}
@@ -101,6 +121,7 @@ export default function PositionsPage() {
       default:
         return (
           <YourPositions
+            error={error}
             formattedPositions={formattedPositions}
             onSelectHandler={onSelectHandler}
             selectedPosition={selectedPosition}
@@ -113,7 +134,7 @@ export default function PositionsPage() {
     <Box
       className={cn(
         'text-white transition-all md:p-12 lg:overflow-visible lg:text-black lg:dark:text-white',
-        'gap-y-9',
+        'h-full gap-y-9',
         currentStep === 'positionDetail'
           ? 'md:h-[789px] lg:w-[1204px]'
           : 'lg:max-h-[716px] lg:w-[611px]',
