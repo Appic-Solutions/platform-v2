@@ -10,7 +10,8 @@ import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 
 const CreatePositionStepTwo = () => {
-  const { feeTiers, stepNextHandler, createPositionForm } = useCreatePosition();
+  const { feeTiers, stepNextHandler, createPositionForm, depositAmountInputsActiveStatus } =
+    useCreatePosition();
   const [
     token0,
     token1,
@@ -52,22 +53,36 @@ const CreatePositionStepTwo = () => {
 
   useEffect(() => {
     if (
-      token0 &&
-      token1 &&
-      minPrice &&
-      maxPrice &&
-      minTick &&
-      maxTick &&
-      initialPrice &&
-      fee &&
-      token0DepositAmount &&
-      token1DepositAmount
+      (token0 &&
+        token1 &&
+        minPrice &&
+        maxPrice &&
+        minTick &&
+        maxTick &&
+        initialPrice &&
+        fee &&
+        depositAmountInputsActiveStatus?.isToken0Active &&
+        token0DepositAmount) ||
+      (depositAmountInputsActiveStatus?.isToken1Active && token1DepositAmount)
     ) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [minPrice, maxPrice, initialPrice, fee, token0DepositAmount, token1DepositAmount]);
+  }, [
+    token0,
+    token1,
+    minPrice,
+    maxPrice,
+    minTick,
+    maxTick,
+    initialPrice,
+    fee,
+    depositAmountInputsActiveStatus?.isToken0Active,
+    token0DepositAmount,
+    depositAmountInputsActiveStatus?.isToken1Active,
+    token1DepositAmount,
+  ]);
 
   return (
     <div className="flex w-full animate-fade select-none flex-col gap-8 lg:flex-row lg:gap-12">

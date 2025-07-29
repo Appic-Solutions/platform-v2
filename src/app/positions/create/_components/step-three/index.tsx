@@ -8,7 +8,7 @@ import AvatarGroup from '../step-two/AvatarGroup';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 
 export default function CreatePositionStepThree() {
-  const { isToken0Selected, resetFormHandler, createPositionForm } = useCreatePosition();
+  const { isToken0Selected, createPositionForm, setStep } = useCreatePosition();
 
   const [token0, token1, fee, minPrice, maxPrice, token0DepositAmount, token1DepositAmount] =
     useWatch({
@@ -26,10 +26,6 @@ export default function CreatePositionStepThree() {
     });
   const token0DepositAmountInUsd = parseFloat(token0DepositAmount) * parseFloat(token0.usdPrice);
   const token1DepositAmountInUsd = parseFloat(token1DepositAmount) * parseFloat(token1.usdPrice);
-
-  const onCancel = () => {
-    resetFormHandler();
-  };
 
   return (
     <div className="flex h-full w-full animate-fade flex-col gap-5">
@@ -132,7 +128,7 @@ export default function CreatePositionStepThree() {
       {/* Action Button */}
       <div className={cn('mt-auto flex items-center justify-center gap-x-3', 'w-full')}>
         <button
-          onClick={onCancel}
+          onClick={() => setStep(1)}
           className={cn(
             'min-h-14 w-full',
             'bg-white/35',

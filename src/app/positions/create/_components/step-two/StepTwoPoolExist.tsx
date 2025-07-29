@@ -1,15 +1,12 @@
-import { RefreshIcon, ZoomInIcon, ZoomOutIcon } from '@/components/icons';
 import Image from 'next/image';
-import { act, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
-import { HandlePriceProps } from '../../_types';
 import {
   ActiveTick,
   get_active_liquidity,
 } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePositionFormDefaultValues } from '../../schema';
+import { useWatch } from 'react-hook-form';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import PriceRangeBarChart, { ChartType } from './PriceRangeBarChart';
@@ -22,11 +19,12 @@ const tabs: ChartType[] = [
 
 const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   const {
-    handlePriceInput,
     isToken0Selected,
     handleSelectedTokenChange,
     createPositionForm,
     handleInitialPriceInput,
+    maxPriceHandler,
+    minPriceHandler,
   } = useCreatePosition();
   const [selectedTab, setSelectedTab] = useState<ChartType>(tabs[0]);
   const { unAuthenticatedAgent } = useSharedStore();
@@ -64,8 +62,8 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
       setChartData(data.result);
     };
     getChartData().then(() => {
-      handlePriceInput({ value: '', minOrMax: 'min' });
-      handlePriceInput({ value: '', minOrMax: 'max' });
+      minPriceHandler('');
+      maxPriceHandler('');
       createPositionForm.setValue('initialPrice', initialPrice);
       handleInitialPriceInput(initialPrice);
       createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
@@ -86,8 +84,8 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   }, [token0, token1, isToken0Selected, icpTokens]);
 
   const resetToFullRange = () => {
-    handlePriceInput({ value: '0', minOrMax: 'min' });
-    handlePriceInput({ value: '0', minOrMax: 'max' });
+    minPriceHandler('0');
+    maxPriceHandler('0');
     setSelectedTab(tabs[0]);
   };
 
@@ -167,13 +165,8 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
             resetToFullRange={resetToFullRange}
             initialPrice={initialPrice}
             chartData={chartData}
-            setMaxPrice={(price) => handlePriceInput({ value: price.toString(), minOrMax: 'max' })}
-            setMinPrice={(price) =>
-              handlePriceInput({
-                minOrMax: 'min',
-                value: price.toString(),
-              })
-            }
+            setMaxPrice={(price) => maxPriceHandler(price.toString())}
+            setMinPrice={(price) => minPriceHandler(price.toString())}
             selectedTab={selectedTab}
           />
         )}

@@ -27,6 +27,8 @@ import type {
 import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min_max';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
+import BigNumber from 'bignumber.js';
+import { IcpToken } from '@/blockchain_api/types/tokens';
 
 export default function useCreatePositionLogic() {
   const { pools, icpTokens } = useSharedStore();
@@ -60,9 +62,29 @@ export default function useCreatePositionLogic() {
     mode: 'onChange',
   });
 
-  const [Token0, Token1, sqrtPriceX96, minTick, maxTick, initialPrice, tickSpacing] = useWatch({
+  const [
+    Token0,
+    Token1,
+    sqrtPriceX96,
+    minTick,
+    maxTick,
+    initialPrice,
+    tickSpacing,
+    MinPrice,
+    MaxPrice,
+  ] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1', 'sqrtPriceX96', 'minTick', 'maxTick', 'initialPrice', 'tickSpacing'],
+    name: [
+      'token0',
+      'token1',
+      'sqrtPriceX96',
+      'minTick',
+      'maxTick',
+      'initialPrice',
+      'tickSpacing',
+      'minPrice',
+      'maxPrice',
+    ],
   });
 
   // we don't use it
@@ -96,19 +118,19 @@ export default function useCreatePositionLogic() {
   };
 
   const handleSelectedTokenChange = () => {
-    const price = parseFloat(initialPrice);
+    const price = BigNumber(initialPrice);
 
-    if (!price || price <= 0 || isNaN(price)) {
+    if (!price || price.lte(0) || price.isNaN()) {
       createPositionForm.resetField('initialPrice');
       setIsToken0Selected(!isToken0Selected);
       return;
     }
 
-    const newValue = (1 / price).toFixed(18).replace(/\.?0+$/, '');
+    const newPrice = BigNumber(1).div(price).decimalPlaces(10).toString();
 
     setIsToken0Selected(!isToken0Selected);
 
-    createPositionForm.setValue('initialPrice', newValue, {
+    createPositionForm.setValue('initialPrice', newPrice, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -118,91 +140,108 @@ export default function useCreatePositionLogic() {
 
   const handleInitialPriceInput = (value: string) => {
     createPositionForm.setValue('initialPrice', value, { shouldValidate: true, shouldDirty: true });
+    createPositionForm.resetField('token0DepositAmount');
+    createPositionForm.resetField('token1DepositAmount');
+    createPositionForm.resetField('minPrice');
+    createPositionForm.resetField('maxPrice');
     createPositionForm.trigger('initialPrice');
   };
 
-  const handlePriceInput = ({ minOrMax, value }: HandlePriceProps) => {
-    const field: CreatePositionFormKeys = minOrMax === 'min' ? 'minPrice' : 'maxPrice';
-    const tickField: CreatePositionFormKeys = minOrMax === 'min' ? 'minTick' : 'maxTick';
+  const isDefaultValue = (val: string, label: string) => val === '' || val === '0' || val === label;
 
-    const price = () => {
-      if (minOrMax === 'min' && (value === '0' || value === '')) return 'min';
-      if (minOrMax === 'max' && (value === '0' || value === '' || value === '\u221E')) return 'max';
-      return value;
-    };
+  const setFormValue = (name: CreatePositionFormKeys, value: string) => {
+    createPositionForm.setValue(name, value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
 
+  const minPriceHandler = (value: string) => {
+    console.log('min price handler =======>');
     console.log({
-      is_min_price: minOrMax === 'min',
+      is_min_price: true,
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
-      price: price(),
+      min_price: value || 'min',
+      max_price: MaxPrice || 'max',
       tick_spacing: tickSpacing,
       token0: Token0,
       token1: Token1,
     });
-
     const alignedPrice = alignMinOrMaxPrice({
-      is_min_price: minOrMax === 'min',
+      is_min_price: true,
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
-      price: price(),
+      min_price: value || 'min',
+      max_price: MaxPrice || 'max',
       tick_spacing: tickSpacing,
       token0: Token0,
       token1: Token1,
     });
 
-    console.log('here');
+    if (!alignedPrice) return;
 
+    // Set min price and tick
+    setFormValue(
+      'minPrice',
+      isDefaultValue(value, 'min') ? 'min' : alignedPrice.min_price.toString(),
+    );
+    setFormValue('minTick', alignedPrice.min_tick.toString());
+
+    // Set max price and tick
+    setFormValue(
+      'maxPrice',
+      isDefaultValue(MaxPrice, 'max') ? 'max' : alignedPrice.max_price.toString(),
+    );
     setDepositAmountInputsActiveStatus({
       isToken0Active: alignedPrice.is_token0_active,
       isToken1Active: alignedPrice.is_token1_active,
     });
+    setFormValue('maxTick', alignedPrice.max_tick.toString());
+  };
 
-    console.log('alignedPrice calculated ==========>', alignedPrice);
-
-    if (value.trim() === '' || value === '0') {
-      if (field === 'minPrice') {
-        createPositionForm.setValue('minPrice', 'min', {
-          shouldValidate: false,
-          shouldDirty: true,
-        });
-      } else {
-        createPositionForm.setValue('maxPrice', 'max', {
-          shouldValidate: false,
-          shouldDirty: true,
-        });
-      }
-      createPositionForm.setValue(tickField, alignedPrice.tick.toString());
-      return;
-    }
-
-    const floatValue = parseFloat(value);
-    if (isNaN(floatValue)) return;
+  const maxPriceHandler = (value: string) => {
+    console.log('max price handler =======>');
+    console.log({
+      is_min_price: false,
+      is_token0_selected: isToken0Selected,
+      pool_sqrt_x98_price: sqrtPriceX96,
+      min_price: MinPrice || 'min',
+      max_price: value || 'max',
+      tick_spacing: tickSpacing,
+      token0: Token0,
+      token1: Token1,
+    });
+    const alignedPrice = alignMinOrMaxPrice({
+      is_min_price: false,
+      is_token0_selected: isToken0Selected,
+      pool_sqrt_x98_price: sqrtPriceX96,
+      min_price: MinPrice || 'min',
+      max_price: value || 'max',
+      tick_spacing: tickSpacing,
+      token0: Token0,
+      token1: Token1,
+    });
 
     if (!alignedPrice) return;
 
-    createPositionForm.setValue(tickField, alignedPrice.tick.toString());
+    // Set min price and tick
+    setFormValue(
+      'minPrice',
+      isDefaultValue(MinPrice, 'min') ? 'min' : alignedPrice.min_price.toString(),
+    );
+    setFormValue('minTick', alignedPrice.min_tick.toString());
 
-    const fixedPrice = Number(alignedPrice.price)
-      .toFixed(6)
-      .replace(/\.?0+$/, '');
-
-    createPositionForm.setValue(field, fixedPrice, {
-      shouldValidate: true,
-      shouldDirty: true,
+    // Set max price and tick
+    setFormValue(
+      'maxPrice',
+      isDefaultValue(value, 'max') ? 'max' : alignedPrice.max_price.toString(),
+    );
+    setFormValue('maxTick', alignedPrice.max_tick.toString());
+    setDepositAmountInputsActiveStatus({
+      isToken0Active: alignedPrice.is_token0_active,
+      isToken1Active: alignedPrice.is_token1_active,
     });
-
-    const dirtyFields = createPositionForm.formState.dirtyFields;
-    const bothFieldsDirty = dirtyFields.minPrice && dirtyFields.maxPrice;
-
-    if (bothFieldsDirty) {
-      createPositionForm.trigger('minPrice');
-      createPositionForm.trigger('maxPrice');
-    } else {
-      createPositionForm.trigger(field);
-    }
-
-    return alignedPrice;
   };
 
   const handleDepositAmountInput = ({
@@ -405,7 +444,9 @@ export default function useCreatePositionLogic() {
     // Step Two
     isToken0Selected,
     setIsToken0Selected,
-    handlePriceInput,
+    // handlePriceInput,
+    minPriceHandler,
+    maxPriceHandler,
     handleInitialPriceInput,
     handleDepositAmountInput,
     depositAmountInputsActiveStatus,

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import SolidCard from '@/components/ui/cards/SolidCard';
@@ -11,9 +11,13 @@ import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 
 const StepTwoPoolNotExist = () => {
-  const { setIsToken0Selected, isToken0Selected, createPositionForm, handlePriceInput } =
-    useCreatePosition();
-  const hasResetPrices = useRef(false);
+  const {
+    handleSelectedTokenChange,
+    isToken0Selected,
+    createPositionForm,
+    minPriceHandler,
+    maxPriceHandler,
+  } = useCreatePosition();
 
   const { icpTokens } = useSharedStore();
 
@@ -24,14 +28,10 @@ const StepTwoPoolNotExist = () => {
 
   const priceText = useMemo(() => {
     if (!token0 || !token1) return 'Select tokens to set price';
+
     const price = initialPrice;
     if (!price || parseFloat(price) <= 0 || isNaN(Number(initialPrice)))
       return 'Enter a valid price';
-    if (!hasResetPrices.current) {
-      handlePriceInput({ value: '', minOrMax: 'min' });
-      handlePriceInput({ value: '', minOrMax: 'max' });
-      hasResetPrices.current = true;
-    }
 
     const result = calculate_price({
       token0,
@@ -39,8 +39,8 @@ const StepTwoPoolNotExist = () => {
       is_token0_selected: isToken0Selected,
       price,
     });
-
     createPositionForm.setValue('sqrtPriceX96', result.sqrt_price_x96);
+
     return result.text;
   }, [token0, token1, isToken0Selected, initialPrice]);
 
@@ -56,31 +56,6 @@ const StepTwoPoolNotExist = () => {
       icpTokens,
     ).text;
   }, [token0, token1, isToken0Selected, icpTokens, initialPrice]);
-
-  const handleSelectedTokenChange = () => {
-    const price = initialPrice;
-
-    if (!price || price === '0' || isNaN(Number(price))) {
-      createPositionForm.resetField('initialPrice');
-      setIsToken0Selected(!isToken0Selected);
-      return;
-    }
-
-    const factor = Math.pow(10, 18);
-
-    const prevInitialPriceFormatted = Number(initialPrice) * factor;
-
-    const newInitialPriceFormatted = (1 * factor) / prevInitialPriceFormatted;
-
-    setIsToken0Selected(!isToken0Selected);
-
-    createPositionForm.setValue('initialPrice', newInitialPriceFormatted.toString(), {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-
-    createPositionForm.trigger('initialPrice');
-  };
 
   const handleSetMarketPrice = () => {
     if (!token0 || !token1 || !icpTokens) return;
@@ -99,6 +74,9 @@ const StepTwoPoolNotExist = () => {
       shouldValidate: true,
       shouldDirty: true,
     });
+
+    minPriceHandler('');
+    maxPriceHandler('');
 
     createPositionForm.trigger('initialPrice');
   };

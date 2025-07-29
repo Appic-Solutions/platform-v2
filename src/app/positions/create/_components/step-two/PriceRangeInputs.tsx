@@ -4,14 +4,25 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { CreatePositionFormDefaultValues } from '../../schema';
 import { cn } from '@/lib/utils';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
+import { useEffect, useRef } from 'react';
 
 const PriceRangeInputs = () => {
-  const { isToken0Selected, handlePriceInput, createPositionForm } = useCreatePosition();
+  const { isToken0Selected, minPriceHandler, createPositionForm, maxPriceHandler } =
+    useCreatePosition();
 
-  const [token0, token1, minPrice, maxPrice, initialPrice] = useWatch({
+  const [token0, token1, minPrice, maxPrice, initialPrice, sqrtPriceX96] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1', 'minPrice', 'maxPrice', 'initialPrice'],
+    name: ['token0', 'token1', 'minPrice', 'maxPrice', 'initialPrice', 'sqrtPriceX96'],
   });
+
+  const hasResetPrices = useRef(false);
+  useEffect(() => {
+    if (sqrtPriceX96 && !hasResetPrices.current) {
+      minPriceHandler('');
+      maxPriceHandler('');
+      hasResetPrices.current = true;
+    }
+  }, [sqrtPriceX96]);
 
   const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
 
@@ -46,12 +57,7 @@ const PriceRangeInputs = () => {
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
                 }
-                onBlur={(e) =>
-                  handlePriceInput({
-                    minOrMax: 'min',
-                    value: e.target.value,
-                  })
-                }
+                onBlur={(e) => minPriceHandler(e.target.value)}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}
@@ -78,12 +84,7 @@ const PriceRangeInputs = () => {
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
                 }
-                onBlur={(e) =>
-                  handlePriceInput({
-                    minOrMax: 'max',
-                    value: e.target.value,
-                  })
-                }
+                onBlur={(e) => maxPriceHandler(e.target.value)}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}
