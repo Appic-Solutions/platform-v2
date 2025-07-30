@@ -44,19 +44,10 @@ export const CreatePositionFormSchema = z
       message: 'Token 1 is required',
     }),
 
-    token0DepositAmount: z
-      .string()
-      .min(1, 'Invalid amount')
-      .refine((val) => parseFloat(val) > 0, {
-        message: 'Must be greater than 0',
-      }),
-
-    token1DepositAmount: z
-      .string()
-      .min(1, 'Invalid amount')
-      .refine((val) => parseFloat(val) > 0, {
-        message: 'Must be greater than 0',
-      }),
+    token0DepositAmount: z.string().min(1, 'required'),
+    isToken0DepositAmountActive: z.boolean(),
+    isToken1DepositAmountActive: z.boolean(),
+    token1DepositAmount: z.string().min(1, 'required'),
 
     minPrice: z.string().min(1, 'required'),
     maxPrice: z.string().min(1, 'required'),
@@ -67,6 +58,10 @@ export const CreatePositionFormSchema = z
   .superRefine((data, ctx) => {
     const min = data.minPrice;
     const max = data.maxPrice;
+    const token0DepositAmount = data.token0DepositAmount;
+    const token1DepositAmount = data.token1DepositAmount;
+    const isToken0DepositAmountActive = data.isToken0DepositAmountActive;
+    const isToken1DepositAmountActive = data.isToken1DepositAmountActive;
 
     if (isNaN(parseFloat(min)) && data.minPrice !== 'min') {
       ctx.addIssue({
@@ -110,6 +105,22 @@ export const CreatePositionFormSchema = z
           message: 'Min and max price cannot be equal',
         });
       }
+    }
+
+    // deposit amount validation
+    if (isToken0DepositAmountActive && (token0DepositAmount === '0' || !token0DepositAmount)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['token0DepositAmount'],
+        message: 'Amount must be greater than 0',
+      });
+    }
+    if (isToken1DepositAmountActive && (token1DepositAmount === '0' || !token1DepositAmount)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['token1DepositAmount'],
+        message: 'Amount must be greater than 0',
+      });
     }
   });
 

@@ -11,8 +11,7 @@ import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 
 const StepTwoPoolNotExist = () => {
-  const { handleSelectedTokenChange, isToken0Selected, createPositionForm, maxOrMinPriceHandler } =
-    useCreatePosition();
+  const { handleSelectedTokenChange, isToken0Selected, createPositionForm } = useCreatePosition();
 
   const { icpTokens } = useSharedStore();
 

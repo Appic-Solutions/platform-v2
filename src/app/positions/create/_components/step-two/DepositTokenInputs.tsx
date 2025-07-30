@@ -10,8 +10,7 @@ import { useSharedStore } from '@/store/store';
 import SetUserWalletBalanceButton from '../SetUserWalletBalanceButton';
 
 const DepositTokenInputs = () => {
-  const { handleDepositAmountInput, createPositionForm, depositAmountInputsActiveStatus } =
-    useCreatePosition();
+  const { handleDepositAmountInput, createPositionForm } = useCreatePosition();
   const { icpBalance, icpIdentity } = useSharedStore();
   const [userTokenBalances, setUserTokenBalances] = useState<{
     token0Balance: string;
@@ -32,17 +31,34 @@ const DepositTokenInputs = () => {
     }
   }, [icpBalance, icpIdentity]);
 
-  const [token0, token1, initialPrice, token0DepositAmount, token1DepositAmount] = useWatch({
+  const [
+    token0,
+    token1,
+    initialPrice,
+    token0DepositAmount,
+    token1DepositAmount,
+    isToken0DepositAmountActive,
+    isToken1DepositAmountActive,
+  ] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1', 'initialPrice', 'token0DepositAmount', 'token1DepositAmount'],
+    name: [
+      'token0',
+      'token1',
+      'initialPrice',
+      'token0DepositAmount',
+      'token1DepositAmount',
+      'isToken0DepositAmountActive',
+      'isToken1DepositAmountActive',
+    ],
   });
 
   const isToken0Disabled =
-    !(initialPrice && parseFloat(initialPrice) > 0) ||
-    !depositAmountInputsActiveStatus?.isToken0Active;
+    !(initialPrice && parseFloat(initialPrice) > 0) || !isToken0DepositAmountActive;
   const isToken1Disabled =
-    !(initialPrice && parseFloat(initialPrice) > 0) ||
-    !depositAmountInputsActiveStatus?.isToken1Active;
+    !(initialPrice && parseFloat(initialPrice) > 0) || !isToken1DepositAmountActive;
+
+  console.log('token0DepositAmount', token0DepositAmount);
+  console.log('token1DepositAmount', token1DepositAmount);
 
   return (
     <div>

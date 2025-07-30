@@ -1,7 +1,6 @@
 'use client';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { CreatePositionFormDefaultValues } from '../../schema';
+import { useWatch } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import { useEffect, useRef } from 'react';
@@ -14,14 +13,6 @@ const PriceRangeInputs = () => {
     name: ['token0', 'token1', 'minPrice', 'maxPrice', 'initialPrice', 'sqrtPriceX96'],
   });
 
-  const hasResetPrices = useRef(false);
-  useEffect(() => {
-    if (sqrtPriceX96 && !hasResetPrices.current) {
-      maxOrMinPriceHandler({ value: '', isMinPrice: true });
-      hasResetPrices.current = true;
-    }
-  }, [sqrtPriceX96]);
-
   const isDisabled = !(initialPrice && parseFloat(initialPrice) > 0);
 
   const handleDecimalInput = (value: string) => {
@@ -31,6 +22,14 @@ const PriceRangeInputs = () => {
     const trimmedDecimal = decimalPart.slice(0, 6);
     return `${intPart}.${trimmedDecimal}`;
   };
+
+  const hasResetPrices = useRef(false);
+  useEffect(() => {
+    if (sqrtPriceX96 && !hasResetPrices.current) {
+      maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
+      hasResetPrices.current = true;
+    }
+  }, [sqrtPriceX96]);
 
   console.log('minPrice ========>', minPrice);
   console.log('maxPrice ========>', maxPrice);
@@ -58,7 +57,16 @@ const PriceRangeInputs = () => {
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
                 }
-                onBlur={(e) => maxOrMinPriceHandler({ value: e.target.value, isMinPrice: true })}
+                onBlur={(e) =>
+                  maxOrMinPriceHandler({
+                    value:
+                      e.target.value === '0' || e.target.value === '' || e.target.value === 'min'
+                        ? 'min'
+                        : e.target.value,
+                    isMinPrice: true,
+                  })
+                }
+                placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}
@@ -87,10 +95,14 @@ const PriceRangeInputs = () => {
                 }
                 onBlur={(e) =>
                   maxOrMinPriceHandler({
-                    value: e.target.value === '\u221E' ? 'max' : e.target.value,
+                    value:
+                      e.target.value === '\u221E' || e.target.value === '0' || e.target.value === ''
+                        ? 'max'
+                        : e.target.value,
                     isMinPrice: false,
                   })
                 }
+                placeholder="∞"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}
