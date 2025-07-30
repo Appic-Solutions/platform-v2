@@ -65,10 +65,10 @@ export const CreatePositionFormSchema = z
     maxTick: z.string().min(1, 'required'),
   })
   .superRefine((data, ctx) => {
-    const min = parseFloat(data.minPrice);
+    const min = data.minPrice;
     const max = data.maxPrice;
 
-    if (isNaN(min)) {
+    if (isNaN(parseFloat(min)) && data.minPrice !== 'min') {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['minPrice'],
@@ -77,7 +77,7 @@ export const CreatePositionFormSchema = z
       return;
     }
 
-    if (min < 0) {
+    if (parseFloat(min) < 0 && data.minPrice !== 'min') {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['minPrice'],
@@ -85,7 +85,7 @@ export const CreatePositionFormSchema = z
       });
     }
 
-    if (max === 'max') {
+    if (max === 'max' || max === '\u221E') {
       return;
     } else {
       if (isNaN(parseFloat(max))) {
@@ -96,14 +96,14 @@ export const CreatePositionFormSchema = z
         });
         return;
       }
-      if (min >= parseFloat(max)) {
+      if (parseFloat(min) >= parseFloat(max)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['minPrice'],
           message: 'Min price must be less than max price',
         });
       }
-      if (min === parseFloat(max)) {
+      if (parseFloat(min) === parseFloat(max)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['minPrice'],

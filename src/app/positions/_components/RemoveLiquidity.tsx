@@ -92,7 +92,7 @@ export default function RemoveLiquidity({ position, setCurrentStep }: RemoveLiqu
               />
               <p className="text-white">BNB Smart Chain Mainnet</p>
               <p className={cn('flex items-center gap-x-1.5', 'ml-2 text-[#77EF4B]')}>
-                <div className="h-[9px] w-[9px] rounded-full bg-[#77EF4B]" />
+                <span className="h-[9px] w-[9px] rounded-full bg-[#77EF4B]" />
                 In range
               </p>
             </div>

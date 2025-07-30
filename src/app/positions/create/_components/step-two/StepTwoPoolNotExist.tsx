@@ -11,13 +11,8 @@ import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 
 const StepTwoPoolNotExist = () => {
-  const {
-    handleSelectedTokenChange,
-    isToken0Selected,
-    createPositionForm,
-    minPriceHandler,
-    maxPriceHandler,
-  } = useCreatePosition();
+  const { handleSelectedTokenChange, isToken0Selected, createPositionForm, maxOrMinPriceHandler } =
+    useCreatePosition();
 
   const { icpTokens } = useSharedStore();
 
@@ -74,9 +69,8 @@ const StepTwoPoolNotExist = () => {
       shouldValidate: true,
       shouldDirty: true,
     });
-
-    minPriceHandler('');
-    maxPriceHandler('');
+    createPositionForm.setValue('minPrice', 'min');
+    createPositionForm.setValue('maxPrice', 'max');
 
     createPositionForm.trigger('initialPrice');
   };

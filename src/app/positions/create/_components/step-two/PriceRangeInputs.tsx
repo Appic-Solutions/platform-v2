@@ -7,8 +7,7 @@ import { useCreatePosition } from '../../_context/CreatePositionContext';
 import { useEffect, useRef } from 'react';
 
 const PriceRangeInputs = () => {
-  const { isToken0Selected, minPriceHandler, createPositionForm, maxPriceHandler } =
-    useCreatePosition();
+  const { isToken0Selected, createPositionForm, maxOrMinPriceHandler } = useCreatePosition();
 
   const [token0, token1, minPrice, maxPrice, initialPrice, sqrtPriceX96] = useWatch({
     control: createPositionForm.control,
@@ -18,8 +17,7 @@ const PriceRangeInputs = () => {
   const hasResetPrices = useRef(false);
   useEffect(() => {
     if (sqrtPriceX96 && !hasResetPrices.current) {
-      minPriceHandler('');
-      maxPriceHandler('');
+      maxOrMinPriceHandler({ value: '', isMinPrice: true });
       hasResetPrices.current = true;
     }
   }, [sqrtPriceX96]);
@@ -33,6 +31,9 @@ const PriceRangeInputs = () => {
     const trimmedDecimal = decimalPart.slice(0, 6);
     return `${intPart}.${trimmedDecimal}`;
   };
+
+  console.log('minPrice ========>', minPrice);
+  console.log('maxPrice ========>', maxPrice);
 
   return (
     <div>
@@ -57,7 +58,7 @@ const PriceRangeInputs = () => {
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
                 }
-                onBlur={(e) => minPriceHandler(e.target.value)}
+                onBlur={(e) => maxOrMinPriceHandler({ value: e.target.value, isMinPrice: true })}
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}
@@ -84,7 +85,12 @@ const PriceRangeInputs = () => {
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
                 }
-                onBlur={(e) => maxPriceHandler(e.target.value)}
+                onBlur={(e) =>
+                  maxOrMinPriceHandler({
+                    value: e.target.value === '\u221E' ? 'max' : e.target.value,
+                    isMinPrice: false,
+                  })
+                }
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
                 {isToken0Selected ? token1.symbol : token0.symbol} = 1{' '}

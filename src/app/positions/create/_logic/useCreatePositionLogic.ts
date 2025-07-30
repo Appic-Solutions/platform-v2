@@ -149,99 +149,50 @@ export default function useCreatePositionLogic() {
 
   const isDefaultValue = (val: string, label: string) => val === '' || val === '0' || val === label;
 
-  const setFormValue = (name: CreatePositionFormKeys, value: string) => {
-    createPositionForm.setValue(name, value, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  };
+  const maxOrMinPriceHandler = ({ isMinPrice, value }: { value: string; isMinPrice: boolean }) => {
+    console.log('price handler =======>');
 
-  const minPriceHandler = (value: string) => {
-    console.log('min price handler =======>');
     console.log({
-      is_min_price: true,
+      is_min_price: isMinPrice,
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
-      min_price: value || 'min',
-      max_price: MaxPrice || 'max',
+      min_price: isMinPrice ? value || 'min' : MinPrice || 'min',
+      max_price: !isMinPrice ? value || 'max' : MaxPrice || 'max',
       tick_spacing: tickSpacing,
       token0: Token0,
       token1: Token1,
     });
     const alignedPrice = alignMinOrMaxPrice({
-      is_min_price: true,
+      is_min_price: isMinPrice,
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
-      min_price: value || 'min',
-      max_price: MaxPrice || 'max',
+      min_price: isMinPrice ? value || 'min' : MinPrice || 'min',
+      max_price: !isMinPrice ? value || 'max' : MaxPrice || 'max',
       tick_spacing: tickSpacing,
       token0: Token0,
       token1: Token1,
     });
 
+    console.log('price aligned', alignedPrice);
+
     if (!alignedPrice) return;
 
-    // Set min price and tick
-    setFormValue(
+    createPositionForm.setValue(
       'minPrice',
       isDefaultValue(value, 'min') ? 'min' : alignedPrice.min_price.toString(),
     );
-    setFormValue('minTick', alignedPrice.min_tick.toString());
-
-    // Set max price and tick
-    setFormValue(
+    createPositionForm.setValue(
       'maxPrice',
       isDefaultValue(MaxPrice, 'max') ? 'max' : alignedPrice.max_price.toString(),
     );
+    createPositionForm.setValue('minTick', alignedPrice.min_tick.toString());
+    createPositionForm.setValue('maxTick', alignedPrice.max_tick.toString());
     setDepositAmountInputsActiveStatus({
       isToken0Active: alignedPrice.is_token0_active,
       isToken1Active: alignedPrice.is_token1_active,
     });
-    setFormValue('maxTick', alignedPrice.max_tick.toString());
-  };
-
-  const maxPriceHandler = (value: string) => {
-    console.log('max price handler =======>');
-    console.log({
-      is_min_price: false,
-      is_token0_selected: isToken0Selected,
-      pool_sqrt_x98_price: sqrtPriceX96,
-      min_price: MinPrice || 'min',
-      max_price: value || 'max',
-      tick_spacing: tickSpacing,
-      token0: Token0,
-      token1: Token1,
-    });
-    const alignedPrice = alignMinOrMaxPrice({
-      is_min_price: false,
-      is_token0_selected: isToken0Selected,
-      pool_sqrt_x98_price: sqrtPriceX96,
-      min_price: MinPrice || 'min',
-      max_price: value || 'max',
-      tick_spacing: tickSpacing,
-      token0: Token0,
-      token1: Token1,
-    });
-
-    if (!alignedPrice) return;
-
-    // Set min price and tick
-    setFormValue(
-      'minPrice',
-      isDefaultValue(MinPrice, 'min') ? 'min' : alignedPrice.min_price.toString(),
-    );
-    setFormValue('minTick', alignedPrice.min_tick.toString());
-
-    // Set max price and tick
-    setFormValue(
-      'maxPrice',
-      isDefaultValue(value, 'max') ? 'max' : alignedPrice.max_price.toString(),
-    );
-    setFormValue('maxTick', alignedPrice.max_tick.toString());
-    setDepositAmountInputsActiveStatus({
-      isToken0Active: alignedPrice.is_token0_active,
-      isToken1Active: alignedPrice.is_token1_active,
-    });
+    createPositionForm.trigger('maxPrice');
+    createPositionForm.trigger('minPrice');
   };
 
   const handleDepositAmountInput = ({
@@ -444,9 +395,7 @@ export default function useCreatePositionLogic() {
     // Step Two
     isToken0Selected,
     setIsToken0Selected,
-    // handlePriceInput,
-    minPriceHandler,
-    maxPriceHandler,
+    maxOrMinPriceHandler,
     handleInitialPriceInput,
     handleDepositAmountInput,
     depositAmountInputsActiveStatus,

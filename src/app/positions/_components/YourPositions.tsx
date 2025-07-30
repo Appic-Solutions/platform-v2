@@ -35,6 +35,7 @@ const NeedConnectWallet = ({ title, description }: { title: string; description:
 };
 
 const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPositionsProps) => {
+  console.log('formattedPositions', formattedPositions);
   return (
     <div className="w-full">
       {/* Header */}
