@@ -2,247 +2,223 @@ import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowLeftIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { FormattedPosition, Step } from '../page';
+import SolidCard from '@/components/ui/cards/SolidCard';
+import { useEffect, useRef, useState } from 'react';
+import BigNumber from 'bignumber.js';
 
 interface RemoveLiquidityProps {
   position: FormattedPosition;
   setCurrentStep: React.Dispatch<React.SetStateAction<Step>>;
 }
 
-export default function RemoveLiquidity({ position, setCurrentStep }: RemoveLiquidityProps) {
+const PERCENTS = [
+  { label: '25%', value: '25' },
+  { label: '50%', value: '50' },
+  { label: '75%', value: '75' },
+  { label: 'max', value: '100' },
+];
+
+const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => {
+  const { token0, token1, is_in_range, total_fees_owed_usd, token0_reserves, token1_reserves } =
+    position;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [percentValue, setPercentValue] = useState('0%');
+  const [tokensReservesAfterRemove, setTokensReservesAfterRemove] = useState({
+    token0: token0_reserves,
+    token1: token1_reserves,
+  });
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.value = percentValue;
+    input.setSelectionRange(0, 0);
+
+    const handleInput = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const raw = target.value.slice(0, -1);
+
+      if (raw.includes('%')) {
+        target.value = '%';
+      } else if (raw.length >= 3 && raw.length <= 4 && !raw.includes('.')) {
+        target.value = `${raw.slice(0, 2)}.${raw.slice(2, 3)}%`;
+        target.setSelectionRange(4, 4);
+      } else if (raw.length >= 5 && raw.length <= 6) {
+        const whole = raw.slice(0, 2);
+        const fraction = raw.slice(3, 5);
+        target.value = `${whole}.${fraction}%`;
+      } else {
+        target.value = raw + '%';
+        target.setSelectionRange(target.value.length - 1, target.value.length - 1);
+      }
+
+      setPercentValue(target.value);
+    };
+
+    input.addEventListener('input', handleInput);
+    return () => input.removeEventListener('input', handleInput);
+  }, []);
+
+  const handlePercentClick = (value: string) => {
+    const newValue = `${value}%`;
+    setPercentValue(newValue);
+    if (inputRef.current) {
+      inputRef.current.value = newValue;
+      inputRef.current.setSelectionRange(newValue.length - 1, newValue.length - 1);
+    }
+  };
+
+  useEffect(() => {
+    const percent = new BigNumber(percentValue.slice(0, -1));
+    const token0ReservesAfterRemove = BigNumber(token0_reserves).minus(
+      BigNumber(token0_reserves).times(percent).div(100),
+    );
+    const token1ReservesAfterRemove = BigNumber(token1_reserves).minus(
+      BigNumber(token1_reserves).times(percent).div(100),
+    );
+    setTokensReservesAfterRemove({
+      token0: token0ReservesAfterRemove.toFixed(8),
+      token1: token1ReservesAfterRemove.toFixed(8),
+    });
+  }, [percentValue]);
+
   return (
     <>
       {/* Header */}
-      <div className={cn('relative isolate', 'flex items-center justify-between gap-4', 'w-full')}>
+      <div className="relative isolate flex w-full items-center justify-between gap-4">
         <ArrowLeftIcon
-          onClick={() => {
-            setCurrentStep('positionDetail');
-          }}
+          onClick={() => setCurrentStep('positionDetail')}
           className="z-10 hidden cursor-pointer md:inline-block"
         />
-        <h1
-          className={cn(
-            'text-[27px] font-bold md:text-[30px]',
-            'md:absolute md:inset-x-0 md:text-center',
-          )}
-        >
+        <h1 className="text-[27px] font-bold md:absolute md:inset-x-0 md:text-center md:text-[30px]">
           Remove liquidity
         </h1>
-        <button
-          className={cn(
-            'px-2.5 py-0.5',
-            'rounded-md',
-            'bg-white/10',
-            'text-xs font-medium text-white/60',
-            'z-10',
-          )}
-        >
+        <button className="z-10 rounded-md bg-white/10 px-2.5 py-0.5 text-xs font-medium text-white/60">
           Get help
         </button>
       </div>
 
-      {/* Main */}
+      {/* Position info */}
       <div className="flex w-full flex-col gap-y-3">
-        <div className={cn('flex items-center justify-between gap-4', 'mb-7 md:mb-1')}>
-          <div
-            className={cn(
-              'max-h-[58px] flex-1',
-              'grid grid-cols-9 md:grid-cols-8',
-              'md:grid-rows-2',
-            )}
-          >
-            <div
-              className={cn(
-                'flex items-center',
-                'col-span-2 sm:col-span-1 md:col-span-2',
-                'max-w-fit',
-                'md:row-span-full',
-              )}
-            >
+        <div className="mb-7 flex items-center justify-between gap-4 md:mb-1">
+          <div className="grid max-h-[58px] flex-1 grid-cols-9 md:grid-cols-8 md:grid-rows-2">
+            <div className="col-span-2 flex max-w-fit items-center sm:col-span-1 md:col-span-2 md:row-span-full">
+              <Avatar src={token0.logo} className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]" />
               <Avatar
-                // src={token?.logo}
-                src="/images/logo/icp-logo.svg"
-                className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
-              />
-              <Avatar
-                // src={token?.logo}
-                src="/images/logo/icp-logo.svg"
-                className={cn('h-[31px] w-[31px] md:h-[58px] md:w-[58px]', '-ml-4')}
+                src={token1.logo}
+                className="-ml-4 h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
               />
             </div>
-            <div
-              className={cn(
-                'flex items-center',
-                'text-[27px] font-bold md:text-[32px]',
-                'col-span-7 sm:col-span-8 md:col-span-6',
-              )}
-            >
-              USDC/ETH
+            <div className="col-span-7 flex items-center text-[27px] font-bold sm:col-span-8 md:col-span-6 md:text-[32px]">
+              {token0.symbol}/{token1.symbol}
             </div>
-            <div
-              className={cn(
-                'flex items-center gap-x-1',
-                'text-xs font-medium',
-                'col-span-full md:col-span-6',
-              )}
-            >
-              <Avatar
-                // src={token?.logo}
-                src="/images/logo/icp-logo.svg"
-                className="h-6 w-6"
-              />
-              <p className="text-white">BNB Smart Chain Mainnet</p>
-              <p className={cn('flex items-center gap-x-1.5', 'ml-2 text-[#77EF4B]')}>
-                <span className="h-[9px] w-[9px] rounded-full bg-[#77EF4B]" />
-                In range
+            <div className="col-span-full flex items-center gap-x-1 text-xs font-medium md:col-span-6">
+              <p
+                className={cn(
+                  'flex items-center gap-x-1.5 text-[13px]',
+                  is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
+                )}
+              >
+                <span
+                  className={cn(
+                    'h-[9px] w-[9px] animate-pulse rounded-full',
+                    is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
+                  )}
+                />
+                {is_in_range ? 'In range' : 'Out of range'}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-x-1">
-            <div
-              className={cn(
-                'rounded-[6px] bg-white/10',
-                'px-1.5 py-px',
-                'text-xs leading-5 text-white/60',
-              )}
-            >
-              V3
-            </div>
-            <div
-              className={cn(
-                'rounded-[6px] bg-white/10',
-                'px-1.5 py-px',
-                'text-xs leading-5 text-white/60',
-              )}
-            >
-              1%
-            </div>
-          </div>
+          <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
+            <span className="text-xs leading-5 text-white/60">{total_fees_owed_usd}%</span>
+          </SolidCard>
         </div>
-        <div
-          className={cn(
-            'bg-[linear-gradient(to_bottom,#242424_0%,#2121214D_100%)]',
-            'border-2 border-[#4C4C4C]/30',
-            'rounded-[28px]',
-            'px-8 py-6',
-            'flex flex-col gap-3',
-          )}
-        >
-          <p className="font-semibold text-white/70 md:text-xl">Withdrawal amount</p>
-          <div className="flex w-full items-center justify-between">
-            <p className="text-[22px] font-semibold text-white md:text-[27px]">1234.55</p>
-            <div className="flex items-center gap-x-2">
-              <span
-                className={cn(
-                  'bg-white/10',
-                  'text-xs font-medium text-white/80 md:text-sm',
-                  'px-1.5 py-1 md:px-3',
-                  'rounded-[10px] md:rounded-[16px]',
-                )}
-              >
-                25%
-              </span>
-              <span
-                className={cn(
-                  'bg-[#2060D5]/45',
-                  'text-xs font-medium text-[#A7C6FF] md:text-sm',
-                  'px-1.5 py-1 md:px-3',
-                  'rounded-[10px] md:rounded-[16px]',
-                )}
-              >
-                50%
-              </span>
-              <span
-                className={cn(
-                  'bg-white/10',
-                  'text-xs font-medium text-white/80 md:text-sm',
-                  'px-1.5 py-1 md:px-3',
-                  'rounded-[10px] md:rounded-[16px]',
-                )}
-              >
-                75%
-              </span>
-              <span
-                className={cn(
-                  'bg-white/10',
-                  'text-xs font-medium text-white/80 md:text-sm',
-                  'px-1.5 py-1 md:px-3',
-                  'rounded-[10px] md:rounded-[16px]',
-                )}
-              >
-                Max
-              </span>
+
+        {/* Input */}
+        <div className="group rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white">
+          <div className="w-full rounded-[20px] bg-box-background-secondary px-5 py-6 lg:px-8">
+            <p className="mb-3 font-semibold text-white/70 md:text-xl">Withdrawal amount</p>
+            <div className="flex items-center justify-between">
+              <div className="relative flex w-min items-center">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="percent max-w-[10rem] border-none bg-transparent pr-5 text-[22px] outline-none lg:text-[27px]"
+                  defaultValue="%"
+                />
+              </div>
+              <div className="flex items-center gap-x-2">
+                {PERCENTS.map(({ label, value }) => (
+                  <span
+                    key={value}
+                    onClick={() => handlePercentClick(value)}
+                    className={cn(
+                      value === percentValue.slice(0, -1) ? 'bg-[#2060D5]/45' : 'bg-white/10',
+                      'cursor-pointer rounded-[10px] px-1.5 py-1 text-xs font-medium text-white/80 md:rounded-[16px] md:px-3 md:text-sm',
+                    )}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* balance */}
+      <SolidCard className="bg-transparent px-5 lg:bg-[#222222] lg:px-8">
+        <div className={cn('flex flex-col gap-y-3', 'w-full')}>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-white/70 md:text-base">
+              {token0.symbol} position
+            </p>
+            <div
+              className={cn(
+                'relative',
+                'flex items-center gap-x-1.5',
+                'text-sm font-semibold text-white md:text-base',
+              )}
+            >
+              <Avatar src={token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
+              {tokensReservesAfterRemove.token0.replace(/\.?0+$/, '')} {token0.symbol}
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-medium text-white/70 md:text-base">
+              {token1.symbol} position
+            </p>
+            <div
+              className={cn(
+                'relative',
+                'flex items-center gap-x-1.5',
+                'text-sm font-semibold text-white md:text-base',
+              )}
+            >
+              <Avatar src={token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
+              {tokensReservesAfterRemove.token1.replace(/\.?0+$/, '')} {token1.symbol}
+            </div>
+          </div>
+        </div>
+      </SolidCard>
+
+      {/* Action Button */}
       <div
         className={cn(
-          'md:bg-[#222222]',
-          'rounded-[14px] md:rounded-[21px]',
-          'px-8 py-6',
-          'flex flex-col gap-y-2.5',
+          'flex h-[50px] items-center justify-center gap-x-3 self-end lg:h-[66px]',
           'w-full',
         )}
       >
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm font-medium text-white/70 md:text-base">ETH position</p>
-          <div
-            className={cn(
-              'relative',
-              'flex items-center gap-x-1.5',
-              'text-sm font-semibold text-white md:text-base',
-            )}
-          >
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className="h-5 w-5 md:h-6 md:w-6"
-            />
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className={cn('h-3 w-3', 'absolute bottom-0 left-3')}
-            />
-            0.002 ETH
-          </div>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm font-medium text-white/70 md:text-base">ETH position</p>
-          <div
-            className={cn(
-              'relative',
-              'flex items-center gap-x-1.5',
-              'text-sm font-semibold text-white md:text-base',
-            )}
-          >
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className="h-5 w-5 md:h-6 md:w-6"
-            />
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className={cn('h-3 w-3', 'absolute bottom-0 left-3')}
-            />
-            0.002 ETH
-          </div>
-        </div>
-      </div>
-
-      {/* Action Button */}
-      <div className={cn('flex items-center justify-center gap-x-3', 'w-full')}>
         <button
           onClick={() => {
             setCurrentStep('positionDetail');
           }}
           className={cn(
-            'min-h-14 w-full',
+            'h-full w-full',
             'bg-white/35',
             'text-white',
             'mt-auto md:mt-0',
-            'select-none rounded-[16px] duration-200',
+            'select-none rounded-[15px] duration-200',
             'hover:opacity-85',
           )}
         >
@@ -250,11 +226,11 @@ export default function RemoveLiquidity({ position, setCurrentStep }: RemoveLiqu
         </button>
         <button
           className={cn(
-            'min-h-14 w-full',
+            'h-full w-full',
             'bg-primary-buttons',
             'text-white',
             'mt-auto md:mt-0',
-            'select-none rounded-[16px] duration-200',
+            'select-none rounded-[15px] duration-200',
             'hover:opacity-85',
           )}
         >
@@ -263,4 +239,6 @@ export default function RemoveLiquidity({ position, setCurrentStep }: RemoveLiqu
       </div>
     </>
   );
-}
+};
+
+export default RemoveLiquidity;
