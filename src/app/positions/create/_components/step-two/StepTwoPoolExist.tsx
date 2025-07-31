@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
 import {
@@ -23,16 +23,15 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
     handleSelectedTokenChange,
     createPositionForm,
     handleInitialPriceInput,
-    maxPriceHandler,
-    minPriceHandler,
+    maxOrMinPriceHandler,
   } = useCreatePosition();
   const [selectedTab, setSelectedTab] = useState<ChartType>(tabs[0]);
   const { unAuthenticatedAgent } = useSharedStore();
   const { icpTokens } = useSharedStore();
 
-  const [token0, token1] = useWatch({
+  const [token0, token1, sqrtPriceX96] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1'],
+    name: ['token0', 'token1', 'sqrtPriceX96'],
   });
   const [chartData, setChartData] = useState<ActiveTick[]>();
 
@@ -45,8 +44,8 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   }, [matchedPool, isToken0Selected, selectedTab]);
 
   useEffect(() => {
+    if (!unAuthenticatedAgent) return;
     const getChartData = async () => {
-      if (!unAuthenticatedAgent) return;
       const data = await get_active_liquidity(
         {
           is_token0_selected: true,
@@ -56,19 +55,24 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
         },
         unAuthenticatedAgent,
       );
-
       if (!data) return;
-
       setChartData(data.result);
     };
     getChartData().then(() => {
-      minPriceHandler('');
-      maxPriceHandler('');
-      createPositionForm.setValue('initialPrice', initialPrice);
+      maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
+      maxOrMinPriceHandler({ value: 'max', isMinPrice: false });
       handleInitialPriceInput(initialPrice);
-      createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
+      if (createPositionForm.getValues('sqrtPriceX96') === '') {
+        createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
+      }
     });
-  }, [token0, token1, unAuthenticatedAgent, initialPrice]);
+  }, [token0, token1, unAuthenticatedAgent]);
+
+  useEffect(() => {
+    if (!matchedPool.sqrt_price_x96) return;
+    maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
+    maxOrMinPriceHandler({ value: 'max', isMinPrice: false });
+  }, []);
 
   const marketPrice = useMemo(() => {
     if (!token0 || !token1 || !icpTokens) return 'Market price unavailable';
@@ -84,8 +88,8 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   }, [token0, token1, isToken0Selected, icpTokens]);
 
   const resetToFullRange = () => {
-    minPriceHandler('0');
-    maxPriceHandler('0');
+    maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
+    maxOrMinPriceHandler({ value: 'max', isMinPrice: false });
     setSelectedTab(tabs[0]);
   };
 
@@ -135,7 +139,10 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
                         ? 'bg-[#1E53B8] text-white'
                         : 'bg-[#222222] text-white/70',
                     )}
-                    onClick={() => handleSelectedTokenChange()}
+                    onClick={() => {
+                      resetToFullRange();
+                      handleSelectedTokenChange();
+                    }}
                     disabled={!t}
                   >
                     <Image
@@ -165,8 +172,18 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
             resetToFullRange={resetToFullRange}
             initialPrice={initialPrice}
             chartData={chartData}
-            setMaxPrice={(price) => maxPriceHandler(price.toString())}
-            setMinPrice={(price) => minPriceHandler(price.toString())}
+            setMaxPrice={(price) => {
+              maxOrMinPriceHandler({
+                value: price.toString() !== '0' ? price.toString() : 'max',
+                isMinPrice: false,
+              });
+            }}
+            setMinPrice={(price) => {
+              maxOrMinPriceHandler({
+                value: price.toString() !== '0' ? price.toString() : 'min',
+                isMinPrice: true,
+              });
+            }}
             selectedTab={selectedTab}
           />
         )}

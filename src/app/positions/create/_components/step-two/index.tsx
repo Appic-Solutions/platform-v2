@@ -10,8 +10,7 @@ import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 
 const CreatePositionStepTwo = () => {
-  const { feeTiers, stepNextHandler, createPositionForm, depositAmountInputsActiveStatus } =
-    useCreatePosition();
+  const { feeTiers, stepNextHandler, createPositionForm } = useCreatePosition();
   const [
     token0,
     token1,
@@ -23,6 +22,8 @@ const CreatePositionStepTwo = () => {
     initialPrice,
     token0DepositAmount,
     token1DepositAmount,
+    isToken0DepositAmountActive,
+    isToken1DepositAmountActive,
   ] = useWatch({
     control: createPositionForm.control,
     name: [
@@ -36,6 +37,8 @@ const CreatePositionStepTwo = () => {
       'initialPrice',
       'token0DepositAmount',
       'token1DepositAmount',
+      'isToken0DepositAmountActive',
+      'isToken1DepositAmountActive',
     ],
   });
 
@@ -51,19 +54,32 @@ const CreatePositionStepTwo = () => {
     }
   }, [fee, feeTiers]);
 
+  const checkTokenAmounts = () => {
+    if (
+      (isToken0DepositAmountActive && (token0DepositAmount === '0' || !token0DepositAmount)) ||
+      (isToken1DepositAmountActive && (token1DepositAmount === '0' || !token1DepositAmount))
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (
-      (token0 &&
-        token1 &&
-        minPrice &&
-        maxPrice &&
-        minTick &&
-        maxTick &&
-        initialPrice &&
-        fee &&
-        depositAmountInputsActiveStatus?.isToken0Active &&
-        token0DepositAmount) ||
-      (depositAmountInputsActiveStatus?.isToken1Active && token1DepositAmount)
+      token0 &&
+      token1 &&
+      minPrice &&
+      maxPrice &&
+      minTick &&
+      maxTick &&
+      initialPrice &&
+      fee &&
+      !checkTokenAmounts() &&
+      createPositionForm.formState.errors.token0DepositAmount === undefined &&
+      createPositionForm.formState.errors.token1DepositAmount === undefined &&
+      createPositionForm.formState.errors.minPrice === undefined &&
+      createPositionForm.formState.errors.maxPrice === undefined
     ) {
       setIsButtonDisabled(false);
     } else {
@@ -78,9 +94,9 @@ const CreatePositionStepTwo = () => {
     maxTick,
     initialPrice,
     fee,
-    depositAmountInputsActiveStatus?.isToken0Active,
+    isToken0DepositAmountActive,
     token0DepositAmount,
-    depositAmountInputsActiveStatus?.isToken1Active,
+    isToken1DepositAmountActive,
     token1DepositAmount,
   ]);
 
