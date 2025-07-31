@@ -141,7 +141,7 @@ export function alignMinOrMaxPrice({
       }
     : {
         min_price: new BigNumber(1).div(min_priceInToken1).toString(),
-        max_price: new BigNumber(1).div(min_priceInToken1).toString(),
+        max_price: new BigNumber(1).div(max_priceInToken1).toString(),
         max_tick: max_tickAligned,
         min_tick: min_tickAligned,
         is_token0_active,

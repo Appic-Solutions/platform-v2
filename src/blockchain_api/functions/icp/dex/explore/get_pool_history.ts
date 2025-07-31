@@ -15,9 +15,10 @@ export interface Price {
 	timestamp: string;
 }
 
-export interface TimeValue {
+export interface TimeVolumeFee {
 	timestamp: string;
-	value: string;
+	fees: string;
+	volume:string;
 }
 
 // Output interface for individual pool history
@@ -25,14 +26,11 @@ export interface PoolHistory {
 	pool: Pool;
 	token0: IcpToken;
 	token1: IcpToken;
-	daily_volume_usd: string[];
-	weekly_volume_usd: string[];
-	monthly_volume_usd: string[];
-	yearly_volume_usd: string[];
-	daily_generated_fees_usd: TimeValue[];
-	weekly_generated_fees_usd: TimeValue[];
-	monthly_generated_fees_usd: TimeValue[];
-	yearly_generated_fees_usd: TimeValue[];
+	hourly_volume_fee_usd:TimeVolumeFee[];
+	daily_volume_fee_usd: TimeVolumeFee[];
+	weekly_volume_fee_usd: TimeVolumeFee[];
+	monthly_volume_fee_usd: TimeVolumeFee[];
+	yearly_volume_fee_usd: TimeVolumeFee[];
 	daily_price_token0_in_token1: Price[];
 	weekly_price_token0_in_token1: Price[];
 	monthly_price_token0_in_token1: Price[];
@@ -202,8 +200,7 @@ function generateDexData(
 
 		// Process buckets for a time frame
 		const processBuckets = (buckets: CandidHistoryBucket[]) => {
-			const volumes: string[] = [];
-			const fees: TimeValue[] = [];
+			const volumes_fees: TimeVolumeFee[] = [];
 			const prices: Price[] = [];
 
 			buckets.forEach((bucket) => {
@@ -236,14 +233,14 @@ function generateDexData(
 				// Price (token0 per token1)
 				const price_inverse = BigNumber(1).dividedBy(price).toString();
 
-				volumes.push(volumeUsd);
-				fees.push({ timestamp: bucket.start_timestamp.toString(), value: feesUsd });
+				volumes_fees.push({volume:volumeUsd,fees:feesUsd,timestamp:bucket.start_timestamp.toString()});
 				prices.push({ token0_in_token1: price, token1_in_token0: price_inverse, timestamp: bucket.start_timestamp.toString() });
 			});
 
-			return { volumes, fees, prices };
+			return { volumes_fees,  prices };
 		};
 
+		const hourlyData=processBuckets(history[1].hourly_frame);
 		const dailyData = processBuckets(history[1].daily_frame);
 		const weeklyData = processBuckets(history[1].daily_frame.slice(-7)); // Last 7 days for weekly
 		const monthlyData = processBuckets(history[1].monthly_frame);
@@ -313,18 +310,16 @@ function generateDexData(
 			pool,
 			token0,
 			token1,
-			daily_volume_usd: dailyData.volumes,
-			weekly_volume_usd: weeklyData.volumes,
-			monthly_volume_usd: monthlyData.volumes,
-			yearly_volume_usd: yearlyData.volumes,
-			daily_generated_fees_usd: dailyData.fees,
-			weekly_generated_fees_usd: weeklyData.fees,
-			monthly_generated_fees_usd: monthlyData.fees,
-			yearly_generated_fees_usd: yearlyData.fees,
+			hourly_volume_fee_usd:hourlyData.volumes_fees,
+			daily_volume_fee_usd: dailyData.volumes_fees,
+			weekly_volume_fee_usd: weeklyData.volumes_fees,
+			monthly_volume_fee_usd: monthlyData.volumes_fees,
+			yearly_volume_fee_usd: yearlyData.volumes_fees,
 			daily_price_token0_in_token1: dailyData.prices, // Note: actually token1/token0, see below
 			weekly_price_token0_in_token1: weeklyData.prices,
 			monthly_price_token0_in_token1: monthlyData.prices,
 			yearly_price_token0_in_token1: yearlyData.prices,
+
 
 
 			total_24h_volume_usd: total_24h_volume_usd.toString(),
