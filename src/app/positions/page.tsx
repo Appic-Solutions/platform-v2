@@ -134,7 +134,7 @@ export default function PositionsPage() {
     <Box
       className={cn(
         'text-white transition-all md:p-12 lg:overflow-visible lg:text-black lg:dark:text-white',
-        'h-full gap-y-9',
+        'h-max',
         currentStep === 'positionDetail'
           ? 'md:h-[789px] lg:w-[1204px]'
           : 'lg:max-h-[716px] lg:w-[611px]',

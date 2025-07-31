@@ -5,6 +5,7 @@ import { FormattedPosition, Step } from '../page';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { useEffect, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
+import Link from 'next/link';
 
 interface RemoveLiquidityProps {
   position: FormattedPosition;
@@ -36,23 +37,23 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
 
     const handleInput = (e: Event) => {
       const target = e.target as HTMLInputElement;
-      const raw = target.value.slice(0, -1);
+      let raw = target.value.replace('%', '').replace(/[^\d.]/g, '');
 
-      if (raw.includes('%')) {
-        target.value = '%';
-      } else if (raw.length >= 3 && raw.length <= 4 && !raw.includes('.')) {
-        target.value = `${raw.slice(0, 2)}.${raw.slice(2, 3)}%`;
-        target.setSelectionRange(4, 4);
-      } else if (raw.length >= 5 && raw.length <= 6) {
-        const whole = raw.slice(0, 2);
-        const fraction = raw.slice(3, 5);
-        target.value = `${whole}.${fraction}%`;
-      } else {
-        target.value = raw + '%';
-        target.setSelectionRange(target.value.length - 1, target.value.length - 1);
+      const dotIndex = raw.indexOf('.');
+      if (dotIndex !== -1) {
+        raw = raw.slice(0, dotIndex + 1) + raw.slice(dotIndex + 1).replace(/\./g, '');
       }
 
-      setPercentValue(target.value);
+      let bn = new BigNumber(raw);
+      if (bn.isNaN() || bn.isNegative()) bn = new BigNumber(0);
+      if (bn.gt(100)) bn = new BigNumber(100);
+
+      const formatted = bn.toFixed() + '%';
+      target.value = formatted;
+      setPercentValue(formatted);
+
+      const caretPos = formatted.length - 1;
+      target.setSelectionRange(caretPos, caretPos);
     };
 
     input.addEventListener('input', handleInput);
@@ -69,13 +70,17 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
   };
 
   useEffect(() => {
-    const percent = new BigNumber(percentValue.slice(0, -1));
-    const token0ReservesAfterRemove = BigNumber(token0_reserves).minus(
-      BigNumber(token0_reserves).times(percent).div(100),
+    const raw = percentValue.replace('%', '');
+    const percent = new BigNumber(raw);
+    const validPercent = percent.isNaN() ? new BigNumber(0) : percent;
+
+    const token0ReservesAfterRemove = new BigNumber(token0_reserves).minus(
+      new BigNumber(token0_reserves).times(validPercent).div(100),
     );
-    const token1ReservesAfterRemove = BigNumber(token1_reserves).minus(
-      BigNumber(token1_reserves).times(percent).div(100),
+    const token1ReservesAfterRemove = new BigNumber(token1_reserves).minus(
+      new BigNumber(token1_reserves).times(validPercent).div(100),
     );
+
     setTokensReservesAfterRemove({
       token0: token0ReservesAfterRemove.toFixed(8),
       token1: token1ReservesAfterRemove.toFixed(8),
@@ -83,9 +88,9 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
   }, [percentValue]);
 
   return (
-    <>
+    <div className="w-full animate-fade">
       {/* Header */}
-      <div className="relative isolate flex w-full items-center justify-between gap-4">
+      <div className="relative isolate mb-10 flex w-full items-center justify-between gap-4">
         <ArrowLeftIcon
           onClick={() => setCurrentStep('positionDetail')}
           className="z-10 hidden cursor-pointer md:inline-block"
@@ -93,81 +98,84 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
         <h1 className="text-[27px] font-bold md:absolute md:inset-x-0 md:text-center md:text-[30px]">
           Remove liquidity
         </h1>
-        <button className="z-10 rounded-md bg-white/10 px-2.5 py-0.5 text-xs font-medium text-white/60">
-          Get help
+        <button
+          className={cn(
+            'px-2.5 py-0.5',
+            'rounded-md',
+            'bg-white/10',
+            'text-xs font-medium text-white/60',
+            'z-10',
+          )}
+        >
+          <Link href="https://t.me/Appic_dao">Get help</Link>
         </button>
       </div>
 
       {/* Position info */}
-      <div className="flex w-full flex-col gap-y-3">
-        <div className="mb-7 flex items-center justify-between gap-4 md:mb-1">
-          <div className="grid max-h-[58px] flex-1 grid-cols-9 md:grid-cols-8 md:grid-rows-2">
-            <div className="col-span-2 flex max-w-fit items-center sm:col-span-1 md:col-span-2 md:row-span-full">
-              <Avatar src={token0.logo} className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]" />
-              <Avatar
-                src={token1.logo}
-                className="-ml-4 h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
+      <div className="mb-7 flex w-full items-center justify-between gap-4 md:mb-6">
+        <div className="grid max-h-[58px] flex-1 grid-cols-9 md:grid-cols-8 md:grid-rows-2">
+          <div className="col-span-2 flex max-w-fit items-center sm:col-span-1 md:col-span-2 md:row-span-full">
+            <Avatar src={token0.logo} className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]" />
+            <Avatar src={token1.logo} className="-ml-4 h-[31px] w-[31px] md:h-[58px] md:w-[58px]" />
+          </div>
+          <div className="col-span-7 flex items-center text-[27px] font-bold sm:col-span-8 md:col-span-6 md:text-[32px]">
+            {token0.symbol}/{token1.symbol}
+          </div>
+          <div className="col-span-full flex items-center gap-x-1 text-xs font-medium md:col-span-6">
+            <p
+              className={cn(
+                'flex items-center gap-x-1.5 text-[13px]',
+                is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
+              )}
+            >
+              <span
+                className={cn(
+                  'h-[9px] w-[9px] animate-pulse rounded-full',
+                  is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
+                )}
+              />
+              {is_in_range ? 'In range' : 'Out of range'}
+            </p>
+          </div>
+        </div>
+        <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
+          <span className="text-xs leading-5 text-white/60">{total_fees_owed_usd}%</span>
+        </SolidCard>
+      </div>
+
+      {/* Input */}
+      <div className="group mb-8 w-full rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white">
+        <div className="w-full rounded-[20px] bg-box-background-secondary px-5 py-6 lg:px-8">
+          <p className="mb-3 font-semibold text-white/70 md:text-xl">Withdrawal amount</p>
+          <div className="flex items-center justify-between">
+            <div className="relative flex w-min items-center">
+              <input
+                ref={inputRef}
+                type="text"
+                className="percent max-w-[10rem] border-none bg-transparent pr-5 text-[22px] outline-none lg:text-[27px]"
+                defaultValue="%"
               />
             </div>
-            <div className="col-span-7 flex items-center text-[27px] font-bold sm:col-span-8 md:col-span-6 md:text-[32px]">
-              {token0.symbol}/{token1.symbol}
-            </div>
-            <div className="col-span-full flex items-center gap-x-1 text-xs font-medium md:col-span-6">
-              <p
-                className={cn(
-                  'flex items-center gap-x-1.5 text-[13px]',
-                  is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
-                )}
-              >
+            <div className="flex items-center gap-x-2">
+              {PERCENTS.map(({ label, value }) => (
                 <span
+                  key={value}
+                  onClick={() => handlePercentClick(value)}
                   className={cn(
-                    'h-[9px] w-[9px] animate-pulse rounded-full',
-                    is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
+                    value === percentValue.slice(0, -1) ? 'bg-[#2060D5]/45' : 'bg-white/10',
+                    'cursor-pointer rounded-[10px] px-1.5 py-1 text-xs font-medium text-white/80 md:rounded-[16px] md:px-3 md:text-sm',
                   )}
-                />
-                {is_in_range ? 'In range' : 'Out of range'}
-              </p>
-            </div>
-          </div>
-          <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-            <span className="text-xs leading-5 text-white/60">{total_fees_owed_usd}%</span>
-          </SolidCard>
-        </div>
-
-        {/* Input */}
-        <div className="group rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white">
-          <div className="w-full rounded-[20px] bg-box-background-secondary px-5 py-6 lg:px-8">
-            <p className="mb-3 font-semibold text-white/70 md:text-xl">Withdrawal amount</p>
-            <div className="flex items-center justify-between">
-              <div className="relative flex w-min items-center">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className="percent max-w-[10rem] border-none bg-transparent pr-5 text-[22px] outline-none lg:text-[27px]"
-                  defaultValue="%"
-                />
-              </div>
-              <div className="flex items-center gap-x-2">
-                {PERCENTS.map(({ label, value }) => (
-                  <span
-                    key={value}
-                    onClick={() => handlePercentClick(value)}
-                    className={cn(
-                      value === percentValue.slice(0, -1) ? 'bg-[#2060D5]/45' : 'bg-white/10',
-                      'cursor-pointer rounded-[10px] px-1.5 py-1 text-xs font-medium text-white/80 md:rounded-[16px] md:px-3 md:text-sm',
-                    )}
-                  >
-                    {label}
-                  </span>
-                ))}
-              </div>
+                >
+                  {label}
+                </span>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
       {/* balance */}
-      <SolidCard className="bg-transparent px-5 lg:bg-[#222222] lg:px-8">
+      <SolidCard className="mb-8 bg-transparent px-5 lg:bg-[#222222] lg:px-8">
         <div className={cn('flex flex-col gap-y-3', 'w-full')}>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
@@ -237,7 +245,7 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
           Continue
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

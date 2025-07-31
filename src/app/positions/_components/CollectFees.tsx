@@ -2,6 +2,8 @@ import { Avatar } from '@/components/common/ui/avatar';
 import { ArrowLeftIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { FormattedPosition, Step } from '../page';
+import Link from 'next/link';
+import SolidCard from '@/components/ui/cards/SolidCard';
 
 interface CollectFeesProps {
   position: FormattedPosition;
@@ -9,10 +11,13 @@ interface CollectFeesProps {
 }
 
 export default function CollectFeesPage({ position, setCurrentStep }: CollectFeesProps) {
+  const { token0, token1, is_in_range, fees_token0_owed, fees_token1_owed } = position;
   return (
-    <>
+    <div className="w-full animate-fade">
       {/* Header */}
-      <div className={cn('relative isolate', 'flex items-center justify-between gap-4', 'w-full')}>
+      <div
+        className={cn('relative isolate', 'mb-8 flex items-center justify-between gap-4', 'w-full')}
+      >
         <ArrowLeftIcon
           onClick={() => {
             setCurrentStep('positionDetail');
@@ -36,45 +41,29 @@ export default function CollectFeesPage({ position, setCurrentStep }: CollectFee
             'z-10',
           )}
         >
-          Get help
+          <Link href="https://t.me/Appic_dao">Get help</Link>
         </button>
       </div>
 
       {/* Main */}
-      <div
-        className={cn(
-          'rounded-[21px] bg-[#222222]',
-          'px-6 py-5 md:px-8 md:py-6',
-          'flex flex-col gap-y-9',
-          'w-full',
-        )}
-      >
+      <SolidCard className="mb-8 bg-transparent px-5 lg:bg-[#222222] lg:px-8">
+        {/* token0 */}
         <div className="flex items-center justify-between gap-2">
-          <div className="relative">
-            <Avatar
-              // src={token?.logo}
-              src="/images/logo/icp-logo.svg"
-              className="h-6 w-6 md:h-7 md:w-7"
-            />
-            <Avatar
-              // src={getChainLogo(token?.chainId)}
-              src="/images/logo/icp-logo.svg"
-              className="absolute -right-1 bottom-0 h-3.5 w-3.5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
-            />
-          </div>
-          <p
-            className={cn(
-              'text-nowrap md:text-xl',
-              'flex-grow',
-              // token?.symbol.length && token?.symbol.length > 7 && 'w-28 text-ellipsis',
-            )}
-          >
-            {/* {token?.symbol || 'Select Token'} */}
-            Select Token
+          <Avatar src={token0.logo} className="h-6 w-6 md:h-7 md:w-7" />
+          <p className={cn('text-nowrap md:text-xl', 'flex-grow')}>{token0.symbol}</p>
+          <p className="text-sm text-white/80 md:text-base">
+            {fees_token0_owed} {token0.symbol}
           </p>
-          <p className="text-sm text-white/80 md:text-base">0.001 BNB $0.0</p>
         </div>
-      </div>
+        {/* token1 */}
+        <div className="mt-9 flex items-center justify-between gap-2">
+          <Avatar src={token1.logo} className="h-6 w-6 md:h-7 md:w-7" />
+          <p className={cn('text-nowrap md:text-xl', 'flex-grow')}>{token1.symbol}</p>
+          <p className="text-sm text-white/80 md:text-base">
+            {fees_token1_owed} {token1.symbol}
+          </p>
+        </div>
+      </SolidCard>
 
       {/* Action Button */}
       <div className={cn('flex items-center justify-center gap-x-3', 'w-full')}>
@@ -107,6 +96,6 @@ export default function CollectFeesPage({ position, setCurrentStep }: CollectFee
           Collect
         </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -37,7 +37,7 @@ const NeedConnectWallet = ({ title, description }: { title: string; description:
 const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPositionsProps) => {
   console.log('formattedPositions', formattedPositions);
   return (
-    <div className="w-full">
+    <div className="w-full animate-fade">
       {/* Header */}
       <div className={cn('mb-8 flex items-center justify-between gap-4', 'w-full')}>
         <h1 className="text-[27px] font-bold md:text-[30px]">Your positions</h1>
