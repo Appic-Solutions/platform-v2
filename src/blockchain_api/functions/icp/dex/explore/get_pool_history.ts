@@ -18,7 +18,7 @@ export interface Price {
 export interface TimeVolumeFee {
 	timestamp: string;
 	fees: string;
-	volume:string;
+	volume: string;
 }
 
 // Output interface for individual pool history
@@ -26,11 +26,12 @@ export interface PoolHistory {
 	pool: Pool;
 	token0: IcpToken;
 	token1: IcpToken;
-	hourly_volume_fee_usd:TimeVolumeFee[];
+	hourly_volume_fee_usd: TimeVolumeFee[];
 	daily_volume_fee_usd: TimeVolumeFee[];
 	weekly_volume_fee_usd: TimeVolumeFee[];
 	monthly_volume_fee_usd: TimeVolumeFee[];
 	yearly_volume_fee_usd: TimeVolumeFee[];
+	hourly_price_token0_in_token1: Price[];
 	daily_price_token0_in_token1: Price[];
 	weekly_price_token0_in_token1: Price[];
 	monthly_price_token0_in_token1: Price[];
@@ -233,14 +234,14 @@ function generateDexData(
 				// Price (token0 per token1)
 				const price_inverse = BigNumber(1).dividedBy(price).toString();
 
-				volumes_fees.push({volume:volumeUsd,fees:feesUsd,timestamp:bucket.start_timestamp.toString()});
+				volumes_fees.push({ volume: volumeUsd, fees: feesUsd, timestamp: bucket.start_timestamp.toString() });
 				prices.push({ token0_in_token1: price, token1_in_token0: price_inverse, timestamp: bucket.start_timestamp.toString() });
 			});
 
-			return { volumes_fees,  prices };
+			return { volumes_fees, prices };
 		};
 
-		const hourlyData=processBuckets(history[1].hourly_frame);
+		const hourlyData = processBuckets(history[1].hourly_frame);
 		const dailyData = processBuckets(history[1].daily_frame);
 		const weeklyData = processBuckets(history[1].daily_frame.slice(-7)); // Last 7 days for weekly
 		const monthlyData = processBuckets(history[1].monthly_frame);
@@ -310,11 +311,13 @@ function generateDexData(
 			pool,
 			token0,
 			token1,
-			hourly_volume_fee_usd:hourlyData.volumes_fees,
+			hourly_volume_fee_usd: hourlyData.volumes_fees,
 			daily_volume_fee_usd: dailyData.volumes_fees,
 			weekly_volume_fee_usd: weeklyData.volumes_fees,
 			monthly_volume_fee_usd: monthlyData.volumes_fees,
 			yearly_volume_fee_usd: yearlyData.volumes_fees,
+
+			hourly_price_token0_in_token1: hourlyData.prices,
 			daily_price_token0_in_token1: dailyData.prices, // Note: actually token1/token0, see below
 			weekly_price_token0_in_token1: weeklyData.prices,
 			monthly_price_token0_in_token1: monthlyData.prices,
