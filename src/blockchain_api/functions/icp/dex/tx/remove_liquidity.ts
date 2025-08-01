@@ -1,10 +1,11 @@
 import { HttpAgent, Actor } from "@dfinity/agent";
-import { appic_dex } from "../../../../canister_ids.json";
-import { Position } from './get_positions';
-import { Result_1 as CollectFeeResult, DecreaseLiquidityArgs, BurnPositionArgs, Result as BurnLiquidityResult, Result_3 as DecreaseLiquidityResult } from "../../../did/appic/appic_dex/appic_dex_types";
+import { appic_dex } from "@/canister_ids.json";
+import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
+import { DecreaseLiquidityArgs, BurnPositionArgs, Result as BurnLiquidityResult, Result_3 as DecreaseLiquidityResult } from "@/blockchain_api/did/appic/appic_dex/appic_dex_types";
 import { idlFactory } from "@/blockchain_api/did/appic/appic_dex/appic_dex.did";
 import { Response } from "@/blockchain_api/types/response";
 import { BigNumber } from "bignumber.js";
+
 export interface RemoveLiquidityArgs {
 	position: Position,
 	percentage: number
@@ -14,6 +15,7 @@ export interface RemoveLiquidityArgs {
 const burn_slippage_percentage: number = 0.3;
 
 
+// step 1 generate args
 export function generate_decrease_liquidty_args({ position, percentage }: RemoveLiquidityArgs): DecreaseLiquidityArgs | BurnPositionArgs {
 	if (percentage < 0 || percentage > 100) {
 		throw "Invlaid liquidity percentage selected";
@@ -45,6 +47,10 @@ export function generate_decrease_liquidty_args({ position, percentage }: Remove
 
 }
 
+
+
+
+// step 2
 export async function remove_liquidity(
 	args: DecreaseLiquidityArgs | BurnPositionArgs,
 	authenticated_agent: HttpAgent
@@ -79,7 +85,7 @@ export async function remove_liquidity(
 		}
 		else {
 
-			let burn_result= (await dex_actor.burn(
+			let burn_result = (await dex_actor.burn(
 				args as BurnPositionArgs
 			)) as BurnLiquidityResult;
 			if ("Err" in burn_result) {
@@ -110,6 +116,7 @@ export async function remove_liquidity(
 		};
 	}
 }
+
 
 
 

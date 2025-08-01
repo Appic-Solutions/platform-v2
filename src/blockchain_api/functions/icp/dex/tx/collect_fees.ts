@@ -1,7 +1,7 @@
 import { HttpAgent, Actor } from "@dfinity/agent";
-import { appic_dex } from "../../../../canister_ids.json";
-import { Position } from './get_positions';
-import { Result_1 as CollectFeeResult } from "../../../did/appic/appic_dex/appic_dex_types";
+import { appic_dex } from "@/canister_ids.json";
+import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
+import { Result_1 as CollectFeeResult } from "@/blockchain_api/did/appic/appic_dex/appic_dex_types";
 import { idlFactory } from "@/blockchain_api/did/appic/appic_dex/appic_dex.did";
 import { Response } from "@/blockchain_api/types/response";
 export interface CollectFeesArgs {

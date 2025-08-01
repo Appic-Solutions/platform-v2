@@ -1,66 +1,48 @@
-import { HttpAgent, Actor } from "@dfinity/agent";
-import { appic_dex } from "../../../../canister_ids.json";
 import { Position } from './get_positions';
-import { IncreaseLiquidityArgs, IncreaseLiquidityError, Result_5 as IncreaseLiquidityResult } from "../../../did/appic/appic_dex/appic_dex_types";
-import { idlFactory } from "@/blockchain_api/did/appic/appic_dex/appic_dex.did";
-import { Response } from "@/blockchain_api/types/response";
+import { IncreaseLiquidityArgs } from "../../../did/appic/appic_dex/appic_dex_types";
+import { IcpToken } from "@/blockchain_api/types/tokens";
 
 export interface AddLiquidityArgs {
 	position: Position,
 	amount0_max: string,
 	amount1_max: string,
+	token0: IcpToken,
+	token1: IcpToken
 }
 
 
 
 
-export function generate_increase_liquidty_args({ position, amount0_max, amount1_max }: AddLiquidityArgs): IncreaseLiquidityArgs {
+export function generate_increase_liquidty_args({
+	position,
+	amount0_max,
+	amount1_max,
+	token0,
+	token1
+}: AddLiquidityArgs): { increase_liquidty_args: IncreaseLiquidityArgs, token0_approval_amount: string, token1_approval_amount: string } {
 	let pool = position.key.pool;
 	let tick_lower = position.key.tick_lower;
 	let tick_upper = position.key.tick_upper;
 
-	return { pool, tick_upper, tick_lower, amount1_max: BigInt(amount1_max), amount0_max: BigInt(amount0_max) } as IncreaseLiquidityArgs;
+	// calculate decimals and apply transfer fees
+	let amount0 = BigNumber(amount0_max).multipliedBy(BigNumber(10).pow(token0.decimals)).decimalPlaces(0);
+	let amount1 = BigNumber(amount1_max).multipliedBy(BigNumber(10).pow(token1.decimals)).decimalPlaces(0);
+
+	let token0_approval_amount = amount0.minus(BigNumber(token0.fee!)).toString();
+	let token1_approval_amount = amount1.minus(BigNumber(token1.fee!)).toString();
+
+
+
+	// fees= 1 approval fee, 1 transfer fee
+	amount0 = amount0.minus(BigNumber(token0.fee!).multipliedBy(2));
+	amount1 = amount1.minus(BigNumber(token1.fee!).multipliedBy(2));
+
+
+	return {
+		increase_liquidty_args: { pool, tick_upper, tick_lower, amount1_max: BigInt(amount1.toString()), amount0_max: BigInt(amount0.toString()), from_subaccount: [] },
+		token1_approval_amount, token0_approval_amount
+	};
 
 }
-
-export async function remove_liquidity(
-	args: IncreaseLiquidityArgs,
-	authenticated_agent: HttpAgent
-): Promise<Response<string | undefined>> {
-	const dex_actor = Actor.createActor(idlFactory, {
-		agent: authenticated_agent,
-		canisterId: appic_dex,
-	});
-
-
-	try {
-
-		let increase_liquidity_result = (await dex_actor.increase_liquidity(
-			args as IncreaseLiquidityArgs
-		)) as IncreaseLiquidityResult;
-		if ("Err" in increase_liquidity_result) {
-			return {
-				message: `${increase_liquidity_result.Err}`,
-				result: undefined,
-				success: false,
-			};
-		} else {
-			return {
-				result: "",
-				success: true,
-				message: "success"
-			}
-		}
-
-
-	} catch (error) {
-		return {
-			message: `Failed to call appic dex canister: ${error}`,
-			result: undefined,
-			success: false,
-		};
-	}
-}
-
 
 

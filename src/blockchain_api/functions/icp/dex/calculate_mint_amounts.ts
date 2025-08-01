@@ -5,8 +5,9 @@ import {
 } from './utils/max_liquidity_amount';
 import { SqrtPriceMath } from './utils/sqrt_price-math';
 import { IcpToken } from '@/blockchain_api/types/tokens';
-import { calculate_price } from './utils/price';
 import { TickMath } from './utils/tick_math';
+import { MintPositionArgs, CandidPoolId } from "../../../did/appic/appic_dex/appic_dex_types";
+
 
 interface TokenAmount {
 	raw: string;
@@ -26,6 +27,8 @@ function formatUnits(amount: BigNumber, decimals: number): string {
 
 export interface CalculateMintAmountsArgs {
 	selected_amount: string;
+
+
 	is_amount_zero: boolean;
 	token0: IcpToken;
 	token1: IcpToken;
@@ -118,3 +121,65 @@ export function calculate_mint_amounts({
 
 
 }
+
+
+
+export interface GenerateMintPositionArgsParams {
+	mint_tick: string;
+	max_tick: string;
+	amount0_max: string;
+	amount1_max: string;
+	token0: IcpToken;
+	token1: IcpToken;
+	pool_id: CandidPoolId;
+}
+
+
+
+export function generate_mint_position_args({
+	mint_tick,
+	max_tick,
+	amount0_max,
+	amount1_max,
+	token0,
+	token1,
+	pool_id,
+}: GenerateMintPositionArgsParams): { mint_position_args: MintPositionArgs, token0_approval_amount: string, token1_approval_amount: string } {
+
+
+
+	let tick_lower = mint_tick < max_tick ? mint_tick : max_tick;
+	let tick_upper = mint_tick < max_tick ? max_tick : mint_tick;
+
+
+	// calculate decimals and apply transfer fees
+	let amount0 = BigNumber(amount0_max).multipliedBy(BigNumber(10).pow(token0.decimals)).decimalPlaces(0);
+	let amount1 = BigNumber(amount1_max).multipliedBy(BigNumber(10).pow(token1.decimals)).decimalPlaces(0);
+
+	let token0_approval_amount = amount0.minus(BigNumber(token0.fee!)).toString();
+	let token1_approval_amount = amount1.minus(BigNumber(token1.fee!)).toString();
+
+
+
+	// fees= 1 approval fee, 1 transfer fee
+	amount0 = amount0.minus(BigNumber(token0.fee!).multipliedBy(2));
+	amount1 = amount1.minus(BigNumber(token1.fee!).multipliedBy(2));
+
+	// Return MintPositionArgs
+	return {
+		mint_position_args: {
+			amount1_max: BigInt(amount1.toString()),
+			pool: pool_id,
+			from_subaccount: [],
+			amount0_max: BigInt(amount0.toString()),
+			tick_lower: BigInt(tick_lower),
+			tick_upper: BigInt(tick_upper),
+
+		},
+		token0_approval_amount,
+		token1_approval_amount
+	};
+}
+
+
+
