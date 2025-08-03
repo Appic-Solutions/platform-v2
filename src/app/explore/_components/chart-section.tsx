@@ -1,18 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { PoolHistory } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  ComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  BarProps,
-} from 'recharts';
+  PoolHistory,
+  Price,
+  TimeVolumeFee,
+} from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import {
   Select,
   SelectContent,
@@ -21,179 +14,185 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { VolumeChart } from './volume-chart';
+import { PriceChart } from './price-chart';
+import { formatInTimeZone } from 'date-fns-tz';
 
-type Timeframe = 'daily' | 'weekly' | 'monthly' | 'yearly';
-type Metric = 'volume' | 'price' | 'liquidity';
+export type Timeframe = 'daily' | 'weekly' | 'monthly' | 'yearly';
+type Metric = 'volume' | 'price';
 
-interface ChartDataItem {
-  time: string;
-  volume: number;
-  price: number;
-  liquidityToken0: number;
-  liquidityToken1: number;
-}
+const TIME_FRAME_OPTIONS: { label: string; value: Timeframe }[] = [
+  { label: '1D', value: 'daily' },
+  { label: '1W', value: 'weekly' },
+  { label: '1M', value: 'monthly' },
+  { label: '1Y', value: 'yearly' },
+];
 
-function transformData(raw: PoolHistory | undefined, timeframe: Timeframe): ChartDataItem[] {
-  if (!raw) return [];
-  const getArray = (key: string) => {
-    const value = raw[`${timeframe}_${key}` as keyof PoolHistory] as string[];
-    return Array.isArray(value) ? value : [];
-  };
+export const TimeFrameLimitMap = new Map<
+  Timeframe,
+  { limitCount: number; dateFormat: string; xTickCount: number }
+>()
+  .set('daily', { limitCount: 24, dateFormat: 'HH:mm a', xTickCount: 6 })
+  .set('weekly', { limitCount: 7, dateFormat: 'EEE', xTickCount: 7 })
+  .set('monthly', { limitCount: 30, dateFormat: 'd MMM', xTickCount: 6 })
+  .set('yearly', { limitCount: 12, dateFormat: 'MMM yyyy', xTickCount: 6 });
 
-  const prices = getArray('price_token0_in_token1');
-  const volumes = getArray('volume_usd');
-  const fees = getArray('generated_fees_usd');
+type ChartInput = { type: 'price'; values: Price[] } | { type: 'volume'; values: TimeVolumeFee[] };
 
-  const token0Price = parseFloat(raw?.token0?.usdPrice || '1');
-  const token1Price = parseFloat(raw?.token1?.usdPrice || '1');
-  const totalPrice = token0Price + token1Price || 1;
+export type VolumeChartDataType = {
+  date: string;
+  value: number;
+  fees: number;
+};
 
-  const length = Math.max(volumes.length, prices.length, fees.length);
+export type PriceChartDataType = {
+  date: string;
+  token0_in_token1: number;
+  token1_in_token0: number;
+};
 
-  return Array.from({ length }).map((_, i) => {
-    const liquidity = parseFloat(fees[i] || '0');
+export const formatDate = (
+  input: ChartInput,
+  timeframe: Timeframe,
+): Array<PriceChartDataType | VolumeChartDataType> => {
+  const config = TimeFrameLimitMap.get(timeframe);
+  if (!config) return [];
+
+  const recentValues = input.values.slice(-config.limitCount);
+
+  return recentValues.map((item) => {
+    const date = new Date(Number(item.timestamp) * 1000);
+    const formattedDate = formatInTimeZone(date, 'UTC', config.dateFormat);
+
+    if (input.type === 'price') {
+      const priceItem = item as Price;
+      return {
+        date: formattedDate,
+        token0_in_token1: Number(Number(priceItem.token0_in_token1).toFixed(8)),
+        token1_in_token0: Number(Number(priceItem.token1_in_token0).toFixed(8)),
+      };
+    }
+
+    const volumeItem = item as TimeVolumeFee;
     return {
-      time: `${i + 1}`,
-      volume: parseFloat(volumes[i] || '0'),
-      price: parseFloat(prices[i] || '0'),
-      liquidityToken0: (liquidity * token0Price) / totalPrice,
-      liquidityToken1: (liquidity * token1Price) / totalPrice,
+      date: formattedDate,
+      value: Number(Number(volumeItem.volume).toFixed(2)),
+      fees: Number(Number(volumeItem.fees).toFixed(2)),
     };
   });
-}
+};
 
-function CustomTooltip({ active, payload, label }: any) {
-  if (active && payload && payload.length) {
-    return (
-      <div className="rounded-md border border-gray-700 bg-gray-900 bg-gradient-to-tr from-[#242424] to-[#2121214d] p-2 text-white">
-        <p className="mb-1 text-xs">{`Time: ${label}`}</p>
-        {payload.map((entry: any, idx: number) => (
-          <p key={`tooltip-item-${idx}`} style={{ color: entry.color }}>
-            {`${entry.name}: ${parseFloat(entry.value).toFixed(8)}`}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
-}
-
-export default function ChartSection({ data }: { data: PoolHistory | undefined }) {
+export default function ChartSection({
+  data,
+  priceSwap,
+}: {
+  data: PoolHistory | undefined;
+  priceSwap: boolean;
+}) {
   const [timeframe, setTimeframe] = useState<Timeframe>('daily');
   const [metric, setMetric] = useState<Metric>('volume');
 
-  const TIME_FRAME_OPTIONS: { label: string; value: Timeframe }[] = [
-    { label: '1D', value: 'daily' },
-    { label: '1W', value: 'weekly' },
-    { label: '1M', value: 'monthly' },
-    { label: '1Y', value: 'yearly' },
-  ];
+  const volumeData = useMemo(
+    () => ({
+      daily: data?.hourly_volume_fee_usd ?? [],
+      weekly: data?.daily_volume_fee_usd ?? [],
+      monthly: data?.daily_volume_fee_usd ?? [],
+      yearly: data?.monthly_volume_fee_usd ?? [],
+    }),
+    [data],
+  );
 
-  const chartData = transformData(data, timeframe);
+  const priceData = useMemo(() => {
+    const mapPrice = (arr: Price[] = []) =>
+      arr.map((item) => ({
+        timestamp: item.timestamp,
+        token0_in_token1: priceSwap ? item.token1_in_token0 : item.token0_in_token1,
+        token1_in_token0: priceSwap ? item.token0_in_token1 : item.token1_in_token0,
+      }));
 
-  const renderChart = () => {
-    switch (metric) {
-      case 'volume':
-        return <Bar dataKey="volume" fill="#2160D5" name="Volume" yAxisId="right" />;
-      case 'price':
-        return (
-          <Line
-            type="monotone"
-            dataKey="price"
-            stroke="#2160D5"
-            strokeWidth={4}
-            yAxisId="right"
-            name="Price"
-            radius={8}
-          />
-        );
-      case 'liquidity':
-        return (
-          <>
-            <Bar
-              dataKey="liquidityToken0"
-              stackId="liquidity"
-              fill="#2160D5"
-              name={data?.token0?.symbol || 'Token0'}
-              yAxisId="right"
-            />
-            <Bar
-              dataKey="liquidityToken1"
-              stackId="liquidity"
-              fill="#BD296B"
-              name={data?.token1?.symbol || 'Token1'}
-              yAxisId="right"
-            />
-          </>
-        );
-    }
-  };
+    return {
+      daily: mapPrice(data?.hourly_price_token0_in_token1),
+      weekly: mapPrice(data?.daily_price_token0_in_token1),
+      monthly: mapPrice(data?.daily_price_token0_in_token1),
+      yearly: mapPrice(data?.monthly_price_token0_in_token1),
+    };
+  }, [data, priceSwap]);
+
+  const volumeChartData = formatDate({ type: 'volume', values: volumeData[timeframe] }, timeframe);
+  const priceChartData = formatDate({ type: 'price', values: priceData[timeframe] }, timeframe);
+
+  const [volumeHovered, setVolumeHovered] = useState<number>(
+    Number(volumeData[timeframe].at(-1)?.volume || 0),
+  );
+  const [priceHovered, setPriceHovered] = useState<number>(
+    Number(priceData[timeframe].at(-1)?.token0_in_token1 || 0),
+  );
+
+  useEffect(() => {
+    setPriceHovered(Number(priceData[timeframe].at(-1)?.token0_in_token1 || 0));
+  }, [priceSwap]);
 
   return (
-    <div className="flex w-full flex-col justify-between gap-y-8">
-      {/* Chart */}
-      <div style={{ width: '100%', height: 453 }}>
-        <ResponsiveContainer>
-          <ComposedChart data={chartData}>
-            {metric !== 'liquidity' && <CartesianGrid stroke="#ffffff14" strokeDasharray="1" />}
-            <XAxis
-              dataKey="time"
-              tick={{ fill: '#ffffffb5' }}
-              tickFormatter={(time) => {
-                return time;
-              }}
-              stroke="#ffffffb5"
-            />
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              stroke="#ffffffb5"
-              tick={{ fill: '#ffffffb5' }}
-              width={70}
-              tickFormatter={(val) => `$${val.toFixed(2)}`}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            {renderChart()}
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+    <>
+      <p className="text-xl font-semibold text-white md:text-[34px]">
+        {metric === 'volume' ? (
+          <>$ {volumeHovered.toFixed(2)}</>
+        ) : (
+          <>
+            1 {priceSwap ? data?.token1.symbol : data?.token0.symbol} = {priceHovered.toFixed(5)}{' '}
+            {priceSwap ? data?.token0.symbol : data?.token1.symbol}
+          </>
+        )}
+      </p>
 
-      {/* Selectors */}
-      <div className="flex items-center justify-between gap-4">
-        <Select defaultValue={metric} onValueChange={(value: Metric) => setMetric(value)}>
-          <SelectTrigger className="max-w-fit gap-x-2 border-none bg-[#565656] text-[#E3E3E3] outline-none ring-0">
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent className="max-w-fit gap-x-2 border-none bg-[#565656] text-[#E3E3E3] outline-none ring-0">
-            <SelectItem value="volume">Volume</SelectItem>
-            <SelectItem value="price">Price</SelectItem>
-            <SelectItem value="liquidity">Liquidity</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex w-full flex-col justify-between gap-y-8">
+        {metric === 'volume' ? (
+          <VolumeChart
+            chartData={volumeChartData as VolumeChartDataType[]}
+            setHovered={setVolumeHovered}
+          />
+        ) : (
+          <PriceChart
+            chartData={priceChartData as PriceChartDataType[]}
+            setHovered={setPriceHovered}
+          />
+        )}
 
-        <div
-          className={cn(
-            'flex items-center gap-2.5',
-            '*:h-8 *:w-8 *:rounded-full',
-            '*:flex *:items-center *:justify-center',
-            '*:cursor-pointer *:text-center *:text-xs',
-          )}
-        >
-          {TIME_FRAME_OPTIONS.map((item, idx) => (
-            <span
-              key={idx}
-              onClick={() => setTimeframe(item.value)}
-              className={cn(
-                item.value === timeframe
-                  ? 'border border-[#e9ddf9] bg-white/70 font-semibold text-[#0A0A0B]'
-                  : 'bg-[#565656] text-white/70',
-              )}
-            >
-              {item.label}
-            </span>
-          ))}
+        <div className="flex items-center justify-between gap-4">
+          <Select defaultValue={metric} onValueChange={(value: Metric) => setMetric(value)}>
+            <SelectTrigger className="max-w-fit gap-x-2 border-none bg-[#565656] text-[#E3E3E3] outline-none ring-0">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent className="max-w-fit gap-x-2 border-none bg-[#565656] text-[#E3E3E3] outline-none ring-0">
+              <SelectItem value="volume">Volume</SelectItem>
+              <SelectItem value="price">Price</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <div
+            className={cn(
+              'flex items-center gap-2.5',
+              '*:h-8 *:w-8 *:rounded-full',
+              '*:flex *:items-center *:justify-center',
+              '*:cursor-pointer *:text-center *:text-xs',
+            )}
+          >
+            {TIME_FRAME_OPTIONS.map((item) => (
+              <span
+                key={item.value}
+                onClick={() => setTimeframe(item.value)}
+                className={cn(
+                  item.value === timeframe
+                    ? 'border border-[#e9ddf9] bg-white/70 font-semibold text-[#0A0A0B]'
+                    : 'bg-[#565656] text-white/70',
+                )}
+              >
+                {item.label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
