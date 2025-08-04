@@ -20,35 +20,43 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
     label: 'Bridge',
     href: '/bridge',
     tooltip: 'Bridge',
-    Icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-h-6 min-w-6" />,
+    Icon: (
+      <ParkOutlineBridgeIcon
+        width={24}
+        height={24}
+        className="min-h-5 min-w-5 md:min-h-6 md:min-w-6"
+      />
+    ),
     active: true,
   },
   {
     label: 'Swap',
     href: '/swap',
     tooltip: 'Coming Soon',
-    Icon: <BlockchainIcon width={24} height={24} className="min-h-6 min-w-6" />,
+    Icon: (
+      <BlockchainIcon width={24} height={24} className="min-h-5 min-w-5 md:min-h-6 md:min-w-6" />
+    ),
     active: false,
   },
   {
     label: 'Pool',
     href: '/positions',
     tooltip: 'Pool',
-    Icon: <PoolIcon width={24} height={24} className="min-h-6 min-w-6" />,
+    Icon: <PoolIcon width={24} height={24} className="min-h-5 min-w-5 md:min-h-6 md:min-w-6" />,
     active: true,
   },
   {
     label: 'Explore',
     href: '/explore',
     tooltip: 'Coming Soon',
-    Icon: <ExploreIcon width={24} height={24} className="min-h-6 min-w-6" />,
-    active: false,
+    Icon: <ExploreIcon width={24} height={24} className="min-h-5 min-w-5 md:min-h-6 md:min-w-6" />,
+    active: true,
   },
   {
     label: 'Advanced',
     href: '/advanced',
     tooltip: 'Coming Soon',
-    Icon: <LockIcon width={24} height={24} className="min-h-6 min-w-6" />,
+    Icon: <LockIcon width={24} height={24} className="min-h-5 min-w-5 md:min-h-6 md:min-w-6" />,
     active: true,
   },
 ];
@@ -65,15 +73,15 @@ export interface ShapeSize {
 export const SHAPE_SIZES: ShapeSize[] = [
   // left_top
   {
-    width: '101px',
-    height: '101px',
+    width: '91px',
+    height: '91px',
     positionTop: '25%',
     positionLeft: '5%',
   },
   // left_bottom
   {
-    width: '131px',
-    height: '131px',
+    width: '120px',
+    height: '120px',
     positionLeft: '8%',
     positionBottom: '20%',
   },
@@ -81,36 +89,36 @@ export const SHAPE_SIZES: ShapeSize[] = [
   {
     positionLeft: '30%',
     positionTop: '35%',
-    width: '68px',
-    height: '68px',
+    width: '64px',
+    height: '64px',
   },
   // right_top
   {
     positionRight: '29%',
     positionTop: '22%',
-    width: '101px',
-    height: '101px',
+    width: '95px',
+    height: '95px',
   },
   // right_center-first
   {
     positionRight: '0%',
     positionBottom: '25%',
-    width: '239px',
-    height: '239px',
+    width: '220px',
+    height: '220px',
   },
   // right_center-second
   {
     positionRight: '35%',
     positionBottom: '50%',
-    width: '65px',
-    height: '65px',
+    width: '60px',
+    height: '60px',
   },
   // right_bottom
   {
     positionRight: '30%',
     positionBottom: '15%',
-    width: '101px',
-    height: '101px',
+    width: '95px',
+    height: '95px',
   },
 ];
 

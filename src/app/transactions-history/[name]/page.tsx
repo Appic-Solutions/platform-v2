@@ -13,13 +13,13 @@ export default function TransactionsHistoryPage({ params }: { params: PageParams
     <Box
       className={cn(
         'flex h-full flex-col justify-start gap-4 overflow-visible duration-300 ease-in-out',
-        'max-md:px-0 md:min-h-[10vh] md:max-w-[510px] md:px-[35px] md:py-[30px] lg:max-w-[617px]',
+        'gap-y-6 md:min-h-[10vh] md:max-w-[510px] lg:max-w-[617px]',
       )}
     >
       {/* Head Title */}
-      <div className="mb-8 flex items-center justify-center text-white md:text-black md:dark:text-white">
+      <div className="flex items-center justify-center text-white md:text-black md:dark:text-white">
         <BackButton />
-        <p className="text-xl font-bold capitalize md:text-3xl">{params.name}</p>
+        <p className="text-2xl font-bold capitalize md:text-3xl">{params.name}</p>
       </div>
 
       {/* Tab Section */}

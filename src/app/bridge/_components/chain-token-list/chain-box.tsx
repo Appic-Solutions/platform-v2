@@ -15,7 +15,7 @@ const ChainBoxPage = ({
   };
 
   return (
-    <div className="mb-7 grid w-full select-none grid-cols-5 place-items-center gap-5 md:px-4">
+    <div className="grid w-full select-none grid-cols-5 place-items-center gap-5">
       {chains.map((chain, idx) => (
         <ChainItem
           key={idx}

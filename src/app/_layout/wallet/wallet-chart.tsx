@@ -10,23 +10,9 @@ import { WalletBalance } from './wallet-pop';
 import { Pie, PieChart } from 'recharts';
 import { getStorageItem } from '@/lib/helpers/localstorage';
 
-const lightColorsPalette = [
-  '#F15A24',
-  '#ED1E79',
-  '#592784',
-  '#3B00B9', // Original colors
-  '#FBB03B',
-  '#932380',
-];
+const lightColorsPalette = ['#F15A24', '#ED1E79', '#592784', '#3B00B9', '#FBB03B', '#932380'];
 
-const darkColorsPalette = [
-  '#F15A24',
-  '#ED1E79',
-  '#592784',
-  '#3B00B9', // Original colors
-  '#FBB03B',
-  '#932380',
-];
+const darkColorsPalette = ['#F15A24', '#ED1E79', '#592784', '#3B00B9', '#FBB03B', '#932380'];
 
 const WalletChart = ({ balance }: { balance: WalletBalance }) => {
   const selectedPalette = getStorageItem('theme');
@@ -54,7 +40,7 @@ const WalletChart = ({ balance }: { balance: WalletBalance }) => {
     ) || {};
   return (
     <div>
-      <ChartContainer config={chartConfig} className="relative mx-auto aspect-square max-h-56">
+      <ChartContainer config={chartConfig} className="relative mx-auto aspect-square max-h-48">
         <PieChart>
           <ChartTooltip
             cursor={false}

@@ -11,7 +11,7 @@ export default function BoxHeader({ title, onBack, className }: BoxHeaderProps) 
   return (
     <div
       className={cn(
-        'mb-8 flex items-center justify-center',
+        'flex items-center justify-center',
         'text-white md:text-black md:dark:text-white',
         className,
       )}
@@ -21,14 +21,14 @@ export default function BoxHeader({ title, onBack, className }: BoxHeaderProps) 
           onClick={onBack}
           className={cn(
             'flex items-center justify-center gap-x-1',
-            'absolute left-4 font-semibold md:left-8',
+            'absolute left-4 font-semibold md:left-10',
           )}
         >
           <ExpandLeftIcon width={18} height={18} />
           Back
         </button>
       )}
-      <p className="text-xl font-bold md:text-3xl">{title}</p>
+      <p className="text-2xl font-bold md:text-3xl">{title}</p>
     </div>
   );
 }

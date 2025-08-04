@@ -37,13 +37,7 @@ const BridgeOptionsList = ({ isPending }: BridgeOptionsListProps) => {
   };
 
   return (
-    <div
-      className={cn(
-        'mb-5 flex flex-col items-start',
-        'md:pr-2 lg:w-full',
-        'animate-slide-in opacity-0',
-      )}
-    >
+    <div className="flex animate-slide-in flex-col items-start opacity-0 md:pr-2 lg:w-full">
       <p className="mb-5 text-[26px] font-bold leading-7 text-primary md:hidden md:text-[40px] md:leading-10">
         Bridge Options
       </p>

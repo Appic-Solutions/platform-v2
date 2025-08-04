@@ -111,10 +111,10 @@ export function WalletPop({
                           className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
                         >
                           <div className="relative flex items-center gap-x-5">
-                            <Avatar src={token.logo} className="h-9 w-9" />
+                            <Avatar src={token.logo} className="h-8 w-8" />
                             <Avatar
                               src={getChainLogo(token.chainId)}
-                              className="absolute left-7 top-5 h-4 w-4"
+                              className="absolute left-8 top-5 h-3.5 w-3.5"
                             />
                             <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
                           </div>

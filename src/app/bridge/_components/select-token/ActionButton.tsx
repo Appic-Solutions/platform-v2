@@ -14,7 +14,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       <button
         ref={ref}
         className={cn(
-          'h-14 w-full rounded-[16px] text-white',
+          'h-12 w-full rounded-xl text-white',
           'bg-primary-buttons',
           'transition-all ease-in-out',
           isDisabled ? 'cursor-not-allowed opacity-50' : 'hover:opacity-85',

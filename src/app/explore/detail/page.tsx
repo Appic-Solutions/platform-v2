@@ -73,20 +73,19 @@ export default function ExploreDetailPage() {
     <Box
       className={cn(
         'md:overflow-y-hidden',
-        'gap-y-10 md:flex-row md:gap-x-16 md:gap-y-14',
+        'gap-y-6 md:flex-row md:gap-x-16',
         'md:max-h-[789px] md:w-full md:max-w-[1204px]',
-        'md:p-11',
       )}
     >
       {data?.success ? (
         <>
           {/* Chart Section */}
-          <div className="flex w-full flex-col gap-y-8">
+          <div className="flex w-full flex-col gap-y-[31px]">
             <div className="flex items-center justify-between gap-3">
               <div
                 className={cn(
                   'flex items-center gap-x-3',
-                  'text-[27px] font-bold text-white md:text-[40px]',
+                  'text-2xl font-bold text-white md:text-3xl',
                 )}
               >
                 <div className="flex">
@@ -126,15 +125,14 @@ export default function ExploreDetailPage() {
           </div>
 
           {/* Stats Section */}
-          <div className="flex w-full flex-col gap-y-10 md:max-w-[440px] md:gap-y-6">
-            <div className="flex flex-col gap-y-2 md:gap-y-2.5">
+          <div className="flex w-full flex-col gap-y-6 md:max-w-[400px]">
+            <div className="flex flex-col gap-y-2">
               <p className="text-xl font-bold text-white md:text-2xl">Stats</p>
               <div
                 className={cn(
-                  'flex flex-col gap-y-4',
-                  'rounded-2xl md:rounded-[21px]',
-                  'bg-[#222222] p-6 md:p-8',
-                  '*:flex *:flex-col *:gap-y-1',
+                  'flex flex-col gap-y-3',
+                  'rounded-2xl md:rounded-[20px]',
+                  'bg-[#222222] p-6',
                 )}
               >
                 <div>
@@ -169,31 +167,31 @@ export default function ExploreDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#898989]">TVL</p>
-                  <p className="flex flex-col gap-y-1 font-bold text-white md:text-[22px]">
+                  <p className="flex flex-col gap-y-1 font-bold text-white md:text-lg">
                     ${Number(data?.result?.pool?.tvl_usd).toFixed(2)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#898989]">24H volume</p>
-                  <p className="flex flex-col gap-y-1 font-bold text-white md:text-[22px]">
+                  <p className="flex flex-col gap-y-1 font-bold text-white md:text-lg">
                     ${Number(data?.result?.total_24h_volume_usd || 0).toFixed(2)}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[#898989]">24H fees</p>
-                  <p className="flex flex-col gap-y-1 font-bold text-white md:text-[22px]">
+                  <p className="flex flex-col gap-y-1 font-bold text-white md:text-lg">
                     ${Number(data?.result?.total_24h_collected_fees_usd || 0).toFixed(2)}
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-y-2 md:gap-y-2.5">
+            <div className="flex flex-col gap-y-2">
               <p className="text-xl font-bold text-white md:text-2xl">Links</p>
               <div
                 className={cn(
-                  'flex flex-col gap-y-3 md:gap-y-4',
-                  'rounded-2xl md:rounded-[21px]',
-                  'bg-[#222222] p-6 md:p-8',
+                  'flex flex-col gap-y-3',
+                  'rounded-2xl md:rounded-[20px]',
+                  'bg-[#222222] p-6',
                   'text-sm font-medium text-white',
                   '*:flex *:items-center *:justify-between *:gap-3',
                 )}
@@ -247,10 +245,10 @@ export default function ExploreDetailPage() {
             <div
               className={cn(
                 'flex items-center justify-center gap-3 md:gap-4',
-                'text-[13px] font-medium md:text-[15px]',
+                'text-sm font-medium',
                 '*:flex *:flex-1 *:items-center *:justify-center *:gap-1',
                 '*:bg-primary-buttons *:text-white',
-                '*:rounded-[10px] *:p-2.5',
+                '*:rounded-lg *:p-2.5',
               )}
             >
               <Link href="/swap">

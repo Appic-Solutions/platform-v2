@@ -31,21 +31,21 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
     <Tabs
       defaultValue={defaultValue}
       onValueChange={(value) => router.push(`/transactions-history/${value}`)}
-      className="h-full w-full overflow-y-auto max-md:pb-10 max-md:pt-4"
+      className="flex h-full w-full flex-col gap-y-7 overflow-y-auto pt-1.5 md:pt-0"
     >
       <TabsList
         className={cn(
-          'mx-auto mb-5 flex max-w-fit items-center justify-center gap-1.5 px-4 py-2.5',
+          'mx-auto flex max-w-fit items-center justify-center gap-1.5',
           'rounded-full bg-box-background text-white ring-[5px] ring-box-border',
-          'sm:px-6 sm:py-3.5',
-          'md:absolute md:-left-24 md:top-24 md:mb-0 md:flex-col md:px-2 md:py-5',
+          'px-4 py-2.5 md:px-2',
+          'md:absolute md:-left-24 md:top-24 md:mb-0 md:flex-col',
         )}
       >
         {PAGE_PARAMS_DATA.map((item, idx) => (
           <TabsTrigger
             key={idx}
             value={item.name}
-            className="data-[state=active]:text-white dark:data-[state=active]:text-black"
+            className="h-10 w-10 data-[state=active]:text-white dark:data-[state=active]:text-black"
           >
             {item.icon}
           </TabsTrigger>
@@ -54,7 +54,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
 
       <TabsContent value="bridge" asChild>
         {evmBalance || icpBalance ? (
-          <div className="flex flex-col items-center justify-center gap-y-5 px-4">
+          <div className="flex flex-col items-center justify-center gap-y-6 md:px-4">
             <BridgeContent />
           </div>
         ) : (
@@ -66,7 +66,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
       </TabsContent>
       <TabsContent value="advanced" asChild>
         {icpBalance ? (
-          <div className="flex flex-col items-center justify-center gap-y-5 px-4">
+          <div className="flex flex-col items-center justify-center gap-y-6 px-4">
             <AdvancedContent />
           </div>
         ) : (

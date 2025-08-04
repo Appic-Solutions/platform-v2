@@ -18,9 +18,9 @@ export default function TokenListPage({ prevStepHandler }: TokenListProps) {
   };
 
   return (
-    <Box className="animate-slide-in justify-normal opacity-0 md:h-[280px] md:max-w-[612px] md:px-9 md:pt-8">
+    <Box className="animate-slide-in gap-y-6 opacity-0 md:h-[280px] md:max-w-[612px]">
       <BoxHeader title="Select Chain" onBack={prevStepHandler} />
-      <div className="mb-7 grid w-full select-none grid-cols-5 place-items-center gap-5 md:px-4">
+      <div className="grid w-full select-none grid-cols-5 place-items-center gap-5">
         {chains.map((chain, idx) => (
           <ChainItem
             key={idx}

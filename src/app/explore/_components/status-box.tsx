@@ -11,15 +11,14 @@ export default function StatusBox({ volume, value }: StatusBoxProps) {
   return (
     <div
       className={cn(
-        'flex flex-col justify-center gap-y-1.5',
-        'min-h-[118px] min-w-[158px] lg:w-full',
-        'px-8 py-6 md:py-8',
-        'rounded-[20px] bg-white/15',
-        'text-[13px] font-medium text-white md:text-[15px]',
+        'flex flex-col justify-between gap-y-1.5 p-5',
+        'min-h-24 min-w-[158px] lg:w-full',
+        'rounded-2xl bg-white/15',
+        'text-white',
       )}
     >
-      <p className="leading-5 text-[#898989]">{volume}</p>
-      <p className="text-lg font-bold md:text-[22px]">
+      <p className="text-[13px] text-sm font-semibold leading-5 text-[#898989]">{volume}</p>
+      <p className="font-bold md:text-xl">
         {isDollar && '$'}
         {value}
       </p>

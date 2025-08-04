@@ -11,11 +11,11 @@ function Card({ children, className, ...other }: CardProps) {
     <div
       className={cn(
         'group relative flex w-full items-center gap-x-7 overflow-clip',
-        'rounded-3xl px-6 py-11 shadow-md',
-        'text-2xl font-bold leading-7 text-black dark:text-white',
+        'rounded-3xl p-6 shadow-md',
+        'text-xl font-bold leading-7 text-black dark:text-white',
         'bg-input-fields bg-cover bg-center bg-no-repeat',
         'backdrop-blur-[30.07605743408203px] duration-200 hover:bg-[#000000]/75',
-        'md:rounded-[36px] md:px-10 md:py-14 md:text-[28px] md:leading-8',
+        'md:rounded-[36px] md:p-9 md:text-2xl md:leading-8',
         className,
       )}
       {...other}

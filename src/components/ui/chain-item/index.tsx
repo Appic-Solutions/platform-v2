@@ -9,7 +9,7 @@ export default function ChainItem({ chain, selectedId, disabled, onClick }: Chai
       <Tooltip>
         <TooltipTrigger
           className={cn(
-            'flex h-12 w-12 cursor-pointer select-none items-center justify-center rounded-full md:h-14 md:w-14',
+            'flex h-12 w-12 cursor-pointer select-none items-center justify-center rounded-full',
             selectedId === chain.chainId && 'ring-primary-buttons ring-4',
             disabled && 'cursor-not-allowed opacity-50',
           )}
@@ -18,7 +18,7 @@ export default function ChainItem({ chain, selectedId, disabled, onClick }: Chai
             onClick(chain);
           }}
         >
-          <Avatar src={chain.logo} className="h-[54px] w-[54px]" />
+          <Avatar src={chain.logo} className="h-12 w-12" />
         </TooltipTrigger>
         <TooltipContent side="bottom">{chain.name}</TooltipContent>
       </Tooltip>

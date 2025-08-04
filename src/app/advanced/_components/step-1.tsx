@@ -16,22 +16,20 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
     return <TokenListPage prevStepHandler={() => setSelectTokenBox(false)} />;
   } else {
     return (
-      <Box
-        className={cn(
-          'flex h-full flex-col justify-normal gap-y-6',
-          'md:h-fit md:max-w-[617px] md:px-[65px] md:py-[55px]',
-        )}
-      >
-        <div className="mb-5 flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
-          <div className="flex items-center gap-3.5 self-start text-2xl font-bold md:text-4xl">
+      <Box className="flex h-full flex-col justify-normal gap-y-6 md:h-fit md:max-w-[617px]">
+        {/* Header */}
+        <div className="flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
+          <div className="flex items-center gap-3.5 self-start text-2xl font-bold md:text-3xl">
             Create Twin Token
-            <InfoCircleIcon className="h-4 w-4 md:h-5 md:w-5" />
+            {/* <InfoCircleIcon className="h-4 w-4 md:h-5 md:w-5" /> */}
           </div>
           <Link href="/transactions-history/advanced" className="flex items-center gap-x-2 text-sm">
-            <HistoryIcon className="h-5 w-5 md:h-6 md:w-6" />
+            <HistoryIcon className="min-h-5 min-w-5" />
             <span className="hidden xs:block">History</span>
           </Link>
         </div>
+
+        {/* Main Content */}
         <div className="flex w-full flex-col justify-between gap-y-1">
           <div className="flex w-full min-w-fit cursor-pointer flex-col gap-y-1">
             <label className="text-white dark:text-white md:text-black">Select Chain</label>
@@ -59,8 +57,10 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
           className="w-full"
           placeholder="Enter Contract Address"
         />
+
+        {/* Action Button */}
         <button
-          className="mt-auto min-h-14 w-full rounded-[16px] bg-primary-buttons text-white duration-200 hover:opacity-85 md:mt-0"
+          className="mt-auto min-h-11 w-full rounded-lg bg-primary-buttons text-white duration-200 hover:opacity-85"
           disabled={isLoading}
         >
           {isLoading ? <Spinner /> : 'Continue'}

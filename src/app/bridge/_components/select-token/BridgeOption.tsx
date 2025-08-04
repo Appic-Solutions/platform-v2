@@ -107,11 +107,11 @@ const BridgeOption = ({
           'w-full border-t border-gray-200 dark:border-gray-700',
           'transform transition-all duration-300',
           isExpanded
-            ? 'mb-2 mt-4 translate-y-0 pt-4 opacity-100'
+            ? 'translate-y-0 pt-3 opacity-100'
             : 'h-0 -translate-y-2 overflow-hidden opacity-0',
         )}
       >
-        <div className="space-y-4">
+        <div className="space-y-3">
           <p className="text-sm font-medium">Option Details:</p>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">

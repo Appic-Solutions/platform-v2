@@ -65,7 +65,7 @@ const WalletAddressInput = ({
     <div
       className={cn(
         'overflow-hidden transition-[max-height] duration-300 ease-in-out',
-        show ? 'mb-4 max-h-[155px]' : 'max-h-0',
+        show ? 'mt-4 max-h-[155px]' : 'max-h-0',
       )}
     >
       <Card
@@ -86,7 +86,7 @@ const WalletAddressInput = ({
               value={address}
               onChange={handleAddressChange}
               className={cn(
-                'w-full rounded-md border-[#1C68F8] py-4 outline-none dark:border-[#000000]',
+                'w-full rounded-md border-[#1C68F8] py-2 outline-none dark:border-[#000000]',
                 'bg-transparent text-primary',
                 'placeholder:text-muted',
                 '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',

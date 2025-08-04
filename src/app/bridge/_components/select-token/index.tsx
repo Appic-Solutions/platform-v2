@@ -34,8 +34,8 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
   return (
     <Box
       className={cn(
-        'flex h-full flex-col gap-4 md:h-fit',
-        'md:max-w-[617px] md:px-[65px] md:py-[55px]',
+        'flex h-full flex-col gap-6 md:h-fit',
+        'md:w-fit md:max-w-[617px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         Number(amount) > 0 &&
@@ -45,18 +45,18 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
-      <div className="mb-5 flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
-        <h1 className="text-[26px] font-bold leading-7 md:text-[40px] md:leading-10">Bridge</h1>
+      <div className="flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
+        <h1 className="text-2xl font-bold md:text-3xl">Bridge</h1>
         <Link href="/transactions-history/bridge" className="flex items-center gap-x-2 text-sm">
           <HistoryIcon width={20} height={20} />
           History
         </Link>
       </div>
 
-      <div className="flex w-full flex-1 flex-col justify-between gap-x-4 lg:flex-row lg:overflow-hidden">
+      <div className="flex w-full flex-1 flex-col justify-between gap-x-4 gap-y-6 lg:flex-row lg:overflow-hidden">
         {/* TOKENS AND AMOUNT INPUT */}
         <div className="flex h-full w-full flex-col items-center justify-between gap-y-4 md:overflow-hidden lg:max-w-[482px]">
-          <div className="flex h-full w-full flex-col gap-y-4">
+          <div className="flex h-full w-full flex-col justify-between">
             {/* TOKENS */}
             <div
               className={cn(
@@ -80,7 +80,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
               />
               <div
                 className={cn(
-                  'group absolute inset-0 z-20 m-auto h-12 w-12 cursor-pointer rounded-full',
+                  'group absolute inset-0 z-20 m-auto h-10 w-10 cursor-pointer rounded-full',
                   'flex items-center justify-center',
                   'bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white',
                   'border-2 border-white dark:border-white/30',
@@ -91,7 +91,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
                 )}
                 onClick={swapTokens}
               >
-                <ArrowsUpDownIcon width={24} height={24} />
+                <ArrowsUpDownIcon width={20} height={20} />
               </div>
               <TokenCard
                 token={toToken}
@@ -127,7 +127,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
             <div
               onClick={() => setShowWalletAddress(!showWalletAddress)}
               className={cn(
-                'flex min-h-14 min-w-14 items-center justify-center rounded-full px-4',
+                'flex min-h-12 min-w-12 items-center justify-center rounded-full px-4',
                 'cursor-pointer transition-colors duration-300',
                 'bg-primary-buttons hover:opacity-85',
                 'transition-all ease-in-out',
@@ -144,14 +144,14 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
         )}
       </div>
       {/* MOBILE ACTION BUTTONS */}
-      <div className={cn('flex w-full items-center gap-x-2', 'lg:hidden')}>
+      <div className="flex w-full items-center gap-x-2 lg:hidden">
         <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
           {actionButtonStatus.text}
         </ActionButton>
         <div
           onClick={() => setShowWalletAddress(!showWalletAddress)}
           className={cn(
-            'flex min-h-14 min-w-14 items-center justify-center rounded-full px-4',
+            'flex min-h-12 min-w-12 items-center justify-center rounded-full px-4',
             'cursor-pointer transition-colors duration-300',
             'bg-primary-buttons hover:opacity-90',
             'transition-all ease-out',

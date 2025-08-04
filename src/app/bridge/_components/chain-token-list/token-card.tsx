@@ -26,7 +26,7 @@ const TokenCard = ({
         className={cn('group flex flex-grow cursor-pointer items-center gap-x-5 duration-200')}
         onClick={onClick}
       >
-        <Avatar src={token.logo} alt={token.name} className="h-[50px] w-[50px]" />
+        <Avatar src={token.logo} alt={token.name} className="h-12 w-12" />
         <div className="flex min-w-0 flex-1 flex-col">
           <p className="truncate text-xl font-bold text-black dark:text-white">{token.symbol}</p>
           <div className="h-5 overflow-hidden">

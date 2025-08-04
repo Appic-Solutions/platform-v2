@@ -59,7 +59,7 @@ const AmountInput = () => {
   };
 
   return (
-    <Card className="max-h-[133px] cursor-auto flex-col items-start justify-center hover:bg-[#000000]/0 md:max-h-[155px]">
+    <Card className="mt-4 max-h-[133px] cursor-auto flex-col items-start justify-center hover:bg-[#000000]/0 md:max-h-[155px]">
       <p className="text-sm font-semibold">Send</p>
       <div className="flex w-full items-center gap-4">
         <div className="relative">

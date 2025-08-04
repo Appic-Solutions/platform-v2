@@ -14,19 +14,19 @@ export interface PageParamsItem {
 export const PAGE_PARAMS_DATA: PageParamsItem[] = [
   {
     name: 'bridge',
-    icon: <ParkOutlineBridgeIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    icon: <ParkOutlineBridgeIcon width={20} height={20} className="min-h-5 min-w-5" />,
   },
   {
     name: 'auto-invest',
-    icon: <BlockchainIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    icon: <BlockchainIcon width={20} height={20} className="min-h-5 min-w-5" />,
   },
   {
     name: 'swap',
-    icon: <ArrowsUpDownIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    icon: <ArrowsUpDownIcon width={20} height={20} className="min-h-5 min-w-5" />,
   },
   {
     name: 'advanced',
-    icon: <LockIcon width={24} height={24} className="min-h-5 min-w-5" />,
+    icon: <LockIcon width={20} height={20} className="min-h-5 min-w-5" />,
   },
 ];
 

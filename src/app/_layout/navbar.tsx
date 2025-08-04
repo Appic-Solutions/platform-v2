@@ -12,7 +12,7 @@ export default function NavbarPage() {
     <div
       className={cn(
         'fixed bottom-0 z-[99] w-full pb-5 xl:pb-0',
-        'h-max md:mx-auto xl:absolute xl:top-8 xl:max-w-[840px]',
+        'h-max md:mx-auto xl:absolute xl:top-8 xl:max-w-[800px]',
       )}
     >
       <ul
@@ -41,7 +41,7 @@ export default function NavbarPage() {
                 className={cn(
                   'flex items-center justify-center gap-x-1 md:gap-x-1.5',
                   path === item.href && 'max-md:px-4 max-sm:py-2.5',
-                  'sm:py-2.5 md:px-4 md:py-4',
+                  'sm:py-2.5 md:px-3 md:py-3',
                 )}
               >
                 {item.Icon}
@@ -49,7 +49,7 @@ export default function NavbarPage() {
                   className={cn(
                     path === item.href ? 'inline-flex' : 'hidden',
                     'md:inline-flex',
-                    'whitespace-nowrap lg:text-lg lg:font-bold',
+                    'whitespace-nowrap lg:font-bold',
                   )}
                 >
                   {item.label}
@@ -73,7 +73,7 @@ export default function NavbarPage() {
                     className={cn(
                       'flex items-center justify-center gap-x-1 md:gap-x-1.5',
                       path === item.href && 'max-md:px-4 max-sm:py-2.5',
-                      'sm:py-2.5 md:px-4 md:py-4',
+                      'sm:py-2.5 md:px-3 md:py-3',
                     )}
                   >
                     {item.Icon}
@@ -81,7 +81,7 @@ export default function NavbarPage() {
                       className={cn(
                         path === item.href ? 'inline-flex' : 'hidden',
                         'md:inline-flex',
-                        'whitespace-nowrap lg:text-lg lg:font-bold',
+                        'whitespace-nowrap lg:font-bold',
                       )}
                     >
                       {item.label}

@@ -24,8 +24,6 @@ export default function AdvancedContent() {
     enabled: !!(icpIdentity && unAuthenticatedAgent),
   });
 
-  console.log('🚀 ~ AdvancedContent ~ data:', data);
-
   const expandHandler = (id: number) => {
     if (itemId === id) {
       setItemId(null);
@@ -47,13 +45,13 @@ export default function AdvancedContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="absolute inset-y-0 my-auto flex items-center justify-center">
+      <div className="my-auto flex items-center justify-center md:absolute md:inset-0">
         <Spinner />
       </div>
     );
   } else if (data?.result.length === 0) {
     return (
-      <div className="absolute inset-y-0 my-auto flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white">
+      <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
         <Image src="/images/empty.png" alt="" width={100} height={100} />
         Empty Advanced History
       </div>

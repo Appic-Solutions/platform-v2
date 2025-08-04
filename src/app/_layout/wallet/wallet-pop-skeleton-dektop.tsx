@@ -1,7 +1,7 @@
 import Skeleton from '@/components/ui/skeleton';
 import React from 'react';
 
-const WalletPopSkeletonDesktop = () => {
+export default function WalletPopSkeletonDesktop() {
   return (
     <div className="flex flex-col items-center gap-y-6">
       <Skeleton className="h-4 w-20" />
@@ -45,6 +45,4 @@ const WalletPopSkeletonDesktop = () => {
       <Skeleton className="h-8 w-full" />
     </div>
   );
-};
-
-export default WalletPopSkeletonDesktop;
+}

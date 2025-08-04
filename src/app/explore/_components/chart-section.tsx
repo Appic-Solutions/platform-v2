@@ -134,7 +134,7 @@ export default function ChartSection({
 
   return (
     <>
-      <p className="text-xl font-semibold text-white md:text-[34px]">
+      <p className="text-2xl font-semibold text-white md:text-3xl">
         {metric === 'volume' ? (
           <>$ {volumeHovered.toFixed(2)}</>
         ) : (

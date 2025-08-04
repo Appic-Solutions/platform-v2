@@ -16,8 +16,8 @@ export default function WalletCard({ connectWallet, walletLogo, walletTitle }: W
         'hover:bg-[#F5F5F5] dark:hover:bg-[#2A2A2A]',
       )}
     >
-      <Avatar src={walletLogo} className="h-[51px] w-[51px]" />
-      <span className="text-lg font-bold text-white">{walletTitle}</span>
+      <Avatar src={walletLogo} className="h-12 w-12" />
+      <span className="font-bold text-white">{walletTitle}</span>
     </div>
   );
 }
