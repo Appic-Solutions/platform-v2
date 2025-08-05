@@ -1,29 +1,11 @@
 'use client';
-import Box from '@/components/ui/box';
-import { cn } from '@/lib/utils';
-import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
 import React, { useEffect, useState } from 'react';
 import YourPositions from './_components/YourPositions';
-import PositionDetail from './_components/PositionDetail';
-import AddLiquidity from './_components/AddLiquidity';
-import CollectFeesPage from './_components/CollectFees';
-import RemoveLiquidity from './_components/RemoveLiquidity';
 import { useSharedStore } from '@/store/store';
-import { IcpToken } from '@/blockchain_api/types/tokens';
 import { useGetPositions } from './_api';
 import { Principal } from '@dfinity/principal';
-
-export type Step =
-  | 'addLiquidity'
-  | 'removeLiquidity'
-  | 'collectFees'
-  | 'positionDetail'
-  | 'yourPositions';
-
-export type FormattedPosition = Position & {
-  token0: IcpToken;
-  token1: IcpToken;
-};
+import PositionDetails from './_components/position-details';
+import { FormattedPosition } from './types';
 
 export default function PositionsPage() {
   const [selectedPosition, setSelectedPosition] = useState<FormattedPosition | undefined>();
@@ -32,7 +14,6 @@ export default function PositionsPage() {
     type: 'walletConnection' | 'network';
   }>();
   const { icpIdentity } = useSharedStore();
-  const [currentStep, setCurrentStep] = useState<Step>('yourPositions');
   const [formattedPositions, setFormattedPositions] = useState<FormattedPosition[]>([]);
 
   const { icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
@@ -88,60 +69,23 @@ export default function PositionsPage() {
 
   const onSelectHandler = (position: FormattedPosition) => {
     setSelectedPosition(position);
-    setCurrentStep('positionDetail');
   };
 
-  const renderContent = () => {
-    if (!selectedPosition) {
-      return (
-        <YourPositions
-          error={error}
-          formattedPositions={formattedPositions}
-          onSelectHandler={onSelectHandler}
-          selectedPosition={selectedPosition}
-        />
-      );
-    }
-
-    switch (currentStep) {
-      case 'positionDetail':
-        return (
-          <PositionDetail
-            setCurrentStep={setCurrentStep}
-            setSelectedPosition={setSelectedPosition}
-            position={selectedPosition}
-          />
-        );
-      case 'addLiquidity':
-        return <AddLiquidity position={selectedPosition} setCurrentStep={setCurrentStep} />;
-      case 'collectFees':
-        return <CollectFeesPage position={selectedPosition} setCurrentStep={setCurrentStep} />;
-      case 'removeLiquidity':
-        return <RemoveLiquidity position={selectedPosition} setCurrentStep={setCurrentStep} />;
-      default:
-        return (
-          <YourPositions
-            error={error}
-            formattedPositions={formattedPositions}
-            onSelectHandler={onSelectHandler}
-            selectedPosition={selectedPosition}
-          />
-        );
-    }
-  };
+  if (!selectedPosition) {
+    return (
+      <YourPositions
+        error={error}
+        formattedPositions={formattedPositions}
+        onSelectHandler={onSelectHandler}
+        selectedPosition={selectedPosition}
+      />
+    );
+  }
 
   return (
-    <Box
-      className={cn(
-        'text-white transition-all md:p-12 lg:overflow-visible lg:text-black lg:dark:text-white',
-        'h-max',
-        currentStep === 'positionDetail'
-          ? 'md:h-[789px] lg:w-[1204px]'
-          : 'lg:max-h-[716px] lg:w-[611px]',
-        'md:p-12',
-      )}
-    >
-      {renderContent()}
-    </Box>
+    <PositionDetails
+      position={selectedPosition}
+      onBackClick={() => setSelectedPosition(undefined)}
+    />
   );
 }
