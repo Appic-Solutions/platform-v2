@@ -1,13 +1,12 @@
-import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Avatar } from '@/components/common/ui/avatar';
 import { cn } from '@/lib/utils';
 
 interface AvatarArgs {
-  token0: IcpToken;
-  token1: IcpToken;
+  avatar0: string;
+  avatar1: string;
 }
 
-const AvatarGroup = ({ token1, token0 }: AvatarArgs) => {
+const AvatarGroup = ({ avatar0, avatar1 }: AvatarArgs) => {
   return (
     <div
       className={cn(
@@ -17,11 +16,8 @@ const AvatarGroup = ({ token1, token0 }: AvatarArgs) => {
         'md:row-span-full',
       )}
     >
-      <Avatar src={token0.logo} className="h-[33px] w-[33px] md:h-[48px] md:w-[48px]" />
-      <Avatar
-        src={token1.logo}
-        className={cn('h-[33px] w-[33px] md:h-[48px] md:w-[48px]', '-ml-4')}
-      />
+      <Avatar src={avatar0} className="h-[28px] w-[28px] md:h-[38px] md:w-[38px]" />
+      <Avatar src={avatar1} className={cn('h-[28px] w-[28px] md:h-[38px] md:w-[38px]', '-ml-4')} />
     </div>
   );
 };

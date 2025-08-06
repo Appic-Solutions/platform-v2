@@ -8,6 +8,7 @@ import { FormattedPosition } from '@/app/positions/types';
 import SetUserWalletBalanceButton from '@/app/positions/create/_components/SetUserWalletBalanceButton';
 import { useEffect, useState } from 'react';
 import AddLiquidityInput from './add-liquidity-input';
+import AvatarGroup from '../../AvatarGroup';
 
 const AddLiquidityStepOne = ({
   position,
@@ -44,44 +45,15 @@ const AddLiquidityStepOne = ({
   return (
     <>
       {/* token names */}
-      <div className={cn('flex items-center justify-between gap-4', 'mb-7 md:mb-3')}>
-        <div
-          className={cn('max-h-[58px] flex-1', 'grid grid-cols-9 md:grid-cols-8', 'md:grid-rows-2')}
-        >
-          <div
-            className={cn(
-              'flex items-center',
-              'col-span-2 sm:col-span-1 md:col-span-2',
-              'max-w-fit',
-              'md:row-span-full',
-            )}
-          >
-            <Avatar
-              src={position.token0.logo}
-              className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
-            />
-            <Avatar
-              // src={token?.logo}
-              src={position.token1.logo}
-              className={cn('h-[31px] w-[31px] md:h-[58px] md:w-[58px]', '-ml-4')}
-            />
-          </div>
-          <div
-            className={cn(
-              'flex items-center',
-              'text-[27px] font-bold md:text-[32px]',
-              'col-span-7 sm:col-span-8 md:col-span-6',
-            )}
-          >
-            {position.token0.symbol}/{position.token1.symbol}
-          </div>
-          <div
-            className={cn(
-              'flex items-center gap-x-1',
-              'text-xs font-medium',
-              'col-span-full md:col-span-6',
-            )}
-          >
+      <div className={cn('flex items-center justify-between gap-4', 'mb-3')}>
+        <div className="flex gap-4">
+          {/* avatars */}
+          <AvatarGroup avatar0={position.token0.logo} avatar1={position.token1.logo} />
+
+          <div>
+            <div className="flex items-center text-xl font-semibold md:text-2xl">
+              {position.token0.symbol}/{position.token1.symbol}
+            </div>
             <p
               className={cn(
                 'flex items-center gap-x-1.5 text-[13px]',
@@ -98,6 +70,7 @@ const AddLiquidityStepOne = ({
             </p>
           </div>
         </div>
+
         <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
           <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
         </SolidCard>
@@ -110,7 +83,7 @@ const AddLiquidityStepOne = ({
         )}
       >
         {/* input0 */}
-        <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-6 lg:px-8">
+        <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-4 lg:px-7">
           <div className="flex h-full w-2/3 flex-col justify-between font-semibold">
             <AddLiquidityInput
               fieldName="token0DepositAmount"
@@ -145,10 +118,10 @@ const AddLiquidityStepOne = ({
       {/* input1 */}
       <div
         className={cn(
-          'group mb-8 rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white',
+          'group mb-3 rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white',
         )}
       >
-        <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-6 lg:px-8">
+        <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-4 lg:px-7">
           <div className="flex h-full w-2/3 flex-col justify-between font-semibold">
             <AddLiquidityInput
               fieldName="token1DepositAmount"
@@ -182,7 +155,7 @@ const AddLiquidityStepOne = ({
       </div>
 
       {/* balance */}
-      <SolidCard className="bg-transparent px-5 lg:bg-[#222222] lg:px-8">
+      <SolidCard className="bg-transparent lg:bg-[#222222]">
         <div className={cn('flex flex-col gap-y-3', 'w-full')}>
           {/* token0 */}
           <div className="flex items-center justify-between gap-4">

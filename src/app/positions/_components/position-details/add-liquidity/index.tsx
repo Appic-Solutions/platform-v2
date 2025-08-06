@@ -87,16 +87,16 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
   return (
     <FormProvider {...addLiquidityForm}>
       <form onSubmit={addLiquidityForm.handleSubmit(submitHandler)} className="h-full w-full">
-        <div className="flex h-full w-full animate-fade flex-col justify-between">
+        <div className="flex h-full w-full animate-fade flex-col">
           {/* Header */}
-          <div className="relative isolate mb-10 flex w-full items-center justify-between gap-4">
+          <div className="relative isolate mb-8 flex w-full items-center justify-between gap-4">
             <ArrowLeftIcon
               onClick={onBack}
               className="z-10 hidden cursor-pointer md:inline-block"
             />
             <h1
               className={cn(
-                'text-[27px] font-bold md:text-[30px]',
+                'text-xl font-bold md:text-2xl',
                 'md:absolute md:inset-x-0 md:text-center',
               )}
             >
@@ -124,21 +124,14 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
           {/* Action Button */}
           <div
             className={cn(
-              'flex h-[50px] items-center justify-center gap-x-3 self-end lg:h-[66px]',
-              'mt-8 w-full',
+              'flex h-[40px] items-center justify-center gap-x-3 self-end lg:h-[52px]',
+              'mt-3 w-full',
             )}
           >
             <button
               onClick={onBack}
               type="button"
-              className={cn(
-                'h-full w-full',
-                'bg-white/35',
-                'text-white',
-                'mt-auto md:mt-0',
-                'select-none rounded-[15px] duration-200',
-                'hover:opacity-85',
-              )}
+              className="mt-auto h-full w-full select-none rounded-[15px] bg-white/35 text-white duration-200 hover:opacity-85 md:mt-0"
             >
               Cancel
             </button>
@@ -148,15 +141,7 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
                 addLiquidityForm.formState.isSubmitting || !addLiquidityForm.formState.isValid
               }
               onClick={onNext}
-              className={cn(
-                'h-full w-full',
-                'bg-primary-buttons',
-                'text-white',
-                'mt-auto md:mt-0',
-                'select-none rounded-[15px] duration-200',
-                'hover:opacity-85',
-                'disabled:opacity-50',
-              )}
+              className="mt-auto h-full w-full select-none rounded-[15px] bg-white/35 text-white duration-200 hover:opacity-85 md:mt-0"
             >
               Continue
             </button>

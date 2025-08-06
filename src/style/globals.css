@@ -6,9 +6,6 @@
 /* Import colors properties */
 @import './colors.css';
 
-/* Import fonts */
-@import './fonts.css';
-
 /* Import scrollbar */
 @import './scrollbar.css';
 

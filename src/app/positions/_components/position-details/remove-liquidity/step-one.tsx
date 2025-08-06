@@ -4,6 +4,7 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import { useEffect, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { FormattedPosition } from '@/app/positions/types';
+import AvatarGroup from '../../AvatarGroup';
 
 interface RemoveLiquidityProps {
   position: FormattedPosition;
@@ -82,22 +83,15 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
   return (
     <>
       {/* Position info */}
-      <div className="mb-7 flex w-full items-center justify-between gap-4 md:mb-6">
-        <div className="grid max-h-[58px] flex-1 grid-cols-9 md:grid-cols-8 md:grid-rows-2">
-          <div className="col-span-2 flex max-w-fit items-center sm:col-span-1 md:col-span-2 md:row-span-full">
-            <Avatar
-              src={position.token0.logo}
-              className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
-            />
-            <Avatar
-              src={position.token1.logo}
-              className="-ml-4 h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
-            />
-          </div>
-          <div className="col-span-7 flex items-center text-[27px] font-bold sm:col-span-8 md:col-span-6 md:text-[32px]">
-            {position.token0.symbol}/{position.token1.symbol}
-          </div>
-          <div className="col-span-full flex items-center gap-x-1 text-xs font-medium md:col-span-6">
+      <div className={cn('flex items-center justify-between gap-4', 'mb-3')}>
+        <div className="flex gap-4">
+          {/* avatars */}
+          <AvatarGroup avatar0={position.token0.logo} avatar1={position.token1.logo} />
+
+          <div>
+            <div className="flex items-center text-xl font-semibold md:text-2xl">
+              {position.token0.symbol}/{position.token1.symbol}
+            </div>
             <p
               className={cn(
                 'flex items-center gap-x-1.5 text-[13px]',
@@ -114,6 +108,7 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
             </p>
           </div>
         </div>
+
         <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
           <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
         </SolidCard>
@@ -121,14 +116,14 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
 
       {/* Input */}
       <div className="group mb-8 w-full rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white">
-        <div className="w-full rounded-[20px] bg-box-background-secondary px-5 py-6 lg:px-8">
-          <p className="mb-3 font-semibold text-white/70 md:text-xl">Withdrawal amount</p>
+        <div className="w-full rounded-[20px] bg-box-background-secondary px-5 py-6">
+          <p className="mb-3 font-semibold text-white/70 md:text-lg">Withdrawal amount</p>
           <div className="flex items-center justify-between">
             <div className="relative flex w-min items-center">
               <input
                 ref={inputRef}
                 type="text"
-                className="percent max-w-[10rem] border-none bg-transparent pr-5 text-[22px] outline-none lg:text-[27px]"
+                className="percent max-w-[10rem] border-none bg-transparent pr-5 text-xl outline-none lg:text-2xl"
                 defaultValue="%"
               />
             </div>
@@ -156,7 +151,7 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
       </div>
 
       {/* balance */}
-      <SolidCard className="mb-8 bg-transparent px-5 lg:bg-[#222222] lg:px-8">
+      <SolidCard className="mb-8 bg-transparent lg:bg-[#222222]">
         <div className={cn('flex flex-col gap-y-3', 'w-full')}>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">

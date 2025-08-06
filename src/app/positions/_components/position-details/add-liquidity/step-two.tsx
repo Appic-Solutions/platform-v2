@@ -25,7 +25,7 @@ export default function AddLiquidityStepTwo({
     Number(position.token1_reserves || 0) + Number(token1DepositAmount || 0);
 
   return (
-    <div className="h-full w-full space-y-4">
+    <div className="h-full w-full space-y-3">
       <SolidCard>
         <div className="flex w-full items-center justify-between">
           <div className="flex h-full w-2/3 flex-col justify-between text-lg font-semibold lg:text-xl">

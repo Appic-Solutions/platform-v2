@@ -87,7 +87,7 @@ const AddLiquidityInput = ({
         <input
           type="text"
           inputMode="decimal"
-          className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+          className="border-none bg-transparent text-xl outline-none lg:text-2xl"
           value={field.value || ''}
           onChange={(e) => {
             const value = limitDecimalPlaces(e.target.value).trim();

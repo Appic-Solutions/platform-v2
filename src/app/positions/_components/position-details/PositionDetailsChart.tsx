@@ -28,9 +28,9 @@ const chartConfig = {
 
 const PositionDetailsChart = () => {
   return (
-    <div className="relative mb-12 w-[85%] sm:w-full">
+    <div className="relative mb-12 w-[85%]">
       <div className="absolute bottom-0 left-0 right-0 h-1/2 w-full bg-gradient-to-t from-[#11326f41] to-[#205fd500]"></div>
-      <ChartContainer className="h-full min-h-[370px] w-full blur-sm" config={chartConfig}>
+      <ChartContainer className="h-full min-h-[300px] w-full blur-sm" config={chartConfig}>
         <LineChart
           className="chart-background position-detail-chart"
           accessibilityLayer

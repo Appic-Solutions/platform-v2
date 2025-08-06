@@ -4,9 +4,9 @@ import { PlusIcon, PoolIcon } from '@/components/icons';
 import PositionCard from '../_components/PositionCard';
 import Spinner from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
-import { FormattedPosition } from '../page';
 import Image from 'next/image';
 import Box from '@/components/ui/box';
+import { FormattedPosition } from '../types';
 
 interface YourPositionsProps {
   formattedPositions: FormattedPosition[] | undefined;
@@ -40,22 +40,19 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
   return (
     <Box
       className={cn(
-        'text-white transition-all md:p-12 lg:overflow-visible lg:text-black lg:dark:text-white',
-        'h-max',
-        'lg:max-h-[716px] lg:w-[611px]',
-        'md:p-12',
+        'h-max text-white transition-all lg:max-h-[570px] lg:w-[490px] lg:text-black lg:dark:text-white',
       )}
     >
       <div className="w-full animate-fade">
         {/* Header */}
         <div className={cn('mb-8 flex items-center justify-between gap-4', 'w-full')}>
-          <h1 className="text-[27px] font-bold md:text-[30px]">Your positions</h1>
+          <h1 className="text-2xl font-semibold md:text-3xl">Your positions</h1>
           <Link
             href="/positions/create"
             className={cn(
-              'flex items-center justify-center',
+              'flex items-center justify-center font-semibold',
               'text-[13px] font-medium md:text-[15px]',
-              'rounded-[10px] p-2.5',
+              'rounded-lg p-2.5',
               'bg-primary-buttons',
             )}
           >
@@ -64,14 +61,13 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
           </Link>
         </div>
 
-        {/* Main */}
         <div
           className={cn(
             'relative isolate',
             'flex w-full flex-col gap-2.5',
-            'mb-8 px-6 py-5 md:p-8',
+            'mb-8 p-4 md:p-6',
             'bg-gradient-to-b from-[#1D55BF]/30 to-[#000000]/30',
-            'rounded-[20px] md:rounded-[30px]',
+            'rounded-2xl md:rounded-3xl',
             'border border-[#4982EF]/40',
           )}
         >
@@ -86,10 +82,10 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
 
         <div
           className={cn(
-            'flex h-full w-full flex-col gap-3',
+            'flex h-full w-full flex-1 flex-col gap-3',
             'pt-3',
             'border-t border-white/20',
-            'overflow-y-auto lg:max-h-96',
+            'max-h-[290px] overflow-y-auto',
           )}
         >
           {formattedPositions?.length ? (

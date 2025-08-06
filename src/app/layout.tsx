@@ -11,9 +11,25 @@ import ThemeSwitch from './_layout/theme-switch';
 import { cn } from '@/lib/utils';
 import NavbarPage from './_layout/navbar';
 
+import { Lora, Rethink_Sans } from 'next/font/google';
+
+const lora = Lora({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-lora',
+});
+
+const rethinkSans = Rethink_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-rethink-sans',
+});
+
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <html lang="en" className="dark relative bg-[#060607] md:h-full">
+    <html lang="en" className={cn('dark relative bg-[#060607] md:h-full', rethinkSans.className)}>
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />

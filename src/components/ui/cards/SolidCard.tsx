@@ -15,10 +15,10 @@ const SolidCard = ({
       className={cn(
         'w-full bg-[#222222]',
         size === 'sm'
-          ? 'rounded-[6px] px-1.5 py-px'
+          ? 'rounded-lg px-1.5 py-px'
           : size === 'md'
-            ? 'rounded-[16px] px-5 py-4'
-            : 'rounded-[21px] px-6 py-5',
+            ? 'rounded-xl px-4 py-3'
+            : 'rounded-2xl px-5 py-4',
         className,
       )}
     >

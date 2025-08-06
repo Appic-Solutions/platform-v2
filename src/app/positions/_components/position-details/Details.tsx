@@ -6,6 +6,7 @@ import React from 'react';
 import PositionDetailsChart from './PositionDetailsChart';
 import { FeesPercentage, PositionPercentage, Step } from '../../types';
 import BigNumber from 'bignumber.js';
+import AvatarGroup from '../AvatarGroup';
 
 interface DetailsProps {
   position: any;
@@ -23,39 +24,28 @@ const Details = ({
   setCurrentStep,
 }: DetailsProps) => {
   return (
-    <div className="flex w-full animate-fade flex-col gap-8 overflow-hidden lg:flex-row lg:gap-12">
+    <div className="flex w-full animate-fade flex-col gap-6 overflow-hidden lg:flex-row">
       {/* Left */}
-      <div className="flex h-full w-full flex-col lg:w-[55%] lg:gap-6">
+      <div className="flex h-full w-full flex-col lg:w-[55%] lg:gap-5">
         <button
           onClick={onBackClick}
           className={cn(
-            'mb-4 flex items-center justify-center gap-x-1 self-start md:mb-0',
+            'mb-2 flex items-center justify-center gap-x-1 self-start md:mb-0',
             'font-semibold',
           )}
         >
-          <ExpandLeftIcon width={18} height={18} />
+          <ExpandLeftIcon width={16} height={16} />
           Back
         </button>
         {/* Header */}
         <div className="flex w-full items-center">
           <div className="mb-4 flex w-full items-center justify-between gap-2 lg:gap-4">
             <div className="flex items-center gap-4">
-              <div className="relative flex">
-                <Avatar
-                  src={position.token0.logo || '/images/logo/icp-logo.svg'}
-                  className="h-[34px] w-[34px] md:h-[46px] md:w-[46px]"
-                />
-                <Avatar
-                  src={position.token1.logo || '/images/logo/icp-logo.svg'}
-                  className={cn('h-[34px] w-[34px] md:h-[46px] md:w-[46px]', '-ml-4')}
-                />
-              </div>
-              <h3 className="text-[27px] font-bold lg:text-[40px]">{`${position.token0.symbol}/${position.token1.symbol}`}</h3>
+              <AvatarGroup avatar0={position.token0.logo} avatar1={position.token1.logo} />
+              <h3 className="text-2xl font-semibold lg:text-3xl">{`${position.token0.symbol}/${position.token1.symbol}`}</h3>
             </div>
             <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-              <span className="text-xs leading-5 text-white/60">
-                {position.fees_token1_owed_usd}
-              </span>
+              <span className="text-xs text-white/60">{position.fees_token1_owed_usd}</span>
             </SolidCard>
           </div>
         </div>
@@ -71,12 +61,12 @@ const Details = ({
         </div>
       </div>
       {/* Right */}
-      <div className="flex h-full w-full select-none flex-col gap-10 text-white md:flex-col-reverse lg:ml-4 lg:w-[45%]">
+      <div className="flex h-full w-full select-none flex-col gap-4 text-white md:flex-col-reverse lg:ml-4 lg:w-[45%]">
         {/* Boxes */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           <SolidCard size="lg" className="w-full bg-[#FFFFFF1A]">
             <h3 className="mb-1 text-sm text-[#898989]">Position</h3>
-            <div className="mb-2.5 text-[22px] font-bold">${position.total_reserves_usd}</div>
+            <div className="mb-2 text-xl font-semibold">${position.total_reserves_usd}</div>
             <div>
               <div className="flex w-full items-center justify-between text-base text-[#FFFFFFCF]">
                 <span>
@@ -86,7 +76,7 @@ const Details = ({
                   {BigNumber(position.token1_reserves).toFixed(6)} {position.token1.symbol}
                 </span>
               </div>
-              <div className="mb-4 flex h-[10px] w-full overflow-hidden rounded-full">
+              <div className="mb-2 flex h-[10px] w-full overflow-hidden rounded-full">
                 {positionPercentage.token0Percent || positionPercentage.token1Percent ? (
                   <>
                     <div
@@ -107,7 +97,7 @@ const Details = ({
                 )}
               </div>
             </div>
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="relative w-max">
                   <Avatar
@@ -115,13 +105,13 @@ const Details = ({
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
                 </div>
-                <p className="font-bold">${position.token0_reserves_usd}</p>
+                <p className="font-semibold">${position.token0_reserves_usd}</p>
               </div>
               <p className="text-sm font-medium text-[#FFFFFFCF]">
                 {position.token0_reserves} {position.token0.symbol}
               </p>
             </div>
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="relative w-max">
                   <Avatar
@@ -129,7 +119,7 @@ const Details = ({
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
                 </div>
-                <p className="font-bold">${position.token1_reserves_usd}</p>
+                <p className="font-semibold">${position.token1_reserves_usd}</p>
               </div>
               <p className="text-sm font-medium text-[#FFFFFFCF]">
                 {position.token1_reserves} {position.token1.symbol}
@@ -138,7 +128,7 @@ const Details = ({
           </SolidCard>
           <SolidCard size="lg" className="w-full bg-[#FFFFFF1A]">
             <h3 className="mb-1 text-sm text-[#898989]">Fees earned</h3>
-            <div className="mb-2.5 text-[22px] font-bold">${position.total_fees_owed_usd}</div>
+            <div className="mb-2 text-xl font-semibold">${position.total_fees_owed_usd}</div>
             <div>
               <div className="flex w-full items-center justify-between text-base text-[#FFFFFFCF]">
                 <span>
@@ -148,7 +138,7 @@ const Details = ({
                   {parseFloat(position.fees_token1_owed).toFixed(6)} {position.token1.symbol}
                 </span>
               </div>
-              <div className="mb-4 flex h-[10px] w-full overflow-hidden rounded-full">
+              <div className="mb-2 flex h-[10px] w-full overflow-hidden rounded-full">
                 {feesPercentage.token0Percent || feesPercentage.token1Percent ? (
                   <>
                     <div
@@ -169,7 +159,7 @@ const Details = ({
                 )}
               </div>
             </div>
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="relative w-max">
                   <Avatar
@@ -177,13 +167,13 @@ const Details = ({
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
                 </div>
-                <p className="font-bold">${position.fees_token0_owed_usd}</p>
+                <p className="font-semibold">${position.fees_token0_owed_usd}</p>
               </div>
               <p className="text-sm font-medium text-[#FFFFFFCF]">
                 {position.fees_token0_owed} {position.token0.symbol}
               </p>
             </div>
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="relative w-max">
                   <Avatar
@@ -191,7 +181,7 @@ const Details = ({
                     className="h-[25px] w-[25px] md:h-[30px] md:w-[30px]"
                   />
                 </div>
-                <p className="font-bold">${position.fees_token1_owed_usd}</p>
+                <p className="font-semibold">${position.fees_token1_owed_usd}</p>
               </div>
               <p className="text-sm font-medium text-[#FFFFFFCF]">
                 {position.fees_token1_owed} {position.token1.symbol}
@@ -200,7 +190,7 @@ const Details = ({
           </SolidCard>
         </div>
         {/* Buttons */}
-        <div className="flex w-full justify-between gap-1 text-sm lg:gap-4 lg:text-[15px]">
+        <div className="flex w-full justify-between gap-1 text-xs lg:gap-4 lg:text-sm">
           <button
             className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('addLiquidity')}
