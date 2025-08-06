@@ -43,11 +43,11 @@ const PositionDetails = ({ position, onBackClick }: PositionDetailsProps) => {
   return (
     <Box
       className={cn(
-        'text-white transition-all md:p-8 lg:overflow-auto lg:text-black lg:dark:text-white',
+        'text-white transition-all md:overflow-auto md:p-8 md:text-black md:dark:text-white',
         'h-max',
         currentStep === 'positionDetail'
-          ? 'lg:h-[580px] lg:w-[965px]'
-          : 'lg:max-h-[570px] lg:w-[490px]',
+          ? 'md:h-[580px] md:w-[965px]'
+          : 'md:max-h-[570px] md:w-[490px]',
       )}
     >
       {currentStep === 'addLiquidity' ? (

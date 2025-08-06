@@ -1,5 +1,3 @@
-import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
-import { Avatar } from '@/components/common/ui/avatar';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
 import React from 'react';

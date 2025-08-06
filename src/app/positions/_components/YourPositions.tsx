@@ -40,7 +40,7 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
   return (
     <Box
       className={cn(
-        'h-max text-white transition-all lg:max-h-[570px] lg:w-[490px] lg:text-black lg:dark:text-white',
+        'h-max text-white transition-all md:max-h-[570px] md:w-[490px] md:text-black md:dark:text-white',
       )}
     >
       <div className="w-full animate-fade">

@@ -65,16 +65,16 @@ export default function CreatePositionStepOne() {
       );
     default:
       return (
-        <div className="flex h-full w-full animate-fade flex-col gap-y-4">
+        <div className="flex h-full w-full animate-fade flex-col gap-y-3">
           {/* Header */}
           <div className="flex w-full items-center justify-between gap-4">
-            <h1 className="text-[27px] font-bold md:text-[39px]">New position</h1>
+            <h1 className="text-2xl font-semibold md:text-3xl">New position</h1>
             <button
               type="button"
               className={cn(
                 'flex items-center justify-center gap-x-0.5',
-                'px-3.5 py-2.5',
-                'rounded-lg',
+                'px-3 py-2',
+                'rounded-md',
                 'bg-[#565656]',
                 'text-sm font-medium text-white',
               )}
@@ -87,13 +87,13 @@ export default function CreatePositionStepOne() {
 
           {/* Main */}
           <div className="flex w-full flex-col gap-y-1 max-md:-mb-4">
-            <p className="text-xl font-bold md:text-2xl">Select pair</p>
-            <p className="max-w-[424px] text-[13px] md:text-[15px]">
+            <p className="text-lg font-semibold md:text-xl">Select pair</p>
+            <p className="w-full text-xs font-medium leading-none text-muted md:text-sm">
               Choose the tokens you want to provide liquidity for. You can select tokens on all
               supported networks.
             </p>
           </div>
-          {/* First Token Selection */}
+          {/* token selection */}
           <div className="flex w-full flex-col gap-2 md:gap-3">
             <div
               className={cn(
@@ -112,19 +112,19 @@ export default function CreatePositionStepOne() {
               }}
             >
               <div className="relative">
-                <Avatar src={Token0?.logo} className="h-9 w-9 md:h-[53px] md:w-[53px]" />
+                <Avatar src={Token0?.logo} className="h-7 w-7 md:h-10 md:w-10" />
                 <Avatar
                   src={getChainLogo(Token0?.chainId)}
                   className={cn(
                     'absolute -bottom-1 -right-1',
-                    'h-3.5 w-3.5 md:h-[22px] md:w-[22px]',
+                    'h-3.5 w-3.5 md:h-4 md:w-4',
                     'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
                   )}
                 />
               </div>
               <p
                 className={cn(
-                  'text-nowrap',
+                  'text-nowrap text-lg md:text-xl',
                   Token0?.symbol.length && Token0?.symbol.length > 7 && 'w-28 text-ellipsis',
                 )}
               >
@@ -149,19 +149,19 @@ export default function CreatePositionStepOne() {
               }}
             >
               <div className="relative">
-                <Avatar src={Token1?.logo} className="h-9 w-9 md:h-[53px] md:w-[53px]" />
+                <Avatar src={Token1?.logo} className="h-7 w-7 md:h-10 md:w-10" />
                 <Avatar
                   src={getChainLogo(Token1?.chainId)}
                   className={cn(
                     'absolute -bottom-1 -right-1',
-                    'h-3.5 w-3.5 md:h-[22px] md:w-[22px]',
+                    'h-3.5 w-3.5 md:h-4 md:w-4',
                     'shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]',
                   )}
                 />
               </div>
               <p
                 className={cn(
-                  'text-nowrap',
+                  'text-nowrap text-lg md:text-xl',
                   Token1?.symbol.length && Token1?.symbol.length > 7 && 'w-28 text-ellipsis',
                 )}
               >
@@ -169,47 +169,33 @@ export default function CreatePositionStepOne() {
               </p>
             </div>
           </div>
-          {/* Second Token Selection */}
-          <div className="flex w-full flex-col gap-y-1">
-            <p className="text-xl font-bold md:text-2xl">Fee tier</p>
-            <p className="max-w-[424px] text-[13px] md:text-[15px]">
+
+          <div className="flex w-full flex-col">
+            <p className="text-lg font-bold md:text-xl">Fee tier</p>
+            <p className="max-w-[424px] text-xs leading-none text-muted md:text-sm">
               The amount earned providing liquidity. Choose an amount that suits your risk tolerance
               and strategy.
             </p>
           </div>
           {/* Fee Tier Box */}
-          <div
-            className={cn(
-              'flex items-center justify-between gap-4',
-              'w-full',
-              'bg-[#222222]/40',
-              'p-[18px] py-[17px]',
-              'rounded-[10px]',
-            )}
-          >
-            <div className="flex flex-col gap-1">
+          <div className="flex w-full items-center justify-between gap-4 rounded-[10px] bg-[#22222261] px-4 py-2">
+            <div className="">
               <div className="flex items-center gap-x-2.5 md:gap-x-3.5">
-                <span className="text-lg font-bold">{Number(Fee) / 10000}% fee tier</span>
+                <span className="text-base font-bold">{Number(Fee) / 10000}% fee tier</span>
                 {selectedFeeTier &&
                   Number(selectedFeeTier.tvl) > 0 &&
                   isSelectedHighestTvl(selectedFeeTier.tvl) && (
-                    <span
-                      className={cn(
-                        'text-[10px] font-medium text-[#7DABFF]',
-                        'bg-[#2060D5]/30',
-                        'rounded-full p-1',
-                      )}
-                    >
+                    <span className="rounded-full bg-[#2060D5]/30 text-[9px] font-medium text-[#7DABFF]">
                       HighestTVL
                     </span>
                   )}
               </div>
-              <p className="text-sm text-white/60">The % you will earn in fees</p>
+              <p className="text-xs text-muted">The % you will earn in fees</p>
             </div>
             <button
               className={cn(
                 'flex items-center justify-center gap-x-0.5',
-                'px-4 py-2.5',
+                'px-4 py-2',
                 'rounded-lg',
                 'bg-[#565656]',
                 'text-sm font-medium text-white',
