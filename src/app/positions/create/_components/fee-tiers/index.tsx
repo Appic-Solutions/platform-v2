@@ -11,22 +11,19 @@ export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler 
     name: 'fee',
   });
 
-  console.log('Fee =========>', Fee);
   return (
-    <div className="flex h-full w-full animate-fade flex-col gap-10">
+    <div className="flex h-full w-full animate-fade flex-col gap-6 overflow-y-auto">
       {/* Header */}
       <div
         className="relative isolate flex w-full items-center justify-between gap-4"
         onClick={stateBackHandler}
       >
         <ArrowLeftIcon className="z-10 cursor-pointer" />
-        <h1 className="absolute inset-x-0 text-center text-[27px] font-bold md:text-[30px]">
-          Fee tiers
-        </h1>
+        <h1 className="absolute inset-x-0 text-center text-2xl font-bold md:text-3xl">Fee tiers</h1>
       </div>
 
       {/* Main */}
-      <div className="flex h-full w-full flex-col gap-3 overflow-y-auto *:w-full">
+      <div className="flex h-full w-full flex-col gap-3 overflow-y-auto px-2 *:w-full">
         {feeTiers.map((tier, idx) => (
           <div
             key={idx}
@@ -40,8 +37,6 @@ export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler 
               'border-2 border-[#4C4C4C]/30',
             )}
             onClick={() => {
-              console.log('selecting fee tier', tier);
-              console.log('selecting fee tier to number', Number(tier.fee));
               selectFeeHandler(Number(tier.fee));
               stateBackHandler();
             }}
@@ -66,7 +61,7 @@ export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler 
               )} */}
               {Number(tier.fee) === Fee && <VerifiedIcon width={32} height={32} />}
             </div>
-            <div className="mb-6 text-[17px] text-[#898989] md:mb-8 md:text-xl">{tier.desc}</div>
+            <div className="mb-6 text-lg text-[#898989] md:mb-4">{tier.desc}</div>
             <div className="flex items-center justify-between gap-4 text-white md:text-xl">
               <span>${Number(tier.tvl).toFixed(2)} TVL</span>
               {/* <span>0% select</span> */}

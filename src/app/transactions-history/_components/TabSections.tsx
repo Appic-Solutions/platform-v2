@@ -54,7 +54,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
 
       <TabsContent value="bridge" asChild>
         {evmBalance || icpBalance ? (
-          <div className="flex flex-col items-center justify-center gap-y-6 md:px-4">
+          <div className="flex flex-col items-center justify-center gap-y-6 md:px-2">
             <BridgeContent />
           </div>
         ) : (
@@ -66,7 +66,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
       </TabsContent>
       <TabsContent value="advanced" asChild>
         {icpBalance ? (
-          <div className="flex flex-col items-center justify-center gap-y-6 px-4">
+          <div className="flex flex-col items-center justify-center gap-y-6 px-2">
             <AdvancedContent />
           </div>
         ) : (

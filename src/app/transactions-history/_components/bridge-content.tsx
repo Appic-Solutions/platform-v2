@@ -75,7 +75,7 @@ export default function BridgeContent() {
         className={cn(
           'flex w-full flex-col bg-input-fields bg-cover bg-center bg-no-repeat shadow-md',
           'rounded-2xl p-5 backdrop-blur-[30px] duration-200 hover:bg-black/75',
-          'md:rounded-[36px] md:px-10',
+          'md:rounded-[36px] md:p-6',
         )}
       >
         {/* Date & Time */}
@@ -88,15 +88,12 @@ export default function BridgeContent() {
           <p>{item.date}</p>
           <p>{item.time}</p>
         </div>
-        <div className="my-5 flex w-full items-center justify-between *:relative">
+        <div className="my-4 flex w-full items-center justify-between *:relative">
           <div>
-            <Avatar
-              src={item.from_token.logo}
-              className="h-[58px] w-[58px] md:h-[72px] md:w-[72px]"
-            />
+            <Avatar src={item.from_token.logo} className="h-12 w-12" />
             <Avatar
               src={getChainLogo(item.from_token.chainId)}
-              className="absolute -bottom-1 -right-1 h-6 w-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+              className="absolute -bottom-1 -right-1 h-5 w-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
           <div className="flex w-full items-center justify-center">
@@ -108,7 +105,7 @@ export default function BridgeContent() {
             />
             <div
               className={cn(
-                'relative z-10 rounded-full p-3',
+                'relative z-10 rounded-full p-2.5',
                 'bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
                 item.status === 'Failed'
                   ? 'border-2 border-solid border-red-500'
@@ -128,22 +125,19 @@ export default function BridgeContent() {
             />
           </div>
           <div>
-            <Avatar
-              src={item.to_token.logo}
-              className="h-[58px] w-[58px] md:h-[72px] md:w-[72px]"
-            />
+            <Avatar src={item.to_token.logo} className="h-12 w-12" />
             <Avatar
               src={getChainLogo(item.to_token.chainId)}
-              className="absolute -bottom-1 -right-1 h-6 w-6 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
+              className="absolute -bottom-1 -right-1 h-5 w-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
             />
           </div>
         </div>
         {/* Transaction Details */}
-        <div className="mb-5 flex flex-col gap-y-4">
+        <div className="mb-4 flex flex-col gap-y-4">
           <div
             className={cn(
               'flex items-center justify-between gap-x-4 text-xs font-bold',
-              'max-md:text-[#898989] md:text-sm md:text-[#333333] md:dark:text-[#898989]',
+              'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
               '*:flex *:flex-1 *:flex-col *:justify-center',
             )}
           >
@@ -151,7 +145,7 @@ export default function BridgeContent() {
               <p>
                 {item.from_token.symbol} on {getChainName(item.from_token.chainId)}
               </p>
-              <p className="text-2xl leading-7 max-md:text-white md:text-[#333333] md:dark:text-white">
+              <p className="text-xl leading-7 max-md:text-white md:text-[#333333] md:dark:text-white">
                 {item.human_readable_base_value
                   ? formatToSignificantFigures(item.human_readable_base_value)
                   : 'Calculating'}
@@ -168,7 +162,7 @@ export default function BridgeContent() {
               <p>
                 {item.to_token.symbol} on {getChainName(item.to_token.chainId)}
               </p>
-              <p className="text-2xl leading-7 max-md:text-white md:text-[#333333] md:dark:text-white">
+              <p className="text-xl leading-7 max-md:text-white md:text-[#333333] md:dark:text-white">
                 {item.human_readable_final_value
                   ? formatToSignificantFigures(item.human_readable_final_value)
                   : 'Calculating'}
@@ -179,7 +173,7 @@ export default function BridgeContent() {
         {/* Status */}
         <div
           className={cn(
-            'flex flex-col gap-y-6 duration-300',
+            'flex flex-col gap-y-4 duration-300',
             itemId === idx
               ? 'mb-8 translate-y-0 opacity-100'
               : 'h-0 -translate-y-2 overflow-hidden opacity-0',
@@ -198,26 +192,26 @@ export default function BridgeContent() {
             </span>
           </div>
           {/* Transaction Steps */}
-          <div className="flex flex-col gap-y-6">
+          <div className="flex flex-col gap-y-4">
             {item.bridge_steps.map((step, idx) => (
               <div
                 key={idx}
                 className={cn(
-                  'group flex items-center justify-between gap-x-4',
+                  'group flex items-center justify-between gap-x-4 h-9',
                   'text-sm font-semibold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]',
                 )}
               >
                 <div className="flex items-center gap-x-9">
                   <div
                     className={cn(
-                      'relative flex h-11 w-11 items-center justify-center rounded-full',
+                      'relative flex h-9 w-9 items-center justify-center rounded-full',
                       step.status === 'Pending'
                         ? 'bg-blue-600/35'
                         : step.status === 'Successful'
                           ? 'bg-[#12B76A33] text-[#12b76a]'
                           : 'bg-[#FF0000]/35 text-[#FF0000]',
                       idx < item.bridge_steps.length - 1 &&
-                        'after:absolute after:top-full after:h-[26px] after:w-[2px] after:bg-[#12B76A33]',
+                        'after:absolute after:top-full after:h-[16px] after:w-[2px] after:bg-[#12B76A33]',
                     )}
                   >
                     {step.status === 'Pending' ? (

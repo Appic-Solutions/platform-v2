@@ -21,7 +21,7 @@ export default function PoolCreatePage() {
         <Box
           className={cn(
             'text-white transition-all lg:overflow-visible lg:text-black lg:dark:text-white',
-            step === 1 ? 'md:h-[580px] md:w-[965px]' : 'md:max-h-[570px] md:w-[490px]',
+            step === 1 ? 'md:w-[1156px]' : 'md:w-[533px]',
           )}
         >
           {step < 2 && <StepNavigator />}

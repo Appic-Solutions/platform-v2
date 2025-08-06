@@ -65,7 +65,7 @@ export default function CreatePositionStepOne() {
       );
     default:
       return (
-        <div className="flex h-full w-full animate-fade flex-col gap-y-3">
+        <div className="flex h-full w-full animate-fade flex-col gap-y-6">
           {/* Header */}
           <div className="flex w-full items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold md:text-3xl">New position</h1>
@@ -99,7 +99,7 @@ export default function CreatePositionStepOne() {
               className={cn(
                 'group relative cursor-pointer overflow-clip',
                 'flex items-center gap-x-3.5',
-                'text-[22px] font-bold text-black dark:text-white md:text-2xl',
+                'text-xl font-bold text-black dark:text-white md:text-2xl',
                 'rounded-[20px] border-2 border-[#4C4C4C]/60',
                 'w-full',
                 'p-5 md:px-8 md:py-4',
@@ -112,7 +112,7 @@ export default function CreatePositionStepOne() {
               }}
             >
               <div className="relative">
-                <Avatar src={Token0?.logo} className="h-7 w-7 md:h-10 md:w-10" />
+                <Avatar src={Token0?.logo} className="h-7 w-7 md:h-12 md:w-12" />
                 <Avatar
                   src={getChainLogo(Token0?.chainId)}
                   className={cn(
@@ -136,7 +136,7 @@ export default function CreatePositionStepOne() {
               className={cn(
                 'group relative cursor-pointer overflow-clip',
                 'flex items-center gap-x-3.5',
-                'text-[22px] font-bold text-black dark:text-white md:text-2xl',
+                'text-xl font-bold text-black dark:text-white md:text-2xl',
                 'rounded-[20px] border-2 border-[#4C4C4C]/60',
                 'w-full',
                 'p-5 md:px-8 md:py-4',
@@ -149,7 +149,7 @@ export default function CreatePositionStepOne() {
               }}
             >
               <div className="relative">
-                <Avatar src={Token1?.logo} className="h-7 w-7 md:h-10 md:w-10" />
+                <Avatar src={Token1?.logo} className="h-7 w-7 md:h-12 md:w-12" />
                 <Avatar
                   src={getChainLogo(Token1?.chainId)}
                   className={cn(
@@ -212,11 +212,11 @@ export default function CreatePositionStepOne() {
           <button
             type="button"
             className={cn(
-              'min-h-14 w-full',
+              'min-h-12 w-full',
               'cursor-pointer bg-primary-buttons',
               'text-white',
               'mt-auto md:mt-0',
-              'select-none rounded-[16px] duration-200',
+              'select-none rounded-xl duration-200',
               'hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50',
             )}
             onClick={stepNextHandler}

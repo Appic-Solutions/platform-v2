@@ -47,7 +47,7 @@ export default function TokenListPage({
   };
 
   return (
-    <div className="flex h-full w-full animate-fade flex-col gap-y-4">
+    <div className="flex h-full w-full animate-fade flex-col gap-y-4 overflow-y-auto">
       <BoxHeader title="Select Token" onBack={stateBackHandler} />
 
       <RHFInput

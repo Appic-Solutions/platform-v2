@@ -41,18 +41,18 @@ const PriceRangeInputs = () => {
         {/* min price */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-40 lg:w-[210px]',
             isDisabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
-            <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Min price</p>
+            <p className="text-base text-[#FFFFFFB8] lg:text-xl">Min price</p>
 
             <div className="flex flex-col gap-2">
               <input
                 disabled={isDisabled}
                 type="text"
-                className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                className="border-none bg-transparent text-xl outline-none lg:text-2xl"
                 value={minPrice === 'min' ? '0' : minPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
@@ -78,17 +78,17 @@ const PriceRangeInputs = () => {
         {/* max price */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-40 lg:w-[210px]',
             isDisabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
-            <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Max price</p>
+            <p className="text-base text-[#FFFFFFB8] lg:text-xl">Max price</p>
             <div className="flex flex-col gap-2">
               <input
                 disabled={isDisabled}
                 type="text"
-                className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                className="border-none bg-transparent text-xl outline-none lg:text-2xl"
                 value={maxPrice === 'max' ? '\u221E' : maxPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))

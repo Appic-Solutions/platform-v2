@@ -29,11 +29,11 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
   );
 
   return (
-    <Box className="h-full justify-between gap-y-5 md:h-auto md:max-w-[612px]">
+    <Box className="h-full justify-between gap-y-5 md:h-auto md:max-w-[533px]">
       {/* Header */}
       <div
         className={cn(
-          'relative flex items-center justify-center',
+          'relative flex w-full items-center justify-center',
           'text-2xl font-bold text-white dark:text-white md:text-3xl md:text-black',
         )}
       >
@@ -63,7 +63,7 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         </div>
       </div>
 
-      <div className="flex w-full flex-col gap-y-3 rounded-lg bg-white/10 p-6 text-white dark:text-white md:text-black">
+      <div className="flex w-full flex-col gap-y-3 rounded-xl bg-white/10 p-6 text-white dark:text-white md:text-black">
         {Step2Data(newTwinMeta).map((item, idx) => (
           <div
             key={idx}
@@ -91,7 +91,7 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         type="submit"
         disabled={!isWalletConnected || !hasSufficientBalance || isLoading}
         className={cn(
-          'min-h-11 w-full rounded-lg bg-primary-buttons text-white duration-200',
+          'min-h-12 w-full rounded-xl bg-primary-buttons text-white duration-200',
           'hover:opacity-85 disabled:pointer-events-none disabled:opacity-50',
         )}
       >

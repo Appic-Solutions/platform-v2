@@ -25,7 +25,7 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
       {/* Header */}
       <div className="relative isolate mb-10 flex w-full items-center justify-between gap-4">
         <ArrowLeftIcon onClick={onBack} className="z-10 hidden cursor-pointer md:inline-block" />
-        <h1 className="text-[27px] font-bold md:absolute md:inset-x-0 md:text-center md:text-[30px]">
+        <h1 className="text-2xl font-bold md:absolute md:inset-x-0 md:text-center md:text-3xl">
           Remove liquidity
         </h1>
         <button

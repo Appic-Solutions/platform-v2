@@ -192,19 +192,19 @@ const Details = ({
         {/* Buttons */}
         <div className="flex w-full justify-between gap-1 text-xs lg:gap-4 lg:text-sm">
           <button
-            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
+            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-lg bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('addLiquidity')}
           >
             <span>Add liquidity</span>
           </button>
           <button
-            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
+            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-lg bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('removeLiquidity')}
           >
             <span>Remove liquidity</span>
           </button>
           <button
-            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-[10px] bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
+            className="flex w-full items-center justify-center gap-2 text-nowrap rounded-lg bg-primary-buttons p-2.5 font-normal leading-3 text-white hover:bg-primary-buttons-hover md:leading-5"
             onClick={() => setCurrentStep('collectFees')}
           >
             <span>Collect fees</span>

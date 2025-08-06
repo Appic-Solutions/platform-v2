@@ -57,7 +57,7 @@ export default function ReviewPositionPage() {
             <InfoCircleIcon />
             Create new pool
           </div>
-          <p className="text-sm text-white/70 md:text-[15px]">
+          <p className="text-sm text-white/70 md:text-sm">
             Choose the tokens you want to provide liquidity for. You can select tokens on all
             supported networks.. Choose the tokens you want to provide liquidity for. You can select
             tokens on all supported networks.
@@ -65,7 +65,7 @@ export default function ReviewPositionPage() {
         </div>
         <div>
           <p className="mb-1.5 text-xl md:text-2xl">Set initial price</p>
-          <p className="mb-2.5 max-w-[528px] text-[13px] md:mb-[18px] md:text-[15px]">
+          <p className="mb-2.5 max-w-[528px] text-[13px] md:mb-[18px] md:text-sm">
             Choose the tokens you want to provide liquidity for. You can select tokens on all
             supported networks.
           </p>
@@ -111,7 +111,7 @@ export default function ReviewPositionPage() {
               </div>
             </div>
             <div className="font-semibold">
-              <p className="text-[22px] md:text-[27px]">1234.55</p>
+              <p className="text-xl md:text-2xl">1234.55</p>
               <p className="text-xs text-white/50 md:text-sm">1 USDC = 1 ETH</p>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function ReviewPositionPage() {
             >
               <p className="mb-10 text-white/70 md:text-[21px]">Min price</p>
               <div className="font-semibold">
-                <p className="text-[22px] md:text-[27px]">1234.55</p>
+                <p className="text-xl md:text-2xl">1234.55</p>
                 <p className="text-xs text-white/50 md:text-sm">USDC = 1 ETH</p>
               </div>
             </div>
@@ -162,7 +162,7 @@ export default function ReviewPositionPage() {
             >
               <p className="mb-10 text-white/70 md:text-[21px]">Max price</p>
               <div className="font-semibold">
-                <p className="text-[22px] md:text-[27px]">1234.55</p>
+                <p className="text-xl md:text-2xl">1234.55</p>
                 <p className="text-xs text-white/50 md:text-sm">USDC = 1 ETH</p>
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function ReviewPositionPage() {
         </div>
         <div className="mb-10 md:mb-[34px]">
           <p className="mb-2 text-xl md:mb-2.5 md:text-2xl">Deposit tokens</p>
-          <p className="mb-3 text-sm text-white/70 md:mb-5 md:text-[15px]">
+          <p className="mb-3 text-sm text-white/70 md:mb-5 md:text-sm">
             The amount earned providing liquidity. Choose an amount that suits your risk tolerance
             and strategy.
           </p>
@@ -195,7 +195,7 @@ export default function ReviewPositionPage() {
                 USDC
               </div>
               <div className="font-semibold">
-                <p className="text-[22px] md:text-[27px]">1234.55</p>
+                <p className="text-xl md:text-2xl">1234.55</p>
                 <p className="text-xs text-white/50 md:text-sm">USDC = 1 ETH</p>
               </div>
             </div>
@@ -219,7 +219,7 @@ export default function ReviewPositionPage() {
                 USDC
               </div>
               <div className="font-semibold">
-                <p className="text-[22px] md:text-[27px]">1234.55</p>
+                <p className="text-xl md:text-2xl">1234.55</p>
                 <p className="text-xs text-white/50 md:text-sm">USDC = 1 ETH</p>
               </div>
             </div>

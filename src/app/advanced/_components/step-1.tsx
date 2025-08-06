@@ -16,7 +16,7 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
     return <TokenListPage prevStepHandler={() => setSelectTokenBox(false)} />;
   } else {
     return (
-      <Box className="flex h-full flex-col justify-normal gap-y-6 md:h-fit md:max-w-[617px]">
+      <Box className="flex h-full flex-col justify-normal gap-y-6 md:h-fit md:max-w-[533px]">
         {/* Header */}
         <div className="flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
           <div className="flex items-center gap-3.5 self-start text-2xl font-bold md:text-3xl">
@@ -37,7 +37,7 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
               onClick={() => setSelectTokenBox(true)}
               className={cn(
                 'flex h-[42px] w-full items-center text-white dark:text-white md:text-black',
-                'rounded-lg bg-white/50 px-3.5 py-2.5 text-[#0A0A0B] dark:bg-white/60 dark:text-[#333333]',
+                'rounded-xl bg-white/50 px-3.5 py-2.5 text-[#0A0A0B] dark:bg-white/60 dark:text-[#333333]',
               )}
             >
               {chainIdWatch !== ''
@@ -60,7 +60,7 @@ export default function Step1({ methods, chainIdWatch, isLoading }: Step1Props) 
 
         {/* Action Button */}
         <button
-          className="mt-auto min-h-11 w-full rounded-lg bg-primary-buttons text-white duration-200 hover:opacity-85"
+          className="mt-auto min-h-12 w-full rounded-xl bg-primary-buttons text-white duration-200 hover:opacity-85"
           disabled={isLoading}
         >
           {isLoading ? <Spinner /> : 'Continue'}

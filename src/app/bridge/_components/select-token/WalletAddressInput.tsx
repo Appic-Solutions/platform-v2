@@ -76,7 +76,7 @@ const WalletAddressInput = ({
         <p className="text-sm font-semibold">Send To Wallet</p>
         <div className="flex w-full items-center gap-4">
           <div className="relative">
-            <Avatar src={avatar} className="h-11 w-11" />
+            <Avatar src={avatar} className="h-12 w-12" />
           </div>
           <div className="relative w-full">
             <input

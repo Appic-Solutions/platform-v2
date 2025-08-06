@@ -63,7 +63,7 @@ const DepositTokenInputs = () => {
   return (
     <div>
       <h3 className="mb-4 text-2xl font-bold">Deposit tokens</h3>
-      <p className="mb-4 text-[15px] font-normal">
+      <p className="mb-4 text-sm font-normal">
         The amount earned providing liquidity. Choose an amount that suits your risk tolerance and
         strategy.
       </p>
@@ -71,18 +71,15 @@ const DepositTokenInputs = () => {
         {/* token0 */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-44 lg:w-[210px]',
             isToken0Disabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
             {/* token name and logo */}
             <div className="flex items-center gap-2">
-              <Avatar
-                src={token0?.logo}
-                className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
-              />
-              <p className="text-base text-[#FFFFFF] lg:text-[21px]">{token0?.symbol || 'N/A'}</p>
+              <Avatar src={token0?.logo} className="h-5 w-5 md:h-7 md:w-7" />
+              <p className="text-[#FFFFFF] lg:text-xl">{token0?.symbol || 'N/A'}</p>
             </div>
 
             {icpIdentity && icpBalance && (
@@ -103,7 +100,7 @@ const DepositTokenInputs = () => {
                     type="text"
                     disabled={isToken0Disabled}
                     inputMode="decimal"
-                    className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                    className="border-none bg-transparent text-xl outline-none lg:text-2xl"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = limitDecimalPlaces(e.target.value);
@@ -123,18 +120,15 @@ const DepositTokenInputs = () => {
         {/* token1 */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-[188px] lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-44 lg:w-[210px]',
             isToken1Disabled && 'opacity-30',
           )}
         >
           <div className="flex h-full flex-col justify-between font-semibold">
             {/* token name and logo */}
             <div className="flex items-center gap-2">
-              <Avatar
-                src={token1?.logo}
-                className="h-[22px] w-[22px] md:h-7 md:w-7 lg:h-[28px] lg:w-[28px]"
-              />
-              <p className="text-base text-[#FFFFFF] lg:text-[21px]">{token1?.symbol || 'N/A'}</p>
+              <Avatar src={token1?.logo} className="h-5 w-5 md:h-7 md:w-7" />
+              <p className="text-base text-[#FFFFFF] lg:text-xl">{token1?.symbol || 'N/A'}</p>
             </div>
 
             {/* user wallet balance */}
@@ -155,7 +149,7 @@ const DepositTokenInputs = () => {
                     type="text"
                     disabled={isToken1Disabled}
                     inputMode="decimal"
-                    className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                    className="border-none bg-transparent text-xl outline-none lg:text-[27px]"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = limitDecimalPlaces(e.target.value);

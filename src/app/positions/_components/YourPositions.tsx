@@ -40,20 +40,20 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
   return (
     <Box
       className={cn(
-        'h-max text-white transition-all md:max-h-[570px] md:w-[490px] md:text-black md:dark:text-white',
+        'h-max text-white transition-all md:max-h-[570px] md:max-w-[533px] md:text-black md:dark:text-white',
       )}
     >
       <div className="w-full animate-fade">
         {/* Header */}
-        <div className={cn('mb-8 flex items-center justify-between gap-4', 'w-full')}>
+        <div className="mb-6 flex w-full items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold md:text-3xl">Your positions</h1>
           <Link
             href="/positions/create"
             className={cn(
               'flex items-center justify-center font-semibold',
-              'text-[13px] font-medium md:text-[15px]',
+              'text-[13px] font-medium md:text-sm',
               'rounded-lg p-2.5',
-              'bg-primary-buttons',
+              'h-[42px] bg-primary-buttons',
             )}
           >
             <PlusIcon className="h-[14px] w-[14px] md:h-[17px] md:w-[17px]" />
@@ -65,7 +65,7 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
           className={cn(
             'relative isolate',
             'flex w-full flex-col gap-2.5',
-            'mb-8 p-4 md:p-6',
+            'mb-6 p-4 md:p-6',
             'bg-gradient-to-b from-[#1D55BF]/30 to-[#000000]/30',
             'rounded-2xl md:rounded-3xl',
             'border border-[#4982EF]/40',
@@ -75,7 +75,7 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
             <PoolIcon width={24} height={24} />
             <p className="text-lg font-medium md:text-xl">Welcome to your positions</p>
           </div>
-          <p className="text-sm text-white/75 md:text-[15px]">
+          <p className="text-sm text-white/75 md:text-sm">
             Connect your wallet to view your current positions.
           </p>
         </div>
@@ -83,7 +83,7 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
         <div
           className={cn(
             'flex h-full w-full flex-1 flex-col gap-3',
-            'pt-3',
+            'pt-6',
             'border-t border-white/20',
             'max-h-[290px] overflow-y-auto',
           )}

@@ -63,7 +63,7 @@ const AmountInput = () => {
       <p className="text-sm font-semibold">Send</p>
       <div className="flex w-full items-center gap-4">
         <div className="relative">
-          <Avatar src={fromToken?.logo} className="h-11 w-11" />
+          <Avatar src={fromToken?.logo} className="h-12 w-12" />
           <Avatar
             src={getChainLogo(fromToken?.chainId)}
             className="absolute -bottom-1 -right-1 h-5 w-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"

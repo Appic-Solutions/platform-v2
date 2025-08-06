@@ -20,12 +20,9 @@ const AvatarGroup = ({ token1, token0 }: AvatarArgs) => {
       <Avatar
         src={token0.logo}
         // src="/images/logo/chains-logos/arbitrum.svg"
-        className="h-[33px] w-[33px] md:h-[48px] md:w-[48px]"
+        className="h-[33px] w-[33px] md:h-12 md:w-12"
       />
-      <Avatar
-        src={token1.logo}
-        className={cn('h-[33px] w-[33px] md:h-[48px] md:w-[48px]', '-ml-4')}
-      />
+      <Avatar src={token1.logo} className={cn('h-[33px] w-[33px] md:h-12 md:w-12', '-ml-4')} />
     </div>
   );
 };

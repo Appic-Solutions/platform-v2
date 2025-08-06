@@ -108,7 +108,7 @@ const CreatePositionStepTwo = () => {
         <div className="flex w-full items-center justify-between">
           <div className="flex w-full items-center gap-2 lg:gap-4">
             <AvatarGroup token0={token0} token1={token1} />
-            <h3 className="text-[27px] font-bold lg:text-[40px]">
+            <h3 className="text-2xl font-bold lg:text-3xl">
               {token0.symbol}/{token1.symbol}
             </h3>
           </div>
@@ -123,7 +123,7 @@ const CreatePositionStepTwo = () => {
       </div>
 
       {/* boxes */}
-      <div className="flex h-full w-full select-none flex-col gap-9 text-white lg:w-[41%]">
+      <div className="flex h-full w-full select-none flex-col gap-6 text-white lg:w-[41%]">
         <PriceRangeInputs />
         {/* deposit tokens boxes */}
         <DepositTokenInputs />
@@ -131,7 +131,7 @@ const CreatePositionStepTwo = () => {
           onClick={stepNextHandler}
           disabled={isButtonDisabled}
           type="button"
-          className="h-[50px] rounded-[15px] bg-primary-buttons disabled:cursor-not-allowed disabled:opacity-50 lg:h-[66px]"
+          className="h-12 rounded-xl bg-primary-buttons disabled:cursor-not-allowed disabled:opacity-50"
         >
           Review
         </button>

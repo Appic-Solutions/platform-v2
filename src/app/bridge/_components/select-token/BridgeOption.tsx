@@ -62,7 +62,7 @@ const BridgeOption = ({
       {/* middle section */}
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-x-2">
-          <div className="rounded-full border-2 border-white/50 p-1 md:p-2">
+          <div className="rounded-full border-2 border-white/50 p-1 md:p-1">
             <div className={cn('relative h-7 w-7', 'lg:h-10 lg:w-10')}>
               <Image src={toToken.logo} alt="btc" className="rounded-full object-contain" fill />
             </div>

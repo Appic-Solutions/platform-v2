@@ -88,16 +88,16 @@ const StepTwoPoolNotExist = () => {
         </p>
       </SolidCard>
 
-      <div className="mt-4 md:mt-8">
+      <div>
         <h3 className="mb-4 text-2xl font-bold">Set initial price</h3>
-        <p className="mb-4 text-[15px] font-thin">
+        <p className="mb-4 text-sm font-thin">
           Choose the tokens you want to provide liquidity for. You can select tokens on all
           supported networks.
         </p>
-        <GradientBorderCard className="h-[148px] lg:h-[196px]">
+        <GradientBorderCard className="h-[148px] md:h-44">
           <div className="flex h-full w-full flex-col justify-between font-semibold">
             <div className="flex items-start justify-between">
-              <p className="text-base text-[#FFFFFFB8] lg:text-[21px]">Initial price</p>
+              <p className="text-base text-[#FFFFFFB8] lg:text-xl">Initial price</p>
 
               <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">
                 {/* token pairs */}
@@ -133,7 +133,7 @@ const StepTwoPoolNotExist = () => {
               <input
                 type="text"
                 {...createPositionForm.register('initialPrice')}
-                className="border-none bg-transparent text-[22px] outline-none lg:text-[27px]"
+                className="border-none bg-transparent text-xl outline-none lg:text-2xl"
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">{priceText}</p>
@@ -143,8 +143,8 @@ const StepTwoPoolNotExist = () => {
       </div>
 
       <SolidCard>
-        <div className="flex w-full flex-col items-start gap-1 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-[17px]">
-          <h3 className="md:text-xl">Market Price: {marketPriceText}</h3>
+        <div className="flex w-full flex-col items-start gap-1 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-lg">
+          <h3>Market Price: {marketPriceText}</h3>
           <button
             type="button"
             className="text-[#FFFFFFC9] disabled:opacity-50"
