@@ -76,11 +76,19 @@ export const formatToSignificantFigures = (
   return `${integerPart}.${trimmedDecimal}`;
 };
 
-export const limitDecimalPlaces = (value: string, maxDecimals = 6) => {
-  if (!value.includes('.')) return value;
-  const [intPart, decimalPart] = value.split('.');
-  return `${intPart}.${decimalPart.slice(0, maxDecimals)}`;
-};
+export function limitDecimalPlaces(value: string, decimals = 6): string {
+  if (!value) return '';
+
+  const sanitized = value.replace(/[^\d.]/g, '');
+
+  const parts = sanitized.split('.');
+  if (parts.length > 2) return parts[0] + '.' + parts[1].slice(0, decimals);
+
+  const [intPart, decimalPart] = parts;
+  const limitedDecimal = decimalPart?.slice(0, decimals) ?? '';
+
+  return decimalPart !== undefined ? `${intPart}.${limitedDecimal}` : intPart;
+}
 
 export const calculatePercent = ({
   num1,

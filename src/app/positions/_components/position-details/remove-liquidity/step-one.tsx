@@ -1,25 +1,17 @@
 import { Avatar } from '@/components/common/ui/avatar';
-import { ArrowLeftIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { FormattedPosition, Step } from '../page';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { useEffect, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
-import Link from 'next/link';
+import { FormattedPosition } from '@/app/positions/types';
 
 interface RemoveLiquidityProps {
   position: FormattedPosition;
-  setCurrentStep: React.Dispatch<React.SetStateAction<Step>>;
+  onBack: () => void;
+  onNext: () => void;
 }
 
-const PERCENTS = [
-  { label: '25%', value: '25' },
-  { label: '50%', value: '50' },
-  { label: '75%', value: '75' },
-  { label: 'max', value: '100' },
-];
-
-const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => {
+const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityProps) => {
   const { token0, token1, is_in_range, total_fees_owed_usd, token0_reserves, token1_reserves } =
     position;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -88,58 +80,42 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
   }, [percentValue]);
 
   return (
-    <div className="w-full animate-fade">
-      {/* Header */}
-      <div className="relative isolate mb-10 flex w-full items-center justify-between gap-4">
-        <ArrowLeftIcon
-          onClick={() => setCurrentStep('positionDetail')}
-          className="z-10 hidden cursor-pointer md:inline-block"
-        />
-        <h1 className="text-[27px] font-bold md:absolute md:inset-x-0 md:text-center md:text-[30px]">
-          Remove liquidity
-        </h1>
-        <button
-          className={cn(
-            'px-2.5 py-0.5',
-            'rounded-md',
-            'bg-white/10',
-            'text-xs font-medium text-white/60',
-            'z-10',
-          )}
-        >
-          <Link href="https://t.me/Appic_dao">Get help</Link>
-        </button>
-      </div>
-
+    <>
       {/* Position info */}
       <div className="mb-7 flex w-full items-center justify-between gap-4 md:mb-6">
         <div className="grid max-h-[58px] flex-1 grid-cols-9 md:grid-cols-8 md:grid-rows-2">
           <div className="col-span-2 flex max-w-fit items-center sm:col-span-1 md:col-span-2 md:row-span-full">
-            <Avatar src={token0.logo} className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]" />
-            <Avatar src={token1.logo} className="-ml-4 h-[31px] w-[31px] md:h-[58px] md:w-[58px]" />
+            <Avatar
+              src={position.token0.logo}
+              className="h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
+            />
+            <Avatar
+              src={position.token1.logo}
+              className="-ml-4 h-[31px] w-[31px] md:h-[58px] md:w-[58px]"
+            />
           </div>
           <div className="col-span-7 flex items-center text-[27px] font-bold sm:col-span-8 md:col-span-6 md:text-[32px]">
-            {token0.symbol}/{token1.symbol}
+            {position.token0.symbol}/{position.token1.symbol}
           </div>
           <div className="col-span-full flex items-center gap-x-1 text-xs font-medium md:col-span-6">
             <p
               className={cn(
                 'flex items-center gap-x-1.5 text-[13px]',
-                is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
+                position.is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
               )}
             >
               <span
                 className={cn(
                   'h-[9px] w-[9px] animate-pulse rounded-full',
-                  is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
+                  position.is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
                 )}
               />
-              {is_in_range ? 'In range' : 'Out of range'}
+              {position.is_in_range ? 'In range' : 'Out of range'}
             </p>
           </div>
         </div>
         <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-          <span className="text-xs leading-5 text-white/60">{total_fees_owed_usd}%</span>
+          <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
         </SolidCard>
       </div>
 
@@ -157,7 +133,12 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
               />
             </div>
             <div className="flex items-center gap-x-2">
-              {PERCENTS.map(({ label, value }) => (
+              {[
+                { label: '25%', value: '25' },
+                { label: '50%', value: '50' },
+                { label: '75%', value: '75' },
+                { label: 'max', value: '100' },
+              ].map(({ label, value }) => (
                 <span
                   key={value}
                   onClick={() => handlePercentClick(value)}
@@ -179,7 +160,7 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
         <div className={cn('flex flex-col gap-y-3', 'w-full')}>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
-              {token0.symbol} position
+              {position.token0.symbol} position
             </p>
             <div
               className={cn(
@@ -188,13 +169,13 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
                 'text-sm font-semibold text-white md:text-base',
               )}
             >
-              <Avatar src={token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              {tokensReservesAfterRemove.token0.replace(/\.?0+$/, '')} {token0.symbol}
+              <Avatar src={position.token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
+              {tokensReservesAfterRemove.token0.replace(/\.?0+$/, '')} {position.token0.symbol}
             </div>
           </div>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
-              {token1.symbol} position
+              {position.token1.symbol} position
             </p>
             <div
               className={cn(
@@ -203,8 +184,8 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
                 'text-sm font-semibold text-white md:text-base',
               )}
             >
-              <Avatar src={token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              {tokensReservesAfterRemove.token1.replace(/\.?0+$/, '')} {token1.symbol}
+              <Avatar src={position.token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
+              {tokensReservesAfterRemove.token1.replace(/\.?0+$/, '')} {position.token1.symbol}
             </div>
           </div>
         </div>
@@ -218,9 +199,7 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
         )}
       >
         <button
-          onClick={() => {
-            setCurrentStep('positionDetail');
-          }}
+          onClick={onBack}
           className={cn(
             'h-full w-full',
             'bg-white/35',
@@ -233,6 +212,7 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
           Cancel
         </button>
         <button
+          onClick={onNext}
           className={cn(
             'h-full w-full',
             'bg-primary-buttons',
@@ -245,8 +225,8 @@ const RemoveLiquidity = ({ position, setCurrentStep }: RemoveLiquidityProps) => 
           Continue
         </button>
       </div>
-    </div>
+    </>
   );
 };
 
-export default RemoveLiquidity;
+export default RemoveLiquidityStepOne;

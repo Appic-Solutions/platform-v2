@@ -15,3 +15,22 @@ export type PoolStoreAction = {
     setPositions: (positions: Position[]) => void;
   };
 };
+
+export type FormattedPosition = Position & {
+  token0: IcpToken;
+  token1: IcpToken;
+};
+
+export type Step = 'addLiquidity' | 'removeLiquidity' | 'collectFees' | 'positionDetail';
+
+export interface PositionDetailsProps {
+  position: FormattedPosition;
+  onBackClick: () => void;
+}
+
+export interface PositionPercentage {
+  token0Percent: number;
+  token1Percent: number;
+}
+
+export type FeesPercentage = PositionPercentage;
