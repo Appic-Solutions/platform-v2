@@ -18,7 +18,7 @@ export default function SkeletonSection() {
         </div>
 
         {/* Chart Placeholder */}
-        <div className="h-[300px] w-full rounded-xl bg-[#1f1f1f]">
+        <div className="h-[400px] w-full rounded-xl bg-[#1f1f1f]">
           <Skeleton className="h-full w-full rounded-xl" />
         </div>
       </div>
