@@ -141,7 +141,7 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
                 addLiquidityForm.formState.isSubmitting || !addLiquidityForm.formState.isValid
               }
               onClick={onNext}
-              className="mt-auto h-full w-full select-none rounded-[15px] bg-white/35 text-white duration-200 hover:opacity-85 md:mt-0"
+              className="mt-auto h-full w-full select-none rounded-[15px] bg-primary-buttons text-white duration-200 hover:opacity-85 disabled:opacity-50 md:mt-0"
             >
               Continue
             </button>
