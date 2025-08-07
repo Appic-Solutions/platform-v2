@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Box from '@/components/ui/box';
 import { FormattedPosition } from '../types';
+import { useAuth } from '@nfid/identitykit/react';
+import { useSharedStore } from '@/store/store';
 
 interface YourPositionsProps {
   formattedPositions: FormattedPosition[] | undefined;
@@ -20,7 +22,8 @@ interface YourPositionsProps {
     | undefined;
 }
 
-const NeedConnectWallet = ({ title, description }: { title: string; description: string }) => {
+const NeedConnectWallet = () => {
+  const { connect } = useAuth();
   return (
     <div
       className={cn(
@@ -29,21 +32,22 @@ const NeedConnectWallet = ({ title, description }: { title: string; description:
       )}
     >
       <Image src="/images/wallet.svg" alt="wallet-Image" width={210} height={210} quality={100} />
-      <p className="text-xl">{title}</p>
-      <p className="mb-24 text-sm leading-6">{description}</p>
+      <button className="hover:text-blue-500" onClick={() => connect()}>
+        Connect Wallet
+      </button>
     </div>
   );
 };
 
 const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPositionsProps) => {
-  console.log('formattedPositions', formattedPositions);
+  const { icpIdentity } = useSharedStore();
   return (
     <Box
       className={cn(
         'h-max text-white transition-all md:max-h-[570px] md:max-w-[533px] md:text-black md:dark:text-white',
       )}
     >
-      <div className="w-full animate-fade">
+      <div className="h-full w-full animate-fade">
         {/* Header */}
         <div className="mb-6 flex w-full items-center justify-between gap-4">
           <h1 className="text-2xl font-semibold md:text-3xl">Your positions</h1>
@@ -61,24 +65,26 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
           </Link>
         </div>
 
-        <div
-          className={cn(
-            'relative isolate',
-            'flex w-full flex-col gap-2.5',
-            'mb-6 p-4 md:p-6',
-            'bg-gradient-to-b from-[#1D55BF]/30 to-[#000000]/30',
-            'rounded-2xl md:rounded-3xl',
-            'border border-[#4982EF]/40',
-          )}
-        >
-          <div className="flex items-center gap-x-1.5">
-            <PoolIcon width={24} height={24} />
-            <p className="text-lg font-medium md:text-xl">Welcome to your positions</p>
+        {!icpIdentity && (
+          <div
+            className={cn(
+              'relative isolate',
+              'flex w-full flex-col gap-2.5',
+              'mb-6 p-4 md:p-6',
+              'bg-gradient-to-b from-[#1D55BF]/30 to-[#000000]/30',
+              'rounded-2xl md:rounded-3xl',
+              'border border-[#4982EF]/40',
+            )}
+          >
+            <div className="flex items-center gap-x-1.5">
+              <PoolIcon width={24} height={24} />
+              <p className="text-lg font-medium md:text-xl">Welcome to your positions</p>
+            </div>
+            <p className="text-sm text-white/75">
+              Connect your wallet to view your current positions.
+            </p>
           </div>
-          <p className="text-sm text-white/75 md:text-sm">
-            Connect your wallet to view your current positions.
-          </p>
-        </div>
+        )}
 
         <div
           className={cn(
@@ -88,7 +94,17 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
             'max-h-[290px] overflow-y-auto',
           )}
         >
-          {formattedPositions?.length ? (
+          {(error && error.type === 'walletConnection') || !icpIdentity ? (
+            <NeedConnectWallet />
+          ) : !formattedPositions || !formattedPositions.length ? (
+            <div className="flex h-full flex-col items-center justify-center gap-2">
+              <p className="text-lg font-semibold lg:text-xl">No positions</p>
+              <p className="text-center text-sm text-muted lg:text-base">
+                Looks like you haven’t added any liquidity yet. Create a position to start earning
+                rewards and fees!
+              </p>
+            </div>
+          ) : formattedPositions?.length ? (
             formattedPositions.map((position) => (
               <PositionCard
                 onSelectHandler={onSelectHandler}
@@ -96,8 +112,6 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
                 position={position}
               />
             ))
-          ) : error && error.type === 'walletConnection' ? (
-            <NeedConnectWallet title={error.text} description="" />
           ) : error && error.type === 'network' ? (
             <p className="w-full text-center">{error.text}</p>
           ) : (

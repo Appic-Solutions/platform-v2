@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import YourPositions from './_components/YourPositions';
 import { useSharedStore } from '@/store/store';
 import { useGetPositions } from './_api';
-import { Principal } from '@dfinity/principal';
 import PositionDetails from './_components/position-details';
 import { FormattedPosition } from './types';
 
@@ -21,15 +20,14 @@ export default function PositionsPage() {
 
   useEffect(() => {
     const getPositionsHandler = async () => {
-      // if (!icpIdentity) {
-      //   setError({
-      //     type: 'walletConnection',
-      //     text: 'To view your positions and rewards you must connect your wallet.',
-      //   });
-      //   return;
-      // }
-      // if (!icpTokens || !pools || !unAuthenticatedAgent || !icpIdentity) {
-      if (!icpTokens || !pools || !unAuthenticatedAgent) {
+      if (!icpIdentity) {
+        setError({
+          type: 'walletConnection',
+          text: 'To view your positions and rewards you must connect your wallet.',
+        });
+        return;
+      }
+      if (!icpTokens || !pools || !unAuthenticatedAgent || !icpIdentity) {
         setError({
           type: 'network',
           text: 'Missing required data.',
@@ -40,9 +38,7 @@ export default function PositionsPage() {
       const res = await getPositions({
         icpTokens,
         pools,
-        owner: Principal.fromText(
-          '7qi53-mqll3-zmsxo-p4vf5-x3wye-nwsca-oag7a-s4tfq-6htqy-3c3zq-bqe',
-        ),
+        owner: icpIdentity,
         unAuthenticatedAgent,
       });
 
