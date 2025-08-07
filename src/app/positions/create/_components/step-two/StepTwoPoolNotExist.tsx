@@ -148,10 +148,10 @@ const StepTwoPoolNotExist = () => {
 
       <SolidCard>
         <div className="flex w-full flex-col items-start gap-1 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-lg">
-          <h3>Market Price: {marketPriceText}</h3>
+          <h3 className="w-3/4 text-ellipsis">Market Price: {marketPriceText}</h3>
           <button
             type="button"
-            className="text-lg text-[#FFFFFFC9] disabled:opacity-50"
+            className="text-base text-[#FFFFFFC9] disabled:opacity-50"
             onClick={handleSetMarketPrice}
             disabled={!token0 || !token1 || !icpTokens}
           >

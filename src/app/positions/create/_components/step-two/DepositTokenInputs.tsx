@@ -62,7 +62,7 @@ const DepositTokenInputs = () => {
             {/* token name and logo */}
             <div className="flex items-center gap-2">
               <Avatar src={token0?.logo} className="h-5 w-5 md:h-7 md:w-7" />
-              <p className="text-[#FFFFFF] lg:text-xl">{token0?.symbol || 'N/A'}</p>
+              <p className="text-ellipsis text-[#FFFFFF] lg:text-xl">{token0?.symbol || 'N/A'}</p>
             </div>
 
             {icpIdentity && (
@@ -111,7 +111,7 @@ const DepositTokenInputs = () => {
             {/* token name and logo */}
             <div className="flex items-center gap-2">
               <Avatar src={token1?.logo} className="h-5 w-5 md:h-7 md:w-7" />
-              <p className="text-base text-[#FFFFFF] lg:text-xl">{token1?.symbol || 'N/A'}</p>
+              <p className="text-ellipsis text-[#FFFFFF] lg:text-xl">{token1?.symbol || 'N/A'}</p>
             </div>
 
             {/* user wallet balance */}

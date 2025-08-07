@@ -36,7 +36,7 @@ const CreatePositionStepTwo = () => {
         <div className="flex w-full items-center justify-between">
           <div className="flex w-full items-center gap-2 lg:gap-4">
             <AvatarGroup avatar0={token0.logo} avatar1={token1.logo} />
-            <h3 className="text-2xl font-bold lg:text-3xl">
+            <h3 className="max-w-96 text-ellipsis text-2xl font-bold lg:text-3xl">
               {token0.symbol}/{token1.symbol}
             </h3>
           </div>
