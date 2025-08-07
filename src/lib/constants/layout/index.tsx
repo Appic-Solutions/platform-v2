@@ -17,6 +17,15 @@ export interface NavbarItem {
 
 export const NAVBAR_ITEMS: NavbarItem[] = [
   {
+    label: 'Swap',
+    href: '/swap',
+    tooltip: 'Swap',
+    Icon: (
+      <BlockchainIcon width={24} height={24} className="min-h-5 min-w-5 md:min-h-6 md:min-w-6" />
+    ),
+    active: true,
+  },
+  {
     label: 'Bridge',
     href: '/bridge',
     tooltip: 'Bridge',
@@ -28,15 +37,6 @@ export const NAVBAR_ITEMS: NavbarItem[] = [
       />
     ),
     active: true,
-  },
-  {
-    label: 'Swap',
-    href: '/swap',
-    tooltip: 'Coming Soon',
-    Icon: (
-      <BlockchainIcon width={24} height={24} className="min-h-5 min-w-5 md:min-h-6 md:min-w-6" />
-    ),
-    active: false,
   },
   {
     label: 'Pool',
