@@ -19,10 +19,15 @@ import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
 import BigNumber from 'bignumber.js';
+import { useAuth } from '@nfid/identitykit/react';
 
 export default function useCreatePositionLogic() {
-  const { pools } = useSharedStore();
-
+  const { pools, icpBalance, icpIdentity, isIcpBalanceLoading } = useSharedStore();
+  const [userTokenBalances, setUserTokenBalances] = useState<{
+    token0Balance: string;
+    token1Balance: string;
+  }>();
+  const { connect: openIcpModal } = useAuth();
   const [step, setStep] = useState(0);
   const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
   const [isToken0Selected, setIsToken0Selected] = useState(true);
@@ -64,6 +69,7 @@ export default function useCreatePositionLogic() {
     token1DepositAmount,
     isToken0DepositAmountActive,
     isToken1DepositAmountActive,
+    Fee,
   ] = useWatch({
     control: createPositionForm.control,
     name: [
@@ -80,6 +86,7 @@ export default function useCreatePositionLogic() {
       'token1DepositAmount',
       'isToken0DepositAmountActive',
       'isToken1DepositAmountActive',
+      'fee',
     ],
   });
 
@@ -292,9 +299,6 @@ export default function useCreatePositionLogic() {
         });
         createPositionForm.trigger('token1DepositAmount');
       }
-
-      console.log('token0DepositAmount', token0DepositAmount);
-      console.log('token1DepositAmount', token1DepositAmount);
     } catch (error) {
       console.error('Error calculating mint amounts:', error);
       createPositionForm.setError(field, {
@@ -331,6 +335,86 @@ export default function useCreatePositionLogic() {
     if (current !== tickSpacing) {
       createPositionForm.setValue('tickSpacing', tickSpacing);
     }
+  };
+
+  const isTokenAmountsValid = () => {
+    if (
+      (isToken0DepositAmountActive && (token0DepositAmount === '0' || !token0DepositAmount)) ||
+      (isToken1DepositAmountActive && (token1DepositAmount === '0' || !token1DepositAmount))
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const actionButtonHandler = () => {
+    if (!icpIdentity) {
+      return openIcpModal();
+    }
+    stepNextHandler();
+  };
+
+  const getActionButtonStatus = (): {
+    isButtonDisabled: boolean;
+    buttonText: string;
+  } => {
+    // conditions:
+    /***
+     * 1- token0 && token1 && minPrice && maxPrice && minTick && maxTick && initialPrice && fee && !checkTokenAmounts
+     * 2- userTokenBalances.token0 and userTokenBalances.token1 must be greater than token0DepositAmount and token1DepositAmount
+     * ***/
+    if (
+      !isTokenAmountsValid() ||
+      !MinPrice ||
+      !MaxPrice ||
+      !minTick ||
+      !maxTick ||
+      !initialPrice ||
+      isNaN(+initialPrice) ||
+      !Fee ||
+      createPositionForm.formState.errors.token0DepositAmount !== undefined ||
+      createPositionForm.formState.errors.token1DepositAmount !== undefined ||
+      createPositionForm.formState.errors.minPrice !== undefined ||
+      createPositionForm.formState.errors.maxPrice !== undefined
+    ) {
+      return {
+        buttonText: 'Review',
+        isButtonDisabled: true,
+      };
+    }
+
+    if (!icpIdentity) {
+      return {
+        buttonText: 'Connect Wallet',
+        isButtonDisabled: false,
+      };
+    }
+
+    if (isIcpBalanceLoading) {
+      return {
+        isButtonDisabled: true,
+        buttonText: 'Fetching wallet balance',
+      };
+    }
+
+    if (
+      !userTokenBalances ||
+      !userTokenBalances.token0Balance ||
+      !userTokenBalances.token1Balance ||
+      +userTokenBalances.token0Balance < +token0DepositAmount ||
+      +userTokenBalances.token1Balance < +token1DepositAmount
+    ) {
+      return {
+        buttonText: 'Not Enough Balance',
+        isButtonDisabled: true,
+      };
+    }
+
+    return {
+      buttonText: 'Review',
+      isButtonDisabled: true,
+    };
   };
 
   useEffect(() => {
@@ -388,6 +472,20 @@ export default function useCreatePositionLogic() {
     getTickSpacingHandler(createPositionForm.getValues('fee'));
   }, [Token0, Token1]);
 
+  const actionButtonStatus = getActionButtonStatus();
+
+  useEffect(() => {
+    if (!icpBalance || !icpIdentity) return;
+
+    const userToken0 = icpBalance.tokens.find((t) => t.canisterId === Token0?.canisterId);
+    const userToken1 = icpBalance.tokens.find((t) => t.canisterId === Token1?.canisterId);
+
+    setUserTokenBalances({
+      token0Balance: userToken0?.balance ?? '0',
+      token1Balance: userToken1?.balance ?? '0',
+    });
+  }, [icpBalance, icpIdentity]);
+
   return {
     step,
     setStep,
@@ -400,6 +498,7 @@ export default function useCreatePositionLogic() {
     resetFormHandler,
     selectTokenHandler,
     feeTiers,
+    userTokenBalances,
     selectFeeHandler,
     // Step Two
     isToken0Selected,
@@ -407,6 +506,8 @@ export default function useCreatePositionLogic() {
     maxOrMinPriceHandler,
     handleInitialPriceInput,
     handleDepositAmountInput,
+    actionButtonStatus,
+    actionButtonHandler,
     // Step Three
     submitHandler: (values: CreatePositionFormDefaultValues) => {},
   };

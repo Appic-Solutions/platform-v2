@@ -10,26 +10,8 @@ import { useSharedStore } from '@/store/store';
 import SetUserWalletBalanceButton from '../SetUserWalletBalanceButton';
 
 const DepositTokenInputs = () => {
-  const { handleDepositAmountInput, createPositionForm } = useCreatePosition();
+  const { handleDepositAmountInput, createPositionForm, userTokenBalances } = useCreatePosition();
   const { icpBalance, icpIdentity } = useSharedStore();
-  const [userTokenBalances, setUserTokenBalances] = useState<{
-    token0Balance: string;
-    token1Balance: string;
-  }>();
-
-  useEffect(() => {
-    if (!icpBalance || !icpIdentity) return;
-
-    const userToken0 = icpBalance.tokens.find((t) => t.canisterId === token0?.canisterId);
-    const userToken1 = icpBalance.tokens.find((t) => t.canisterId === token1?.canisterId);
-
-    if (userToken0?.balance && userToken1?.balance) {
-      setUserTokenBalances({
-        token0Balance: userToken0?.balance,
-        token1Balance: userToken1?.balance,
-      });
-    }
-  }, [icpBalance, icpIdentity]);
 
   const [
     token0,
@@ -57,13 +39,14 @@ const DepositTokenInputs = () => {
   const isToken1Disabled =
     !(initialPrice && parseFloat(initialPrice) > 0) || !isToken1DepositAmountActive;
 
-  console.log('token0DepositAmount', token0DepositAmount);
-  console.log('token1DepositAmount', token1DepositAmount);
+  console.log({
+    userTokenBalances,
+  });
 
   return (
     <div>
-      <h3 className="mb-4 text-2xl font-bold">Deposit tokens</h3>
-      <p className="mb-4 text-sm font-normal">
+      <h3 className="mb-2 text-lg font-bold lg:text-xl">Deposit tokens</h3>
+      <p className="mb-4 text-sm font-medium text-muted">
         The amount earned providing liquidity. Choose an amount that suits your risk tolerance and
         strategy.
       </p>
@@ -71,7 +54,7 @@ const DepositTokenInputs = () => {
         {/* token0 */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-44 lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-40 lg:w-[210px]',
             isToken0Disabled && 'opacity-30',
           )}
         >
@@ -82,7 +65,7 @@ const DepositTokenInputs = () => {
               <p className="text-[#FFFFFF] lg:text-xl">{token0?.symbol || 'N/A'}</p>
             </div>
 
-            {icpIdentity && icpBalance && (
+            {icpIdentity && (
               <SetUserWalletBalanceButton
                 isAmountZero={true}
                 token={token0}
@@ -100,7 +83,7 @@ const DepositTokenInputs = () => {
                     type="text"
                     disabled={isToken0Disabled}
                     inputMode="decimal"
-                    className="border-none bg-transparent text-xl outline-none lg:text-2xl"
+                    className="border-none bg-transparent text-lg outline-none lg:text-xl"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = limitDecimalPlaces(e.target.value);
@@ -111,7 +94,7 @@ const DepositTokenInputs = () => {
                   />
                 )}
               />
-              <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
+              <p className="text-xs text-[#FFFFFF7A]">
                 ${(Number(token0DepositAmount || 0) * Number(token0?.usdPrice || 0)).toFixed(2)}
               </p>
             </div>
@@ -120,7 +103,7 @@ const DepositTokenInputs = () => {
         {/* token1 */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-44 lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-40 lg:w-[210px]',
             isToken1Disabled && 'opacity-30',
           )}
         >
@@ -132,7 +115,7 @@ const DepositTokenInputs = () => {
             </div>
 
             {/* user wallet balance */}
-            {icpIdentity && icpBalance && (
+            {icpIdentity && (
               <SetUserWalletBalanceButton
                 isAmountZero={false}
                 token={token1}
@@ -149,7 +132,7 @@ const DepositTokenInputs = () => {
                     type="text"
                     disabled={isToken1Disabled}
                     inputMode="decimal"
-                    className="border-none bg-transparent text-xl outline-none lg:text-[27px]"
+                    className="border-none bg-transparent text-lg outline-none lg:text-xl"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = limitDecimalPlaces(e.target.value);
@@ -160,7 +143,7 @@ const DepositTokenInputs = () => {
                   />
                 )}
               />
-              <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
+              <p className="text-xs text-[#FFFFFF7A]">
                 ${(Number(token1DepositAmount || 0) * Number(token1?.usdPrice || 0)).toFixed(2)}
               </p>
             </div>
