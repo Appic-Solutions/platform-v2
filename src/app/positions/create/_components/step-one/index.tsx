@@ -94,7 +94,7 @@ export default function CreatePositionStepOne() {
             </p>
           </div>
           {/* token selection */}
-          <div className="flex w-full flex-col gap-2 md:gap-3">
+          <div className="flex w-full gap-2 md:gap-3">
             <div
               className={cn(
                 'group relative cursor-pointer overflow-clip',
@@ -102,7 +102,7 @@ export default function CreatePositionStepOne() {
                 'text-xl font-bold text-black dark:text-white md:text-2xl',
                 'rounded-[20px] border-2 border-[#4C4C4C]/60',
                 'w-full',
-                'p-5 md:px-8 md:py-4',
+                'p-4',
                 'bg-[linear-gradient(to_bottom,#242424_0%,#2121214D_100%)]',
                 'duration-200 hover:bg-[#000000]/75',
               )}
@@ -139,7 +139,7 @@ export default function CreatePositionStepOne() {
                 'text-xl font-bold text-black dark:text-white md:text-2xl',
                 'rounded-[20px] border-2 border-[#4C4C4C]/60',
                 'w-full',
-                'p-5 md:px-8 md:py-4',
+                'p-4',
                 'bg-[linear-gradient(to_bottom,#242424_0%,#2121214D_100%)]',
                 'duration-200 hover:bg-[#000000]/75',
               )}

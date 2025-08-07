@@ -4,8 +4,8 @@ import { Avatar } from '@/components/common/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useWatch } from 'react-hook-form';
 import SolidCard from '@/components/ui/cards/SolidCard';
-import AvatarGroup from '../step-two/AvatarGroup';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
+import AvatarGroup from '@/app/positions/_components/AvatarGroup';
 
 export default function CreatePositionStepThree() {
   const { isToken0Selected, createPositionForm, setStep } = useCreatePosition();
@@ -50,8 +50,8 @@ export default function CreatePositionStepThree() {
       {/* header */}
       <div className="flex w-full items-center justify-between">
         <div className="flex w-full items-center gap-2 lg:gap-4">
-          <AvatarGroup token0={token0} token1={token1} />
-          <h3 className="text-[27px] font-bold lg:text-[40px]">
+          <AvatarGroup avatar0={token0.logo} avatar1={token1.logo} />
+          <h3 className="text-2xl font-semibold lg:text-3xl">
             {token0.symbol}/{token1.symbol}
           </h3>
         </div>

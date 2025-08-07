@@ -89,12 +89,12 @@ const StepTwoPoolNotExist = () => {
       </SolidCard>
 
       <div>
-        <h3 className="mb-4 text-2xl font-bold">Set initial price</h3>
-        <p className="mb-4 text-sm font-thin">
+        <h3 className="mb-2 text-lg font-semibold lg:text-xl">Set initial price</h3>
+        <p className="mb-4 text-sm font-medium text-muted">
           Choose the tokens you want to provide liquidity for. You can select tokens on all
           supported networks.
         </p>
-        <GradientBorderCard className="h-[148px] md:h-44">
+        <GradientBorderCard className="h-[148px] md:h-40">
           <div className="flex h-full w-full flex-col justify-between font-semibold">
             <div className="flex items-start justify-between">
               <p className="text-base text-[#FFFFFFB8] lg:text-xl">Initial price</p>
@@ -113,7 +113,11 @@ const StepTwoPoolNotExist = () => {
                             ? 'bg-[#1E53B8] text-white'
                             : 'bg-[#222222] text-white/70',
                         )}
-                        onClick={() => handleSelectedTokenChange()}
+                        onClick={() => {
+                          if ((isToken0Selected && idx === 0) || (!isToken0Selected && idx === 1))
+                            return;
+                          handleSelectedTokenChange();
+                        }}
                         disabled={!t}
                       >
                         <Image
@@ -147,7 +151,7 @@ const StepTwoPoolNotExist = () => {
           <h3>Market Price: {marketPriceText}</h3>
           <button
             type="button"
-            className="text-[#FFFFFFC9] disabled:opacity-50"
+            className="text-lg text-[#FFFFFFC9] disabled:opacity-50"
             onClick={handleSetMarketPrice}
             disabled={!token0 || !token1 || !icpTokens}
           >

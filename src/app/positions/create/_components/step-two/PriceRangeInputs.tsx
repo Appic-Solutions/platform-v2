@@ -31,17 +31,14 @@ const PriceRangeInputs = () => {
     }
   }, [sqrtPriceX96]);
 
-  console.log('minPrice ========>', minPrice);
-  console.log('maxPrice ========>', maxPrice);
-
   return (
     <div>
-      <h3 className="mb-4 text-xl font-bold lg:text-2xl">Set Price range</h3>
+      <h3 className="mb-4 text-lg font-bold lg:text-xl">Set Price range</h3>
       <div className="relative flex justify-start gap-4 lg:justify-between">
         {/* min price */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-40 lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-36 lg:w-[210px]',
             isDisabled && 'opacity-30',
           )}
         >
@@ -52,7 +49,7 @@ const PriceRangeInputs = () => {
               <input
                 disabled={isDisabled}
                 type="text"
-                className="border-none bg-transparent text-xl outline-none lg:text-2xl"
+                className="border-none bg-transparent text-lg outline-none lg:text-xl"
                 value={minPrice === 'min' ? '0' : minPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
@@ -78,7 +75,7 @@ const PriceRangeInputs = () => {
         {/* max price */}
         <GradientBorderCard
           className={cn(
-            'h-[148px] w-[166px] transition-opacity lg:h-40 lg:w-[210px]',
+            'h-[148px] w-[166px] transition-opacity lg:h-36 lg:w-[210px]',
             isDisabled && 'opacity-30',
           )}
         >
@@ -88,7 +85,7 @@ const PriceRangeInputs = () => {
               <input
                 disabled={isDisabled}
                 type="text"
-                className="border-none bg-transparent text-xl outline-none lg:text-2xl"
+                className="border-none bg-transparent text-lg outline-none lg:text-xl"
                 value={maxPrice === 'max' ? '\u221E' : maxPrice}
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
