@@ -118,7 +118,7 @@ export default function PriceRangeChart({
 
   return (
     <>
-      <div className="relative min-h-[250px] w-full animate-fade" ref={containerRef}>
+      <div className="relative h-max min-h-[250px] w-full animate-fade" ref={containerRef}>
         <ChartContainer chartData={filteredChartData} chartWidth={chartWidth} xScale={xScale} />
         <XAxisLabels
           xAxisNumbers={xAxisNumbers}
@@ -142,7 +142,7 @@ export default function PriceRangeChart({
         <div
           className={cn(
             'flex w-full flex-row items-start justify-between gap-4 lg:items-center',
-            'mb:-bottom-16 absolute -bottom-24',
+            'absolute -bottom-24 lg:-bottom-16',
           )}
         >
           <button

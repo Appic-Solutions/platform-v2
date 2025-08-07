@@ -104,7 +104,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   return (
     <>
       {/* tabs */}
-      <div className="flex w-full rounded-[10px] bg-[#222222] px-[10px] py-[6px] lg:mb-6">
+      <div className="flex w-full rounded-[10px] bg-[#222222] px-[10px] py-[6px] lg:mb-4">
         {/* TODO: Handle tab selection, change prices when custom range selected and when full range selected */}
         {tabs.map((tab) => (
           <button
@@ -123,7 +123,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
         ))}
       </div>
       {/* chart */}
-      <div className="chart-background mb-28 flex w-full flex-col gap-6 lg:mb-0 lg:gap-16">
+      <div className="chart-background mb-12 flex w-full flex-col gap-6 lg:mb-0 lg:gap-6">
         <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 lg:flex-row-reverse lg:items-center">
           {/* token0 & token1 switcher */}
           <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">

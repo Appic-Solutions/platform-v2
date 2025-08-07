@@ -112,7 +112,7 @@ export default function CreatePositionStepOne() {
               }}
             >
               <div className="relative">
-                <Avatar src={Token0?.logo} className="h-7 w-7 md:h-12 md:w-12" />
+                <Avatar src={Token0?.logo} className="h-7 w-7 md:h-[38px] md:w-[38px]" />
                 <Avatar
                   src={getChainLogo(Token0?.chainId)}
                   className={cn(
@@ -149,7 +149,7 @@ export default function CreatePositionStepOne() {
               }}
             >
               <div className="relative">
-                <Avatar src={Token1?.logo} className="h-7 w-7 md:h-12 md:w-12" />
+                <Avatar src={Token1?.logo} className="h-7 w-7 md:h-[38px] md:w-[38px]" />
                 <Avatar
                   src={getChainLogo(Token1?.chainId)}
                   className={cn(

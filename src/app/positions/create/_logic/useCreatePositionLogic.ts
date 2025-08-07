@@ -364,6 +364,15 @@ export default function useCreatePositionLogic() {
      * 1- token0 && token1 && minPrice && maxPrice && minTick && maxTick && initialPrice && fee && !checkTokenAmounts
      * 2- userTokenBalances.token0 and userTokenBalances.token1 must be greater than token0DepositAmount and token1DepositAmount
      * ***/
+    // TODO: write some logs on each step to see what's happening
+    if (isIcpBalanceLoading) {
+      console.log('icp balance is loading');
+      return {
+        isButtonDisabled: true,
+        buttonText: 'Fetching wallet balance',
+      };
+    }
+
     if (
       !isTokenAmountsValid() ||
       !MinPrice ||
@@ -378,6 +387,7 @@ export default function useCreatePositionLogic() {
       createPositionForm.formState.errors.minPrice !== undefined ||
       createPositionForm.formState.errors.maxPrice !== undefined
     ) {
+      console.log('conditions are not met');
       return {
         buttonText: 'Review',
         isButtonDisabled: true,
@@ -385,16 +395,10 @@ export default function useCreatePositionLogic() {
     }
 
     if (!icpIdentity) {
+      console.log('wallet is not connected');
       return {
         buttonText: 'Connect Wallet',
         isButtonDisabled: false,
-      };
-    }
-
-    if (isIcpBalanceLoading) {
-      return {
-        isButtonDisabled: true,
-        buttonText: 'Fetching wallet balance',
       };
     }
 
@@ -405,6 +409,7 @@ export default function useCreatePositionLogic() {
       +userTokenBalances.token0Balance < +token0DepositAmount ||
       +userTokenBalances.token1Balance < +token1DepositAmount
     ) {
+      console.log('not enough balance');
       return {
         buttonText: 'Not Enough Balance',
         isButtonDisabled: true,
@@ -413,7 +418,7 @@ export default function useCreatePositionLogic() {
 
     return {
       buttonText: 'Review',
-      isButtonDisabled: true,
+      isButtonDisabled: false,
     };
   };
 
@@ -463,8 +468,12 @@ export default function useCreatePositionLogic() {
 
       if (feeTiersWithTvl.length > 0) {
         feeTiersWithTvl.sort((a, b) => b.numericTvl - a.numericTvl);
-        const highestTvlFee = feeTiersWithTvl[0].fee;
-        createPositionForm.setValue('fee', Number(highestTvlFee));
+        const highestTvlFee = Number(feeTiersWithTvl[0].fee);
+
+        const currentFee = createPositionForm.getValues('fee');
+        if (currentFee !== highestTvlFee) {
+          createPositionForm.setValue('fee', highestTvlFee);
+        }
       }
     }
     feeManuallySelected.current = false;

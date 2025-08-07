@@ -20,7 +20,7 @@ export default function ChartContainer({ chartData, chartWidth, xScale }: ChartC
 
   return (
     chartWidth > 0 && (
-      <ResponsiveContainer height={250}>
+      <ResponsiveContainer height={200}>
         <BarChart data={normalizedChartData}>
           <Bar
             dataKey="liquidity_gross"
