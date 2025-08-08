@@ -16,7 +16,12 @@ const SetUserWalletBalanceButton = ({ userTokenBalance, token, isAmountZero }: P
   return (
     <div className="flex w-full items-center justify-between gap-1.5">
       <span className="text-ellipsis text-sm font-semibold text-white/50">
-        {(userTokenBalance && parseFloat(userTokenBalance).toFixed(6)) || 0} {token.symbol}
+        {(userTokenBalance &&
+          parseFloat(userTokenBalance)
+            .toFixed(6)
+            .replace(/\.?0+$/, '')) ||
+          0}{' '}
+        {token.symbol}
       </span>
       <button
         disabled={!userTokenBalance}

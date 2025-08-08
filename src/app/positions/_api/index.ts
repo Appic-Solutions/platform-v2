@@ -5,9 +5,9 @@ import {
   GetPositionsByOwnerArgs,
 } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { IcpToken } from '@/blockchain_api/types/tokens';
-import { HttpAgent } from '@dfinity/agent';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { GetChartDataArgs } from '../create/_types';
+import { Agent, HttpAgent } from '@dfinity/agent';
+import { useMutation } from '@tanstack/react-query';
+import { GetChartDataArgs } from '../types';
 
 export const fetchAllPools = async (agent: HttpAgent, tokens: IcpToken[]) => {
   const response = await get_all_pools(agent, tokens);

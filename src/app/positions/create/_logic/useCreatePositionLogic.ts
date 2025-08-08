@@ -14,12 +14,13 @@ import {
 
 import { sortTokens } from '@/blockchain_api/functions/icp/dex/utils/token_order';
 import { CreatePositionFormDefaultValues, CreatePositionFormSchema } from '../schema';
-import type { FeeTier, SelectFeeHandlerProps, SelectTokenHandlerProps } from '../_types';
+import type { FeeTier, SelectFeeHandlerProps, SelectTokenHandlerProps } from '../../types';
 import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min_max';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
 import BigNumber from 'bignumber.js';
 import { useAuth } from '@nfid/identitykit/react';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 export default function useCreatePositionLogic() {
   const { pools, icpBalance, icpIdentity, isIcpBalanceLoading } = useSharedStore();
@@ -29,6 +30,7 @@ export default function useCreatePositionLogic() {
   }>();
   const { connect: openIcpModal } = useAuth();
   const [step, setStep] = useState(0);
+  const [existPool, setExistPool] = useState<Pool>();
   const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
   const [isToken0Selected, setIsToken0Selected] = useState(true);
   const feeManuallySelected = useRef(false);
@@ -503,6 +505,8 @@ export default function useCreatePositionLogic() {
     feeTiers,
     userTokenBalances,
     selectFeeHandler,
+    existPool,
+    setExistPool,
     // Step Two
     isToken0Selected,
     setIsToken0Selected,

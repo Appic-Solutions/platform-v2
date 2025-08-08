@@ -5,19 +5,22 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import PriceRangeInputs from './PriceRangeInputs';
 import DepositTokenInputs from './DepositTokenInputs';
 import StepTwoPoolExist from './StepTwoPoolExist';
-import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import AvatarGroup from '@/app/positions/_components/AvatarGroup';
 
 const CreatePositionStepTwo = () => {
-  const { feeTiers, createPositionForm, actionButtonStatus, actionButtonHandler } =
-    useCreatePosition();
+  const {
+    feeTiers,
+    createPositionForm,
+    actionButtonStatus,
+    actionButtonHandler,
+    existPool,
+    setExistPool,
+  } = useCreatePosition();
   const [token0, token1, fee] = useWatch({
     control: createPositionForm.control,
     name: ['token0', 'token1', 'fee'],
   });
-
-  const [existPool, setExistPool] = useState<Pool>();
 
   useEffect(() => {
     const selectedFee = feeTiers.find((tier) => Number(tier.fee) === fee);

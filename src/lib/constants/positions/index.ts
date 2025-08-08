@@ -1,3 +1,5 @@
+import { CreatePositionStepDetail } from '@/app/positions/types';
+
 export const allowedInputCharacters = [
   '0',
   '1',
@@ -15,4 +17,152 @@ export const allowedInputCharacters = [
   'ArrowLeft',
   'ArrowRight',
   'Tab',
+];
+
+export const createPositionStepsDetails: CreatePositionStepDetail[] = [
+  {
+    title: 'Step 1',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Please Approve the transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Approved Successfully',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to approve spending',
+      },
+    },
+  },
+  {
+    title: 'Step 2',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Sending mint transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Transaction Successful',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to send the transaction',
+      },
+    },
+  },
+];
+
+export const addLiquidityStepsDetails: CreatePositionStepDetail[] = [
+  {
+    title: 'Step 1',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Please Approve the transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Approved Successfully',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to approve spending',
+      },
+    },
+  },
+  {
+    title: 'Step 2',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Sending add liquidity transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Transaction Successful',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to send the transaction',
+      },
+    },
+  },
+];
+
+export const collectFeesStepsDetails: CreatePositionStepDetail[] = [
+  {
+    title: 'Step 1',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Sending add liquidity transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Approved Successfully',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to approve spending',
+      },
+    },
+  },
+  {
+    title: 'Step 2',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Sending add liquidity transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Transaction Successful',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to send the transaction',
+      },
+    },
+  },
+];
+
+export const removeLiquidityStepsDetails: CreatePositionStepDetail[] = [
+  {
+    title: 'Step 1',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Preparing transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Successful',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to prepare spending',
+      },
+    },
+  },
+  {
+    title: 'Step 2',
+    statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Sending remove liquidity transaction',
+      },
+      successful: {
+        statusTitle: 'Successful',
+        description: 'Transaction Successful',
+      },
+      failed: {
+        statusTitle: 'Failed',
+        description: 'Failed to send the transaction',
+      },
+    },
+  },
 ];
