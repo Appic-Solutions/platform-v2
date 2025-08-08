@@ -1,6 +1,8 @@
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { CreatePositionFormDefaultValues } from '../schema';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { ActiveTickArgs } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
+import { HttpAgent } from '@dfinity/agent';
 
 export interface SelectTokenHandlerProps {
   name: 'token0' | 'token1';
@@ -30,4 +32,9 @@ export interface FeeTiersProps {
 export interface HandlePriceProps {
   value: string;
   minOrMax: 'min' | 'max';
+}
+
+export interface GetChartDataArgs {
+  args: ActiveTickArgs;
+  unauthenticated_agent: HttpAgent;
 }

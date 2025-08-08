@@ -1,3 +1,4 @@
+import { get_active_liquidity } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 import {
   getPositionsByOwner,
@@ -6,6 +7,7 @@ import {
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { HttpAgent } from '@dfinity/agent';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { GetChartDataArgs } from '../create/_types';
 
 export const fetchAllPools = async (agent: HttpAgent, tokens: IcpToken[]) => {
   const response = await get_all_pools(agent, tokens);
@@ -25,5 +27,13 @@ export const useGetPositions = () => {
         owner,
         unAuthenticatedAgent,
       }),
+  });
+};
+
+export const useGetChartData = () => {
+  return useMutation({
+    mutationKey: ['chart-data'],
+    mutationFn: (params: GetChartDataArgs) =>
+      get_active_liquidity(params.args, params.unauthenticated_agent),
   });
 };

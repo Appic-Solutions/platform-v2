@@ -150,16 +150,11 @@ export default function useCreatePositionLogic() {
     createPositionForm.trigger('initialPrice');
   };
 
-  const maxOrMinPriceHandler = ({ isMinPrice, value }: { value: string; isMinPrice: boolean }) => {
-    console.log('price handler =======>');
-
-    const effectiveMinPrice =
-      isMinPrice && value === '0' ? 'min' : isMinPrice ? value || 'min' : MinPrice || 'min';
-    const effectiveMaxPrice =
-      !isMinPrice && value === '0' ? 'max' : !isMinPrice ? value || 'max' : MaxPrice || 'max';
+  const maxOrMinPriceHandler = ({ minValue, maxValue }: { minValue: string; maxValue: string }) => {
+    const effectiveMinPrice = minValue === '0' ? 'min' : minValue || 'min';
+    const effectiveMaxPrice = maxValue === '0' ? 'max' : maxValue || 'max';
 
     console.log({
-      is_min_price: isMinPrice,
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
       min_price: effectiveMinPrice,
@@ -170,7 +165,6 @@ export default function useCreatePositionLogic() {
     });
 
     const alignedPrice = alignMinOrMaxPrice({
-      is_min_price: isMinPrice,
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
       min_price: effectiveMinPrice,

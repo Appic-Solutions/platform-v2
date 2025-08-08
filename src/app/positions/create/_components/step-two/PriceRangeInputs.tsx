@@ -26,7 +26,7 @@ const PriceRangeInputs = () => {
   const hasResetPrices = useRef(false);
   useEffect(() => {
     if (sqrtPriceX96 && !hasResetPrices.current) {
-      maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
+      maxOrMinPriceHandler({ maxValue: 'max', minValue: 'min' });
       hasResetPrices.current = true;
     }
   }, [sqrtPriceX96]);
@@ -56,11 +56,11 @@ const PriceRangeInputs = () => {
                 }
                 onBlur={(e) =>
                   maxOrMinPriceHandler({
-                    value:
+                    minValue:
                       e.target.value === '0' || e.target.value === '' || e.target.value === 'min'
                         ? 'min'
                         : e.target.value,
-                    isMinPrice: true,
+                    maxValue: maxPrice,
                   })
                 }
                 placeholder="0"
@@ -92,11 +92,11 @@ const PriceRangeInputs = () => {
                 }
                 onBlur={(e) =>
                   maxOrMinPriceHandler({
-                    value:
+                    minValue: minPrice,
+                    maxValue:
                       e.target.value === '\u221E' || e.target.value === '0' || e.target.value === ''
                         ? 'max'
                         : e.target.value,
-                    isMinPrice: false,
                   })
                 }
                 placeholder="∞"

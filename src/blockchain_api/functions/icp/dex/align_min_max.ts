@@ -11,7 +11,6 @@ export interface AlignMinMaxPriceArgs {
   min_price: string;
   max_price: string;
   tick_spacing: number;
-  is_min_price: boolean;
   pool_sqrt_x98_price: string;
 }
 

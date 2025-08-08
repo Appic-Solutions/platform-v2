@@ -9,6 +9,7 @@ import { calculate_price, get_market_price } from '@/blockchain_api/functions/ic
 import { useSharedStore } from '@/store/store';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
+import TokenSwitcher from './TokenSwitcher';
 
 const StepTwoPoolNotExist = () => {
   const { handleSelectedTokenChange, isToken0Selected, createPositionForm } = useCreatePosition();
@@ -98,40 +99,7 @@ const StepTwoPoolNotExist = () => {
           <div className="flex h-full w-full flex-col justify-between font-semibold">
             <div className="flex items-start justify-between">
               <p className="text-base text-[#FFFFFFB8] lg:text-xl">Initial price</p>
-
-              <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">
-                {/* token pairs */}
-                {[token0, token1].map(
-                  (t, idx) =>
-                    t && (
-                      <button
-                        type="button"
-                        key={idx}
-                        className={cn(
-                          'flex items-center gap-1 rounded-md px-[10px] py-[4px] text-xs font-semibold transition-all',
-                          (isToken0Selected && idx === 0) || (!isToken0Selected && idx === 1)
-                            ? 'bg-[#1E53B8] text-white'
-                            : 'bg-[#222222] text-white/70',
-                        )}
-                        onClick={() => {
-                          if ((isToken0Selected && idx === 0) || (!isToken0Selected && idx === 1))
-                            return;
-                          handleSelectedTokenChange();
-                        }}
-                        disabled={!t}
-                      >
-                        <Image
-                          src={t.logo}
-                          alt={t.symbol}
-                          width={17}
-                          height={17}
-                          className="rounded-full"
-                        />
-                        {t.symbol}
-                      </button>
-                    ),
-                )}
-              </div>
+              <TokenSwitcher />
             </div>
             <div className="flex flex-col gap-2">
               <input

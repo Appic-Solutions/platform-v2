@@ -73,6 +73,10 @@ export default function PriceRangeChart({
       setMaxPrice(parseFloat(initialPrice) * 1.2);
       setMinPrice(parseFloat(initialPrice) * 0.8);
     }
+    if (selectedTab?.value === 'fullRange') {
+      setMaxPrice(0);
+      setMinPrice(0);
+    }
   }, [selectedTab, initialPrice]);
 
   useEffect(() => {

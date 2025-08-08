@@ -18,12 +18,12 @@ export default function useDragHandlers(
   const handleLeftDrag = useCallback(
     (clientX: number) => {
       if (!containerRef.current) return;
+
       const rect = containerRef.current.getBoundingClientRect();
       const x = clientX - rect.left;
       let newPrice = xScale.invert(x);
 
       newPrice = Math.min(newPrice, rightPrice);
-
       setLeftPrice(newPrice);
       debouncedSetPrices(newPrice, rightPrice);
     },

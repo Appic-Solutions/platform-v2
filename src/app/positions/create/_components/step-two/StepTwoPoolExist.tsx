@@ -11,6 +11,10 @@ import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import PriceRangeBarChart, { ChartType } from './PriceRangeBarChart';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
+import TokenSwitcher from './TokenSwitcher';
+import { useGetChartData } from '@/app/positions/_api';
+import Skeleton from '@/components/ui/skeleton';
+import ChartSkeleton from './ChartSkeleton';
 
 const tabs: ChartType[] = [
   { label: 'Full range', value: 'fullRange' },
@@ -18,22 +22,20 @@ const tabs: ChartType[] = [
 ];
 
 const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
-  const {
-    isToken0Selected,
-    handleSelectedTokenChange,
-    createPositionForm,
-    handleInitialPriceInput,
-    maxOrMinPriceHandler,
-  } = useCreatePosition();
+  const { mutateAsync: getChartData, isPending } = useGetChartData();
+  const [chartData, setChartData] = useState<ActiveTick[]>();
   const [selectedTab, setSelectedTab] = useState<ChartType>(tabs[0]);
+
+  const { isToken0Selected, createPositionForm, handleInitialPriceInput, maxOrMinPriceHandler } =
+    useCreatePosition();
+
   const { unAuthenticatedAgent } = useSharedStore();
   const { icpTokens } = useSharedStore();
 
-  const [token0, token1, sqrtPriceX96] = useWatch({
+  const [token0, token1] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1', 'sqrtPriceX96'],
+    name: ['token0', 'token1'],
   });
-  const [chartData, setChartData] = useState<ActiveTick[]>();
 
   const initialPrice = useMemo(() => {
     return isToken0Selected && matchedPool.token0_price_in_token1
@@ -45,33 +47,34 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
 
   useEffect(() => {
     if (!unAuthenticatedAgent) return;
-    const getChartData = async () => {
-      const data = await get_active_liquidity(
-        {
+
+    const getChartDataHandler = async () => {
+      const data = await getChartData({
+        args: {
           is_token0_selected: true,
           pool_id: matchedPool.pool_id,
           token0: token0,
           token1: token1,
         },
-        unAuthenticatedAgent,
-      );
-      if (!data) return;
-      setChartData(data.result);
-    };
-    getChartData().then(() => {
-      maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
-      maxOrMinPriceHandler({ value: 'max', isMinPrice: false });
-      handleInitialPriceInput(initialPrice);
-      if (createPositionForm.getValues('sqrtPriceX96') === '') {
-        createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
+        unauthenticated_agent: unAuthenticatedAgent,
+      });
+
+      if (data && data.success && data.result) {
+        setChartData(data.result);
+        maxOrMinPriceHandler({ minValue: 'min', maxValue: 'max' });
+        handleInitialPriceInput(initialPrice);
+        if (createPositionForm.getValues('sqrtPriceX96') === '') {
+          createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
+        }
       }
-    });
+    };
+
+    getChartDataHandler();
   }, [token0, token1, unAuthenticatedAgent]);
 
   useEffect(() => {
     if (!matchedPool.sqrt_price_x96) return;
-    maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
-    maxOrMinPriceHandler({ value: 'max', isMinPrice: false });
+    maxOrMinPriceHandler({ minValue: 'min', maxValue: 'max' });
   }, []);
 
   const marketPrice = useMemo(() => {
@@ -88,8 +91,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   }, [token0, token1, isToken0Selected, icpTokens]);
 
   const resetToFullRange = () => {
-    maxOrMinPriceHandler({ value: 'min', isMinPrice: true });
-    maxOrMinPriceHandler({ value: 'max', isMinPrice: false });
+    maxOrMinPriceHandler({ minValue: 'min', maxValue: 'max' });
     setSelectedTab(tabs[0]);
   };
 
@@ -105,7 +107,6 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
     <>
       {/* tabs */}
       <div className="flex w-full rounded-[10px] bg-[#222222] px-[10px] py-[6px] lg:mb-4">
-        {/* TODO: Handle tab selection, change prices when custom range selected and when full range selected */}
         {tabs.map((tab) => (
           <button
             type="button"
@@ -123,40 +124,11 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
         ))}
       </div>
       {/* chart */}
+
       <div className="chart-background mb-12 flex w-full flex-col gap-6 lg:mb-0 lg:gap-6">
         <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 lg:flex-row-reverse lg:items-center">
-          {/* token0 & token1 switcher */}
-          <div className="flex rounded-[10px] bg-[#222222] px-[4px] py-[2px]">
-            {[token0, token1].map(
-              (t, idx) =>
-                t && (
-                  <button
-                    type="button"
-                    key={idx}
-                    className={cn(
-                      'flex items-center gap-1 rounded-md px-[10px] py-[4px] text-xs font-semibold transition-all',
-                      (isToken0Selected && idx === 0) || (!isToken0Selected && idx === 1)
-                        ? 'bg-[#1E53B8] text-white'
-                        : 'bg-[#222222] text-white/70',
-                    )}
-                    onClick={() => {
-                      resetToFullRange();
-                      handleSelectedTokenChange();
-                    }}
-                    disabled={!t}
-                  >
-                    <Image
-                      src={t.logo}
-                      alt={t.symbol}
-                      width={17}
-                      height={17}
-                      className="rounded-full"
-                    />
-                    {t.symbol}
-                  </button>
-                ),
-            )}
-          </div>
+          <TokenSwitcher onButtonClick={resetToFullRange} />
+
           {/* market price */}
           <div className="text-[14px] font-bold">
             <span className="text-[#9F9F9F]">Market price:</span>
@@ -167,25 +139,29 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
             </p>
           </div>
         </div>
-        {chartData && (
+        {isPending ? (
+          <ChartSkeleton />
+        ) : chartData ? (
           <PriceRangeBarChart
             resetToFullRange={resetToFullRange}
             initialPrice={initialPrice}
             chartData={chartData}
             setMaxPrice={(price) => {
               maxOrMinPriceHandler({
-                value: price.toString() !== '0' ? price.toString() : 'max',
-                isMinPrice: false,
+                maxValue: price.toString() !== '0' ? price.toString() : 'max',
+                minValue: createPositionForm.getValues('minPrice'),
               });
             }}
             setMinPrice={(price) => {
               maxOrMinPriceHandler({
-                value: price.toString() !== '0' ? price.toString() : 'min',
-                isMinPrice: true,
+                minValue: price.toString() !== '0' ? price.toString() : 'min',
+                maxValue: createPositionForm.getValues('maxPrice'),
               });
             }}
             selectedTab={selectedTab}
           />
+        ) : (
+          'Failed to load chart data. please try again'
         )}
       </div>
     </>
