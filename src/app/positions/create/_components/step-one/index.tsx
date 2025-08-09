@@ -6,7 +6,7 @@ import FeeTiers from '../fee-tiers';
 import TokenList from '../token-list';
 import { useWatch } from 'react-hook-form';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
-import { FeeTier } from '../../_types';
+import { FeeTier } from '@/app/positions/types';
 
 export default function CreatePositionStepOne() {
   const {
@@ -30,7 +30,6 @@ export default function CreatePositionStepOne() {
   });
 
   useEffect(() => {
-    console.log('here');
     if (Token0 && Token1 && Fee) {
       setIsFormValid(true);
       setSelectedFeeTier(feeTiers.find((tier) => Number(tier.fee) === Fee));

@@ -40,7 +40,7 @@ const NeedConnectWallet = () => {
 };
 
 const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPositionsProps) => {
-  const { icpIdentity } = useSharedStore();
+  const { icpIdentity, isIcpBalanceLoading } = useSharedStore();
   return (
     <Box
       className={cn(
@@ -94,7 +94,7 @@ const YourPositions = ({ formattedPositions, onSelectHandler, error }: YourPosit
             'max-h-[290px] overflow-y-auto',
           )}
         >
-          {(error && error.type === 'walletConnection') || !icpIdentity ? (
+          {!icpIdentity ? (
             <NeedConnectWallet />
           ) : !formattedPositions || !formattedPositions.length ? (
             <div className="flex h-full flex-col items-center justify-center gap-2">

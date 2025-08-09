@@ -355,12 +355,6 @@ export default function useCreatePositionLogic() {
     isButtonDisabled: boolean;
     buttonText: string;
   } => {
-    // conditions:
-    /***
-     * 1- token0 && token1 && minPrice && maxPrice && minTick && maxTick && initialPrice && fee && !checkTokenAmounts
-     * 2- userTokenBalances.token0 and userTokenBalances.token1 must be greater than token0DepositAmount and token1DepositAmount
-     * ***/
-    // TODO: write some logs on each step to see what's happening
     if (isIcpBalanceLoading) {
       console.log('icp balance is loading');
       return {

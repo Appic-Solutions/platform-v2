@@ -40,7 +40,9 @@ const PositionCard = ({
           </div>
         </div>
         <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-          <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
+          <span className="text-xs leading-5 text-white/60">
+            {Number(position.key.pool.fee) / 10000}%
+          </span>
         </SolidCard>
       </div>
 

@@ -88,7 +88,6 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
     <FormProvider {...addLiquidityForm}>
       <form onSubmit={addLiquidityForm.handleSubmit(submitHandler)} className="h-full w-full">
         <div className="flex h-full w-full animate-fade flex-col">
-          {/* Header */}
           <div className="relative isolate mb-8 flex w-full items-center justify-between gap-4">
             <ArrowLeftIcon
               onClick={onBack}
@@ -114,6 +113,7 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
               <Link href="https://t.me/Appic_dao">Get help</Link>
             </button>
           </div>
+
           {step === 1 && (
             <AddLiquidityStepOne addLiquidityForm={addLiquidityForm} position={position} />
           )}
@@ -121,7 +121,7 @@ export default function AddLiquidity({ position, setCurrentStep }: AddLiquidityP
           {step === 2 && (
             <AddLiquidityStepTwo addLiquidityForm={addLiquidityForm} position={position} />
           )}
-          {/* Action Button */}
+
           <div
             className={cn(
               'flex h-[40px] items-center justify-center gap-x-3 self-end lg:h-[52px]',

@@ -1,7 +1,7 @@
+import { FeeTiersProps } from '@/app/positions/types';
 import { ArrowLeftIcon, VerifiedIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { FeeTiersProps } from '../../_types';
 
 export default function FeeTiers({ stateBackHandler, feeTiers, selectFeeHandler }: FeeTiersProps) {
   const { control } = useFormContext();
