@@ -79,9 +79,6 @@ export default function PositionsPage() {
   }
 
   return (
-    <PositionDetails
-      position={selectedPosition}
-      onBackClick={() => setSelectedPosition(undefined)}
-    />
+    <PositionDetails position={selectedPosition} onReset={() => setSelectedPosition(undefined)} />
   );
 }

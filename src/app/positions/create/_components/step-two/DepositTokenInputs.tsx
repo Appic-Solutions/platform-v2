@@ -67,7 +67,12 @@ const DepositTokenInputs = () => {
 
             {icpIdentity && (
               <SetUserWalletBalanceButton
-                isAmountZero={true}
+                onMaxClick={(balance) => {
+                  handleDepositAmountInput({
+                    amount: balance,
+                    isAmountZero: true,
+                  });
+                }}
                 token={token0}
                 userTokenBalance={userTokenBalances?.token0Balance}
               />
@@ -117,7 +122,12 @@ const DepositTokenInputs = () => {
             {/* user wallet balance */}
             {icpIdentity && (
               <SetUserWalletBalanceButton
-                isAmountZero={false}
+                onMaxClick={(balance) => {
+                  handleDepositAmountInput({
+                    amount: balance,
+                    isAmountZero: false,
+                  });
+                }}
                 token={token1}
                 userTokenBalance={userTokenBalances?.token1Balance}
               />

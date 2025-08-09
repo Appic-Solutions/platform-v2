@@ -10,7 +10,7 @@ import AvatarGroup from '../AvatarGroup';
 
 interface DetailsProps {
   position: any;
-  onBackClick: () => void;
+  onReset: () => void;
   positionPercentage: PositionPercentage;
   feesPercentage: FeesPercentage;
   setCurrentStep: React.Dispatch<React.SetStateAction<Step>>;
@@ -18,7 +18,7 @@ interface DetailsProps {
 
 const Details = ({
   position,
-  onBackClick,
+  onReset,
   positionPercentage,
   feesPercentage,
   setCurrentStep,
@@ -28,7 +28,7 @@ const Details = ({
       {/* Left */}
       <div className="flex h-full w-full flex-col lg:w-[55%] lg:gap-5">
         <button
-          onClick={onBackClick}
+          onClick={onReset}
           className={cn(
             'mb-2 flex items-center justify-center gap-x-1 self-start md:mb-0',
             'font-semibold',

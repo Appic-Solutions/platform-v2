@@ -30,7 +30,7 @@ export type Step = 'addLiquidity' | 'removeLiquidity' | 'collectFees' | 'positio
 
 export interface PositionDetailsProps {
   position: FormattedPosition;
-  onBackClick: () => void;
+  onReset: () => void;
 }
 
 export interface PositionPercentage {

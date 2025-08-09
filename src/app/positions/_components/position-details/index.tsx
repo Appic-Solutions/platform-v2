@@ -7,14 +7,15 @@ import { PositionDetailsProps, Step, PositionPercentage, FeesPercentage } from '
 import AddLiquidity from './add-liquidity';
 import RemoveLiquidity from './remove-liquidity';
 import CollectFees from './collect-fees';
+import { useSharedStore } from '@/store/store';
 
-const PositionDetails = ({ position, onBackClick }: PositionDetailsProps) => {
+const PositionDetails = ({ position, onReset }: PositionDetailsProps) => {
+  const { icpIdentity } = useSharedStore();
   const [currentStep, setCurrentStep] = useState<Step>('positionDetail');
   const [positionPercentage, setPositionPercentage] = useState<PositionPercentage>({
     token0Percent: 0,
     token1Percent: 0,
   });
-
   const [feesPercentage, setFeesPercentage] = useState<FeesPercentage>({
     token0Percent: 0,
     token1Percent: 0,
@@ -40,6 +41,12 @@ const PositionDetails = ({ position, onBackClick }: PositionDetailsProps) => {
     });
   }, []);
 
+  useEffect(() => {
+    if (!icpIdentity) {
+      onReset();
+    }
+  }, [icpIdentity]);
+
   return (
     <Box
       className={cn(
@@ -60,7 +67,7 @@ const PositionDetails = ({ position, onBackClick }: PositionDetailsProps) => {
         <Details
           setCurrentStep={setCurrentStep}
           position={position}
-          onBackClick={onBackClick}
+          onReset={onReset}
           positionPercentage={positionPercentage}
           feesPercentage={feesPercentage}
         />

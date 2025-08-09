@@ -28,7 +28,8 @@ const AddLiquidityStepOne = ({
 
     const userToken0 = icpBalance.tokens.find((t) => t.canisterId === position.token0?.canisterId);
     const userToken1 = icpBalance.tokens.find((t) => t.canisterId === position.token1?.canisterId);
-
+    console.log(icpBalance);
+    console.log(userToken1);
     if (userToken0?.balance && userToken1?.balance) {
       setUserTokenBalances({
         token0Balance: userToken0?.balance,
@@ -107,7 +108,7 @@ const AddLiquidityStepOne = ({
             </div>
             {icpIdentity && icpBalance && (
               <SetUserWalletBalanceButton
-                isAmountZero={true}
+                onMaxClick={(amount) => console.log(amount)}
                 token={position.token0}
                 userTokenBalance={userTokenBalances?.token0Balance}
               />
@@ -145,7 +146,7 @@ const AddLiquidityStepOne = ({
             </div>
             {icpIdentity && icpBalance && (
               <SetUserWalletBalanceButton
-                isAmountZero={false}
+                onMaxClick={(amount) => console.log(amount)}
                 token={position.token1}
                 userTokenBalance={userTokenBalances?.token1Balance}
               />
@@ -157,7 +158,6 @@ const AddLiquidityStepOne = ({
       {/* balance */}
       <SolidCard className="bg-transparent lg:bg-[#222222]">
         <div className={cn('flex flex-col gap-y-3', 'w-full')}>
-          {/* token0 */}
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
               {position.token0.symbol} position
@@ -178,7 +178,7 @@ const AddLiquidityStepOne = ({
               {position.token0.symbol}
             </div>
           </div>
-          {/* token1 */}
+
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
               {position.token1.symbol} position
