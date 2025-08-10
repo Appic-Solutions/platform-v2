@@ -95,6 +95,9 @@ export interface CreatePositionStepDetail {
 export type RemoveLiquidityStep = CreatePositionStep;
 export type RemoveLiquidityStepDetail = CreatePositionStepDetail;
 
+export type AddLiquidityStep = CreatePositionStep;
+export type AddLiquidityStepDetail = CreatePositionStepDetail;
+
 export interface ExecuteRemoveLiquidityParams {
   args: DecreaseLiquidityArgs | BurnPositionArgs;
   authenticated_agent: HttpAgent;

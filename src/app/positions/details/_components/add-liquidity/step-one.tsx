@@ -2,20 +2,25 @@ import { Avatar } from '@/components/common/ui/avatar';
 import { cn } from '@/lib/utils';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { useSharedStore } from '@/store/store';
-import { UseFormReturn, useWatch } from 'react-hook-form';
-import { AddLiquidityFormDefaultValues } from '@/app/positions/create/schema';
-import { FormattedPosition } from '@/app/positions/types';
 import { useEffect, useState } from 'react';
 import AddLiquidityInput from './add-liquidity-input';
 import AvatarGroup from '@/app/positions/_components/AvatarGroup';
+import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
+import { useRouter } from 'next/navigation';
 
-const AddLiquidityStepOne = ({
-  position,
-  addLiquidityForm,
-}: {
-  position: FormattedPosition;
-  addLiquidityForm: UseFormReturn<AddLiquidityFormDefaultValues>;
-}) => {
+const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
+  const {
+    selectedPosition: position,
+    token0DepositAmount,
+    token1DepositAmount,
+    actions,
+  } = usePositionDetailsStore();
+
+  if (!position) {
+    useRouter().push('/positions');
+    return;
+  }
+
   const [userTokenBalances, setUserTokenBalances] = useState<{
     token0Balance: string;
     token1Balance: string;
@@ -32,11 +37,6 @@ const AddLiquidityStepOne = ({
       token1Balance: userToken1?.balance ?? '0',
     });
   }, [icpBalance, icpIdentity]);
-
-  const [token0DepositAmount, token1DepositAmount] = useWatch({
-    control: addLiquidityForm.control,
-    name: ['token0DepositAmount', 'token1DepositAmount'],
-  });
 
   return (
     <>
@@ -76,15 +76,17 @@ const AddLiquidityStepOne = ({
         </div>
 
         <AddLiquidityInput
-          fieldName="token0DepositAmount"
-          form={addLiquidityForm}
+          // fieldName="token0DepositAmount"
+          // form={addLiquidityForm}
+          isAmountZero={true}
           position={position}
           userTokenBalance={userTokenBalances?.token0Balance}
         />
 
         <AddLiquidityInput
-          fieldName="token1DepositAmount"
-          form={addLiquidityForm}
+          // fieldName="token1DepositAmount"
+          // form={addLiquidityForm}
+          isAmountZero={false}
           position={position}
           userTokenBalance={userTokenBalances?.token1Balance}
         />
@@ -135,6 +137,23 @@ const AddLiquidityStepOne = ({
           </div>
         </div>
       </SolidCard>
+      <div className="flex h-[40px] w-full items-center justify-center gap-x-3 self-end lg:h-[52px]">
+        <button
+          onClick={() => actions.setCurrentStep('positionDetail')}
+          type="button"
+          className="mt-auto h-full w-full select-none rounded-[15px] bg-white/35 text-white duration-200 hover:opacity-85 md:mt-0"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          // disabled={!}
+          onClick={onNext}
+          className="mt-auto h-full w-full select-none rounded-[15px] bg-primary-buttons text-white duration-200 hover:opacity-85 disabled:opacity-50 md:mt-0"
+        >
+          Continue
+        </button>
+      </div>
     </>
   );
 };

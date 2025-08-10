@@ -34,6 +34,7 @@ export default function RemoveLiquidityStepTwo({ position, tokensRemoveAmount }:
 
   const openModalHandler = () => {
     setIsOpen(true);
+    // executeRemoveLiquidity()
   };
 
   async function executeRemoveLiquidity() {
@@ -69,7 +70,8 @@ export default function RemoveLiquidityStepTwo({ position, tokensRemoveAmount }:
         status: 'pending',
         errorMessage: null,
       });
-
+      const { amount0_max, amount1_max, from_subaccount, pool, tick_lower, tick_upper } =
+        generatedArgs.result;
       // Step 2
       const removeLiquidityResponse = await remove_liquidity(
         {
