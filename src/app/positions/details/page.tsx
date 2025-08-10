@@ -28,7 +28,7 @@ const PositionDetails = () => {
         'gap-8 text-white transition-all md:overflow-auto md:text-black md:dark:text-white',
         currentStep === 'positionDetail'
           ? 'md:h-[580px] md:w-[965px]'
-          : 'md:max-h-[570px] md:w-[533px]',
+          : 'md:max-h-[600px] md:w-[533px]',
       )}
     >
       {currentStep !== 'positionDetail' && (
@@ -58,11 +58,11 @@ const PositionDetails = () => {
         </div>
       )}
       {currentStep === 'addLiquidity' ? (
-        <AddLiquidity position={selectedPosition} setCurrentStep={actions.setCurrentStep} />
+        <AddLiquidity />
       ) : currentStep === 'removeLiquidity' ? (
         <RemoveLiquidity />
       ) : currentStep === 'collectFees' ? (
-        <CollectFees position={selectedPosition} setCurrentStep={actions.setCurrentStep} />
+        <CollectFees />
       ) : (
         <Details />
       )}

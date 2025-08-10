@@ -1,19 +1,120 @@
+'use client';
+
 import React, { useState } from 'react';
-import { FormattedPosition, Step } from '@/app/positions/types';
-import CollectFeesStepOne from './step-one';
-import CollectFeesStepTwo from './step-two';
+import { Avatar } from '@/components/common/ui/avatar';
+import SolidCard from '@/components/ui/cards/SolidCard';
+import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
+import { useRouter } from 'next/navigation';
+import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
+import { PositionStepper } from '@/app/positions/_components/position-stepper';
+import { collectFeesStepsDetails } from '@/lib/constants/positions';
+import { mint_position } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
+import { useSharedStore } from '@/store/store';
 
-interface CollectFeesProps {
-  position: FormattedPosition;
-  setCurrentStep: (step: Step) => void;
-}
+const CollectFees = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const { selectedPosition, actions } = usePositionDetailsStore();
+  const { authenticatedAgent } = useSharedStore();
+  const router = useRouter();
 
-const CollectFees = ({ position, setCurrentStep }: CollectFeesProps) => {
-  const [step, setStep] = useState(1);
-  return step === 1 ? (
-    <CollectFeesStepOne onBack={() => setCurrentStep('positionDetail')} position={position} />
-  ) : (
-    <CollectFeesStepTwo />
+  if (!selectedPosition) {
+    router.push('/positions');
+    return;
+  }
+
+  const openModalHandler = () => {
+    setIsOpen(true);
+    executeCollectFees();
+  };
+
+  const executeCollectFees = async () => {
+    if (authenticatedAgent) {
+      const result = await mint_position({ position: selectedPosition }, authenticatedAgent);
+      if (!result.success || !result.result) {
+        actions.setMintStep({
+          step: 1,
+          status: 'failed',
+          errorMessage: result.message,
+        });
+        return result.message;
+      }
+      actions.setMintStep({
+        step: 1,
+        status: 'successful',
+        errorMessage: null,
+      });
+    }
+  };
+  console.log(selectedPosition);
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
+      <div className="flex h-full w-full animate-fade flex-col gap-6">
+        {/* Main */}
+        <SolidCard className="bg-transparent px-5 lg:bg-[#222222] lg:px-8">
+          {/* token0 */}
+          <div className="flex items-center justify-between gap-2">
+            <Avatar src={selectedPosition.token0.logo} className="h-6 w-6 md:h-7 md:w-7" />
+            <p className={cn('text-nowrap md:text-xl', 'flex-grow')}>
+              {selectedPosition.token0.symbol}
+            </p>
+            <p className="text-sm text-white/80 md:text-base">
+              {selectedPosition.fees_token0_owed} {selectedPosition.token0.symbol}
+            </p>
+          </div>
+          {/* token1 */}
+          <div className="mt-9 flex items-center justify-between gap-2">
+            <Avatar src={selectedPosition.token1.logo} className="h-6 w-6 md:h-7 md:w-7" />
+            <p className={cn('text-nowrap md:text-xl', 'flex-grow')}>
+              {selectedPosition.token1.symbol}
+            </p>
+            <p className="text-sm text-white/80 md:text-base">
+              {selectedPosition.fees_token1_owed} {selectedPosition.token1.symbol}
+            </p>
+          </div>
+        </SolidCard>
+
+        {/* Action Button */}
+        <div
+          className={cn(
+            'flex h-[40px] w-full items-center justify-center gap-x-3 self-end lg:h-[52px]',
+          )}
+        >
+          <button
+            onClick={() => actions.setCurrentStep('positionDetail')}
+            className="mt-auto h-full w-full select-none rounded-[15px] bg-white/35 text-white duration-200 hover:opacity-85 md:mt-0"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={
+              !selectedPosition.total_fees_owed_usd ||
+              selectedPosition.total_fees_owed_usd === '0' ||
+              selectedPosition.total_fees_owed_usd === '0.00'
+            }
+            onClick={openModalHandler}
+            className="mt-auto h-full w-full select-none rounded-[15px] bg-primary-buttons text-white duration-200 hover:opacity-85 disabled:opacity-50 md:mt-0"
+          >
+            Collect
+          </button>
+        </div>
+      </div>
+
+      {/* <DialogTitle /> */}
+      <DialogOverlay onClick={(e) => e.stopPropagation()}>
+        <DialogContent
+          aria-describedby={undefined}
+          onInteractOutside={(e) => e.preventDefault()}
+          className="h-[350] w-fit min-w-80"
+        >
+          <PositionStepper
+            title="Collect Fees"
+            onCloseModal={() => setIsOpen(false)}
+            steps={collectFeesStepsDetails}
+          />
+        </DialogContent>
+      </DialogOverlay>
+    </Dialog>
   );
 };
 

@@ -96,28 +96,11 @@ export const addLiquidityStepsDetails: CreatePositionStepDetail[] = [
 
 export const collectFeesStepsDetails: CreatePositionStepDetail[] = [
   {
-    title: 'Step 1',
-    statuses: {
-      pending: {
-        statusTitle: 'Pending',
-        description: 'Sending add liquidity transaction',
-      },
-      successful: {
-        statusTitle: 'Successful',
-        description: 'Approved Successfully',
-      },
-      failed: {
-        statusTitle: 'Failed',
-        description: 'Failed to approve spending',
-      },
-    },
-  },
-  {
     title: 'Step 2',
     statuses: {
       pending: {
         statusTitle: 'Pending',
-        description: 'Sending add liquidity transaction',
+        description: 'Sending Collect Fees transaction',
       },
       successful: {
         statusTitle: 'Successful',

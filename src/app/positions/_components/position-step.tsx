@@ -5,19 +5,16 @@ import React from 'react';
 import Image from 'next/image';
 
 import { useRouter } from 'next/navigation';
-import {
-  AddLiquidityStepDetail,
-  AddLiquidityStep as AddLiquidityStepType,
-} from '@/app/positions/types';
+import { CreatePositionStep, CreatePositionStepDetail } from '@/app/positions/types';
 
-export const AddLiquidityStep = ({
+export const PositionStep = ({
   currentStep,
   step,
   index,
   onResetTransaction,
 }: {
-  step: AddLiquidityStepDetail;
-  currentStep: AddLiquidityStepType;
+  step: CreatePositionStepDetail;
+  currentStep: CreatePositionStep;
   index: number;
   onResetTransaction: () => void;
 }) => {

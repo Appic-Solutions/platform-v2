@@ -5,7 +5,6 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import { Avatar } from '@/components/common/ui/avatar';
 import { TokensRemoveAmount } from '.';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
-import { RemoveLiquidityStepper } from './remove-liquidity-stepper';
 import { removeLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -14,14 +13,24 @@ import { useSharedStore } from '@/store/store';
 import { generate_args_and_approve_mint_position } from '@/blockchain_api/functions/icp/dex/tx/mint_position';
 import { useRouter } from 'next/navigation';
 import BigNumber from 'bignumber.js';
-import { remove_liquidity } from '@/blockchain_api/functions/icp/dex/tx/remove_liquidity';
+import {
+  generate_decrease_liquidity_args,
+  remove_liquidity,
+} from '@/blockchain_api/functions/icp/dex/tx/remove_liquidity';
+import { PositionStepper } from '@/app/positions/_components/position-stepper';
+import { DecreaseLiquidityArgs } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 
 interface Props {
   position: FormattedPosition;
   tokensRemoveAmount: TokensRemoveAmount;
+  percentValue: string;
 }
 
-export default function RemoveLiquidityStepTwo({ position, tokensRemoveAmount }: Props) {
+export default function RemoveLiquidityStepTwo({
+  position,
+  tokensRemoveAmount,
+  percentValue,
+}: Props) {
   const { actions, selectedPosition } = usePositionDetailsStore();
   const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -34,67 +43,58 @@ export default function RemoveLiquidityStepTwo({ position, tokensRemoveAmount }:
 
   const openModalHandler = () => {
     setIsOpen(true);
-    // executeRemoveLiquidity()
+    executeRemoveLiquidity();
   };
 
   async function executeRemoveLiquidity() {
     if (authenticatedAgent && unAuthenticatedAgent && selectedPosition) {
       // step1
-      const generatedArgs = await generate_args_and_approve_mint_position(
-        {
-          amount0_max: BigNumber(position.token0_reserves)
-            .minus(tokensRemoveAmount.token0)
-            .toString(),
-          amount1_max: BigNumber(position.token1_reserves)
-            .minus(tokensRemoveAmount.token1)
-            .toString(),
-          max_tick: selectedPosition.key.tick_upper.toString(),
-          mint_tick: selectedPosition.key.tick_lower.toString(),
-          pool_id: selectedPosition.pool.pool_id,
-          token0: selectedPosition.token0,
-          token1: selectedPosition.token1,
-        },
-        authenticatedAgent,
-        unAuthenticatedAgent,
-      );
-      if (!generatedArgs.success || !generatedArgs.result) {
-        actions.setRemoveLiquidityStep({
+      console.log(Number(percentValue.slice(0, -1)));
+
+      const generatedArgs = generate_decrease_liquidity_args({
+        position: selectedPosition,
+        percentage: Number(percentValue.slice(0, -1)),
+      }) as DecreaseLiquidityArgs;
+
+      if (!generatedArgs) {
+        actions.setMintStep({
           step: 1,
           status: 'failed',
-          errorMessage: generatedArgs.message,
+          errorMessage: null,
         });
-        return generatedArgs.message;
+        return generatedArgs;
       }
-      actions.setRemoveLiquidityStep({
+
+      actions.setMintStep({
         step: 2,
         status: 'pending',
         errorMessage: null,
       });
-      const { amount0_max, amount1_max, from_subaccount, pool, tick_lower, tick_upper } =
-        generatedArgs.result;
+
+      const { amount0_min, amount1_min, pool, tick_lower, tick_upper, liquidity } = generatedArgs;
       // Step 2
       const removeLiquidityResponse = await remove_liquidity(
         {
           // TODO: Fix these properties
-          amount0_min: '',
-          amount1_min: '',
-          liquidity: '',
-          pool: selectedPosition.pool.pool_id,
-          tick_lower: selectedPosition.key.tick_lower,
-          tick_upper: selectedPosition.key.tick_upper,
+          amount0_min: amount0_min,
+          amount1_min: amount1_min,
+          liquidity: liquidity,
+          pool: pool,
+          tick_lower: tick_lower,
+          tick_upper: tick_upper,
         },
         authenticatedAgent,
       );
 
       if (!removeLiquidityResponse.success) {
-        actions.setRemoveLiquidityStep({
+        actions.setMintStep({
           step: 2,
           status: 'failed',
           errorMessage: removeLiquidityResponse.message,
         });
         return removeLiquidityResponse.message;
       }
-      actions.setRemoveLiquidityStep({
+      actions.setMintStep({
         step: 2,
         status: 'successful',
         errorMessage: null,
@@ -146,6 +146,43 @@ export default function RemoveLiquidityStepTwo({ position, tokensRemoveAmount }:
           </div>
         </SolidCard>
 
+        <SolidCard className="bg-transparent lg:bg-[#222222]">
+          <div className={cn('flex flex-col gap-y-3', 'w-full')}>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm font-medium text-white/70 md:text-base">
+                {position.token0.symbol} fees
+              </p>
+              <div
+                className={cn(
+                  'relative',
+                  'flex items-center gap-x-1.5',
+                  'text-sm font-semibold text-white md:text-base',
+                )}
+              >
+                <Avatar src={position.token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
+                {position.fees_token0_owed} {position.token0.symbol}{' '}
+                <span className="text-muted">({position.fees_token0_owed_usd}$)</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm font-medium text-white/70 md:text-base">
+                {position.token1.symbol} fees
+              </p>
+              <div
+                className={cn(
+                  'relative',
+                  'flex items-center gap-x-1.5',
+                  'text-sm font-semibold text-white md:text-base',
+                )}
+              >
+                <Avatar src={position.token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
+                {position.fees_token1_owed} {position.token1.symbol}{' '}
+                <span className="text-muted">({position.fees_token1_owed_usd}$)</span>
+              </div>
+            </div>
+          </div>
+        </SolidCard>
+
         {/* Action Button */}
         <div
           className={cn(
@@ -173,7 +210,8 @@ export default function RemoveLiquidityStepTwo({ position, tokensRemoveAmount }:
           onInteractOutside={(e) => e.preventDefault()}
           className="h-[350] w-fit min-w-80"
         >
-          <RemoveLiquidityStepper
+          <PositionStepper
+            title="Remove Liquidity"
             onCloseModal={() => setIsOpen(false)}
             steps={removeLiquidityStepsDetails}
           />

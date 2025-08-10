@@ -46,6 +46,7 @@ const RemoveLiquidity = () => {
         />
       ) : (
         <RemoveLiquidityStepTwo
+          percentValue={percentValue}
           position={selectedPosition}
           tokensRemoveAmount={tokensRemoveAmount}
         />

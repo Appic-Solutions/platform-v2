@@ -98,6 +98,9 @@ export type RemoveLiquidityStepDetail = CreatePositionStepDetail;
 export type AddLiquidityStep = CreatePositionStep;
 export type AddLiquidityStepDetail = CreatePositionStepDetail;
 
+export type CollectFeesStep = CreatePositionStep;
+export type CollectFeesStepDetail = CreatePositionStepDetail;
+
 export interface ExecuteRemoveLiquidityParams {
   args: DecreaseLiquidityArgs | BurnPositionArgs;
   authenticated_agent: HttpAgent;

@@ -3,7 +3,6 @@
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { Avatar } from '@/components/common/ui/avatar';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
-import { AddLiquidityStepper } from './add-liquidity-stepper';
 import { addLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
@@ -13,6 +12,7 @@ import {
   generate_args_and_approve_add_liquidity,
   increase_liquidity,
 } from '@/blockchain_api/functions/icp/dex/tx/add_liquidity';
+import { PositionStepper } from '@/app/positions/_components/position-stepper';
 
 export default function AddLiquidityStepTwo() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ export default function AddLiquidityStepTwo() {
 
   const openModalHandler = () => {
     setIsOpen(true);
-    // submitHandler();
+    submitHandler();
   };
 
   const submitHandler = async () => {
@@ -49,6 +49,21 @@ export default function AddLiquidityStepTwo() {
         unAuthenticatedAgent,
       );
 
+      if (!increaseLiquidityArgs || !increaseLiquidityArgs.success) {
+        actions.setMintStep({
+          step: 1,
+          status: 'failed',
+          errorMessage: null,
+        });
+        return increaseLiquidityArgs;
+      }
+
+      actions.setMintStep({
+        step: 2,
+        status: 'pending',
+        errorMessage: null,
+      });
+
       if (increaseLiquidityArgs.result) {
         const { amount0_max, amount1_max, from_subaccount, pool, tick_lower, tick_upper } =
           increaseLiquidityArgs.result;
@@ -58,12 +73,21 @@ export default function AddLiquidityStepTwo() {
           authenticatedAgent,
         );
 
-        if (result.result) {
-          console.log(result);
+        if (!result.success) {
+          actions.setMintStep({
+            step: 2,
+            status: 'failed',
+            errorMessage: result.message,
+          });
+          return result.message;
         }
+        actions.setMintStep({
+          step: 2,
+          status: 'successful',
+          errorMessage: null,
+        });
       }
     }
-    // onNext();
   };
 
   const token0TotalAmount =
@@ -132,7 +156,8 @@ export default function AddLiquidityStepTwo() {
           onInteractOutside={(e) => e.preventDefault()}
           className="h-[350] w-fit min-w-80"
         >
-          <AddLiquidityStepper
+          <PositionStepper
+            title="Add Liquidity"
             onCloseModal={() => setIsOpen(false)}
             steps={addLiquidityStepsDetails}
           />

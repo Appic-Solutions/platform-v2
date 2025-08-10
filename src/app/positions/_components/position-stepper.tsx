@@ -1,19 +1,19 @@
 import Stepper from '@/app/_layout/Stepper';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
-import { RemoveLiquidityStepDetail } from '@/app/positions/types';
+import { CreatePositionStepDetail } from '@/app/positions/types';
 import { CloseIcon } from '@/components/icons';
 import { DialogClose } from '@/components/ui/dialog';
-import { removeLiquidityStepsDetails } from '@/lib/constants/positions';
 import React from 'react';
-import { RemoveLiquidityStep } from './remove-liquidity-step';
+import { PositionStep } from './position-step';
 
 interface Props {
-  steps: RemoveLiquidityStepDetail[];
+  steps: CreatePositionStepDetail[];
   onCloseModal: () => void;
+  title: string;
 }
 
-export const RemoveLiquidityStepper = ({ steps, onCloseModal }: Props) => {
-  const { removeLiquidityPrevStep, removeLiquidityStep, actions } = usePositionDetailsStore();
+export const PositionStepper = ({ steps, onCloseModal, title }: Props) => {
+  const { mintPrevStep, mintStep, actions } = usePositionDetailsStore();
 
   const resetTransaction = () => {
     console.log('reset');
@@ -25,26 +25,25 @@ export const RemoveLiquidityStepper = ({ steps, onCloseModal }: Props) => {
   };
 
   const stepperClickHandler = (activeId: number) => {
-    if (removeLiquidityPrevStep.step === activeId) return;
-    actions.setRemoveLiquidityPrevStep({ step: activeId, status: 'successful' });
+    if (mintPrevStep.step === activeId) return;
+    actions.setMintPrevStep({ step: activeId, status: 'successful' });
   };
 
   return (
     <div className="relative w-full max-w-[691px] justify-start gap-y-9">
-      <div className="text-center text-lg font-bold text-primary">Remove Liquidity</div>
+      <div className="text-center text-lg font-bold text-primary">{title}</div>
       <DialogClose onClick={closeModal} className="absolute right-5 top-0">
         <CloseIcon className="h-6 w-6 text-primary" />
       </DialogClose>
       <div className="flex flex-col items-center justify-center gap-y-16 py-5 md:flex-row md:items-start md:gap-x-16">
-        {removeLiquidityStepsDetails.map((step, index) => (
-          <RemoveLiquidityStep
+        {steps.map((step, index) => (
+          <PositionStep
             key={index}
             onResetTransaction={resetTransaction}
             currentStep={
-              removeLiquidityPrevStep.step === 0 ||
-              removeLiquidityPrevStep.step === removeLiquidityStep.step
-                ? removeLiquidityStep
-                : removeLiquidityPrevStep
+              mintPrevStep.step === 0 || mintPrevStep.step === mintStep.step
+                ? mintStep
+                : mintPrevStep
             }
             index={index}
             step={step}
@@ -53,8 +52,8 @@ export const RemoveLiquidityStepper = ({ steps, onCloseModal }: Props) => {
       </div>
       <Stepper
         totalSteps={steps.length}
-        currentStep={removeLiquidityStep.step}
-        selectedStep={removeLiquidityPrevStep.step}
+        currentStep={mintStep.step}
+        selectedStep={mintPrevStep.step}
         clickHandler={stepperClickHandler}
       />
     </div>
