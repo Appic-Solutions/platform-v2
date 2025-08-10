@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 import { FormattedPosition } from '../types';
 import AvatarGroup from './AvatarGroup';
+import Link from 'next/link';
 
 const PositionCard = ({
   position,
@@ -12,7 +13,8 @@ const PositionCard = ({
   onSelectHandler: (position: FormattedPosition) => void;
 }) => {
   return (
-    <div
+    <Link
+      href="positions/details"
       className={cn('cursor-pointer rounded-2xl bg-[#222222] lg:rounded-3xl')}
       onClick={() => onSelectHandler(position)}
     >
@@ -72,7 +74,7 @@ const PositionCard = ({
           <span className="text-[13px] font-semibold text-white/50">Full range</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

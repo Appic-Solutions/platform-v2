@@ -4,10 +4,10 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import { useEffect, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { FormattedPosition } from '@/app/positions/types';
-import AvatarGroup from '../../AvatarGroup';
 import { TokensRemoveAmount } from '.';
 import { removeLiquidityPercents } from '@/lib/constants/positions';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
+import AvatarGroup from '@/app/positions/_components/AvatarGroup';
 
 interface Props {
   position: FormattedPosition;

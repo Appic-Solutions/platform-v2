@@ -1,30 +1,26 @@
 'use client';
-import { cn } from '@/lib/utils';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { usePositionDetailsStore } from '../_store/usePositionDetailsStore';
 import Box from '@/components/ui/box';
-import Details from './Details';
-import AddLiquidity from './add-liquidity';
-import RemoveLiquidity from './remove-liquidity';
-import CollectFees from './collect-fees';
-import { useSharedStore } from '@/store/store';
+import { cn } from '@/lib/utils';
 import { ArrowLeftIcon } from '@/components/icons';
 import Link from 'next/link';
-import { usePositionDetailsStore } from '../../_store/usePositionDetailsStore';
+import { useRouter } from 'next/navigation';
+import { useSharedStore } from '@/store/store';
+import AddLiquidity from './_components/add-liquidity';
+import RemoveLiquidity from './_components/remove-liquidity';
+import CollectFees from './_components/collect-fees';
+import Details from './_components/Details';
 
-// TODO: delete all duplicated components if the second logic (route based) supported all of your needs
 const PositionDetails = () => {
+  const { currentStep, actions, selectedPosition } = usePositionDetailsStore();
   const { icpIdentity } = useSharedStore();
-  const { selectedPosition: position, currentStep, actions } = usePositionDetailsStore();
+  const router = useRouter();
 
-  if (!position) {
-    return null;
+  if (!selectedPosition || !icpIdentity) {
+    router.push('/positions');
+    return;
   }
-
-  useEffect(() => {
-    if (!icpIdentity) {
-      actions.setSelectedPosition(undefined);
-    }
-  });
 
   return (
     <Box
@@ -61,13 +57,12 @@ const PositionDetails = () => {
           </button>
         </div>
       )}
-
       {currentStep === 'addLiquidity' ? (
-        <AddLiquidity position={position} setCurrentStep={actions.setCurrentStep} />
+        <AddLiquidity position={selectedPosition} setCurrentStep={actions.setCurrentStep} />
       ) : currentStep === 'removeLiquidity' ? (
         <RemoveLiquidity />
       ) : currentStep === 'collectFees' ? (
-        <CollectFees position={position} setCurrentStep={actions.setCurrentStep} />
+        <CollectFees position={selectedPosition} setCurrentStep={actions.setCurrentStep} />
       ) : (
         <Details />
       )}

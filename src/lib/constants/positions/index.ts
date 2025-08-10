@@ -1,3 +1,4 @@
+import { RemoveLiquidityPercent } from '@/app/positions/_components/position-details/remove-liquidity/step-one';
 import { CreatePositionStepDetail } from '@/app/positions/types';
 
 export const allowedInputCharacters = [
@@ -166,3 +167,10 @@ export const removeLiquidityStepsDetails: CreatePositionStepDetail[] = [
     },
   },
 ];
+
+export const removeLiquidityPercents: RemoveLiquidityPercent[] = [
+  { label: '25%', value: '25' },
+  { label: '50%', value: '50' },
+  { label: '75%', value: '75' },
+  { label: 'max', value: '100' },
+] as const;

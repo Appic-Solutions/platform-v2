@@ -8,7 +8,6 @@ import { Agent, HttpAgent } from '@dfinity/agent';
 import { useState } from 'react';
 import { CreatePositionStep } from '../../types';
 
-// TODO: change name of this function to something more related to last step of create position, add liquidity, collect fee, remove liquidity
 export default function useReviewPositionLogic() {
   const [createPositionStep, setCreatePositionStep] = useState<CreatePositionStep>({
     status: 'pending',

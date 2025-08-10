@@ -32,7 +32,7 @@ export default function CreatePositionStepper({ steps, onCloseModal }: Props) {
 
   return (
     <div className="relative w-full max-w-[691px] justify-start gap-y-9">
-      <div className="text-center text-lg font-bold text-primary">Bridge Transaction</div>
+      <div className="text-center text-lg font-bold text-primary">Create Position</div>
       <DialogClose onClick={closeModal} className="absolute right-5 top-0">
         <CloseIcon className="h-6 w-6 text-primary" />
       </DialogClose>

@@ -1,4 +1,8 @@
-import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import {
+  BurnPositionArgs,
+  CandidPoolId,
+  DecreaseLiquidityArgs,
+} from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { ActiveTickArgs } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { HttpAgent } from '@dfinity/agent';
@@ -86,4 +90,12 @@ export interface CreatePositionStepDetail {
   statuses: {
     [key in 'pending' | 'successful' | 'failed']: TxStatus;
   };
+}
+
+export type RemoveLiquidityStep = CreatePositionStep;
+export type RemoveLiquidityStepDetail = CreatePositionStepDetail;
+
+export interface ExecuteRemoveLiquidityParams {
+  args: DecreaseLiquidityArgs | BurnPositionArgs;
+  authenticated_agent: HttpAgent;
 }

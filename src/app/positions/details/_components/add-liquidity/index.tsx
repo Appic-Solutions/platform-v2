@@ -2,9 +2,6 @@ import { useState } from 'react';
 import { FormattedPosition, Step } from '@/app/positions/types';
 import AddLiquidityStepOne from './step-one';
 import AddLiquidityStepTwo from './step-two';
-import { ArrowLeftIcon } from '@/components/icons';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
   AddLiquidityFormDefaultValues,
