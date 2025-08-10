@@ -4,12 +4,12 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import PositionDetailsChart from './PositionDetailsChart';
-import { FeesPercentage, PositionPercentage, Step } from '../../types';
+import { FeesPercentage, FormattedPosition, PositionPercentage, Step } from '../../types';
 import BigNumber from 'bignumber.js';
 import AvatarGroup from '../AvatarGroup';
 
 interface DetailsProps {
-  position: any;
+  position: FormattedPosition;
   onReset: () => void;
   positionPercentage: PositionPercentage;
   feesPercentage: FeesPercentage;
@@ -45,7 +45,9 @@ const Details = ({
               <h3 className="text-2xl font-semibold lg:text-3xl">{`${position.token0.symbol}/${position.token1.symbol}`}</h3>
             </div>
             <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-              <span className="text-xs text-white/60">{position.fees_token1_owed_usd}</span>
+              <span className="text-xs text-white/60">
+                {Number(position.pool.pool_id.fee) / 10000}%
+              </span>
             </SolidCard>
           </div>
         </div>
@@ -68,7 +70,7 @@ const Details = ({
             <h3 className="mb-1 text-sm text-[#898989]">Position</h3>
             <div className="mb-2 text-xl font-semibold">${position.total_reserves_usd}</div>
             <div>
-              <div className="flex w-full items-center justify-between text-base text-[#FFFFFFCF]">
+              <div className="flex w-full items-center justify-between text-sm text-[#FFFFFFCF]">
                 <span>
                   {BigNumber(position.token0_reserves).toFixed(6)} {position.token0.symbol}
                 </span>
@@ -130,7 +132,7 @@ const Details = ({
             <h3 className="mb-1 text-sm text-[#898989]">Fees earned</h3>
             <div className="mb-2 text-xl font-semibold">${position.total_fees_owed_usd}</div>
             <div>
-              <div className="flex w-full items-center justify-between text-base text-[#FFFFFFCF]">
+              <div className="flex w-full items-center justify-between text-sm text-[#FFFFFFCF]">
                 <span>
                   {parseFloat(position.fees_token0_owed).toFixed(6)} {position.token0.symbol}
                 </span>

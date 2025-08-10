@@ -5,10 +5,9 @@ import { useSharedStore } from '@/store/store';
 import { UseFormReturn, useWatch } from 'react-hook-form';
 import { AddLiquidityFormDefaultValues } from '@/app/positions/create/schema';
 import { FormattedPosition } from '@/app/positions/types';
-import SetUserWalletBalanceButton from '@/app/positions/create/_components/SetUserWalletBalanceButton';
 import { useEffect, useState } from 'react';
-import AddLiquidityInput from './add-liquidity-input';
 import AvatarGroup from '../../AvatarGroup';
+import AddLiquidityInput from './add-liquidity-input';
 
 const AddLiquidityStepOne = ({
   position,
@@ -28,14 +27,10 @@ const AddLiquidityStepOne = ({
 
     const userToken0 = icpBalance.tokens.find((t) => t.canisterId === position.token0?.canisterId);
     const userToken1 = icpBalance.tokens.find((t) => t.canisterId === position.token1?.canisterId);
-    console.log(icpBalance);
-    console.log(userToken1);
-    if (userToken0?.balance && userToken1?.balance) {
-      setUserTokenBalances({
-        token0Balance: userToken0?.balance,
-        token1Balance: userToken1?.balance,
-      });
-    }
+    setUserTokenBalances({
+      token0Balance: userToken0?.balance ?? '0',
+      token1Balance: userToken1?.balance ?? '0',
+    });
   }, [icpBalance, icpIdentity]);
 
   const [token0DepositAmount, token1DepositAmount] = useWatch({
@@ -45,119 +40,58 @@ const AddLiquidityStepOne = ({
 
   return (
     <>
-      {/* token names */}
-      <div className={cn('flex items-center justify-between gap-4', 'mb-3')}>
-        <div className="flex gap-4">
-          {/* avatars */}
-          <AvatarGroup avatar0={position.token0.logo} avatar1={position.token1.logo} />
+      <div className="flex flex-col gap-2">
+        {/* token names */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex gap-4">
+            {/* avatars */}
+            <AvatarGroup avatar0={position.token0.logo} avatar1={position.token1.logo} />
 
-          <div>
-            <div className="flex items-center text-xl font-semibold md:text-2xl">
-              {position.token0.symbol}/{position.token1.symbol}
-            </div>
-            <p
-              className={cn(
-                'flex items-center gap-x-1.5 text-[13px]',
-                position.is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
-              )}
-            >
-              <span
+            <div>
+              <div className="flex items-center text-xl font-semibold md:text-2xl">
+                {position.token0.symbol}/{position.token1.symbol}
+              </div>
+              <p
                 className={cn(
-                  'h-[9px] w-[9px] animate-pulse rounded-full',
-                  position.is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
+                  'flex items-center gap-x-1.5 text-[13px]',
+                  position.is_in_range ? 'text-[#77EF4B]' : 'text-[#EE5D5D]',
                 )}
-              />
-              {position.is_in_range ? 'In range' : 'Out of range'}
-            </p>
-          </div>
-        </div>
-
-        <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-          <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
-        </SolidCard>
-      </div>
-
-      {/* inputs */}
-      <div
-        className={cn(
-          'group mb-3 rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white',
-        )}
-      >
-        {/* input0 */}
-        <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-4 lg:px-7">
-          <div className="flex h-full w-2/3 flex-col justify-between font-semibold">
-            <AddLiquidityInput
-              fieldName="token0DepositAmount"
-              form={addLiquidityForm}
-              position={position}
-            />
-            <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
-              $
-              {(Number(token0DepositAmount || 0) * Number(position.token0.usdPrice || 0)).toFixed(
-                2,
-              )}
-            </p>
-          </div>
-          {/* logo */}
-          <div className="flex w-max flex-col gap-2">
-            <div className={cn('relative', 'flex gap-x-1.5 self-end')}>
-              <Avatar src={position.token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              <p className="text-sm font-semibold text-white md:text-xl">
-                {position.token0.symbol}
+              >
+                <span
+                  className={cn(
+                    'h-[9px] w-[9px] animate-pulse rounded-full',
+                    position.is_in_range ? 'bg-[#77EF4B]' : 'bg-[#EE5D5D]',
+                  )}
+                />
+                {position.is_in_range ? 'In range' : 'Out of range'}
               </p>
             </div>
-            {icpIdentity && icpBalance && (
-              <SetUserWalletBalanceButton
-                onMaxClick={(amount) => console.log(amount)}
-                token={position.token0}
-                userTokenBalance={userTokenBalances?.token0Balance}
-              />
-            )}
           </div>
+
+          <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
+            <span className="text-xs leading-5 text-white/60">
+              {Number(position.pool.pool_id.fee) / 10000}%
+            </span>
+          </SolidCard>
         </div>
-      </div>
-      {/* input1 */}
-      <div
-        className={cn(
-          'group mb-3 rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white',
-        )}
-      >
-        <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-4 lg:px-7">
-          <div className="flex h-full w-2/3 flex-col justify-between font-semibold">
-            <AddLiquidityInput
-              fieldName="token1DepositAmount"
-              form={addLiquidityForm}
-              position={position}
-            />
-            <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
-              $
-              {(Number(token1DepositAmount || 0) * Number(position.token1?.usdPrice || 0)).toFixed(
-                2,
-              )}
-            </p>
-          </div>
-          {/* logo */}
-          <div className="flex w-max flex-col gap-2">
-            <div className={cn('relative', 'flex gap-x-1.5 self-end')}>
-              <Avatar src={position.token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              <p className="text-sm font-semibold text-white md:text-xl">
-                {position.token1.symbol}
-              </p>
-            </div>
-            {icpIdentity && icpBalance && (
-              <SetUserWalletBalanceButton
-                onMaxClick={(amount) => console.log(amount)}
-                token={position.token1}
-                userTokenBalance={userTokenBalances?.token1Balance}
-              />
-            )}
-          </div>
-        </div>
+
+        <AddLiquidityInput
+          fieldName="token0DepositAmount"
+          form={addLiquidityForm}
+          position={position}
+          userTokenBalance={userTokenBalances?.token0Balance}
+        />
+
+        <AddLiquidityInput
+          fieldName="token1DepositAmount"
+          form={addLiquidityForm}
+          position={position}
+          userTokenBalance={userTokenBalances?.token1Balance}
+        />
       </div>
 
-      {/* balance */}
       <SolidCard className="bg-transparent lg:bg-[#222222]">
-        <div className={cn('flex flex-col gap-y-3', 'w-full')}>
+        <div className="flex w-full flex-col gap-y-3">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
               {position.token0.symbol} position

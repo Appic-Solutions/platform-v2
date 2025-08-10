@@ -14,32 +14,6 @@ interface CollectFeesStepOneProps {
 const CollectFeesStepOne = ({ onBack, position }: CollectFeesStepOneProps) => {
   return (
     <div className="w-full animate-fade">
-      {/* Header */}
-      <div
-        className={cn('relative isolate', 'mb-8 flex items-center justify-between gap-4', 'w-full')}
-      >
-        <ArrowLeftIcon onClick={onBack} className="z-10 hidden cursor-pointer md:inline-block" />
-        <h1
-          className={cn(
-            'text-[27px] font-bold md:text-[30px]',
-            'md:absolute md:inset-x-0 md:text-center',
-          )}
-        >
-          Collect fees
-        </h1>
-        <button
-          className={cn(
-            'px-2.5 py-0.5',
-            'rounded-md',
-            'bg-white/10',
-            'text-xs font-medium text-white/60',
-            'z-10',
-          )}
-        >
-          <Link href="https://t.me/Appic_dao">Get help</Link>
-        </button>
-      </div>
-
       {/* Main */}
       <SolidCard className="mb-8 bg-transparent px-5 lg:bg-[#222222] lg:px-8">
         {/* token0 */}

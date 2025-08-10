@@ -8,6 +8,7 @@ import AddLiquidity from './add-liquidity';
 import RemoveLiquidity from './remove-liquidity';
 import CollectFees from './collect-fees';
 import { useSharedStore } from '@/store/store';
+import PositionDetailsHeader from './position-details-header';
 
 const PositionDetails = ({ position, onReset }: PositionDetailsProps) => {
   const { icpIdentity } = useSharedStore();
@@ -50,13 +51,15 @@ const PositionDetails = ({ position, onReset }: PositionDetailsProps) => {
   return (
     <Box
       className={cn(
-        'text-white transition-all md:overflow-auto md:text-black md:dark:text-white',
-        'h-max',
+        'gap-8 text-white transition-all md:overflow-auto md:text-black md:dark:text-white',
         currentStep === 'positionDetail'
           ? 'md:h-[580px] md:w-[965px]'
           : 'md:max-h-[570px] md:w-[533px]',
       )}
     >
+      {currentStep !== 'positionDetail' && (
+        <PositionDetailsHeader step={currentStep} onBack={() => setCurrentStep('positionDetail')} />
+      )}
       {currentStep === 'addLiquidity' ? (
         <AddLiquidity position={position} setCurrentStep={setCurrentStep} />
       ) : currentStep === 'removeLiquidity' ? (

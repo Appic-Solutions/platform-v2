@@ -5,22 +5,22 @@ import { useEffect, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { FormattedPosition } from '@/app/positions/types';
 import AvatarGroup from '../../AvatarGroup';
+import { TokensRemoveAmount } from '.';
 
-interface RemoveLiquidityProps {
+interface Props {
   position: FormattedPosition;
-  onBack: () => void;
-  onNext: () => void;
+  setTokensRemoveAmount: React.Dispatch<React.SetStateAction<TokensRemoveAmount>>;
+  percentValue: string;
+  setPercentValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityProps) => {
-  const { token0, token1, is_in_range, total_fees_owed_usd, token0_reserves, token1_reserves } =
-    position;
+const RemoveLiquidityStepOne = ({
+  position,
+  setTokensRemoveAmount,
+  percentValue,
+  setPercentValue,
+}: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [percentValue, setPercentValue] = useState('0%');
-  const [tokensReservesAfterRemove, setTokensReservesAfterRemove] = useState({
-    token0: token0_reserves,
-    token1: token1_reserves,
-  });
 
   useEffect(() => {
     const input = inputRef.current;
@@ -67,23 +67,16 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
     const percent = new BigNumber(raw);
     const validPercent = percent.isNaN() ? new BigNumber(0) : percent;
 
-    const token0ReservesAfterRemove = new BigNumber(token0_reserves).minus(
-      new BigNumber(token0_reserves).times(validPercent).div(100),
-    );
-    const token1ReservesAfterRemove = new BigNumber(token1_reserves).minus(
-      new BigNumber(token1_reserves).times(validPercent).div(100),
-    );
-
-    setTokensReservesAfterRemove({
-      token0: token0ReservesAfterRemove.toFixed(8),
-      token1: token1ReservesAfterRemove.toFixed(8),
+    setTokensRemoveAmount({
+      token0: new BigNumber(position.token0_reserves).times(validPercent).div(100),
+      token1: new BigNumber(position.token1_reserves).times(validPercent).div(100),
     });
   }, [percentValue]);
 
   return (
-    <>
+    <div className="flex animate-fade flex-col gap-2">
       {/* Position info */}
-      <div className={cn('flex items-center justify-between gap-4', 'mb-3')}>
+      <div className="mb-3 flex items-center justify-between gap-4">
         <div className="flex gap-4">
           {/* avatars */}
           <AvatarGroup avatar0={position.token0.logo} avatar1={position.token1.logo} />
@@ -110,12 +103,14 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
         </div>
 
         <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-          <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
+          <span className="text-xs leading-5 text-white/60">
+            {Number(position.pool.pool_id.fee) / 10000}%
+          </span>
         </SolidCard>
       </div>
 
       {/* Input */}
-      <div className="group mb-8 w-full rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white">
+      <div className="group w-full rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white">
         <div className="w-full rounded-[20px] bg-box-background-secondary px-5 py-6">
           <p className="mb-3 font-semibold text-white/70 md:text-lg">Withdrawal amount</p>
           <div className="flex items-center justify-between">
@@ -149,78 +144,7 @@ const RemoveLiquidityStepOne = ({ position, onBack, onNext }: RemoveLiquidityPro
           </div>
         </div>
       </div>
-
-      {/* balance */}
-      <SolidCard className="mb-8 bg-transparent lg:bg-[#222222]">
-        <div className={cn('flex flex-col gap-y-3', 'w-full')}>
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm font-medium text-white/70 md:text-base">
-              {position.token0.symbol} position
-            </p>
-            <div
-              className={cn(
-                'relative',
-                'flex items-center gap-x-1.5',
-                'text-sm font-semibold text-white md:text-base',
-              )}
-            >
-              <Avatar src={position.token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              {tokensReservesAfterRemove.token0.replace(/\.?0+$/, '')} {position.token0.symbol}
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm font-medium text-white/70 md:text-base">
-              {position.token1.symbol} position
-            </p>
-            <div
-              className={cn(
-                'relative',
-                'flex items-center gap-x-1.5',
-                'text-sm font-semibold text-white md:text-base',
-              )}
-            >
-              <Avatar src={position.token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              {tokensReservesAfterRemove.token1.replace(/\.?0+$/, '')} {position.token1.symbol}
-            </div>
-          </div>
-        </div>
-      </SolidCard>
-
-      {/* Action Button */}
-      <div
-        className={cn(
-          'flex h-[50px] items-center justify-center gap-x-3 self-end lg:h-[66px]',
-          'w-full',
-        )}
-      >
-        <button
-          onClick={onBack}
-          className={cn(
-            'h-full w-full',
-            'bg-white/35',
-            'text-white',
-            'mt-auto md:mt-0',
-            'select-none rounded-[15px] duration-200',
-            'hover:opacity-85',
-          )}
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onNext}
-          className={cn(
-            'h-full w-full',
-            'bg-primary-buttons',
-            'text-white',
-            'mt-auto md:mt-0',
-            'select-none rounded-[15px] duration-200',
-            'hover:opacity-85',
-          )}
-        >
-          Continue
-        </button>
-      </div>
-    </>
+    </div>
   );
 };
 
