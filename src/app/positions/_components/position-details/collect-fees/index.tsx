@@ -5,7 +5,7 @@ import CollectFeesStepTwo from './step-two';
 
 interface CollectFeesProps {
   position: FormattedPosition;
-  setCurrentStep: React.Dispatch<React.SetStateAction<Step>>;
+  setCurrentStep: (step: Step) => void;
 }
 
 const CollectFees = ({ position, setCurrentStep }: CollectFeesProps) => {

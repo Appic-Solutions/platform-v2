@@ -1,11 +1,7 @@
-import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
-import {
-  ActiveTick,
-  get_active_liquidity,
-} from '@/blockchain_api/functions/icp/dex/get_active_ticks';
+import { ActiveTick } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { useWatch } from 'react-hook-form';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
@@ -13,7 +9,6 @@ import PriceRangeBarChart, { ChartType } from './PriceRangeBarChart';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import TokenSwitcher from './TokenSwitcher';
 import { useGetChartData } from '@/app/positions/_api';
-import Skeleton from '@/components/ui/skeleton';
 import ChartSkeleton from './ChartSkeleton';
 
 const tabs: ChartType[] = [
@@ -70,7 +65,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
     };
 
     getChartDataHandler();
-  }, [token0, token1, unAuthenticatedAgent]);
+  }, [unAuthenticatedAgent]);
 
   useEffect(() => {
     if (!matchedPool.sqrt_price_x96) return;

@@ -7,16 +7,19 @@ import BigNumber from 'bignumber.js';
 interface Props {
   userTokenBalance: string | undefined;
   token: IcpToken;
-  isAmountZero: boolean;
+  onMaxClick: (amount: string) => void;
 }
 
-const SetUserWalletBalanceButton = ({ userTokenBalance, token, isAmountZero }: Props) => {
-  const { handleDepositAmountInput } = useCreatePosition();
-
+const SetUserWalletBalanceButton = ({ userTokenBalance, token, onMaxClick }: Props) => {
   return (
     <div className="flex w-full items-center justify-between gap-1.5">
       <span className="text-ellipsis text-sm font-semibold text-white/50">
-        {(userTokenBalance && parseFloat(userTokenBalance).toFixed(6)) || 0} {token.symbol}
+        {(userTokenBalance &&
+          parseFloat(userTokenBalance)
+            .toFixed(6)
+            .replace(/\.?0+$/, '')) ||
+          0}{' '}
+        {token.symbol}
       </span>
       <button
         disabled={!userTokenBalance}
@@ -33,15 +36,9 @@ const SetUserWalletBalanceButton = ({ userTokenBalance, token, isAmountZero }: P
             const formattedBalance = new BigNumber(userTokenBalance)
               .decimalPlaces(6, BigNumber.ROUND_DOWN)
               .toFixed();
-            handleDepositAmountInput({
-              amount: formattedBalance,
-              isAmountZero: isAmountZero,
-            });
+            onMaxClick(formattedBalance);
           } else {
-            handleDepositAmountInput({
-              amount: '0',
-              isAmountZero: isAmountZero,
-            });
+            onMaxClick('0');
           }
         }}
       >

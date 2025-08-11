@@ -4,10 +4,10 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import { useEffect, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { FormattedPosition } from '@/app/positions/types';
-import AvatarGroup from '../../AvatarGroup';
 import { TokensRemoveAmount } from '.';
 import { removeLiquidityPercents } from '@/lib/constants/positions';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
+import AvatarGroup from '@/app/positions/_components/AvatarGroup';
 
 interface Props {
   position: FormattedPosition;
@@ -160,7 +160,7 @@ const RemoveLiquidityStepOne = ({
         <div className={cn('flex flex-col gap-y-3', 'w-full')}>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
-              {position.token0.symbol} position
+              {position.token0.symbol}
             </p>
             <div
               className={cn(
@@ -170,16 +170,13 @@ const RemoveLiquidityStepOne = ({
               )}
             >
               <Avatar src={position.token0.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              {BigNumber(position.token0_reserves)
-                .minus(tokensRemoveAmount.token0)
-                .toString()
-                .replace(/\.?0+$/, '')}{' '}
+              {tokensRemoveAmount.token0.toString().replace(/\.?0+$/, '') || '0'}{' '}
               {position.token0.symbol}
             </div>
           </div>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-white/70 md:text-base">
-              {position.token1.symbol} position
+              {position.token1.symbol}
             </p>
             <div
               className={cn(
@@ -189,10 +186,7 @@ const RemoveLiquidityStepOne = ({
               )}
             >
               <Avatar src={position.token1.logo} className="h-5 w-5 md:h-6 md:w-6" />
-              {BigNumber(position.token0_reserves)
-                .minus(tokensRemoveAmount.token0)
-                .toString()
-                .replace(/\.?0+$/, '')}{' '}
+              {tokensRemoveAmount.token1.toString().replace(/\.?0+$/, '') || '0'}{' '}
               {position.token1.symbol}
             </div>
           </div>

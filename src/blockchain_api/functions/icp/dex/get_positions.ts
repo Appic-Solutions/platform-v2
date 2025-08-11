@@ -14,10 +14,6 @@ import { Principal } from '@dfinity/principal';
 import { arePoolsEqual } from './utils/pool_comparison';
 import BigNumber from 'bignumber.js';
 
-// chart => set blur and "coming soon" on it
-
-// the blue and pink colors changes based on token0usdreserves and token1usdreserves
-// the second box bar should be based on fees_token0_owed_usd and fees_token1_owed_usd
 export interface Position {
   key: CandidPositionKey;
   fees_token0_owed: string;

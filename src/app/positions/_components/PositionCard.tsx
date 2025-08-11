@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 import { FormattedPosition } from '../types';
 import AvatarGroup from './AvatarGroup';
+import Link from 'next/link';
 
 const PositionCard = ({
   position,
@@ -12,7 +13,8 @@ const PositionCard = ({
   onSelectHandler: (position: FormattedPosition) => void;
 }) => {
   return (
-    <div
+    <Link
+      href="positions/details"
       className={cn('cursor-pointer rounded-2xl bg-[#222222] lg:rounded-3xl')}
       onClick={() => onSelectHandler(position)}
     >
@@ -40,7 +42,9 @@ const PositionCard = ({
           </div>
         </div>
         <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-          <span className="text-xs leading-5 text-white/60">{position.total_fees_owed_usd}%</span>
+          <span className="text-xs leading-5 text-white/60">
+            {Number(position.key.pool.fee) / 10000}%
+          </span>
         </SolidCard>
       </div>
 
@@ -70,7 +74,7 @@ const PositionCard = ({
           <span className="text-[13px] font-semibold text-white/50">Full range</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

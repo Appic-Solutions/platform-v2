@@ -1,6 +1,4 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import { ErrorIcon } from '@/components/icons';

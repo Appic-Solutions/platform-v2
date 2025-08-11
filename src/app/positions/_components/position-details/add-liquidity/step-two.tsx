@@ -5,7 +5,6 @@ import { FormattedPosition } from '@/app/positions/types';
 import { AddLiquidityFormDefaultValues } from '@/app/positions/create/schema';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { Avatar } from '@/components/common/ui/avatar';
-import { cn } from '@/lib/utils';
 
 export default function AddLiquidityStepTwo({
   position,

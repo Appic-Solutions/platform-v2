@@ -14,12 +14,13 @@ import {
 
 import { sortTokens } from '@/blockchain_api/functions/icp/dex/utils/token_order';
 import { CreatePositionFormDefaultValues, CreatePositionFormSchema } from '../schema';
-import type { FeeTier, SelectFeeHandlerProps, SelectTokenHandlerProps } from '../_types';
+import type { FeeTier, SelectFeeHandlerProps, SelectTokenHandlerProps } from '../../types';
 import { alignMinOrMaxPrice } from '@/blockchain_api/functions/icp/dex/align_min_max';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { limitDecimalPlaces } from '@/lib/utils';
 import BigNumber from 'bignumber.js';
 import { useAuth } from '@nfid/identitykit/react';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 export default function useCreatePositionLogic() {
   const { pools, icpBalance, icpIdentity, isIcpBalanceLoading } = useSharedStore();
@@ -29,6 +30,7 @@ export default function useCreatePositionLogic() {
   }>();
   const { connect: openIcpModal } = useAuth();
   const [step, setStep] = useState(0);
+  const [existPool, setExistPool] = useState<Pool>();
   const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
   const [isToken0Selected, setIsToken0Selected] = useState(true);
   const feeManuallySelected = useRef(false);
@@ -154,16 +156,6 @@ export default function useCreatePositionLogic() {
     const effectiveMinPrice = minValue === '0' ? 'min' : minValue || 'min';
     const effectiveMaxPrice = maxValue === '0' ? 'max' : maxValue || 'max';
 
-    console.log({
-      is_token0_selected: isToken0Selected,
-      pool_sqrt_x98_price: sqrtPriceX96,
-      min_price: effectiveMinPrice,
-      max_price: effectiveMaxPrice,
-      tick_spacing: tickSpacing,
-      token0: Token0,
-      token1: Token1,
-    });
-
     const alignedPrice = alignMinOrMaxPrice({
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
@@ -173,8 +165,6 @@ export default function useCreatePositionLogic() {
       token0: Token0,
       token1: Token1,
     });
-
-    console.log('aligned price', alignedPrice);
 
     if (!alignedPrice) return;
 
@@ -219,16 +209,18 @@ export default function useCreatePositionLogic() {
     });
 
     if (!trimmed) {
-      console.log('Empty input, skipping calculation');
       createPositionForm.trigger(field);
       createPositionForm.setValue('token0DepositAmount', '');
       createPositionForm.setValue('token1DepositAmount', '');
       return;
     }
 
+    if (validAmount.endsWith('.')) {
+      return;
+    }
+
     const parsed = parseFloat(validAmount);
     if (isNaN(parsed) || parsed < 0) {
-      console.log('Invalid or negative amount, skipping calculation');
       createPositionForm.setValue(field, '', {
         shouldValidate: true,
         shouldDirty: true,
@@ -237,25 +229,9 @@ export default function useCreatePositionLogic() {
     }
 
     if (!Token0 || !Token1 || !sqrtPriceX96 || !minTick || !maxTick) {
-      console.log('Missing prerequisites for calculation', {
-        Token0,
-        Token1,
-        sqrtPriceX96,
-        minTick,
-        maxTick,
-      });
       return;
     }
 
-    console.log({
-      selected_amount: validAmount,
-      token0: Token0,
-      token1: Token1,
-      sqrt_price_x96: sqrtPriceX96,
-      min_tick: minTick,
-      max_tick: maxTick,
-      is_amount_zero: isAmountZero,
-    });
     if (!minTick || !maxTick) {
       createPositionForm.trigger('minTick');
       createPositionForm.trigger('maxTick');
@@ -270,13 +246,6 @@ export default function useCreatePositionLogic() {
         min_tick: minTick,
         max_tick: maxTick,
         is_amount_zero: isAmountZero,
-      });
-
-      console.log('Mint amounts calculated', {
-        result,
-        token0Amount: result.token0.formatted,
-        token1Amount: result.token1.formatted,
-        isAmountZero,
       });
 
       if (isToken0DepositAmountActive) {
@@ -353,14 +322,7 @@ export default function useCreatePositionLogic() {
     isButtonDisabled: boolean;
     buttonText: string;
   } => {
-    // conditions:
-    /***
-     * 1- token0 && token1 && minPrice && maxPrice && minTick && maxTick && initialPrice && fee && !checkTokenAmounts
-     * 2- userTokenBalances.token0 and userTokenBalances.token1 must be greater than token0DepositAmount and token1DepositAmount
-     * ***/
-    // TODO: write some logs on each step to see what's happening
     if (isIcpBalanceLoading) {
-      console.log('icp balance is loading');
       return {
         isButtonDisabled: true,
         buttonText: 'Fetching wallet balance',
@@ -381,7 +343,6 @@ export default function useCreatePositionLogic() {
       createPositionForm.formState.errors.minPrice !== undefined ||
       createPositionForm.formState.errors.maxPrice !== undefined
     ) {
-      console.log('conditions are not met');
       return {
         buttonText: 'Review',
         isButtonDisabled: true,
@@ -389,7 +350,6 @@ export default function useCreatePositionLogic() {
     }
 
     if (!icpIdentity) {
-      console.log('wallet is not connected');
       return {
         buttonText: 'Connect Wallet',
         isButtonDisabled: false,
@@ -403,7 +363,6 @@ export default function useCreatePositionLogic() {
       +userTokenBalances.token0Balance < +token0DepositAmount ||
       +userTokenBalances.token1Balance < +token1DepositAmount
     ) {
-      console.log('not enough balance');
       return {
         buttonText: 'Not Enough Balance',
         isButtonDisabled: true,
@@ -503,6 +462,8 @@ export default function useCreatePositionLogic() {
     feeTiers,
     userTokenBalances,
     selectFeeHandler,
+    existPool,
+    setExistPool,
     // Step Two
     isToken0Selected,
     setIsToken0Selected,

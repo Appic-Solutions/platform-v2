@@ -6,8 +6,9 @@ import React, { useEffect, useState } from 'react';
 import PositionDetailsChart from './PositionDetailsChart';
 import { FeesPercentage, PositionPercentage, Step } from '../../types';
 import BigNumber from 'bignumber.js';
-import AvatarGroup from '../AvatarGroup';
+import AvatarGroup from '../../_components/AvatarGroup';
 import { usePositionDetailsStore } from '../../_store/usePositionDetailsStore';
+import Link from 'next/link';
 
 const Details = () => {
   const { selectedPosition: position, actions } = usePositionDetailsStore();
@@ -49,8 +50,8 @@ const Details = () => {
     <div className="flex w-full animate-fade flex-col gap-6 overflow-hidden lg:flex-row">
       {/* Left */}
       <div className="flex h-full w-full flex-col lg:w-[55%] lg:gap-5">
-        <button
-          onClick={() => actions.setSelectedPosition(undefined)}
+        <Link
+          href={'/positions'}
           className={cn(
             'mb-2 flex items-center justify-center gap-x-1 self-start md:mb-0',
             'font-semibold',
@@ -58,7 +59,7 @@ const Details = () => {
         >
           <ExpandLeftIcon width={16} height={16} />
           Back
-        </button>
+        </Link>
         {/* Header */}
         <div className="flex w-full items-center">
           <div className="mb-4 flex w-full items-center justify-between gap-2 lg:gap-4">

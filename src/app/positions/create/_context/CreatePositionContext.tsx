@@ -2,13 +2,15 @@
 
 import { createContext, useContext } from 'react';
 import useCreatePositionLogic from '../_logic/useCreatePositionLogic';
+import useReviewPositionLogic from '../_logic/useReviewPositionLogic';
 
-type CreatePositionContextType = ReturnType<typeof useCreatePositionLogic>;
+type CreatePositionContextType = ReturnType<typeof useCreatePositionLogic> &
+  ReturnType<typeof useReviewPositionLogic>;
 
 const CreatePositionContext = createContext<CreatePositionContextType | undefined>(undefined);
 
 export function CreatePositionProvider({ children }: { children: React.ReactNode }) {
-  const poolLogic = useCreatePositionLogic();
+  const poolLogic = { ...useCreatePositionLogic(), ...useReviewPositionLogic() };
   return (
     <CreatePositionContext.Provider value={poolLogic}>{children}</CreatePositionContext.Provider>
   );
