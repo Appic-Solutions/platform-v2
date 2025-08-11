@@ -8,7 +8,8 @@ export interface CollectFeesArgs {
 	position: Position
 }
 
-export async function mint_position(
+// Step one
+export async function collect_fees(
 	{ position }: CollectFeesArgs,
 	authenticated_agent: HttpAgent
 ): Promise<Response<string | undefined>> {

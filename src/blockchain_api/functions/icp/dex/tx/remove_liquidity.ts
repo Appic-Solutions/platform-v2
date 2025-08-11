@@ -24,8 +24,8 @@ export function generate_decrease_liquidty_args({ position, percentage }: Remove
 	let tick_lower = position.key.tick_lower;
 	let tick_upper = position.key.tick_upper;
 	if (percentage == 100) {
-		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy((100 - burn_slippage_percentage) / 100).toFixed();
-		let amount1_min = BigNumber(position.token1_reserves_raw).multipliedBy((100 - burn_slippage_percentage) / 100).toFixed();
+		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
+		let amount1_min = BigNumber(position.token1_reserves_raw).multipliedBy((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
 		return {
 			amount1_min: BigInt(amount1_min),
 			pool,
@@ -35,8 +35,8 @@ export function generate_decrease_liquidty_args({ position, percentage }: Remove
 		} as BurnPositionArgs;
 	} else {
 		let liquidity = BigNumber(position.liquidity).multipliedBy(percentage / 100).toFixed()
-		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).toFixed();
-		let amount1_min = BigNumber(position.token1_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).toFixed();
+		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
+		let amount1_min = BigNumber(position.token1_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
 
 		return {
 			pool,
