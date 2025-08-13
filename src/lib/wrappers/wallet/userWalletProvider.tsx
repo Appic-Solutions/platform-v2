@@ -3,12 +3,12 @@ import { useAuthenticatedAgent } from '@/lib/hooks/useAuthenticatedAgent';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useSharedStoreActions } from '@/store/store';
 import { Principal } from '@dfinity/principal';
-import { useAccounts } from '@nfid/identitykit/react';
+import { useAccounts, useDelegationType, useIdentity } from '@nfid/identitykit/react';
 import { useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
 
 export const UserWalletProvider = () => {
 	const {
-		setIcpIdentity, 
+		setIcpIdentity,
 		setIsEvmConnected,
 		setEvmAddress,
 		setChainId,
@@ -18,6 +18,7 @@ export const UserWalletProvider = () => {
 
 	// ICP Wallet Hooks
 	const icpAccounts = useAccounts();
+	const icpIdentity = useIdentity();
 
 	// EVM Wallet Hooks
 	const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
@@ -26,6 +27,7 @@ export const UserWalletProvider = () => {
 	// Agents
 	const authenticatedAgent = useAuthenticatedAgent();
 	const unAuthenticatedAgent = useUnAuthenticatedAgent();
+
 
 	// Set unauthenticated agent
 	useEffect(() => {
@@ -42,7 +44,12 @@ export const UserWalletProvider = () => {
 				setAuthenticatedAgent(authenticatedAgent);
 			}
 		}
-	}, [icpAccounts, authenticatedAgent, setIcpIdentity, setAuthenticatedAgent]);
+		if (icpIdentity != undefined && authenticatedAgent) {
+			setIcpIdentity(icpIdentity.getPrincipal());
+			setAuthenticatedAgent(authenticatedAgent);
+		}
+
+	}, [icpAccounts, icpIdentity, authenticatedAgent, setIcpIdentity, setAuthenticatedAgent]);
 
 	// Set EVM connection state
 	useEffect(() => {

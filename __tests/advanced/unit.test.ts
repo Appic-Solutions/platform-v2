@@ -20,6 +20,7 @@ const mockCandidEvmToken: CandidEvmToken = {
   erc20_contract_address: '0x123',
   chain_id: BigInt(1),
   symbol: 'TST',
+	is_wrapped_icrc:false,
 };
 
 const mockNewTwinMetadata: NewTwinMetadata = {

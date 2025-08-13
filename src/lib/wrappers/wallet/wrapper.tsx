@@ -9,55 +9,54 @@ import { mainnet, arbitrum, avalanche, base, optimism, polygon, bsc } from '@reo
 import { WagmiProvider, type Config } from 'wagmi';
 
 if (!projectId) {
-  throw new Error('Project ID is not defined');
+	throw new Error('Project ID is not defined');
 }
 
 // Set up metadata
 const metadata = {
-  name: 'Appicdao',
-  description: 'Appic crosschain swap on icp',
-  url: 'http://app.appicdao.com', // origin must match your domain & subdomain
-  icons: ['https://assets.reown.com/reown-profile-pic.png'],
-  debug: true,
+	name: 'Appicdao',
+	description: 'Appic crosschain swap on icp',
+	url: 'http://app.appicdao.com', // origin must match your domain & subdomain
+	icons: ['https://assets.reown.com/reown-profile-pic.png'],
+	debug: true,
 };
 
 // Create the modal
 createAppKit({
-  adapters: [wagmiAdapter],
-  projectId,
-  networks: [mainnet, arbitrum, avalanche, base, optimism, polygon, bsc],
-  defaultNetwork: mainnet,
+	adapters: [wagmiAdapter],
+	projectId,
+	networks: [mainnet, arbitrum, avalanche, base, optimism, polygon, bsc],
+	defaultNetwork: mainnet,
 
-  metadata: metadata,
-  features: {
-    analytics: true, // Optional - defaults to your Cloud configuration
-  },
+	metadata: metadata,
+	features: {
+		analytics: true, // Optional - defaults to your Cloud configuration
+	},
 });
 
 const IdentityKitCustomSignerAuthType = {
-  [NFIDW.id]: IdentityKitAuthType.DELEGATION,
-  ['Plug']: IdentityKitAuthType.ACCOUNTS,
-  [OISY.id]: IdentityKitAuthType.ACCOUNTS, // does not support icrc34_delegation
-  [InternetIdentity.id]: IdentityKitAuthType.DELEGATION, // does not support icrc27_accounts
-  [Stoic.id]: IdentityKitAuthType.DELEGATION, // does not support icrc27_accounts
+	[NFIDW.id]: IdentityKitAuthType.DELEGATION,
+	['Plug']: IdentityKitAuthType.DELEGATION,
+	[OISY.id]: IdentityKitAuthType.ACCOUNTS, // does not support icrc34_delegation
+	[InternetIdentity.id]: IdentityKitAuthType.DELEGATION, // does not support icrc27_accounts
+	[Stoic.id]: IdentityKitAuthType.DELEGATION, // does not support icrc27_accounts
 };
 
+
 export const WalletWrapper = ({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) => {
-  return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
-      <IdentityKitProvider
-        authType={IdentityKitAuthType.ACCOUNTS}
-        signers={[OISY, NFIDW, InternetIdentity, Stoic]}
-        signerClientOptions={{
-          targets: [],
-        }}
-      >
-        {children}
-      </IdentityKitProvider>
-    </WagmiProvider>
-  );
+	return (
+		<WagmiProvider config={wagmiAdapter.wagmiConfig as Config}>
+			<IdentityKitProvider
+				authType={IdentityKitCustomSignerAuthType}
+				signers={[OISY, NFIDW, InternetIdentity, Stoic]}
+				signerClientOptions={{ targets: ["4ati2-naaaa-aaaad-qg6la-cai", "2ztvj-yaaaa-aaaap-ahiza-cai"] }}
+			>
+				{children}
+			</IdentityKitProvider>
+		</WagmiProvider>
+	);
 };
