@@ -5,34 +5,58 @@ import ChainBoxPage from './chain-box';
 import TokenCard from './token-card';
 import BoxHeader from '@/components/ui/box-header';
 import TokenSkeleton from './token-skeleton';
-import { useSwapActions, useSwapStore } from '../../_store';
+import { TokenType, useSwapActions, useSwapStore } from '../../_store';
 import { ChainTokenListLogic } from './_logic';
+import { useSharedStore } from '@/store/store';
+import { useState } from 'react';
+import { IcpToken } from '@/blockchain_api/types/tokens';
 
-interface TokenListProps {
-  isPending: boolean;
-  isError: boolean;
-}
-
-export default function TokenListPage({ isPending, isError }: TokenListProps) {
+export default function TokenListPage() {
   // store
-  const { swapPairs: tokens, selectedTokenType } = useSwapStore();
+  const { icpTokens } = useSharedStore();
+  const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
   // Logic
   const {
-    isTokenSelected,
     selectToken,
-    filteredTokens,
+    // filteredTokens,
     sortTokens,
     selectedChainId,
     setSelectedChainId,
     query,
+    updatedIcpTokens,
     setQuery,
   } = ChainTokenListLogic();
   const { setActiveStep } = useSwapActions();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const currentSelected = selectedTokenType === 'in' ? tokenIn : tokenOut;
+  const otherSelected = selectedTokenType === 'in' ? tokenOut : tokenIn;
+
+  const lowerQuery = query?.toLowerCase() || '';
+
+  const matchesSearch = (token: TokenType) =>
+    token.name.toLowerCase().includes(lowerQuery) ||
+    token.symbol.toLowerCase().includes(lowerQuery) ||
+    (token.canisterId
+      ? token.canisterId.toLowerCase().includes(lowerQuery)
+      : token.contractAddress
+        ? token.contractAddress.toLowerCase().includes(lowerQuery)
+        : null);
+
+  const filteredTokens = updatedIcpTokens?.filter(
+    (token) => token.canisterId !== otherSelected?.canisterId && matchesSearch(token),
+  );
+
+  const handleTokenClick = (token: TokenType) => {
+    selectToken(token);
+    setSearchQuery('');
+    setActiveStep(1);
+  };
 
   return (
     <Box className="animate-slide-in justify-normal gap-y-6 opacity-0 md:h-[607px] md:max-w-[533px]">
       <BoxHeader
-        title={selectedTokenType === 'from' ? 'Swap From' : 'Swap To'}
+        title={selectedTokenType === 'in' ? 'Sell' : 'Buy'}
         onBack={() => setActiveStep(1)}
       />
       <ChainBoxPage selectedChainId={selectedChainId} onChainSelect={setSelectedChainId} />
@@ -50,26 +74,13 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
         )}
       />
       <div className="flex h-full w-full flex-col gap-y-6 overflow-y-scroll">
-        {isPending ? (
-          <>
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-          </>
-        ) : isError ? (
-          <div>Error While loading. Please try again</div>
-        ) : tokens && filteredTokens && filteredTokens.length > 0 ? (
+        {icpTokens && filteredTokens && filteredTokens.length > 0 ? (
           sortTokens(filteredTokens)?.map((token, idx) => (
             <TokenCard
               key={idx}
               token={token}
-              onClick={() => {
-                selectToken(token);
-                setActiveStep(1);
-              }}
-              isSelected={isTokenSelected(token)}
+              onClick={() => handleTokenClick(token)}
+              isSelected={token.canisterId === currentSelected?.canisterId}
             />
           ))
         ) : (

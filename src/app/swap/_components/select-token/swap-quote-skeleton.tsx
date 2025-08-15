@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import Skeleton from '@/components/ui/skeleton';
 
-const BridgeOptionSkeleton = () => {
+const SwapQuoteSkeleton = () => {
   return (
     <Card className="h-[165px] w-full flex-col items-start justify-center gap-4 px-6 py-2">
       {/* top section */}
@@ -32,4 +32,4 @@ const BridgeOptionSkeleton = () => {
   );
 };
 
-export default BridgeOptionSkeleton;
+export default SwapQuoteSkeleton;

@@ -3,11 +3,11 @@ import Box from '@/components/ui/box';
 import { cn, getChainLogo } from '@/lib/utils';
 import HistoryIcon from '@/components/icons/history';
 import Link from 'next/link';
-import { TokenCard } from './TokenCard';
-import AmountInput from './AmountInput';
-import WalletAddressInput from './WalletAddressInput';
-import ActionButton from './ActionButton';
-import SwapOptionsList from './SwapOptionsList';
+import { TokenCard } from './token-card';
+import AmountInput from './amount-input';
+import WalletAddressInput from './wallet-address-input';
+import ActionButton from './action-button';
+import SwapOptionsList from './swap-quote-list';
 import SwapSelectTokenLogic from './_logic';
 import { useSwapActions, useSwapStore } from '../../_store';
 
@@ -15,9 +15,9 @@ interface SelectTokenProps {
   isPendingSwapOptions: boolean;
 }
 
-export default function SwapSelectTokenPage({ isPendingSwapOptions }: SelectTokenProps) {
+export default function SwapSelectTokenPage() {
   // swap store
-  const { fromToken, toToken, amount, toWalletAddress, swapOptions, toWalletValidationError } =
+  const { tokenIn, tokenOut, amount, toWalletAddress, swapQuote, toWalletValidationError } =
     useSwapStore();
   const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } = useSwapActions();
   // Logic
@@ -37,10 +37,7 @@ export default function SwapSelectTokenPage({ isPendingSwapOptions }: SelectToke
         'md:w-fit md:max-w-[617px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        Number(amount) > 0 &&
-          swapOptions.options &&
-          swapOptions.options.length > 0 &&
-          'lg:w-[1060px] lg:max-w-[1060px]',
+        Number(amount) > 0 && swapQuote.quote && 'lg:w-[1060px] lg:max-w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
@@ -60,21 +57,21 @@ export default function SwapSelectTokenPage({ isPendingSwapOptions }: SelectToke
             <div
               className={cn(
                 'relative flex w-full',
-                fromToken && toToken
+                tokenIn && tokenOut
                   ? 'flex-col gap-y-4 sm:flex-row sm:gap-x-4'
                   : 'flex-col gap-y-4',
               )}
             >
               <TokenCard
-                token={fromToken}
+                token={tokenIn}
                 customOnClick={() => {
-                  setSelectedTokenType('from');
+                  setSelectedTokenType('in');
                   changeStep('next');
                 }}
-                label="From"
+                label="In"
                 className={cn(
-                  fromToken && 'py-5 md:rounded-3xl md:py-5',
-                  fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
+                  tokenIn && 'py-5 md:rounded-3xl md:py-5',
+                  tokenIn && tokenOut && 'max-h-min md:max-h-min md:px-6',
                 )}
               />
               <div
@@ -84,7 +81,7 @@ export default function SwapSelectTokenPage({ isPendingSwapOptions }: SelectToke
                   'bg-[#C0C0C0] text-black dark:bg-[#0B0B0B] dark:text-white',
                   'border-2 border-white dark:border-white/30',
                   'transition-transform duration-300',
-                  fromToken && toToken
+                  tokenIn && tokenOut
                     ? 'hover:rotate-180 sm:rotate-90 sm:hover:-rotate-90'
                     : 'hover:rotate-180',
                 )}
@@ -93,29 +90,29 @@ export default function SwapSelectTokenPage({ isPendingSwapOptions }: SelectToke
                 <ArrowsUpDownIcon width={20} height={20} />
               </div>
               <TokenCard
-                token={toToken}
+                token={tokenOut}
                 customOnClick={() => {
-                  setSelectedTokenType('to');
+                  setSelectedTokenType('out');
                   changeStep('next');
                 }}
-                label="To"
+                label="Out"
                 className={cn(
-                  toToken && 'py-5 md:rounded-3xl md:py-5',
-                  fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
+                  tokenOut && 'py-5 md:rounded-3xl md:py-5',
+                  tokenIn && tokenOut && 'max-h-min md:max-h-min md:px-6',
                 )}
               />
             </div>
             {/* AMOUNT INPUT */}
-            {fromToken && toToken && <AmountInput />}
+            {tokenIn && tokenOut && <AmountInput />}
             {/* WALLET ADDRESS INPUT */}
             <WalletAddressInput
-              token={toToken}
+              token={tokenOut}
               address={toWalletAddress}
               setAddress={setToWalletAddress}
               validationError={toWalletValidationError}
               onValidationError={setToWalletValidationError}
               show={showWalletAddress}
-              avatar={getChainLogo(toToken?.chainId)}
+              avatar={getChainLogo(tokenOut?.chainId)}
             />
           </div>
           {/* DESKTOP ACTION BUTTONS */}
@@ -138,9 +135,7 @@ export default function SwapSelectTokenPage({ isPendingSwapOptions }: SelectToke
         </div>
 
         {/* SWAP OPTIONS */}
-        {Number(amount) > 0 && swapOptions.options && swapOptions.options?.length > 0 && (
-          <SwapOptionsList isPending={isPendingSwapOptions} />
-        )}
+        {Number(amount) > 0 && swapQuote.quote && <SwapOptionsList />}
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className="flex w-full items-center gap-x-2 lg:hidden">

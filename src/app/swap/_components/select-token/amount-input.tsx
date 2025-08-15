@@ -10,29 +10,28 @@ import { Avatar } from '@/components/common/ui/avatar';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
-
   // Logic
   const { isWalletConnected } = SelectTokenLogic();
 
-  const { fromToken, usdPrice, amount, selectedTokenBalance, swapOptions } = useSwapStore();
+  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
   useEffect(() => {
-    if (fromToken?.chain_type === 'EVM' && evmBalance) {
+    if (tokenIn?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find(
         (t) =>
-          t.contractAddress.toLocaleLowerCase() ===
-            fromToken.contractAddress?.toLocaleLowerCase() && t.chainId === fromToken.chainId,
+          t.contractAddress.toLocaleLowerCase() === tokenIn.contractAddress?.toLocaleLowerCase() &&
+          t.chainId === tokenIn.chainId,
       );
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
 
-    if (fromToken?.chain_type === 'ICP' && icpBalance) {
-      const mainToken = icpBalance.tokens.find((t) => t.canisterId === fromToken?.canisterId);
+    if (tokenIn?.chain_type === 'ICP' && icpBalance) {
+      const mainToken = icpBalance.tokens.find((t) => t.canisterId === tokenIn?.canisterId);
       setSelectedTokenBalance(mainToken?.balance || '0.00');
     }
-  }, [isEvmConnected, icpIdentity, fromToken, evmBalance, icpBalance, setSelectedTokenBalance]);
+  }, [isEvmConnected, icpIdentity, tokenIn, evmBalance, icpBalance, setSelectedTokenBalance]);
 
   // bouncing on input change
   useEffect(() => {
@@ -51,9 +50,7 @@ const AmountInput = () => {
   }, [amount]);
 
   const handleAmountChange = (value: string) => {
-    const usdPrice = new BigNumber(value == '' ? '0' : value).multipliedBy(
-      fromToken?.usdPrice || 0,
-    );
+    const usdPrice = new BigNumber(value == '' ? '0' : value).multipliedBy(tokenIn?.usdPrice || 0);
     setUsdPrice(usdPrice.toFixed(2));
     setAmount(value);
   };
@@ -63,9 +60,9 @@ const AmountInput = () => {
       <p className="text-sm font-semibold">Send</p>
       <div className="flex w-full items-center gap-4">
         <div className="relative">
-          <Avatar src={fromToken?.logo} className="h-12 w-12" />
+          <Avatar src={tokenIn?.logo} className="h-12 w-12" />
           <Avatar
-            src={getChainLogo(fromToken?.chainId)}
+            src={getChainLogo(tokenIn?.chainId)}
             className="absolute -bottom-1 -right-1 h-5 w-5 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
           />
         </div>
@@ -123,12 +120,11 @@ const AmountInput = () => {
               </p>
             )}
           </div>
-          {!swapOptions.options ||
-            (swapOptions.options?.length === 0 && swapOptions.message && (
-              <p className="absolute -bottom-5 animate-slide-in-from-top text-xs text-yellow-600">
-                {swapOptions.message}
-              </p>
-            ))}
+          {!swapQuote.quote && swapQuote.message && (
+            <p className="absolute -bottom-5 animate-slide-in-from-top text-xs text-yellow-600">
+              {swapQuote.message}
+            </p>
+          )}
         </div>
       </div>
     </Card>
