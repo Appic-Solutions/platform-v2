@@ -23,4 +23,5 @@ export interface Chain {
   viem_config?: ViemChain;
   twin_handle?: string;
   twin_token_support: boolean;
+	is_swap_active:boolean;
 }

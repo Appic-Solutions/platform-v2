@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { IcpToken } from '../types/tokens';
 import { BigNumber } from 'bignumber.js';
+import { Response } from '../types/response';
 
 // Define interfaces based on the API response structure
 interface ICPRoute {
@@ -31,38 +32,109 @@ interface ICPQuoteResponse {
   data: ICPQuoteData;
 }
 
+export interface IcpQuote {
+  protocol: string;
+  tokenIn: string;
+  tokenOut: string;
+  amountIn: string;
+  amountOut: string;
+  amountOutUSD: string;
+  routeString: string;
+  route: ICPRoute[];
+  score: number;
+  minAmountOut: string;
+  slippage: string;
+  estimatedTime: number;
+  usdValueIn: string; // USD value of input amount
+  usdDifference: string; // Difference between USD out and USD in
+  tokenInPriceInTokenOut: string; // Price of tokenIn in terms of tokenOut (how many tokenOut per 1 tokenIn)
+  tokenOutPriceInTokenIn: string; // Price of tokenOut in terms of tokenIn (how many tokenIn per 1 tokenOut)
+}
+
 /**
- * Fetches the ICP quote using the provided API endpoint.
- * @param tokenIn Input token principal or mapped address
- * @param tokenOut Output token principal or mapped address
- * @param amountIn Amount to swap in smallest token unit (as string)
- * @returns Promise resolving to the full quote response
+ * Fetches the ICP quote using the provided API endpoint and transforms it with calculated details.
+ * @param tokenIn Input token details
+ * @param tokenOut Output token details
+ * @param amount Amount to swap (as decimal string)
+ * @returns Promise resolving to the transformed quote response
  */
-export async function fetchICPQuote(
+async function fetchICPQuote(
   tokenIn: IcpToken,
   tokenOut: IcpToken,
   amount: string,
-): Promise<ICPQuoteResponse> {
-  let amountIn = BigNumber(amount)
-    .multipliedBy(BigNumber(10).pow(tokenIn.decimals))
-    .minus(tokenIn.fee!)
-    .toString();
-  try {
-    let response = await axios.get<ICPQuoteResponse>('https://quoter.appicdao.com/api/icp/quote', {
-      params: {
-        tokenIn: tokenIn.canisterId,
-        tokenOut: tokenOut.canisterId,
-        amountIn,
-      },
-    });
-    response.data.data.amountOut = BigNumber(response.data.data.amountOut)
-      .minus(tokenOut.fee!)
-      .toString();
-    response.data.data.minAmountOut = BigNumber(response.data.data.minAmountOut)
-      .minus(tokenOut.fee!)
-      .toString();
+): Promise<Response<IcpQuote | undefined>> {
+  const bn10 = BigNumber(10);
+  const feeIn = tokenIn.fee || '0';
+  const feeOut = tokenOut.fee || '0';
 
-    return response.data;
+  const amountIn = BigNumber(amount)
+    .multipliedBy(bn10.pow(tokenIn.decimals))
+    .minus(feeIn)
+    .toString();
+
+  try {
+    const response = await axios.get<ICPQuoteResponse>(
+      'https://quoter.appicdao.com/api/icp/quote',
+      {
+        params: {
+          tokenIn: tokenIn.canisterId,
+          tokenOut: tokenOut.canisterId,
+          amountIn,
+        },
+      },
+    );
+
+    if (response.data.success == true) {
+      const data = response.data.data;
+
+      // Adjust amountOut and minAmountOut for output fee
+      data.amountOut = BigNumber(data.amountOut).minus(feeOut).toString();
+      data.minAmountOut = BigNumber(data.minAmountOut).minus(feeOut).toString();
+
+      // Calculate decimal-adjusted amounts
+      const amountInDec = BigNumber(data.amountIn).div(bn10.pow(tokenIn.decimals));
+      const amountOutDec = BigNumber(data.amountOut).div(bn10.pow(tokenOut.decimals));
+
+      // Transform routeString with decimals and symbols
+      data.routeString = `${amountInDec.toFixed(6)} ${tokenIn.symbol} -> ${amountOutDec.toFixed(6)} ${tokenOut.symbol}`;
+
+      // Calculate prices
+      const tokenInPriceInTokenOut = amountOutDec.div(amountInDec).toFixed(6);
+      const tokenOutPriceInTokenIn = amountInDec.div(amountOutDec).toFixed(6);
+
+      // Calculate USD values
+      const usdValueIn = amountInDec.multipliedBy(tokenIn.usdPrice || '0').toFixed(2);
+      const usdValueOut = amountOutDec.multipliedBy(tokenOut.usdPrice || '0').toFixed(2);
+      const usdDifference = BigNumber(usdValueOut).minus(usdValueIn).toFixed(2);
+
+      // Map to IcpQuote with additional calculated fields
+      const quote: IcpQuote = {
+        protocol: data.protocol,
+        tokenIn: data.tokenIn,
+        tokenOut: data.tokenOut,
+        amountIn: data.amountIn,
+        amountOut: data.amountOut,
+        amountOutUSD: usdValueOut,
+        routeString: data.routeString,
+        route: data.route,
+        score: data.score,
+        minAmountOut: data.minAmountOut,
+        slippage: data.slippage,
+        estimatedTime: data.estimatedTime,
+        usdValueIn,
+        usdDifference,
+        tokenInPriceInTokenOut,
+        tokenOutPriceInTokenIn,
+      };
+
+      return { result: quote, message: '', success: true };
+    } else {
+      return {
+        success: false,
+        message: `${response.data.data}`,
+        result: undefined,
+      };
+    }
   } catch (error) {
     console.error('Error fetching ICP quote:', error);
     throw error;
