@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
 
 import { cn, getChainLogo } from '@/lib/utils';
-import { getStorageItem } from '@/lib/helpers/localstorage';
+import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
 import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useAuth } from '@nfid/identitykit/react';
@@ -15,13 +15,8 @@ import {
   check_deposit_status,
   check_withdraw_status,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
-import {
-  get_all_pools,
-  Pool,
-} from '@/blockchain_api/functions/icp/dex/get_pool';
-import {
-  get_dex_data,
-} from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
+import { get_all_pools, Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 
@@ -37,18 +32,9 @@ import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import WalletCard from './wallet/wallet-card';
 import { WalletPop } from './wallet/wallet-pop';
 import { CloseIcon } from '@/components/icons';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  PopoverClose,
-} from '@/components/ui/popover';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
+import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
 
 const WalletPage = () => {
   const {
@@ -190,7 +176,10 @@ const WalletPage = () => {
         unAuthenticatedAgent as HttpAgent,
       );
 
-      if (!res.success || ['Successful', 'QuarantinedReimbursement', 'Reimbursed'].includes(res.result)) {
+      if (
+        !res.success ||
+        ['Successful', 'QuarantinedReimbursement', 'Reimbursed'].includes(res.result)
+      ) {
         setPendingTx(undefined);
         removePendingTransaction();
       }
@@ -205,6 +194,28 @@ const WalletPage = () => {
       !!unAuthenticatedAgent &&
       pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
       !!icpIdentity,
+  });
+
+  useQuery({
+    queryKey: ['IcpTokens'],
+    queryFn: async () => {
+      if (!unAuthenticatedAgent) return [];
+
+      await get_icp_tokens(unAuthenticatedAgent).then((res) => {
+        if (res.result) {
+          setStorageItem('icpTokens', JSON.stringify(res.result));
+        }
+        return res.result;
+      });
+
+      return [];
+    },
+    enabled: !!unAuthenticatedAgent,
+    refetchInterval: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+    gcTime: 1000 * 60 * 10,
   });
 
   const rawIcpTokens = useMemo(() => {
