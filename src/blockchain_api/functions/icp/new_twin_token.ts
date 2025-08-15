@@ -24,6 +24,7 @@ import {
 	generate_twin_token_transfer_fee,
 } from './generate_new_twin_token_symbol';
 import { Chain } from '@/blockchain_api/types/chains';
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 
 const icp_transfer_fee = 10_000;
 
@@ -54,6 +55,7 @@ export const get_evm_token_and_generate_twin_token = async (
 	from_chain_id: Chain,
 	to_chain_id: Chain,
 	token_address: string,
+	token: IcpToken | EvmToken,
 	unauthenticated_agent: HttpAgent,
 ): Promise<Response<NewTwinMetadata | undefined>> => {
 

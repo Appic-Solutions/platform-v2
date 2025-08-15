@@ -34,15 +34,20 @@ interface ICPQuoteResponse {
 
 export interface IcpQuote {
   protocol: string;
-  tokenIn: string;
-  tokenOut: string;
+  tokenIn: IcpToken;
+  tokenOut: IcpToken;
+  amountInRaw: string;
+  amountOutRaw: string;
   amountIn: string;
+  approvalAmount: string;
   amountOut: string;
   amountOutUSD: string;
   routeString: string;
   route: ICPRoute[];
   score: number;
+  minAmountOutRaw: string;
   minAmountOut: string;
+  minAmountOutUSD: string;
   slippage: string;
   estimatedTime: number;
   usdValueIn: string; // USD value of input amount
@@ -67,10 +72,15 @@ export async function fetchICPQuote(
   const feeIn = tokenIn.fee || '0';
   const feeOut = tokenOut.fee || '0';
 
-  const amountIn = BigNumber(amount)
+  const approvalAmount = BigNumber(amount)
     .multipliedBy(bn10.pow(tokenIn.decimals))
     .minus(feeIn)
-    .toString();
+    .toFixed();
+
+  const amountIn = BigNumber(amount)
+    .multipliedBy(bn10.pow(tokenIn.decimals))
+    .minus(BigNumber(feeIn).multipliedBy(2))
+    .toFixed();
 
   try {
     const response = await axios.get<ICPQuoteResponse>(
@@ -94,6 +104,7 @@ export async function fetchICPQuote(
       // Calculate decimal-adjusted amounts
       const amountInDec = BigNumber(data.amountIn).div(bn10.pow(tokenIn.decimals));
       const amountOutDec = BigNumber(data.amountOut).div(bn10.pow(tokenOut.decimals));
+      const minAmountOutDec = BigNumber(data.minAmountOut).div(bn10.pow(tokenOut.decimals));
 
       // Transform routeString with decimals and symbols
       data.routeString = `${amountInDec.toFixed(6)} ${tokenIn.symbol} -> ${amountOutDec.toFixed(6)} ${tokenOut.symbol}`;
@@ -105,20 +116,26 @@ export async function fetchICPQuote(
       // Calculate USD values
       const usdValueIn = amountInDec.multipliedBy(tokenIn.usdPrice || '0').toFixed(2);
       const usdValueOut = amountOutDec.multipliedBy(tokenOut.usdPrice || '0').toFixed(2);
+      const usdValueMinOut = minAmountOutDec.multipliedBy(tokenOut.usdPrice || '0').toFixed(2);
       const usdDifference = BigNumber(usdValueOut).minus(usdValueIn).toFixed(2);
 
       // Map to IcpQuote with additional calculated fields
       const quote: IcpQuote = {
         protocol: data.protocol,
-        tokenIn: data.tokenIn,
-        tokenOut: data.tokenOut,
-        amountIn: data.amountIn,
-        amountOut: data.amountOut,
+        tokenIn: tokenIn,
+        tokenOut: tokenOut,
+        amountInRaw: data.amountIn,
+        amountOutRaw: data.amountOut,
+        amountIn: amountInDec.toFixed(),
+        approvalAmount: approvalAmount,
+        amountOut: amountOutDec.toFixed(),
         amountOutUSD: usdValueOut,
         routeString: data.routeString,
         route: data.route,
         score: data.score,
-        minAmountOut: data.minAmountOut,
+        minAmountOutRaw: data.minAmountOut,
+        minAmountOut: minAmountOutDec.toFixed(),
+        minAmountOutUSD: usdValueMinOut,
         slippage: data.slippage,
         estimatedTime: data.estimatedTime,
         usdValueIn,
