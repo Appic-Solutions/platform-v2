@@ -22,11 +22,11 @@ const SwapPage = () => {
   });
 
   useEffect(() => {
-    if (swapQuoteData && swapQuoteData.data) {
+    if (swapQuoteData && swapQuoteData.result) {
       console.log('swapQuoteData', swapQuoteData);
-      setSwapQuote({ message: '', quote: swapQuoteData.data });
+      setSwapQuote({ message: '', quote: swapQuoteData.result });
     }
-  }, [swapQuoteData]);
+  }, [swapQuoteData, tokenIn, tokenOut, amount]);
 
   const renderStep = () => {
     switch (activeStep) {

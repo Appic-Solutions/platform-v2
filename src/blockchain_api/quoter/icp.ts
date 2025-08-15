@@ -58,7 +58,7 @@ export interface IcpQuote {
  * @param amount Amount to swap (as decimal string)
  * @returns Promise resolving to the transformed quote response
  */
-async function fetchICPQuote(
+export async function fetchICPQuote(
   tokenIn: IcpToken,
   tokenOut: IcpToken,
   amount: string,

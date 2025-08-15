@@ -8,13 +8,13 @@ import { useSwapActions, useSwapStore } from '@/app/swap/_store';
 import { RadialCountDown } from './radial-count-down';
 import SwapQuoteSkeleton from './swap-quote-skeleton';
 import { useQuery } from '@tanstack/react-query';
-import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
 import { IcpToken } from '@/blockchain_api/types/tokens';
+import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
 
 const SwapQuotesList = () => {
   const { tokenOut, swapQuote, tokenIn, amount } = useSwapStore();
   const { setSwapQuote } = useSwapActions();
-  const refetchDuration = 5000;
+  const refetchDuration = 20000;
 
   const { data: swapQuoteData, isPending } = useQuery({
     queryKey: ['swap-quot'],
@@ -27,9 +27,9 @@ const SwapQuotesList = () => {
   });
 
   useEffect(() => {
-    if (swapQuoteData && swapQuoteData.data) {
+    if (swapQuoteData && swapQuoteData.result) {
       console.log('swapQuoteData', swapQuoteData);
-      setSwapQuote({ message: '', quote: swapQuoteData.data });
+      setSwapQuote({ message: '', quote: swapQuoteData.result });
     }
   }, [swapQuoteData]);
 
@@ -47,7 +47,7 @@ const SwapQuotesList = () => {
         )}
       >
         <div className={cn('flex-shrink-1 h-fit w-full')}>
-          {tokenOut && swapQuote.quote ? (
+          {tokenOut && swapQuote.quote && !isPending ? (
             <Card
               // onClick={() => handleQuoteSelect(quote)}
               className={cn(

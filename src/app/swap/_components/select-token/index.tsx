@@ -11,10 +11,6 @@ import SwapOptionsList from './swap-quote-list';
 import SwapSelectTokenLogic from './_logic';
 import { useSwapActions, useSwapStore } from '../../_store';
 
-interface SelectTokenProps {
-  isPendingSwapOptions: boolean;
-}
-
 export default function SwapSelectTokenPage() {
   // swap store
   const { tokenIn, tokenOut, amount, toWalletAddress, swapQuote, toWalletValidationError } =
@@ -68,7 +64,7 @@ export default function SwapSelectTokenPage() {
                   setSelectedTokenType('in');
                   changeStep('next');
                 }}
-                label="In"
+                label="Sell"
                 className={cn(
                   tokenIn && 'py-5 md:rounded-3xl md:py-5',
                   tokenIn && tokenOut && 'max-h-min md:max-h-min md:px-6',
@@ -95,7 +91,7 @@ export default function SwapSelectTokenPage() {
                   setSelectedTokenType('out');
                   changeStep('next');
                 }}
-                label="Out"
+                label="Buy"
                 className={cn(
                   tokenOut && 'py-5 md:rounded-3xl md:py-5',
                   tokenIn && tokenOut && 'max-h-min md:max-h-min md:px-6',
