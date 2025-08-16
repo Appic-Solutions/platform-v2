@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { PositionStepper } from '@/app/positions/_components/position-stepper';
 import { collectFeesStepsDetails } from '@/lib/constants/positions';
-import { mint_position } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
+import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
 import { useSharedStore } from '@/store/store';
 
 const CollectFees = () => {
@@ -30,7 +30,7 @@ const CollectFees = () => {
 
   const executeCollectFees = async () => {
     if (authenticatedAgent) {
-      const result = await mint_position({ position: selectedPosition }, authenticatedAgent);
+      const result = await collect_fees({ position: selectedPosition }, authenticatedAgent);
       if (!result.success || !result.result) {
         actions.setMintStep({
           step: 1,
