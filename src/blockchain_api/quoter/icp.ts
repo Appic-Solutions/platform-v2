@@ -107,7 +107,7 @@ export async function fetchICPQuote(
       const minAmountOutDec = BigNumber(data.minAmountOut).div(bn10.pow(tokenOut.decimals));
 
       // Transform routeString with decimals and symbols
-      data.routeString = `${amountInDec.toFixed(6)} ${tokenIn.symbol} -> ${amountOutDec.toFixed(6)} ${tokenOut.symbol}`;
+      data.routeString = `${tokenIn.symbol} -> ${tokenOut.symbol}`;
 
       // Calculate prices
       const tokenInPriceInTokenOut = amountOutDec.div(amountInDec).toFixed(6);

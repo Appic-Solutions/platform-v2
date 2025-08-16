@@ -2,22 +2,17 @@
 
 import * as React from 'react';
 import { RadialProgress } from '@/components/ui/radial-progress';
-import Spinner from '@/components/ui/spinner';
 
 interface RadialCountDownProps {
-  duration: number; // milliseconds
   isPending?: boolean;
+  resetKey?: string | number;
 }
 
-export const RadialCountDown = ({ duration, isPending = false }: RadialCountDownProps) => {
+export const RadialCountDown = () => {
   const [progress, setProgress] = React.useState(0);
+  const duration = 20000;
 
   React.useEffect(() => {
-    if (isPending) {
-      setProgress(0);
-      return;
-    }
-
     let startTime: number | null = null;
     let animationFrameId: number;
 
@@ -38,18 +33,8 @@ export const RadialCountDown = ({ duration, isPending = false }: RadialCountDown
 
     animationFrameId = requestAnimationFrame(animate);
 
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [duration, isPending]);
-
-  if (isPending) {
-    return (
-      <div className="flex items-center justify-center">
-        <Spinner className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [duration]);
 
   return <RadialProgress value={progress} />;
 };

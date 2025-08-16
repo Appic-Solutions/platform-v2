@@ -131,7 +131,7 @@ export default function SwapSelectTokenPage() {
         </div>
 
         {/* SWAP OPTIONS */}
-        {Number(amount) > 0 && swapQuote.quote && <SwapOptionsList />}
+        {Number(amount) > 0 && <SwapOptionsList />}
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className="flex w-full items-center gap-x-2 lg:hidden">

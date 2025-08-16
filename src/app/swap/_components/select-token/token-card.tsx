@@ -23,7 +23,7 @@ export function TokenCard({ token, customOnClick, label, className }: TokenCardP
         customOnClick?.();
       }}
     >
-      <p className="text-sm font-semibold">{label}</p>
+      <p className="text-xs leading-none text-muted md:text-sm">{label}</p>
       <div className="flex items-center gap-4">
         <div className="relative">
           <Avatar src={token?.logo} className="h-12 w-12" />
@@ -43,7 +43,7 @@ export function TokenCard({ token, customOnClick, label, className }: TokenCardP
           </p>
           <p
             className={cn(
-              'text-sm',
+              'text-xs leading-none text-muted md:text-sm',
               getChainName(token?.chainId).length > 3 && 'w-20 text-ellipsis',
             )}
           >

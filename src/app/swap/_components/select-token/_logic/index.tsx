@@ -13,16 +13,15 @@ const SwapSelectTokenLogic = () => {
 
   const {
     activeStep,
-    fromToken,
-    toToken,
+    tokenIn,
+    tokenOut,
     amount,
     toWalletAddress,
-    selectedOption,
     toWalletValidationError,
     selectedTokenBalance,
-    swapOptions,
+    swapQuote,
   } = useSwapStore();
-  const { setActiveStep, setFromToken, setToToken } = useSwapActions();
+  const { setActiveStep, setTokenIn, setTokenOut } = useSwapActions();
 
   const {
     isEvmBalanceLoading,
@@ -45,16 +44,16 @@ const SwapSelectTokenLogic = () => {
   }
 
   function swapTokens() {
-    if (!fromToken || !toToken) return;
-    const temp = fromToken;
-    setFromToken(toToken);
-    setToToken(temp);
+    if (!tokenIn || !tokenOut) return;
+    const temp = tokenIn;
+    setTokenIn(tokenOut);
+    setTokenOut(temp);
   }
 
   function isWalletConnected(type: 'from' | 'to') {
     let mainToken: TokenType | undefined;
-    if (type === 'from') mainToken = fromToken;
-    if (type === 'to') mainToken = toToken;
+    if (type === 'from') mainToken = tokenIn;
+    if (type === 'to') mainToken = tokenOut;
 
     if (mainToken) {
       if (mainToken?.chain_type === 'EVM' && isEvmConnected && evmBalance) {
@@ -72,10 +71,10 @@ const SwapSelectTokenLogic = () => {
     isDisable: boolean;
     text: string;
   } {
-    if (!fromToken || !toToken) {
+    if (!tokenIn || !tokenOut) {
       return {
         isDisable: true,
-        text: 'Select token to bridge',
+        text: 'Select token to swap',
       };
     }
 
@@ -94,48 +93,14 @@ const SwapSelectTokenLogic = () => {
     }
 
     if (
-      (isWalletConnected('to') && isWalletConnected('from') && selectedOption) ||
-      (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && selectedOption)
+      (isWalletConnected('to') && isWalletConnected('from')) ||
+      (toWalletAddress && !toWalletValidationError && isWalletConnected('from'))
     ) {
       if (new BigNumber(amount).isGreaterThan(new BigNumber(selectedTokenBalance))) {
         return {
           isDisable: true,
           text: 'INSUFFICIENT Funds',
         };
-      }
-      if (!selectedOption.is_native) {
-        if (fromToken.chain_type === 'EVM') {
-          // The native token of the transaction chain that the user holds in his wallet
-          const userNativeToken = evmBalance?.tokens.find(
-            (token) =>
-              token.contractAddress === selectedOption.native_fee_token_id &&
-              token.chainId === selectedOption.chain_id,
-          );
-          if (
-            !userNativeToken ||
-            Number(userNativeToken.balance) <
-              Number(selectedOption.fees.human_readable_total_native_fee)
-          ) {
-            return {
-              isDisable: true,
-              text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
-            };
-          }
-        } else if (fromToken.chain_type === 'ICP') {
-          const userNativeToken = icpBalance?.tokens.find(
-            (token) => token.canisterId === selectedOption.native_fee_token_id,
-          );
-          if (
-            !userNativeToken ||
-            Number(userNativeToken.balance) <
-              Number(selectedOption.fees.human_readable_total_native_fee)
-          ) {
-            return {
-              isDisable: true,
-              text: `INSUFFICIENT ${selectedOption.fees.native_fee_token_symbol} Balance`,
-            };
-          }
-        }
       }
     }
 
@@ -145,7 +110,7 @@ const SwapSelectTokenLogic = () => {
           isDisable: true,
           text: 'Enter Valid Address',
         };
-      } else if (!swapOptions.options?.length) {
+      } else if (!swapQuote.quote) {
         return {
           isDisable: true,
           text: 'Set token amount to continue',
@@ -153,46 +118,34 @@ const SwapSelectTokenLogic = () => {
       } else if (!isWalletConnected('from')) {
         return {
           isDisable: false,
-          text: `Connect ${fromToken.chain_type} Wallet`,
+          text: `Connect ${tokenIn.chain_type} Wallet`,
         };
-      } else if (swapOptions.options?.length && toWalletAddress && !toWalletValidationError) {
+      } else if (swapQuote.quote && toWalletAddress && !toWalletValidationError) {
         return {
           isDisable: false,
-          text: 'Review Bridge',
+          text: 'Review Swap',
         };
       }
     }
 
-    if (
-      fromToken &&
-      toToken &&
-      fromToken.contractAddress === toToken.contractAddress &&
-      fromToken.chainId === toToken.chainId
-    ) {
+    if (swapQuote.quote && !swapQuote.quote) {
       return {
         isDisable: true,
-        text: 'Please select different tokens',
-      };
-    }
-
-    if (swapOptions.options && swapOptions.options.length > 0 && !selectedOption) {
-      return {
-        isDisable: true,
-        text: 'Select Bridge Option',
+        text: 'Select Swap Option',
       };
     }
 
     if (!isWalletConnected('from')) {
       return {
         isDisable: false,
-        text: `Connect ${fromToken.chain_type} Wallet`,
+        text: `Connect ${tokenIn.chain_type} Wallet`,
       };
     }
 
     if (!showWalletAddress && !isWalletConnected('to')) {
       return {
         isDisable: false,
-        text: `Connect ${toToken.chain_type} Wallet`,
+        text: `Connect ${tokenOut.chain_type} Wallet`,
       };
     }
 
@@ -200,18 +153,17 @@ const SwapSelectTokenLogic = () => {
       toWalletAddress &&
       !toWalletValidationError &&
       isWalletConnected('from') &&
-      swapOptions.options &&
-      swapOptions.options?.length > 0
+      swapQuote.quote
     ) {
       return {
         isDisable: false,
-        text: 'Review Bridge',
+        text: 'Review Swap',
       };
     }
-    if (isWalletConnected('from') && isWalletConnected('to') && swapOptions.options?.length) {
+    if (isWalletConnected('from') && isWalletConnected('to') && swapQuote.quote) {
       return {
         isDisable: false,
-        text: 'Review Bridge',
+        text: 'Review Swap',
       };
     }
 
@@ -231,12 +183,12 @@ const SwapSelectTokenLogic = () => {
   };
 
   const actionButtonHandler = () => {
-    if (!isWalletConnected('from') && fromToken) {
-      openConnectWalletModalHandler(fromToken);
+    if (!isWalletConnected('from') && tokenIn) {
+      openConnectWalletModalHandler(tokenIn);
       return;
     }
-    if (!isWalletConnected('to') && toToken && !showWalletAddress) {
-      openConnectWalletModalHandler(toToken);
+    if (!isWalletConnected('to') && tokenOut && !showWalletAddress) {
+      openConnectWalletModalHandler(tokenOut);
       return;
     }
 

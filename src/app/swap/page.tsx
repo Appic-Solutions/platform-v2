@@ -23,7 +23,6 @@ const SwapPage = () => {
 
   useEffect(() => {
     if (swapQuoteData && swapQuoteData.result) {
-      console.log('swapQuoteData', swapQuoteData);
       setSwapQuote({ message: '', quote: swapQuoteData.result });
     }
   }, [swapQuoteData, tokenIn, tokenOut, amount]);

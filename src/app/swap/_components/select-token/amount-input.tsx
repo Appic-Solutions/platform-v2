@@ -10,7 +10,6 @@ import { Avatar } from '@/components/common/ui/avatar';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
-  // Logic
   const { isWalletConnected } = SelectTokenLogic();
 
   const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
@@ -57,7 +56,7 @@ const AmountInput = () => {
 
   return (
     <Card className="mt-4 max-h-[133px] cursor-auto flex-col items-start justify-center hover:bg-[#000000]/0 md:max-h-[155px]">
-      <p className="text-sm font-semibold">Send</p>
+      <p className="text-xs leading-none text-muted md:text-sm">Send</p>
       <div className="flex w-full items-center gap-4">
         <div className="relative">
           <Avatar src={tokenIn?.logo} className="h-12 w-12" />
@@ -111,9 +110,11 @@ const AmountInput = () => {
             )}
           </div>
           <div className="flex w-full items-center justify-between">
-            <p className="text-sm">${Number(usdPrice).toFixed(2)}</p>
+            <p className="text-xs leading-none text-muted md:text-sm">
+              ${Number(usdPrice).toFixed(2)}
+            </p>
             {isWalletConnected('from') && (
-              <p className="text-nowrap text-center text-xs font-semibold text-muted md:text-sm">
+              <p className="text-nowrap text-center text-xs font-semibold leading-none text-muted md:text-sm">
                 {new BigNumber(selectedTokenBalance)
                   .decimalPlaces(8, BigNumber.ROUND_DOWN)
                   .toFixed()}
