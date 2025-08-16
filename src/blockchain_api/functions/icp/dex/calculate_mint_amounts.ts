@@ -125,7 +125,7 @@ export function calculate_mint_amounts({
 
 
 export interface GenerateMintPositionArgsParams {
-	mint_tick: string;
+	min_tick: string;
 	max_tick: string;
 	amount0_max: string;
 	amount1_max: string;
@@ -137,7 +137,7 @@ export interface GenerateMintPositionArgsParams {
 
 
 export function generate_mint_position_args({
-	mint_tick,
+	min_tick,
 	max_tick,
 	amount0_max,
 	amount1_max,
@@ -148,8 +148,8 @@ export function generate_mint_position_args({
 
 
 
-	let tick_lower = mint_tick < max_tick ? mint_tick : max_tick;
-	let tick_upper = mint_tick < max_tick ? max_tick : mint_tick;
+	let tick_lower = BigNumber(min_tick).lt(max_tick) ? min_tick : max_tick;
+	let tick_upper = BigNumber(min_tick).lt(max_tick) ? max_tick : min_tick;
 
 
 	// calculate decimals and apply transfer fees

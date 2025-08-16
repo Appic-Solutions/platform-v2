@@ -29,13 +29,15 @@ export function generate_decrease_liquidity_args({ position, percentage }: Remov
 	if (percentage == 100) {
 		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
 		let amount1_min = BigNumber(position.token1_reserves_raw).multipliedBy((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
-		return {
+		let burn_args: BurnPositionArgs = {
 			amount1_min: BigInt(amount1_min),
 			pool,
 			amount0_min: BigInt(amount0_min),
 			tick_lower,
 			tick_upper,
-		} as BurnPositionArgs;
+		};
+		return burn_args;
+
 	} else {
 		let liquidity = BigNumber(position.liquidity).multipliedBy(percentage / 100).toFixed()
 		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
@@ -54,13 +56,15 @@ export function generate_decrease_liquidity_args({ position, percentage }: Remov
 
 // step 2
 export async function remove_liquidity(
-	args: DecreaseLiquidityArgs | BurnPositionArgs,
+	args: BurnPositionArgs | DecreaseLiquidityArgs,
 	authenticated_agent: Agent,
 ): Promise<Response<string | undefined>> {
 	const dex_actor = Actor.createActor(idlFactory, {
 		agent: authenticated_agent,
 		canisterId: appic_dex,
 	});
+
+	console.log("burn args:", args)
 
 	try {
 		if ('liquidity' in args) {

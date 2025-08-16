@@ -26,6 +26,8 @@ export function generate_increase_liquidty_args({
   let tick_lower = position.key.tick_lower;
   let tick_upper = position.key.tick_upper;
 
+	console.log(token0,token1);
+
   // calculate decimals and apply transfer fees
   let amount0 = BigNumber(amount0_max)
     .multipliedBy(BigNumber(10).pow(token0.decimals))

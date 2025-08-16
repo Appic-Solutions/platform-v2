@@ -67,7 +67,7 @@ export default function CreatePositionStepThree() {
         amount1_max: token1DepositAmount,
         authenticatedAgent,
         max_tick: maxTick,
-        mint_tick: minTick,
+        min_tick: minTick,
         pool_exists: !!existPool,
         sqrt_price_x96: sqrtPriceX96,
         pool_id: existPool
