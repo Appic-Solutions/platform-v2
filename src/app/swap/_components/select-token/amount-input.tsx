@@ -12,7 +12,7 @@ const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
   const { isWalletConnected } = SelectTokenLogic();
 
-  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
+  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote, tokenOut } = useSwapStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
@@ -32,7 +32,6 @@ const AmountInput = () => {
     }
   }, [isEvmConnected, icpIdentity, tokenIn, evmBalance, icpBalance, setSelectedTokenBalance]);
 
-  // bouncing on input change
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleAmountChange(inputAmount);
@@ -41,7 +40,6 @@ const AmountInput = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [inputAmount]);
 
-  // set amount from store if it exist on mount
   useEffect(() => {
     if (amount) {
       setInputAmount(amount);
@@ -117,7 +115,8 @@ const AmountInput = () => {
               <p className="text-nowrap text-center text-xs font-semibold leading-none text-muted md:text-sm">
                 {new BigNumber(selectedTokenBalance)
                   .decimalPlaces(8, BigNumber.ROUND_DOWN)
-                  .toFixed()}
+                  .toFixed()}{' '}
+                {tokenIn?.symbol}
               </p>
             )}
           </div>

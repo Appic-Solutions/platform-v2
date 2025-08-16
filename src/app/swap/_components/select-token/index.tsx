@@ -66,8 +66,9 @@ export default function SwapSelectTokenPage() {
                 }}
                 label="Sell"
                 className={cn(
-                  tokenIn && 'py-5 md:rounded-3xl md:py-5',
-                  tokenIn && tokenOut && 'max-h-min md:max-h-min md:px-6',
+                  tokenIn &&
+                    tokenOut &&
+                    'max-h-min py-5 md:max-h-min md:rounded-3xl md:px-6 md:py-5',
                 )}
               />
               <div
@@ -93,8 +94,9 @@ export default function SwapSelectTokenPage() {
                 }}
                 label="Buy"
                 className={cn(
-                  tokenOut && 'py-5 md:rounded-3xl md:py-5',
-                  tokenIn && tokenOut && 'max-h-min md:max-h-min md:px-6',
+                  tokenIn &&
+                    tokenOut &&
+                    'max-h-min py-5 md:max-h-min md:rounded-3xl md:px-6 md:py-5',
                 )}
               />
             </div>

@@ -3,11 +3,6 @@
 import * as React from 'react';
 import { RadialProgress } from '@/components/ui/radial-progress';
 
-interface RadialCountDownProps {
-  isPending?: boolean;
-  resetKey?: string | number;
-}
-
 export const RadialCountDown = () => {
   const [progress, setProgress] = React.useState(0);
   const duration = 20000;

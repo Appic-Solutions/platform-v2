@@ -38,7 +38,7 @@ const SwapQuotesList = () => {
     if (amount) {
       refetch();
     }
-  }, [amount]);
+  }, [amount, tokenIn, tokenOut]);
 
   return (
     <div className="flex animate-slide-in flex-col items-start opacity-0 md:pr-2 lg:w-full">
