@@ -1,4 +1,4 @@
-import { HttpAgent, Actor, Agent } from '@dfinity/agent';
+import { Actor, Agent } from '@dfinity/agent';
 import { appic_dex } from '@/canister_ids.json';
 import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { Result_1 as CollectFeeResult } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
@@ -11,7 +11,7 @@ export interface CollectFeesArgs {
 // Step one
 export async function collect_fees(
 	{ position }: CollectFeesArgs,
-	authenticated_agent: HttpAgent
+	authenticated_agent: Agent,
 ): Promise<Response<string | undefined>> {
 	const dex_actor = Actor.createActor(idlFactory, {
 		agent: authenticated_agent,

@@ -145,7 +145,7 @@ export const get_bridge_options = async (
 			);
 
 			// In case of native deposit we need to keep some native tokens in users wallet, otherwise the transaction will be rejected by wallet
-			if (bridge_metadata.is_native && bridge_metadata.chain_id==8453) {
+			if (bridge_metadata.is_native && bridge_metadata.chain_id == 8453) {
 				amount = new BigNumber(amount).minus(base_l1_fee).toFixed();
 			}
 
@@ -249,8 +249,8 @@ export const get_bridge_options = async (
 			);
 
 			// apply l1_fee if transaction is for base
-			if(bridge_metadata.chain_id==8453){
-				max_transaction_fee=BigNumber(max_transaction_fee).plus(base_l1_fee).toFixed();
+			if (bridge_metadata.chain_id == 8453) {
+				max_transaction_fee = BigNumber(max_transaction_fee).plus(base_l1_fee).toFixed();
 			}
 
 			if (bridge_metadata.is_native) {
@@ -451,7 +451,7 @@ const estimate_withdrawal_gas = async (
 	// }
 };
 
-const get_gas_price = async (
+export const get_gas_price = async (
 	chain: ViemChain,
 	rpc_url: string,
 ): Promise<{ max_fee_per_gas: string; max_priority_fee_per_gas: string }> => {
@@ -694,6 +694,16 @@ export const encode_approval_function_data = (
 		args: [deposit_helper_contract, amount],
 	});
 };
+
+export const encode_deploy_erc20_function_data = (name: string, symbol: string, decimals: number,
+	base_token_bytes: string): `0x${string}` => {
+	return encodeFunctionData({
+		abi: appic_minter_abi_v2,
+		functionName: "deployERC20",
+		args: [name,symbol,BigInt(decimals),base_token_bytes]
+	})
+
+}
 
 /**
  * Calculate bridge options.

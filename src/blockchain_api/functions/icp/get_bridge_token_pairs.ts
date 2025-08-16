@@ -96,12 +96,13 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
 				usdPrice: { result: icp_token.usd_price, success: true, message: "" }
 			}
 		} else {
+			let usdPrice = evm_token.usd_price.length == 1 ?
+				{ result: evm_token.usd_price[0], message: "", success: true } :
+				await get_evm_token_price(evm_token.erc20_contract_address, parsed_chain_id);
+
 			return {
 				pair,
-				usdPrice: await get_evm_token_price(
-					evm_token.erc20_contract_address,
-					parsed_chain_id,
-				)
+				usdPrice
 			}
 		}
 	});
