@@ -19,7 +19,7 @@ export interface RemoveLiquidityArgs {
 const burn_slippage_percentage: number = 0.3;
 
 // step 1 generate args
-export function generate_decrease_liquidty_args({ position, percentage }: RemoveLiquidityArgs): DecreaseLiquidityArgs | BurnPositionArgs {
+export function generate_decrease_liquidity_args({ position, percentage }: RemoveLiquidityArgs): DecreaseLiquidityArgs | BurnPositionArgs {
 	if (percentage < 0 || percentage > 100) {
 		throw "Invlaid liquidity percentage selected";
 	}

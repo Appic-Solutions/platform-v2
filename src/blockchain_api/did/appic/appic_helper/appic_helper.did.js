@@ -1,10 +1,13 @@
 export const idlFactory = ({ IDL }) => {
   const CandidEvmToken = IDL.Record({
     'decimals' : IDL.Nat8,
+    'usd_price' : IDL.Opt(IDL.Text),
     'logo' : IDL.Text,
     'name' : IDL.Text,
     'erc20_contract_address' : IDL.Text,
     'chain_id' : IDL.Nat,
+    'cmc_id' : IDL.Opt(IDL.Nat),
+    'volume_usd_24h' : IDL.Opt(IDL.Text),
     'is_wrapped_icrc' : IDL.Bool,
     'symbol' : IDL.Text,
   });
@@ -34,6 +37,76 @@ export const idlFactory = ({ IDL }) => {
     'operator' : Operator,
     'evm_token' : CandidEvmToken,
     'icp_token' : CandidIcpToken,
+  });
+  const CandidPoolId = IDL.Record({
+    'fee' : IDL.Nat,
+    'token0' : IDL.Principal,
+    'token1' : IDL.Principal,
+  });
+  const SwapType = IDL.Variant({
+    'ExactOutput' : IDL.Vec(CandidPoolId),
+    'ExactInput' : IDL.Vec(CandidPoolId),
+    'ExactOutputSingle' : CandidPoolId,
+    'ExactInputSingle' : CandidPoolId,
+  });
+  const CandidPositionKey = IDL.Record({
+    'owner' : IDL.Principal,
+    'pool' : CandidPoolId,
+    'tick_lower' : IDL.Int,
+    'tick_upper' : IDL.Int,
+  });
+  const CandidEventType = IDL.Variant({
+    'Swap' : IDL.Record({
+      'principal' : IDL.Principal,
+      'token_in' : IDL.Principal,
+      'final_amount_in' : IDL.Nat,
+      'final_amount_out' : IDL.Nat,
+      'token_out' : IDL.Principal,
+      'swap_type' : SwapType,
+    }),
+    'CreatedPool' : IDL.Record({
+      'token0' : IDL.Principal,
+      'token1' : IDL.Principal,
+      'pool_fee' : IDL.Nat,
+    }),
+    'BurntPosition' : IDL.Record({
+      'amount0_received' : IDL.Nat,
+      'principal' : IDL.Principal,
+      'burnt_position' : CandidPositionKey,
+      'liquidity' : IDL.Nat,
+      'amount1_received' : IDL.Nat,
+    }),
+    'IncreasedLiquidity' : IDL.Record({
+      'principal' : IDL.Principal,
+      'amount0_paid' : IDL.Nat,
+      'liquidity_delta' : IDL.Nat,
+      'amount1_paid' : IDL.Nat,
+      'modified_position' : CandidPositionKey,
+    }),
+    'CollectedFees' : IDL.Record({
+      'principal' : IDL.Principal,
+      'amount1_collected' : IDL.Nat,
+      'position' : CandidPositionKey,
+      'amount0_collected' : IDL.Nat,
+    }),
+    'DecreasedLiquidity' : IDL.Record({
+      'amount0_received' : IDL.Nat,
+      'principal' : IDL.Principal,
+      'liquidity_delta' : IDL.Nat,
+      'amount1_received' : IDL.Nat,
+      'modified_position' : CandidPositionKey,
+    }),
+    'MintedPosition' : IDL.Record({
+      'principal' : IDL.Principal,
+      'amount0_paid' : IDL.Nat,
+      'liquidity' : IDL.Nat,
+      'created_position' : CandidPositionKey,
+      'amount1_paid' : IDL.Nat,
+    }),
+  });
+  const CandidEvent = IDL.Record({
+    'timestamp' : IDL.Nat64,
+    'payload' : CandidEventType,
   });
   const CandidErc20TwinLedgerSuiteStatus = IDL.Variant({
     'PendingApproval' : IDL.Null,
@@ -65,6 +138,10 @@ export const idlFactory = ({ IDL }) => {
     'operator' : Operator,
     'chain_id' : IDL.Nat,
     'minter_id' : IDL.Principal,
+  });
+  const TopVolumeTokens = IDL.Record({
+    'chain' : IDL.Nat64,
+    'tokens' : IDL.Vec(CandidEvmToken),
   });
   const TransactionSearchParam = IDL.Variant({
     'TxWithdrawalId' : IDL.Nat,
@@ -190,10 +267,19 @@ export const idlFactory = ({ IDL }) => {
     'evm_token_contract' : IDL.Text,
     'evm_token_chain_id' : IDL.Nat,
   });
+  const EvmSearchQuery = IDL.Record({
+    'query' : IDL.Text,
+    'chain_id' : IDL.Nat64,
+  });
   return IDL.Service({
     'add_evm_token' : IDL.Func([CandidEvmToken], [], []),
     'add_icp_token' : IDL.Func([CandidIcpToken], [], []),
     'get_bridge_pairs' : IDL.Func([], [IDL.Vec(TokenPair)], ['query']),
+    'get_dex_actions_for_principal' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(CandidEvent)],
+        ['query'],
+      ),
     'get_erc20_twin_ls_requests_by_creator' : IDL.Func(
         [IDL.Principal],
         [IDL.Vec(CandidLedgerSuiteRequest)],
@@ -211,6 +297,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'get_icp_tokens' : IDL.Func([], [IDL.Vec(CandidIcpToken)], ['query']),
     'get_minters' : IDL.Func([], [IDL.Vec(MinterArgs)], ['query']),
+    'get_top_100_tokens_by_volume_per_chain' : IDL.Func(
+        [],
+        [IDL.Vec(TopVolumeTokens)],
+        ['query'],
+      ),
     'get_transaction' : IDL.Func(
         [GetTxParams],
         [IDL.Opt(Transaction)],
@@ -240,6 +331,16 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'request_update_bridge_pairs' : IDL.Func([], [], []),
+    'search_evm_token' : IDL.Func(
+        [EvmSearchQuery],
+        [IDL.Vec(CandidEvmToken)],
+        ['query'],
+      ),
+    'update_evm_token_price_volume' : IDL.Func(
+        [IDL.Vec(IDL.Tuple(IDL.Nat64, IDL.Text, IDL.Text))],
+        [],
+        [],
+      ),
     'update_twin_ls_request' : IDL.Func(
         [CandidAddErc20TwinLedgerSuiteRequest],
         [],
