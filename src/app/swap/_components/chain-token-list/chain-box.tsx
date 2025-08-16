@@ -21,7 +21,7 @@ const ChainBoxPage = ({
           key={idx}
           chain={chain}
           selectedId={selectedChainId}
-          disabled={chain.disabled}
+          disabled={!chain.is_swap_active}
           onClick={ChainItemClickHandler}
         />
       ))}

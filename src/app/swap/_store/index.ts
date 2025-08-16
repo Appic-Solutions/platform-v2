@@ -1,11 +1,11 @@
 import { TxHash } from '@/blockchain_api/functions/icp/bridge_transactions';
-import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { IcpQuote } from '@/blockchain_api/quoter/icp';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { PendingTransaction } from '@/lib/helpers/session';
 import { create } from 'zustand';
 
 export type TokenType = EvmToken | IcpToken;
-type SelectionType = 'from' | 'to';
+type SelectionType = 'in' | 'out';
 export type Status = 'failed' | 'successful' | 'pending' | undefined;
 
 export interface TxStepType {
@@ -17,15 +17,13 @@ interface swapState {
   activeStep: number;
   selectedTokenType: SelectionType;
   usdPrice: string;
-  fromToken: TokenType | undefined;
-  toToken: TokenType | undefined;
+  tokenIn: TokenType | undefined;
+  tokenOut: TokenType | undefined;
   amount: string;
-  swapOptions: {
-    options: BridgeOption[] | undefined;
+  swapQuote: {
+    quote: IcpQuote | undefined;
     message: string;
   };
-  selectedOption: BridgeOption | undefined;
-  swapPairs: (EvmToken | IcpToken)[] | undefined;
   selectedTokenBalance: string;
   toWalletAddress: string;
   toWalletValidationError: string;
@@ -43,16 +41,14 @@ type Action = {
     setActiveStep: (step: number) => void;
     setSelectedTokenType: (type: SelectionType) => void;
     setAmount: (amount: string) => void;
-    setSelectedOption: (option: BridgeOption) => void;
-    setSwapPairs: (swapPairs: (EvmToken | IcpToken)[]) => void;
-    setSwapOptions: (params: { options: BridgeOption[] | undefined; message: string }) => void;
+    setSwapQuote: (params: { quote: IcpQuote | undefined; message: string }) => void;
     setUsdPrice: (usdPrice: string) => void;
     setToWalletAddress: (walletAddress: string) => void;
     setToWalletValidationError: (toWalletValidationError: string) => void;
     setSelectedTokenBalance: (tokenBalance: string) => void;
     // select token actions
-    setFromToken: (token: TokenType | undefined) => void;
-    setToToken: (token: TokenType | undefined) => void;
+    setTokenIn: (token: TokenType | undefined) => void;
+    setTokenOut: (token: TokenType | undefined) => void;
     // tx actions
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
@@ -74,15 +70,14 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
     status: 'successful' as Status,
   },
   amount: '',
-  swapOptions: {
-    options: undefined,
+  swapQuote: {
+    quote: undefined,
     message: '',
   },
-  swapPairs: undefined,
-  fromToken: undefined,
-  selectedOption: undefined,
-  selectedTokenType: 'from' as SelectionType,
-  toToken: undefined,
+  tokenIn: undefined,
+  selectedQuote: undefined,
+  selectedTokenType: 'in',
+  tokenOut: undefined,
   usdPrice: '0',
   toWalletAddress: '',
   toWalletValidationError: '',
@@ -94,12 +89,10 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
     setSelectedTokenType: (selectedTokenType) => set({ selectedTokenType }),
-    setFromToken: (fromToken) => set({ fromToken }),
-    setToToken: (toToken) => set({ toToken }),
+    setTokenIn: (tokenIn) => set({ tokenIn }),
+    setTokenOut: (tokenOut) => set({ tokenOut }),
     setAmount: (amount) => set({ amount }),
-    setSelectedOption: (selectedOption) => set({ selectedOption }),
-    setSwapPairs: (swapPairs) => set({ swapPairs }),
-    setSwapOptions: (swapOptions) => set({ swapOptions }),
+    setSwapQuote: (swapQuote) => set({ swapQuote }),
     setUsdPrice: (usdPrice) => set({ usdPrice }),
     setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),
     setToWalletValidationError: (toWalletValidationError) => set({ toWalletValidationError }),

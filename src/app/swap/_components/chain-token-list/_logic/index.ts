@@ -8,46 +8,46 @@ import { useEffect, useMemo, useState } from 'react';
 
 export function ChainTokenListLogic() {
   // Swap Actions
-  const { setFromToken, setToToken, setAmount } = useSwapActions();
+  const { setTokenIn, setTokenOut, setAmount } = useSwapActions();
   // Swap Store
-  const { selectedTokenType, fromToken, toToken, swapPairs } = useSwapStore();
+  const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
   // shared store
-  const { evmBalance, icpBalance } = useSharedStore();
+  const { evmBalance, icpBalance, icpTokens } = useSharedStore();
 
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
-  const [updatedSwapPairs, setUpdatedSwapPairs] = useState<TokenType[]>();
+  const [updatedIcpTokens, setUpdatedIcpTokens] = useState<TokenType[]>();
   const [query, setQuery] = useState('');
 
   // select token function in chain token list
   function selectToken(token: EvmToken | IcpToken) {
-    const setToken = selectedTokenType === 'from' ? setFromToken : setToToken;
-    if (fromToken && toToken) {
-      setFromToken(undefined);
-      setToToken(undefined);
+    const setToken = selectedTokenType === 'in' ? setTokenIn : setTokenOut;
+    if (tokenIn && tokenOut) {
+      setTokenIn(undefined);
+      setTokenOut(undefined);
       setAmount('');
     }
     setToken(token);
   }
 
   function isTokenSelected(token: TokenType) {
-    if (selectedTokenType === 'from' && fromToken) {
-      if (fromToken?.chain_type === 'ICP') {
-        return fromToken.canisterId === token.canisterId;
+    if (selectedTokenType === 'in' && tokenIn) {
+      if (tokenIn?.chain_type === 'ICP') {
+        return tokenIn.canisterId === token.canisterId;
       }
-      return fromToken?.contractAddress === token.contractAddress;
-    } else if (selectedTokenType === 'to' && toToken) {
-      if (toToken?.chain_type === 'ICP') {
-        return toToken.canisterId === token.canisterId;
+      return tokenIn?.contractAddress === token.contractAddress;
+    } else if (selectedTokenType === 'out' && tokenOut) {
+      if (tokenOut?.chain_type === 'ICP') {
+        return tokenOut.canisterId === token.canisterId;
       }
-      return toToken?.contractAddress === token.contractAddress;
+      return tokenOut?.contractAddress === token.contractAddress;
     }
     return false;
   }
 
   useEffect(() => {
-    if ((icpBalance || evmBalance) && swapPairs) {
-      setUpdatedSwapPairs((prevTokens) => {
-        let updatedTokenList = prevTokens || swapPairs;
+    if ((icpBalance || evmBalance) && icpTokens) {
+      setUpdatedIcpTokens((prevTokens) => {
+        let updatedTokenList = prevTokens || icpTokens;
 
         if (icpBalance === undefined) {
           updatedTokenList = updatedTokenList.map((token) =>
@@ -96,50 +96,19 @@ export function ChainTokenListLogic() {
         return updatedTokenList;
       });
     } else {
-      setUpdatedSwapPairs(swapPairs);
+      setUpdatedIcpTokens(icpTokens);
     }
-  }, [evmBalance, icpBalance, swapPairs]);
+  }, [evmBalance, icpBalance, icpTokens]);
 
   // set selected chain id
   useEffect(() => {
-    const tokenToCheck = selectedTokenType === 'from' ? fromToken : toToken;
+    const tokenToCheck = selectedTokenType === 'in' ? tokenIn : tokenOut;
     if (tokenToCheck) {
       setSelectedChainId(tokenToCheck.chainId);
     } else {
       setSelectedChainId(chains[0].chainId);
     }
-  }, [selectedTokenType, fromToken, toToken]);
-
-  // filter tokens
-  const filteredTokens = useMemo(() => {
-    const searchQuery = query.toLowerCase();
-    if (!fromToken && toToken && updatedSwapPairs && selectedTokenType === 'from') {
-      return get_bridge_pairs_for_token(
-        updatedSwapPairs,
-        toToken.canisterId || toToken.contractAddress || '',
-        toToken.chainId,
-        selectedChainId || 0,
-      );
-    }
-    if (fromToken && !toToken && updatedSwapPairs && selectedTokenType === 'to') {
-      return get_bridge_pairs_for_token(
-        updatedSwapPairs,
-        fromToken.canisterId || fromToken.contractAddress || '',
-        fromToken.chainId,
-        selectedChainId || 0,
-      );
-    } else {
-      return updatedSwapPairs
-        ?.filter((token) => token.chainId === selectedChainId)
-        .filter(
-          (token) =>
-            token.name.toLowerCase().includes(searchQuery) ||
-            token.symbol.toLowerCase().includes(searchQuery) ||
-            token.contractAddress?.toLowerCase().includes(searchQuery) ||
-            token.canisterId?.toLowerCase().includes(searchQuery),
-        );
-    }
-  }, [query, selectedChainId, updatedSwapPairs, fromToken, selectedTokenType, toToken]);
+  }, [selectedTokenType, tokenIn, tokenOut]);
 
   // sort items based on balance
   const sortTokens = (tokens: TokenType[]) => {
@@ -153,7 +122,7 @@ export function ChainTokenListLogic() {
   return {
     selectToken,
     isTokenSelected,
-    filteredTokens,
+    updatedIcpTokens,
     sortTokens,
     query,
     setQuery,

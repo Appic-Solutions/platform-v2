@@ -73,7 +73,7 @@ const WalletAddressInput = ({
           'max-h-[133px] cursor-auto flex-col items-start justify-center gap-y-2 hover:bg-[#000000]/0 md:max-h-[155px]',
         )}
       >
-        <p className="text-sm font-semibold">Send To Wallet</p>
+        <p className="text-xs leading-none text-muted md:text-sm">Send To Wallet</p>
         <div className="flex w-full items-center gap-4">
           <div className="relative">
             <Avatar src={avatar} className="h-12 w-12" />

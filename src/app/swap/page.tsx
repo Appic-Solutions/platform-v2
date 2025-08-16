@@ -2,63 +2,37 @@
 import SwapSelectTokenPage from './_components/select-token';
 import TokenListPage from './_components/chain-token-list';
 import { useEffect } from 'react';
-import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
-import { BridgeOptionsListRequest } from './_api/types/request';
 import { useSwapActions, useSwapStore } from './_store';
-import { useSharedStore } from '@/store/store';
 import { StepperContainer } from './_components/bridge-review';
 import MinimizeProgressBarWidget from '@/app/_layout/minimize-progress-bar-widget';
 import { ParkOutlineBridgeIcon } from '@/components/icons';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { useQuery } from '@tanstack/react-query';
+import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
 
 const SwapPage = () => {
-  const { unAuthenticatedAgent } = useSharedStore();
-  const { amount, fromToken, toToken, swapPairs, activeStep, pendingTx } = useSwapStore();
-  const { setSwapPairs, setSwapOptions } = useSwapActions();
+  const { amount, tokenIn, tokenOut, activeStep, pendingTx } = useSwapStore();
+  const { setSwapQuote } = useSwapActions();
 
-  const { data: swapPairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
-  const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } =
-    useGetBridgeOptions();
-
-  useEffect(() => {
-    if (swapPairsData) setSwapPairs(swapPairsData);
-  }, [swapPairsData, setSwapPairs]);
+  const { data: swapQuoteData } = useQuery({
+    queryKey: ['swap-quot'],
+    // TODO: When Evm to Evm and Evm to Icp swap developed, this type assertions
+    queryFn: () => fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount),
+    enabled: !!tokenIn && !!tokenOut && !!amount,
+  });
 
   useEffect(() => {
-    if (amount && unAuthenticatedAgent && fromToken && toToken && swapPairs) {
-      const getBridgeOptionsParams: BridgeOptionsListRequest = {
-        agent: unAuthenticatedAgent,
-        amount: amount,
-        bridge_pairs: swapPairs,
-        from_token: fromToken,
-        to_token: toToken,
-      };
-      try {
-        getBridgeOptions(getBridgeOptionsParams).then((res) => {
-          console.log(res);
-          if (res) {
-            setSwapOptions({ message: res.message, options: res.result });
-          }
-        });
-      } catch (error) {
-        throw new Error(`Error! ${error}`);
-      }
+    if (swapQuoteData && swapQuoteData.result) {
+      setSwapQuote({ message: '', quote: swapQuoteData.result });
     }
-  }, [
-    amount,
-    swapPairs,
-    unAuthenticatedAgent,
-    fromToken,
-    toToken,
-    getBridgeOptions,
-    setSwapOptions,
-  ]);
+  }, [swapQuoteData, tokenIn, tokenOut, amount]);
 
   const renderStep = () => {
     switch (activeStep) {
       case 1:
-        return <SwapSelectTokenPage isPendingSwapOptions={isPendingBridgeOptions} />;
+        return <SwapSelectTokenPage />;
       case 2:
-        return <TokenListPage isPending={isPending} isError={isError} />;
+        return <TokenListPage />;
       case 3:
         return <StepperContainer />;
       default:

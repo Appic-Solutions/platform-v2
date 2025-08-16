@@ -23,45 +23,14 @@ import {
   request_withdraw,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { SwapLogic } from '../_logic';
+import { GetICPSwapQuoteRequest } from '../_types';
+import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
 
-const useGetBridgePairs = (agent: HttpAgent | undefined) => {
-  const { getBridgePairsFromLocalStorage, setBridgePairsWithTime } = SwapLogic();
-  const refetchTime = 1000 * 60 * 10;
-  const fetchBridgePairs = async () => {
-    const { data, lastFetchTime } = getBridgePairsFromLocalStorage();
-    const currentTime = new Date().getTime();
-    const timeDiff = lastFetchTime ? currentTime - lastFetchTime : Infinity;
-
-    if (data && data.length > 0 && timeDiff < refetchTime) {
-      return data;
-    } else {
-      if (!agent) throw new Error('Agent is not available!');
-
-      const response = await get_bridge_pairs(agent);
-      setBridgePairsWithTime(response.result);
-      return response.result;
-    }
-  };
-
-  return useQuery({
-    queryKey: ['bridge-pairs'],
-    queryFn: fetchBridgePairs,
-    refetchInterval: refetchTime,
-    enabled: !!agent,
-  });
-};
-
-const useGetBridgeOptions = () => {
+const useGetICPSwapQuote = () => {
   return useMutation({
-    mutationKey: ['bridge-options'],
-    mutationFn: (params: BridgeOptionsListRequest) =>
-      get_bridge_options(
-        params.from_token,
-        params.to_token,
-        params.amount,
-        params.agent,
-        params.bridge_pairs,
-      ),
+    mutationKey: ['swap-quot'],
+    mutationFn: (params: GetICPSwapQuoteRequest) =>
+      fetchICPQuote(params.tokenIn, params.tokenOut, params.amount),
   });
 };
 
@@ -163,8 +132,7 @@ const useNotifyAppicHelperDeposit = () => {
 };
 
 export {
-  useGetBridgePairs,
-  useGetBridgeOptions,
+  useGetICPSwapQuote,
   useCreateWalletClient,
   useDepositTokenWithApproval,
   useNotifyAppicHelperDeposit,
