@@ -1,11 +1,11 @@
 'use client';
-import { TransactionStep } from './TransactionStep';
+import { TransactionStep } from './transaction-step';
 import { TxStep } from '../../_api/types';
 import { useSwapStore } from '../../_store';
 import { DialogClose } from '@/components/ui/dialog';
 import { CloseIcon } from '@/components/icons';
 import Stepper from '@/app/_layout/Stepper';
-import BridgeReviewLogic from './_logic';
+import BridgeReviewLogic from './_logic/use-swap-review-logic';
 
 interface Props {
   steps: TxStep[];
@@ -27,7 +27,7 @@ export default function BridgeTransactionStepper({ steps, onCloseModal }: Props)
 
   return (
     <div className="relative w-full max-w-[691px] justify-start gap-y-9">
-      <div className="text-center text-lg font-bold text-primary">Bridge Transaction</div>
+      <div className="text-center text-lg font-bold text-primary">Swap Transaction</div>
       <DialogClose onClick={closeModal} className="absolute right-5 top-0">
         <CloseIcon className="h-6 w-6 text-primary" />
       </DialogClose>

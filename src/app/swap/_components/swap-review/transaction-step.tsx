@@ -22,18 +22,19 @@ export const TransactionStep = ({
   steps: TxStep[];
   onResetTransaction: () => void;
 }) => {
-  const { txErrorMessage, fromToken, toToken } = useSwapStore();
+  const { txErrorMessage, tokenIn, tokenOut } = useSwapStore();
   const router = useRouter();
   const getLogoHandler = () => {
     // withdrawal tx
-    if (steps.length === 4) {
-      if (currentStep.count < 2) return getChainLogo(fromToken?.chainId);
-      return getChainLogo(toToken?.chainId);
-    }
+    // TODO: fix this condition for ICP to evm or evm to ICP
+    // if (steps.length === 4) {
+    //   if (currentStep.count < 2) return getChainLogo(tokenIn?.chainId);
+    //   return getChainLogo(tokenOut?.chainId);
+    // }
     // deposit tx
-    if (steps.length === 5) {
-      if (currentStep.count < 3) return getChainLogo(fromToken?.chainId);
-      return getChainLogo(toToken?.chainId);
+    if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
+      if (currentStep.count < 3) return getChainLogo(tokenIn?.chainId);
+      return getChainLogo(tokenOut?.chainId);
     }
   };
 
@@ -95,8 +96,8 @@ export const TransactionStep = ({
           </p>
         </div>
       )}
-      {((fromToken?.chain_type === 'ICP' && currentStep.count === 4) ||
-        (fromToken?.chain_type === 'EVM' && currentStep.count === 5)) && (
+      {((tokenIn?.chain_type === 'ICP' && currentStep.count === 4) ||
+        (tokenIn?.chain_type === 'EVM' && currentStep.count === 5)) && (
         <>
           <p className="pb-2 text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
             You can safely close this window

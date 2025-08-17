@@ -5,7 +5,7 @@ import { useAppKit } from '@reown/appkit/react';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 
-const SwapSelectTokenLogic = () => {
+export const useSwapSelectTokenLogic = () => {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
 
   const { connect: openIcpModal } = useAuth();
@@ -215,5 +215,3 @@ const SwapSelectTokenLogic = () => {
     isWalletConnected,
   };
 };
-
-export default SwapSelectTokenLogic;

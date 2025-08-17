@@ -30,9 +30,7 @@ interface swapState {
   // tx states
   txStep: TxStepType;
   txErrorMessage: string | undefined;
-  pendingTx: PendingTransaction | undefined;
   prevTxStep: TxStepType;
-  txHash: TxHash | undefined;
   withdrawalId: string | undefined;
 }
 
@@ -52,9 +50,7 @@ type Action = {
     // tx actions
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
-    setPendingTx: (pendingTxs: PendingTransaction | undefined) => void;
     setPrevTxStep: (prevStep: TxStepType) => void;
-    setTxHash: (txHash: TxHash | undefined) => void;
     setWithdrawalId: (withdrawalId: string | undefined) => void;
   };
 };
@@ -83,8 +79,6 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
   toWalletValidationError: '',
   selectedTokenBalance: '',
   txErrorMessage: undefined,
-  pendingTx: undefined,
-  txHash: undefined,
   withdrawalId: undefined,
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
@@ -100,10 +94,8 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
     // tx actions
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
-    setTxHash: (txHash) => set({ txHash }),
     setPrevTxStep: (prevTxStep) => set({ prevTxStep }),
     setWithdrawalId: (withdrawalId) => set({ withdrawalId }),
-    setPendingTx: (pendingTx) => set({ pendingTx }),
   },
 }));
 

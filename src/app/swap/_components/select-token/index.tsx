@@ -8,7 +8,7 @@ import AmountInput from './amount-input';
 import WalletAddressInput from './wallet-address-input';
 import ActionButton from './action-button';
 import SwapOptionsList from './swap-quote-list';
-import SwapSelectTokenLogic from './_logic';
+import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { useSwapActions, useSwapStore } from '../../_store';
 
 export default function SwapSelectTokenPage() {
@@ -24,7 +24,7 @@ export default function SwapSelectTokenPage() {
     setShowWalletAddress,
     actionButtonHandler,
     actionButtonStatus,
-  } = SwapSelectTokenLogic();
+  } = useSwapSelectTokenLogic();
 
   return (
     <Box
@@ -33,7 +33,7 @@ export default function SwapSelectTokenPage() {
         'md:w-fit md:max-w-[617px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        Number(amount) > 0 && swapQuote.quote && 'lg:w-[1060px] lg:max-w-[1060px]',
+        Number(amount) > 0 && 'lg:w-[1060px] lg:max-w-[1060px]',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >

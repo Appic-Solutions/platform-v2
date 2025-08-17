@@ -1,27 +1,25 @@
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
-import BridgeTransactionStepper from './TransactionStepper';
+import BridgeTransactionStepper from './transaction-stepper';
 import { useEffect, useState } from 'react';
 import { useSwapStore } from '../../_store';
-import SwapReview from './SwapReview';
+import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
 import { depositStepsDetails, withdrawalStepsDetails } from '@/lib/constants/bridge';
+import { icpSwapStepsDetails } from '@/lib/constants/swap';
 
 export const StepperContainer = () => {
-  // Modal states
   const [isOpen, setIsOpen] = useState(false);
-  // all steps of transaction details like title, logo and status
   const [steps, setSteps] = useState<TxStep[]>();
-  // bridge store
-  const { fromToken } = useSwapStore();
+  const { tokenIn } = useSwapStore();
 
   useEffect(() => {
-    if (fromToken?.chain_type === 'EVM') {
+    if (tokenIn?.chain_type === 'EVM') {
       setSteps(depositStepsDetails);
     }
-    if (fromToken?.chain_type === 'ICP') {
-      setSteps(withdrawalStepsDetails);
+    if (tokenIn?.chain_type === 'ICP') {
+      setSteps(icpSwapStepsDetails);
     }
-  }, [fromToken]);
+  }, [tokenIn]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>

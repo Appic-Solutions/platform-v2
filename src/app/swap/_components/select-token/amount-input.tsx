@@ -5,12 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { useSharedStore } from '@/store/store';
 import { useSwapActions, useSwapStore } from '@/app/swap/_store';
 import BigNumber from 'bignumber.js';
-import SelectTokenLogic from './_logic';
+import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { Avatar } from '@/components/common/ui/avatar';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
-  const { isWalletConnected } = SelectTokenLogic();
+  const { isWalletConnected } = useSwapSelectTokenLogic();
 
   const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote, tokenOut } = useSwapStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
