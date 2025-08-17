@@ -43,7 +43,7 @@ export default function AddLiquidityStepTwo() {
           amount1_max: token1DepositAmount,
           position: position,
           token0: position.token0,
-          token1: position.token0,
+          token1: position.token1,
         },
         authenticatedAgent,
         unAuthenticatedAgent,
