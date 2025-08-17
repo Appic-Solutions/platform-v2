@@ -16,27 +16,26 @@ import { PositionStepper } from '@/app/positions/_components/position-stepper';
 
 export default function AddLiquidityStepTwo() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFreshRequest, setIsFreshRequest] = useState(true);
+  const router = useRouter();
 
   const {
     token0DepositAmount,
     token1DepositAmount,
     selectedPosition: position,
     actions,
+    mintStep,
   } = usePositionDetailsStore();
 
   const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
   if (!position) {
-    return useRouter().push('/positions');
+    return router.push('/positions');
   }
 
-  const openModalHandler = () => {
-    setIsOpen(true);
-    submitHandler();
-  };
-
-  const submitHandler = async () => {
+  const addLiquidityHandler = async () => {
     if (authenticatedAgent && unAuthenticatedAgent) {
       // step1
+      setIsFreshRequest(false);
       const increaseLiquidityArgs = await generate_args_and_approve_add_liquidity(
         {
           amount0_max: token0DepositAmount,
@@ -55,6 +54,7 @@ export default function AddLiquidityStepTwo() {
           status: 'failed',
           errorMessage: null,
         });
+        setIsFreshRequest(true);
         return increaseLiquidityArgs;
       }
 
@@ -79,6 +79,7 @@ export default function AddLiquidityStepTwo() {
             status: 'failed',
             errorMessage: result.message,
           });
+          setIsFreshRequest(true);
           return result.message;
         }
         actions.setMintStep({
@@ -87,6 +88,21 @@ export default function AddLiquidityStepTwo() {
           errorMessage: null,
         });
       }
+    }
+  };
+
+  const openModalHandler = () => {
+    setIsOpen(true);
+    if (isFreshRequest) {
+      addLiquidityHandler();
+    }
+  };
+
+  const onCloseModal = () => {
+    if (mintStep.step === 2 && mintStep.status === 'successful') {
+      router.push('/positions');
+    } else {
+      setIsOpen(false);
     }
   };
 
@@ -158,7 +174,7 @@ export default function AddLiquidityStepTwo() {
         >
           <PositionStepper
             title="Add Liquidity"
-            onCloseModal={() => setIsOpen(false)}
+            onCloseModal={onCloseModal}
             steps={addLiquidityStepsDetails}
           />
         </DialogContent>
