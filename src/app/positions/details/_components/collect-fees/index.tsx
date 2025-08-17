@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Avatar } from '@/components/common/ui/avatar';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 import { useRouter } from 'next/navigation';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { PositionStepper } from '@/app/positions/_components/position-stepper';
@@ -113,7 +113,7 @@ const CollectFees = () => {
         </div>
       </div>
 
-      {/* <DialogTitle /> */}
+      <DialogTitle />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
           aria-describedby={undefined}

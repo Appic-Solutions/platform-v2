@@ -9,6 +9,7 @@ import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetai
 import { useRouter } from 'next/navigation';
 
 const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
+  const [isDisabled, setIsDisabled] = useState(true);
   const {
     selectedPosition: position,
     token0DepositAmount,
@@ -37,6 +38,22 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
       token1Balance: userToken1?.balance ?? '0',
     });
   }, [icpBalance, icpIdentity]);
+
+  useEffect(() => {
+    if (
+      userTokenBalances &&
+      userTokenBalances.token0Balance &&
+      userTokenBalances.token1Balance &&
+      Number(token0DepositAmount) > 0 &&
+      Number(token1DepositAmount) > 0 &&
+      userTokenBalances?.token0Balance >= token0DepositAmount &&
+      userTokenBalances?.token1Balance >= token1DepositAmount
+    ) {
+      setIsDisabled(false);
+      return;
+    }
+    setIsDisabled(true);
+  }, [userTokenBalances, token0DepositAmount, token1DepositAmount]);
 
   return (
     <>
@@ -76,16 +93,12 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
         </div>
 
         <AddLiquidityInput
-          // fieldName="token0DepositAmount"
-          // form={addLiquidityForm}
           isAmountZero={true}
           position={position}
           userTokenBalance={userTokenBalances?.token0Balance}
         />
 
         <AddLiquidityInput
-          // fieldName="token1DepositAmount"
-          // form={addLiquidityForm}
           isAmountZero={false}
           position={position}
           userTokenBalance={userTokenBalances?.token1Balance}
@@ -137,6 +150,7 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
           </div>
         </div>
       </SolidCard>
+
       <div className="flex h-[40px] w-full items-center justify-center gap-x-3 self-end lg:h-[52px]">
         <button
           onClick={() => actions.setCurrentStep('positionDetail')}
@@ -147,7 +161,7 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
         </button>
         <button
           type="button"
-          // disabled={!}
+          disabled={isDisabled}
           onClick={onNext}
           className="mt-auto h-full w-full select-none rounded-[15px] bg-primary-buttons text-white duration-200 hover:opacity-85 disabled:opacity-50 md:mt-0"
         >
