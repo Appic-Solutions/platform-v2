@@ -1,4 +1,4 @@
-import { RemoveLiquidityPercent } from '@/app/positions/_components/position-details/remove-liquidity/step-one';
+import { RemoveLiquidityPercent } from '@/app/positions/details/_components/remove-liquidity/step-one';
 import { CreatePositionStepDetail } from '@/app/positions/types';
 
 export const allowedInputCharacters = [
@@ -96,7 +96,7 @@ export const addLiquidityStepsDetails: CreatePositionStepDetail[] = [
 
 export const collectFeesStepsDetails: CreatePositionStepDetail[] = [
   {
-    title: 'Step 2',
+    title: 'Step 1',
     statuses: {
       pending: {
         statusTitle: 'Pending',

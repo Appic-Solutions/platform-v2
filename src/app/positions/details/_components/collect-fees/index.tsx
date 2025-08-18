@@ -13,8 +13,9 @@ import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees
 import { useSharedStore } from '@/store/store';
 
 const CollectFees = () => {
+  const [isFreshRequest, setIsFreshRequest] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const { selectedPosition, actions } = usePositionDetailsStore();
+  const { selectedPosition, actions, mintStep } = usePositionDetailsStore();
   const { authenticatedAgent } = useSharedStore();
   const router = useRouter();
 
@@ -23,13 +24,9 @@ const CollectFees = () => {
     return;
   }
 
-  const openModalHandler = () => {
-    setIsOpen(true);
-    executeCollectFees();
-  };
-
-  const executeCollectFees = async () => {
+  const collectFeesHandler = async () => {
     if (authenticatedAgent) {
+      setIsFreshRequest(false);
       const result = await collect_fees({ position: selectedPosition }, authenticatedAgent);
       if (!result.success || !result.result) {
         actions.setMintStep({
@@ -37,6 +34,7 @@ const CollectFees = () => {
           status: 'failed',
           errorMessage: result.message,
         });
+        setIsFreshRequest(true);
         return result.message;
       }
       actions.setMintStep({
@@ -46,7 +44,22 @@ const CollectFees = () => {
       });
     }
   };
-  console.log(selectedPosition);
+
+  const openModalHandler = () => {
+    setIsOpen(true);
+    if (isFreshRequest) {
+      collectFeesHandler();
+    }
+  };
+
+  const onCloseModal = () => {
+    if (mintStep.step === 2 && mintStep.status === 'successful') {
+      router.push('/positions');
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <div className="flex h-full w-full animate-fade flex-col gap-6">
@@ -100,7 +113,7 @@ const CollectFees = () => {
         </div>
       </div>
 
-      {/* <DialogTitle /> */}
+      <DialogTitle />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
           aria-describedby={undefined}
@@ -109,7 +122,7 @@ const CollectFees = () => {
         >
           <PositionStepper
             title="Collect Fees"
-            onCloseModal={() => setIsOpen(false)}
+            onCloseModal={onCloseModal}
             steps={collectFeesStepsDetails}
           />
         </DialogContent>

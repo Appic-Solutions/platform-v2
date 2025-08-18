@@ -1,7 +1,6 @@
 import React from 'react';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { cn } from '@/lib/utils';
-import { useCreatePosition } from '@/app/positions/create/_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 
 interface Props {
