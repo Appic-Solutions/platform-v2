@@ -19,8 +19,9 @@ export async function collect_fees(
 	});
 
 	try {
-		let collect_fees_result = (await dex_actor.collect_fees(position)) as CollectFeeResult;
+		let collect_fees_result = (await dex_actor.collect_fees(position.key)) as CollectFeeResult;
 		if ('Err' in collect_fees_result) {
+			console.log(collect_fees_result.Err);
 			return {
 				message: `${collect_fees_result.Err}`,
 				result: undefined,

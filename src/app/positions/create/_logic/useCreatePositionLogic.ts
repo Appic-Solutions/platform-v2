@@ -182,10 +182,10 @@ export default function useCreatePositionLogic() {
     createPositionForm.setValue('isToken1DepositAmountActive', alignedPrice.is_token1_active);
 
     if (!alignedPrice.is_token0_active && createPositionForm.getValues('token0DepositAmount')) {
-      createPositionForm.setValue('token0DepositAmount', '');
+      createPositionForm.setValue('token0DepositAmount', '0');
     }
     if (!alignedPrice.is_token1_active && createPositionForm.getValues('token1DepositAmount')) {
-      createPositionForm.setValue('token1DepositAmount', '');
+      createPositionForm.setValue('token1DepositAmount', '0');
     }
 
     createPositionForm.trigger('maxPrice');

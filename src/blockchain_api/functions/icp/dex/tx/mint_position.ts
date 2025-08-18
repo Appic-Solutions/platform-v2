@@ -32,6 +32,7 @@ export async function generate_args_and_approve_mint_position(
 	unauthenticated_agent: HttpAgent,
 ): Promise<Response<MintPositionArgs | undefined>> {
 	console.log(args);
+
 	let { mint_position_args, token1_approval_amount, token0_approval_amount } =
 		generate_mint_position_args(args);
 	console.log(mint_position_args);

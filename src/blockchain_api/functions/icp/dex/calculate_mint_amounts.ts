@@ -165,6 +165,20 @@ export function generate_mint_position_args({
 	amount0 = amount0.minus(BigNumber(token0.fee!).multipliedBy(2));
 	amount1 = amount1.minus(BigNumber(token1.fee!).multipliedBy(2));
 
+
+	// in case providing liquidity for an out of range position
+	console.log(amount0_max, amount1_max);
+	if (amount0_max == "0") {
+		amount0 = BigNumber(0)
+		token0_approval_amount = "0"
+	}
+	if (amount1_max == "0") {
+		amount1 = BigNumber(0)
+		token1_approval_amount = "0"
+	}
+
+
+
 	// Return MintPositionArgs
 	return {
 		mint_position_args: {

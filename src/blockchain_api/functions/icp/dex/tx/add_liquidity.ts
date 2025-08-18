@@ -29,6 +29,7 @@ export async function generate_args_and_approve_add_liquidity(
 	let { increase_liquidty_args, token1_approval_amount, token0_approval_amount } =
 		generate_increase_liquidty_args(args);
 
+
 	// approval tx
 	const token0_actor = Actor.createActor(IcrcIdlFactory, {
 		agent: authenticated_agent,
