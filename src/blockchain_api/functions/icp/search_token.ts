@@ -70,4 +70,4 @@ export async function createIcpTokenFromCanister( canisterId: string, unAuthenti
 
 
 
-export async function()
+// export async function()

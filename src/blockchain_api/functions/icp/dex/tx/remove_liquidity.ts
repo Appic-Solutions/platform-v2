@@ -39,7 +39,7 @@ export function generate_decrease_liquidity_args({ position, percentage }: Remov
 		return burn_args;
 
 	} else {
-		let liquidity = BigNumber(position.liquidity).multipliedBy(percentage / 100).toFixed()
+		let liquidity = BigNumber(position.liquidity).multipliedBy(percentage / 100).decimalPlaces(0).toFixed()
 		let amount0_min = BigNumber(position.token0_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
 		let amount1_min = BigNumber(position.token1_reserves_raw).multipliedBy(percentage / 100).minus((100 - burn_slippage_percentage) / 100).decimalPlaces(0).toFixed();
 
@@ -87,6 +87,7 @@ export async function remove_liquidity(
 		} else {
 			let burn_result = (await dex_actor.burn(args as BurnPositionArgs)) as BurnLiquidityResult;
 			if ('Err' in burn_result) {
+				console.log(burn_result.Err);
 				return {
 					message: `${burn_result.Err}`,
 					result: undefined,
@@ -101,6 +102,7 @@ export async function remove_liquidity(
 			}
 		}
 	} catch (error) {
+		console.log(error);
 		return {
 			message: `Failed to call appic dex canister: ${error}`,
 			result: undefined,

@@ -29,7 +29,6 @@ import { is_native_token } from '../evm/utils/erc20_helpers';
 import BigNumber from 'bignumber.js';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
 import { createPublicClient, http, Chain as ViemChain } from 'viem';
-import { max } from 'date-fns';
 
 // Enums and Types
 export enum Badge {

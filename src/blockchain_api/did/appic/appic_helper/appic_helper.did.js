@@ -21,6 +21,7 @@ export const idlFactory = ({ IDL }) => {
   const CandidIcpToken = IDL.Record({
     'fee' : IDL.Nat,
     'decimals' : IDL.Nat8,
+    'listed_on_appic_dex' : IDL.Opt(IDL.Bool),
     'usd_price' : IDL.Text,
     'logo' : IDL.Text,
     'name' : IDL.Text,
@@ -43,7 +44,7 @@ export const idlFactory = ({ IDL }) => {
     'token0' : IDL.Principal,
     'token1' : IDL.Principal,
   });
-  const SwapType = IDL.Variant({
+  const CandidSwapType = IDL.Variant({
     'ExactOutput' : IDL.Vec(CandidPoolId),
     'ExactInput' : IDL.Vec(CandidPoolId),
     'ExactOutputSingle' : CandidPoolId,
@@ -51,62 +52,59 @@ export const idlFactory = ({ IDL }) => {
   });
   const CandidPositionKey = IDL.Record({
     'owner' : IDL.Principal,
-    'pool' : CandidPoolId,
     'tick_lower' : IDL.Int,
+    'pool_id' : CandidPoolId,
     'tick_upper' : IDL.Int,
   });
-  const CandidEventType = IDL.Variant({
+  const CandidDexAction = IDL.Variant({
     'Swap' : IDL.Record({
-      'principal' : IDL.Principal,
       'token_in' : IDL.Principal,
       'final_amount_in' : IDL.Nat,
       'final_amount_out' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
       'token_out' : IDL.Principal,
-      'swap_type' : SwapType,
+      'swap_type' : CandidSwapType,
     }),
     'CreatedPool' : IDL.Record({
       'token0' : IDL.Principal,
       'token1' : IDL.Principal,
-      'pool_fee' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
+      'pool_fee' : IDL.Nat32,
     }),
     'BurntPosition' : IDL.Record({
       'amount0_received' : IDL.Nat,
-      'principal' : IDL.Principal,
       'burnt_position' : CandidPositionKey,
       'liquidity' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
       'amount1_received' : IDL.Nat,
     }),
     'IncreasedLiquidity' : IDL.Record({
-      'principal' : IDL.Principal,
       'amount0_paid' : IDL.Nat,
       'liquidity_delta' : IDL.Nat,
       'amount1_paid' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
       'modified_position' : CandidPositionKey,
     }),
     'CollectedFees' : IDL.Record({
-      'principal' : IDL.Principal,
       'amount1_collected' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
       'position' : CandidPositionKey,
       'amount0_collected' : IDL.Nat,
     }),
     'DecreasedLiquidity' : IDL.Record({
       'amount0_received' : IDL.Nat,
-      'principal' : IDL.Principal,
       'liquidity_delta' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
       'amount1_received' : IDL.Nat,
       'modified_position' : CandidPositionKey,
     }),
     'MintedPosition' : IDL.Record({
-      'principal' : IDL.Principal,
       'amount0_paid' : IDL.Nat,
       'liquidity' : IDL.Nat,
       'created_position' : CandidPositionKey,
       'amount1_paid' : IDL.Nat,
+      'timestamp' : IDL.Nat64,
     }),
-  });
-  const CandidEvent = IDL.Record({
-    'timestamp' : IDL.Nat64,
-    'payload' : CandidEventType,
   });
   const CandidErc20TwinLedgerSuiteStatus = IDL.Variant({
     'PendingApproval' : IDL.Null,
@@ -210,6 +208,7 @@ export const idlFactory = ({ IDL }) => {
     'native_ledger_burn_index' : IDL.Nat,
   });
   const Transaction = IDL.Variant({
+    'DexAction' : CandidDexAction,
     'EvmToIcp' : CandidEvmToIcp,
     'IcpToEvm' : CandidIcpToEvm,
   });
@@ -277,7 +276,7 @@ export const idlFactory = ({ IDL }) => {
     'get_bridge_pairs' : IDL.Func([], [IDL.Vec(TokenPair)], ['query']),
     'get_dex_actions_for_principal' : IDL.Func(
         [IDL.Principal],
-        [IDL.Vec(CandidEvent)],
+        [IDL.Vec(CandidDexAction)],
         ['query'],
       ),
     'get_erc20_twin_ls_requests_by_creator' : IDL.Func(

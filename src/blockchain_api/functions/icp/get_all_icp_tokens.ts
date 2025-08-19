@@ -49,7 +49,7 @@ export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToke
 // transform response into icp response
 export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] => {
 	return icp_tokens
-		.filter((token) => token.rank.length == 1 && token.rank[0] <= 30) // Match by canisterId/address
+		// .filter((token) => token.rank.length == 1 && token.rank[0] <= 30) // Match by canisterId/address
 		.map((token) => {
 			return {
 				name: token.name,
@@ -66,6 +66,7 @@ export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] =
 				balanceRawInteger: undefined,
 				usdBalance: undefined, // Optional, can be added later
 				rank: token.rank[0] || undefined,
+				listed_on_appic_dex: token.listed_on_appic_dex[0] || false
 			};
 		});
 };
