@@ -29,9 +29,9 @@ export const Step2Data = (newTwinMeta: NewTwinMetadata | undefined) => [
   },
   {
     title: 'Twin Token Creation Fee:',
-    value: `${newTwinMeta?.human_readable_creation_fee} ICP`,
+    value: `${newTwinMeta?.human_readable_creation_fee} ${newTwinMeta?.creation_fee_token}`,
   },
-  {
+  Number(newTwinMeta?.twin_token?.human_readable_transfer_fee) > 0 && {
     title: 'Twin Token Transfer Fee:',
     value: `${newTwinMeta?.twin_token.human_readable_transfer_fee} ${newTwinMeta?.twin_token.symbol}`,
   },

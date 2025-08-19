@@ -59,7 +59,7 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         <div className="relative">
           <Avatar src={newTwinMeta?.base_token.logo} className="h-12 w-12" />
           <Avatar
-            src={getChainLogo(newTwinMeta?.base_chain.chainId)}
+            src={getChainLogo(newTwinMeta?.twin_chain.chainId)}
             className="absolute -right-1 bottom-0 h-4 w-4 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
           />
         </div>
@@ -70,19 +70,21 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
       </div>
 
       <div className="flex w-full flex-col gap-y-3 rounded-xl bg-white/10 p-6 text-white dark:text-white md:text-black">
-        {Step2Data(newTwinMeta).map((item, idx) => (
-          <div
-            key={idx}
-            className={cn(
-              'flex items-center justify-between gap-x-1',
-              'text-sm font-medium md:text-base',
-              idx === 2 && 'border-b border-white/15 pb-4',
-            )}
-          >
-            <p>{item.title}</p>
-            <p className={cn((idx === 6 || idx === 7) && 'text-[#27AE60]')}>{item.value}</p>
-          </div>
-        ))}
+        {Step2Data(newTwinMeta).map((item, idx) =>
+          item ? (
+            <div
+              key={idx}
+              className={cn(
+                'flex items-center justify-between gap-x-1',
+                'text-sm font-medium md:text-base',
+                idx === 2 && 'border-b border-white/15 pb-4',
+              )}
+            >
+              <p>{item.title}</p>
+              <p className={cn((idx === 6 || idx === 7) && 'text-[#27AE60]')}>{item.value}</p>
+            </div>
+          ) : null,
+        )}
       </div>
 
       <button
