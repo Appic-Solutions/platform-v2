@@ -7,6 +7,7 @@ export default function RHFInput({
   name,
   label,
   wrapperClassName,
+  showError = true,
   className,
   ...props
 }: InputProps) {
@@ -39,7 +40,7 @@ export default function RHFInput({
               className,
             )}
           />
-          {error && <span className="text-sm text-red-500">{error.message}</span>}
+          {showError && error && <span className="text-sm text-red-500">{error.message}</span>}
         </div>
       )}
     />

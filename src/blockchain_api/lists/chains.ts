@@ -16,7 +16,7 @@ export const chains: Chain[] = [
 
 		logo: '/images/logo/chains-logos/icp.svg',
 
-		twin_token_support: false,
+		twin_token_support: true,
 
 		is_swap_active: true,
 	},

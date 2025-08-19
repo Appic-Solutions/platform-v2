@@ -4,8 +4,11 @@ import { NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
 import { useSharedStore } from '@/store/store';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
-import { useFormLogic } from './form';
 import { apiService } from './api';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { formSchema } from '../validation';
+import { Chain } from '@/blockchain_api/types/chains';
 
 export default function LogicHelper(): UseLogicReturn {
   // State
@@ -19,17 +22,21 @@ export default function LogicHelper(): UseLogicReturn {
   const [shouldPoll, setShouldPoll] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
+  // Store
+  const { unAuthenticatedAgent, authenticatedAgent, icpTokens } = useSharedStore();
+
+  // Form
+  const methods = useForm<DefaultValuesType>({
+    defaultValues: {
+      baseChain: undefined,
+      twinChain: undefined,
+      canisterIdOrTokenAddress: '',
+    },
+    resolver: zodResolver(formSchema),
+  });
+
+  // Hook
   const { toast } = useToast();
-  const { methods, chainIdWatch } = useFormLogic();
-
-  // Handler
-  const closeModalHandler = () => {
-    setIsOpen(false);
-    setStatus('pending');
-  };
-
-  // React Query for polling Step Four
   const { data } = useQuery({
     queryKey: ['checkStepFour'],
     queryFn: () => apiService.checkTwinRequest(newTwinMeta!, unAuthenticatedAgent!),
@@ -37,6 +44,7 @@ export default function LogicHelper(): UseLogicReturn {
     refetchInterval: 1000 * 60,
   });
 
+  // Effect
   useEffect(() => {
     if (data?.success) {
       setShouldPoll(false);
@@ -46,22 +54,17 @@ export default function LogicHelper(): UseLogicReturn {
     }
   }, [data]);
 
-  const handleError = (message: string) => {
-    setStatus('failed');
-    setErrorMessage(message);
-    setCanCloseModal(true);
-    toast({ title: message, variant: 'destructive' });
-    throw new Error(message);
-  };
-
+  // Handler
   const onSubmit = async (data: DefaultValuesType) => {
     try {
       setIsLoading(true);
       if (step === 1) {
         const result = await apiService.fetchTwinToken(
-          data.chain_id,
-          data.contract_address,
+          data.baseChain as Chain,
+          data.twinChain as Chain,
+          data.canisterIdOrTokenAddress,
           unAuthenticatedAgent!,
+          icpTokens ? icpTokens : [],
         );
         setNewTwinMeta(result);
         setStep(2);
@@ -82,6 +85,18 @@ export default function LogicHelper(): UseLogicReturn {
     }
   };
 
+  const handleError = (message: string) => {
+    setStatus('failed');
+    setErrorMessage(message);
+    setCanCloseModal(true);
+    toast({ title: message, variant: 'destructive' });
+  };
+
+  const closeModalHandler = () => {
+    setIsOpen(false);
+    setStatus('pending');
+  };
+
   return {
     // State
     step,
@@ -94,10 +109,9 @@ export default function LogicHelper(): UseLogicReturn {
     errorMessage,
     canCloseModal,
     closeModalHandler,
-
     // Form
     methods,
+    // Handler
     onSubmit,
-    chainIdWatch,
   };
 }

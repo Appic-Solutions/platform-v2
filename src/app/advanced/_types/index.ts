@@ -1,12 +1,14 @@
 import { NewTwinMetadata } from '@/blockchain_api/functions/icp/new_twin_token';
+import { Chain } from '@/blockchain_api/types/chains';
 import { Dispatch, SetStateAction } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 export type Status = 'failed' | 'pending' | 'successful';
 
 export interface DefaultValuesType {
-  chain_id: string;
-  contract_address: string;
+  baseChain?: Chain;
+  twinChain?: Chain;
+  canisterIdOrTokenAddress: string;
 }
 
 export interface UseLogicReturn {
@@ -22,12 +24,10 @@ export interface UseLogicReturn {
   closeModalHandler: () => void;
   methods: UseFormReturn<DefaultValuesType>;
   onSubmit: (data: DefaultValuesType) => void;
-  chainIdWatch: string;
 }
 
 export interface Step1Props {
   methods: UseFormReturn<DefaultValuesType>;
-  chainIdWatch: string;
   isLoading: boolean;
 }
 
@@ -39,6 +39,10 @@ export interface Step2Props {
 
 export interface TokenListProps {
   prevStepHandler: () => void;
+  fieldName: string;
+  title: string;
+  baseChain: Chain | undefined;
+  twinChain: Chain | undefined;
 }
 
 export interface ProcessModalProps {
