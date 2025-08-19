@@ -16,7 +16,6 @@ const SwapQuotesList = () => {
 
   const {
     data: swapQuoteData,
-    isPending,
     isLoading,
     refetch,
     isFetching,
@@ -54,9 +53,10 @@ const SwapQuotesList = () => {
         )}
       >
         <div className={cn('flex-shrink-1 h-fit w-full')}>
-          {tokenOut && swapQuote.quote && !isPending && !isLoading && !isFetching ? (
+          {isFetching || isLoading ? (
+            <SwapQuoteSkeleton />
+          ) : tokenOut && swapQuote.quote ? (
             <Card
-              // onClick={() => handleQuoteSelect(quote)}
               className={cn(
                 'w-full flex-col items-start justify-between gap-3 overflow-hidden rounded-[20px] border !py-4 px-4',
                 'md:rounded-[36px] md:px-6',
@@ -177,9 +177,7 @@ const SwapQuotesList = () => {
                 </div>
               </div>
             </Card>
-          ) : (
-            <SwapQuoteSkeleton />
-          )}
+          ) : null}
         </div>
       </div>
     </div>

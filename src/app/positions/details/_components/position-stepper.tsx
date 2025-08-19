@@ -1,10 +1,10 @@
 import Stepper from '@/app/_layout/Stepper';
-import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { CreatePositionStepDetail } from '@/app/positions/types';
 import { CloseIcon } from '@/components/icons';
 import { DialogClose } from '@/components/ui/dialog';
 import React from 'react';
 import { PositionStep } from './position-step';
+import { usePositionDetailsStore } from '../../_store/usePositionDetailsStore';
 
 interface Props {
   steps: CreatePositionStepDetail[];
@@ -15,13 +15,8 @@ interface Props {
 export const PositionStepper = ({ steps, onCloseModal, title }: Props) => {
   const { mintPrevStep, mintStep, actions } = usePositionDetailsStore();
 
-  const resetTransaction = () => {
-    console.log('reset');
-  };
-
   const closeModal = () => {
     onCloseModal();
-    resetTransaction();
   };
 
   const stepperClickHandler = (activeId: number) => {
@@ -39,7 +34,6 @@ export const PositionStepper = ({ steps, onCloseModal, title }: Props) => {
         {steps.map((step, index) => (
           <PositionStep
             key={index}
-            onResetTransaction={resetTransaction}
             currentStep={
               mintPrevStep.step === 0 || mintPrevStep.step === mintStep.step
                 ? mintStep

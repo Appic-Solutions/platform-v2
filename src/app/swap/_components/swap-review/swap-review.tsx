@@ -6,18 +6,10 @@ import Box from '@/components/ui/box';
 import BoxHeader from '@/components/ui/box-header';
 import { useSwapActions, useSwapStore } from '../../_store';
 import { DialogTrigger } from '@/components/ui/dialog';
-import SwapReviewLogic from './_logic/use-swap-review-logic';
 
 const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { swapQuote, tokenOut } = useSwapStore();
   const { setActiveStep } = useSwapActions();
-
-  const { executeTransaction } = SwapReviewLogic();
-
-  const openModal = () => {
-    executeTransaction();
-    onOpenModal();
-  };
 
   if (swapQuote && swapQuote.quote && tokenOut) {
     return (
@@ -147,7 +139,7 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
               </div>
             </div>
           </Card>
-          <DialogTrigger onClick={openModal}>
+          <DialogTrigger onClick={onOpenModal}>
             <div
               className={cn(
                 'flex h-14 w-full items-center justify-center rounded-[16px] text-white',

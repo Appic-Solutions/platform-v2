@@ -13,16 +13,12 @@ export const TransactionStep = ({
   currentStep,
   step,
   index,
-  steps,
-  onResetTransaction,
 }: {
   step: TxStep;
   currentStep: TxStepType;
   index: number;
-  steps: TxStep[];
-  onResetTransaction: () => void;
 }) => {
-  const { txErrorMessage, tokenIn, tokenOut } = useSwapStore();
+  const { txErrorMessage, tokenIn, tokenOut, actions, txStep } = useSwapStore();
   const router = useRouter();
   const getLogoHandler = () => {
     // withdrawal tx
@@ -39,7 +35,11 @@ export const TransactionStep = ({
   };
 
   const onNavigateToHistory = () => {
-    onResetTransaction();
+    actions.setTxStep({ count: 1, status: 'pending' });
+    actions.setPrevTxStep({
+      count: 0,
+      status: 'pending',
+    });
     router.push('/transactions-history/bridge');
   };
 
@@ -96,8 +96,7 @@ export const TransactionStep = ({
           </p>
         </div>
       )}
-      {((tokenIn?.chain_type === 'ICP' && currentStep.count === 4) ||
-        (tokenIn?.chain_type === 'EVM' && currentStep.count === 5)) && (
+      {txStep.count === 2 && txStep.status === 'successful' && (
         <>
           <p className="pb-2 text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
             You can safely close this window

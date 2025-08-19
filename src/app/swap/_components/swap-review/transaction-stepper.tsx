@@ -5,20 +5,14 @@ import { useSwapStore } from '../../_store';
 import { DialogClose } from '@/components/ui/dialog';
 import { CloseIcon } from '@/components/icons';
 import Stepper from '@/app/_layout/Stepper';
-import BridgeReviewLogic from './_logic/use-swap-review-logic';
 
 interface Props {
   steps: TxStep[];
   onCloseModal: () => void;
 }
 
-export default function BridgeTransactionStepper({ steps, onCloseModal }: Props) {
-  const { resetTransaction } = BridgeReviewLogic();
+export default function SwapTransactionStepper({ steps, onCloseModal }: Props) {
   const { txStep, prevTxStep, actions } = useSwapStore();
-  const closeModal = () => {
-    onCloseModal();
-    resetTransaction();
-  };
 
   const stepperClickHandler = (activeId: number) => {
     if (prevTxStep.count === activeId) return;
@@ -28,20 +22,18 @@ export default function BridgeTransactionStepper({ steps, onCloseModal }: Props)
   return (
     <div className="relative w-full max-w-[691px] justify-start gap-y-9">
       <div className="text-center text-lg font-bold text-primary">Swap Transaction</div>
-      <DialogClose onClick={closeModal} className="absolute right-5 top-0">
+      <DialogClose onClick={onCloseModal} className="absolute right-5 top-0">
         <CloseIcon className="h-6 w-6 text-primary" />
       </DialogClose>
       <div className="flex flex-col items-center justify-center gap-y-16 py-5 md:flex-row md:items-start md:gap-x-16">
         {steps.map((step, index) => (
           <TransactionStep
             key={index}
-            onResetTransaction={resetTransaction}
             currentStep={
               prevTxStep.count === 0 || prevTxStep.count === txStep.count ? txStep : prevTxStep
             }
             index={index}
             step={step}
-            steps={steps}
           />
         ))}
       </div>

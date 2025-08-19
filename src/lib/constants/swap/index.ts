@@ -2,36 +2,36 @@ import { TxStep } from '@/app/swap/_api/types';
 
 export const icpSwapStepsDetails: TxStep[] = [
   {
-    title: 'Step 1',
+    title: 'transaction approval',
     statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Please approve the approval transaction in your wallet',
+      },
       successful: {
-        statusTitle: '',
-        description: '',
+        statusTitle: 'Successful',
+        description: 'Transaction approved successfully',
       },
       failed: {
-        statusTitle: '',
-        description: '',
-      },
-      pending: {
-        statusTitle: '',
-        description: '',
+        statusTitle: 'Failed',
+        description: 'Failed to approve transaction',
       },
     },
   },
   {
-    title: 'Step 2',
+    title: 'sending the swap transaction',
     statuses: {
+      pending: {
+        statusTitle: 'Pending',
+        description: 'Please approve the swap transaction in your wallet',
+      },
       successful: {
-        statusTitle: '',
-        description: '',
+        statusTitle: 'Successful',
+        description: 'Swapped assets successfully',
       },
       failed: {
-        statusTitle: '',
-        description: '',
-      },
-      pending: {
-        statusTitle: '',
-        description: '',
+        statusTitle: 'Failed',
+        description: 'Failed to swap transaction',
       },
     },
   },

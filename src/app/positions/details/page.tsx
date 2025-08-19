@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import { usePositionDetailsStore } from '../_store/usePositionDetailsStore';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import { ArrowLeftIcon } from '@/components/icons';
@@ -11,6 +10,7 @@ import AddLiquidity from './_components/add-liquidity';
 import RemoveLiquidity from './_components/remove-liquidity';
 import CollectFees from './_components/collect-fees';
 import Details from './_components/Details';
+import { usePositionDetailsStore } from '../_store/usePositionDetailsStore';
 
 const PositionDetails = () => {
   const { currentStep, actions, selectedPosition } = usePositionDetailsStore();

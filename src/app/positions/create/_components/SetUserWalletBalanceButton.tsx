@@ -18,7 +18,6 @@ const SetUserWalletBalanceButton = ({ userTokenBalance, token, onMaxClick }: Pro
             .toFixed(6)
             .replace(/\.?0+$/, '')) ||
           0}{' '}
-        {token.symbol}
       </span>
       <button
         disabled={!userTokenBalance}

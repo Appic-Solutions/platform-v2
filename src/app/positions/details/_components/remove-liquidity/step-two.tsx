@@ -8,15 +8,16 @@ import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/
 import { removeLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { useSharedStore } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import {
   generate_decrease_liquidity_args,
   remove_liquidity,
 } from '@/blockchain_api/functions/icp/dex/tx/remove_liquidity';
-import { PositionStepper } from '@/app/positions/_components/position-stepper';
+import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { DecreaseLiquidityArgs } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { QueryClient } from '@tanstack/react-query';
+import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 
 interface Props {
   position: FormattedPosition;
@@ -34,32 +35,38 @@ export default function RemoveLiquidityStepTwo({
   const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const queryClient = new QueryClient();
 
   if (!selectedPosition) {
     router.push('/positions');
-    return;
+    return null;
   }
 
   const openModalHandler = () => {
     setIsOpen(true);
     if (isFreshRequest) {
-      executeRemoveLiquidity();
+      setIsFreshRequest(false);
+      removeLiquidityHandler();
     }
   };
 
   const onCloseModal = () => {
-    if (mintStep.step === 2 && mintStep.status === 'successful') {
-      router.push('/positions');
-    } else {
-      setIsOpen(false);
+    if (mintStep.step === 2) {
+      if (mintStep.status === 'successful') {
+        actions.resetTxState();
+        router.push('/positions');
+      } else if (mintStep.status === 'failed') {
+        setIsFreshRequest(true);
+        actions.resetTxState();
+        setIsOpen(false);
+      } else {
+        setIsOpen(false);
+      }
     }
   };
 
-  async function executeRemoveLiquidity() {
+  const removeLiquidityHandler = async () => {
     if (authenticatedAgent && unAuthenticatedAgent && selectedPosition) {
-      // step1
-      setIsFreshRequest(false);
-
       const generatedArgs = generate_decrease_liquidity_args({
         position: selectedPosition,
         percentage: Number(percentValue.slice(0, -1)),
@@ -71,8 +78,7 @@ export default function RemoveLiquidityStepTwo({
           status: 'failed',
           errorMessage: null,
         });
-        setIsFreshRequest(true);
-        return generatedArgs;
+        return;
       }
 
       actions.setMintStep({
@@ -90,16 +96,16 @@ export default function RemoveLiquidityStepTwo({
           status: 'failed',
           errorMessage: removeLiquidityResponse.message,
         });
-        setIsFreshRequest(true);
-        return removeLiquidityResponse.message;
+        return;
       }
       actions.setMintStep({
         step: 2,
         status: 'successful',
         errorMessage: null,
       });
+      queryClient.invalidateQueries({ queryKey: ['fetch-wallet-balances'] });
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>

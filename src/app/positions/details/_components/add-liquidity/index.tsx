@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { FormattedPosition, Step } from '@/app/positions/types';
 import AddLiquidityStepOne from './step-one';
 import AddLiquidityStepTwo from './step-two';
 

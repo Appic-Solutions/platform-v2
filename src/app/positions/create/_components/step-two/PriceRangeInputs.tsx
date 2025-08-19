@@ -17,6 +17,7 @@ const PriceRangeInputs = () => {
 
   const handleDecimalInput = (value: string) => {
     if (!value.includes('.')) return value;
+    if (value.includes('.') && value.length === 1) return '';
 
     const [intPart, decimalPart] = value.split('.');
     const trimmedDecimal = decimalPart.slice(0, 6);
@@ -51,6 +52,11 @@ const PriceRangeInputs = () => {
                 type="text"
                 className="border-none bg-transparent text-lg outline-none lg:text-xl"
                 value={minPrice === 'min' ? '0' : minPrice}
+                onFocus={(e) => {
+                  if (e.target.value === '0') {
+                    createPositionForm.setValue('minPrice', '');
+                  }
+                }}
                 onChange={(e) =>
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
                 }
@@ -87,18 +93,23 @@ const PriceRangeInputs = () => {
                 type="text"
                 className="border-none bg-transparent text-lg outline-none lg:text-xl"
                 value={maxPrice === 'max' ? '\u221E' : maxPrice}
+                onFocus={(e) => {
+                  if (e.target.value === '\u221E') {
+                    createPositionForm.setValue('maxPrice', '');
+                  }
+                }}
                 onChange={(e) =>
                   createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
                 }
-                onBlur={(e) =>
+                onBlur={(e) => {
                   maxOrMinPriceHandler({
                     minValue: minPrice,
                     maxValue:
                       e.target.value === '\u221E' || e.target.value === '0' || e.target.value === ''
                         ? 'max'
                         : e.target.value,
-                  })
-                }
+                  });
+                }}
                 placeholder="∞"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">

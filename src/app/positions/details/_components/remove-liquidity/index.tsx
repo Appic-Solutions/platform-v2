@@ -19,19 +19,7 @@ const RemoveLiquidity = () => {
     token1: new BigNumber(0),
   });
 
-  const onNext = () => {
-    if (step === 1) {
-      setStep(2);
-    } else {
-      submitHandler;
-    }
-  };
-
   if (!selectedPosition) return null;
-
-  const submitHandler = () => {
-    console.log('submit');
-  };
 
   return (
     <div className="flex w-full animate-fade flex-col gap-6">

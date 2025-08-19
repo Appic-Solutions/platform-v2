@@ -7,8 +7,8 @@ import PositionDetailsChart from './PositionDetailsChart';
 import { FeesPercentage, PositionPercentage, Step } from '../../types';
 import BigNumber from 'bignumber.js';
 import AvatarGroup from '../../_components/AvatarGroup';
-import { usePositionDetailsStore } from '../../_store/usePositionDetailsStore';
 import Link from 'next/link';
+import { usePositionDetailsStore } from '../../_store/usePositionDetailsStore';
 
 const Details = () => {
   const { selectedPosition: position, actions } = usePositionDetailsStore();

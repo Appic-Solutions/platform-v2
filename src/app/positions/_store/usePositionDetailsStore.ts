@@ -27,6 +27,7 @@ interface Action {
     setUserPositionsList: (positions: FormattedPosition[]) => void;
     setMintStep: (mintStep: CreatePositionStep) => void;
     setMintPrevStep: (mintPrevStep: CreatePositionStep) => void;
+    resetTxState: () => void;
     // add liquidity
     setToken0DepositAmount: (token0DepositAmount: string) => void;
     setToken1DepositAmount: (token1DepositAmount: string) => void;
@@ -57,6 +58,14 @@ export const usePositionDetailsStore = create<State & Action>()((set) => ({
     setUserPositionsList: (userPositionsList) => set({ userPositionsList }),
     setMintPrevStep: (mintPrevStep) => set({ mintPrevStep }),
     setMintStep: (mintStep) => set({ mintStep }),
+    resetTxState: () =>
+      set({
+        mintStep: {
+          status: 'pending',
+          step: 1,
+          errorMessage: null,
+        },
+      }),
     // add liquidity
     setToken0DepositAmount: (token0DepositAmount) => set({ token0DepositAmount }),
     setToken1DepositAmount: (token1DepositAmount) => set({ token1DepositAmount }),

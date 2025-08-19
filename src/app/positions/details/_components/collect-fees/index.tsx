@@ -6,11 +6,12 @@ import SolidCard from '@/components/ui/cards/SolidCard';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 import { useRouter } from 'next/navigation';
-import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
-import { PositionStepper } from '@/app/positions/_components/position-stepper';
+import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { collectFeesStepsDetails } from '@/lib/constants/positions';
 import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
 import { useSharedStore } from '@/store/store';
+import { QueryClient } from '@tanstack/react-query';
+import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 
 const CollectFees = () => {
   const [isFreshRequest, setIsFreshRequest] = useState(true);
@@ -18,6 +19,7 @@ const CollectFees = () => {
   const { selectedPosition, actions, mintStep } = usePositionDetailsStore();
   const { authenticatedAgent } = useSharedStore();
   const router = useRouter();
+  const queryClient = new QueryClient();
 
   if (!selectedPosition) {
     router.push('/positions');
@@ -26,37 +28,46 @@ const CollectFees = () => {
 
   const collectFeesHandler = async () => {
     if (authenticatedAgent) {
-      setIsFreshRequest(false);
       const result = await collect_fees({ position: selectedPosition }, authenticatedAgent);
+
       if (!result.success || !result.result) {
         actions.setMintStep({
           step: 1,
           status: 'failed',
           errorMessage: result.message,
         });
-        setIsFreshRequest(true);
-        return result.message;
+      } else {
+        actions.setMintStep({
+          step: 1,
+          status: 'successful',
+          errorMessage: null,
+        });
       }
-      actions.setMintStep({
-        step: 1,
-        status: 'successful',
-        errorMessage: null,
-      });
+
+      queryClient.invalidateQueries({ queryKey: ['fetch-wallet-balances'] });
     }
   };
 
   const openModalHandler = () => {
     setIsOpen(true);
     if (isFreshRequest) {
+      setIsFreshRequest(false);
       collectFeesHandler();
     }
   };
 
   const onCloseModal = () => {
-    if (mintStep.step === 2 && mintStep.status === 'successful') {
-      router.push('/positions');
-    } else {
-      setIsOpen(false);
+    if (mintStep.step === 2) {
+      if (mintStep.status === 'successful') {
+        actions.resetTxState();
+        router.push('/positions');
+      } else if (mintStep.status === 'failed') {
+        setIsFreshRequest(true);
+        actions.resetTxState();
+        setIsOpen(false);
+      } else {
+        setIsOpen(false);
+      }
     }
   };
 

@@ -13,8 +13,7 @@ import { useSwapActions, useSwapStore } from '../../_store';
 
 export default function SwapSelectTokenPage() {
   // swap store
-  const { tokenIn, tokenOut, amount, toWalletAddress, swapQuote, toWalletValidationError } =
-    useSwapStore();
+  const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError } = useSwapStore();
   const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } = useSwapActions();
   // Logic
   const {

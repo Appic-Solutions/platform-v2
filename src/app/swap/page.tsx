@@ -14,18 +14,18 @@ const SwapPage = () => {
   const { amount, tokenIn, tokenOut, activeStep } = useSwapStore();
   const { setSwapQuote } = useSwapActions();
 
-  const { data: swapQuoteData } = useQuery({
-    queryKey: ['swap-quot'],
-    // TODO: When Evm to Evm and Evm to Icp swap developed, this type assertions
-    queryFn: () => fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount),
-    enabled: !!tokenIn && !!tokenOut && !!amount,
-  });
+  // const { data: swapQuoteData } = useQuery({
+  //   queryKey: ['swap-quot'],
+  //   // TODO: When Evm to Evm and Evm to Icp swap developed, this type assertions
+  //   queryFn: () => fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount),
+  //   enabled: !!tokenIn && !!tokenOut && !!amount,
+  // });
 
-  useEffect(() => {
-    if (swapQuoteData && swapQuoteData.result) {
-      setSwapQuote({ message: '', quote: swapQuoteData.result });
-    }
-  }, [swapQuoteData, tokenIn, tokenOut, amount]);
+  // useEffect(() => {
+  //   if (swapQuoteData && swapQuoteData.result) {
+  //     setSwapQuote({ message: '', quote: swapQuoteData.result });
+  //   }
+  // }, [swapQuoteData, tokenIn, tokenOut, amount]);
 
   switch (activeStep) {
     case 1:

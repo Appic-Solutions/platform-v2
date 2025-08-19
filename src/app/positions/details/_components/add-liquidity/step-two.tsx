@@ -6,18 +6,20 @@ import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/
 import { addLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
-import { useRouter } from 'next/router';
 import { useSharedStore } from '@/store/store';
 import {
   generate_args_and_approve_add_liquidity,
   increase_liquidity,
 } from '@/blockchain_api/functions/icp/dex/tx/add_liquidity';
-import { PositionStepper } from '@/app/positions/_components/position-stepper';
+import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
+import { useRouter } from 'next/navigation';
+import { QueryClient } from '@tanstack/react-query';
 
 export default function AddLiquidityStepTwo() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFreshRequest, setIsFreshRequest] = useState(true);
   const router = useRouter();
+  const queryClient = new QueryClient();
 
   const {
     token0DepositAmount,
@@ -29,13 +31,13 @@ export default function AddLiquidityStepTwo() {
 
   const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
   if (!position) {
-    return router.push('/positions');
+    router.push('/positions');
+    return null;
   }
 
   const addLiquidityHandler = async () => {
     if (authenticatedAgent && unAuthenticatedAgent) {
       // step1
-      setIsFreshRequest(false);
       const increaseLiquidityArgs = await generate_args_and_approve_add_liquidity(
         {
           amount0_max: token0DepositAmount,
@@ -54,7 +56,6 @@ export default function AddLiquidityStepTwo() {
           status: 'failed',
           errorMessage: null,
         });
-        setIsFreshRequest(true);
         return increaseLiquidityArgs;
       }
 
@@ -79,7 +80,6 @@ export default function AddLiquidityStepTwo() {
             status: 'failed',
             errorMessage: result.message,
           });
-          setIsFreshRequest(true);
           return result.message;
         }
         actions.setMintStep({
@@ -87,6 +87,7 @@ export default function AddLiquidityStepTwo() {
           status: 'successful',
           errorMessage: null,
         });
+        queryClient.invalidateQueries({ queryKey: ['fetch-wallet-balances'] });
       }
     }
   };
@@ -94,15 +95,23 @@ export default function AddLiquidityStepTwo() {
   const openModalHandler = () => {
     setIsOpen(true);
     if (isFreshRequest) {
+      setIsFreshRequest(false);
       addLiquidityHandler();
     }
   };
 
   const onCloseModal = () => {
-    if (mintStep.step === 2 && mintStep.status === 'successful') {
-      router.push('/positions');
-    } else {
-      setIsOpen(false);
+    if (mintStep.step === 2) {
+      if (mintStep.status === 'successful') {
+        actions.resetTxState();
+        router.push('/positions');
+      } else if (mintStep.status === 'failed') {
+        setIsFreshRequest(true);
+        actions.resetTxState();
+        setIsOpen(false);
+      } else {
+        setIsOpen(false);
+      }
     }
   };
 

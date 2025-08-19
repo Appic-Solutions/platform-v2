@@ -6,8 +6,8 @@ import BigNumber from 'bignumber.js';
 import { FormattedPosition } from '@/app/positions/types';
 import { TokensRemoveAmount } from '.';
 import { removeLiquidityPercents } from '@/lib/constants/positions';
-import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import AvatarGroup from '@/app/positions/_components/AvatarGroup';
+import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 
 interface Props {
   position: FormattedPosition;

@@ -6,22 +6,22 @@ import Image from 'next/image';
 
 import { useRouter } from 'next/navigation';
 import { CreatePositionStep, CreatePositionStepDetail } from '@/app/positions/types';
+import { usePositionDetailsStore } from '../../_store/usePositionDetailsStore';
 
 export const PositionStep = ({
   currentStep,
   step,
   index,
-  onResetTransaction,
 }: {
   step: CreatePositionStepDetail;
   currentStep: CreatePositionStep;
   index: number;
-  onResetTransaction: () => void;
 }) => {
   const router = useRouter();
+  const { actions } = usePositionDetailsStore();
 
   const onNavigateToHistory = () => {
-    onResetTransaction();
+    actions.resetTxState();
     router.push('/positions');
   };
 
