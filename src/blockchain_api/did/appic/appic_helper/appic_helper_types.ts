@@ -47,54 +47,46 @@ export interface CandidAddErc20TwinLedgerSuiteRequest {
   'evm_token_contract' : string,
   'evm_token_chain_id' : bigint,
 }
-export type CandidErc20TwinLedgerSuiteFee = { 'Icp' : bigint } |
-  { 'Appic' : bigint };
-export type CandidErc20TwinLedgerSuiteStatus = { 'PendingApproval' : null } |
-  { 'Created' : null } |
-  { 'Installed' : null };
-export interface CandidEvent {
-  'timestamp' : bigint,
-  'payload' : CandidEventType,
-}
-export type CandidEventType = {
+export type CandidDexAction = {
     'Swap' : {
-      'principal' : Principal,
       'token_in' : Principal,
       'final_amount_in' : bigint,
       'final_amount_out' : bigint,
+      'timestamp' : bigint,
       'token_out' : Principal,
-      'swap_type' : SwapType,
+      'swap_type' : CandidSwapType,
     }
   } |
   {
     'CreatedPool' : {
       'token0' : Principal,
       'token1' : Principal,
-      'pool_fee' : bigint,
+      'timestamp' : bigint,
+      'pool_fee' : number,
     }
   } |
   {
     'BurntPosition' : {
       'amount0_received' : bigint,
-      'principal' : Principal,
       'burnt_position' : CandidPositionKey,
       'liquidity' : bigint,
+      'timestamp' : bigint,
       'amount1_received' : bigint,
     }
   } |
   {
     'IncreasedLiquidity' : {
-      'principal' : Principal,
       'amount0_paid' : bigint,
       'liquidity_delta' : bigint,
       'amount1_paid' : bigint,
+      'timestamp' : bigint,
       'modified_position' : CandidPositionKey,
     }
   } |
   {
     'CollectedFees' : {
-      'principal' : Principal,
       'amount1_collected' : bigint,
+      'timestamp' : bigint,
       'position' : CandidPositionKey,
       'amount0_collected' : bigint,
     }
@@ -102,21 +94,26 @@ export type CandidEventType = {
   {
     'DecreasedLiquidity' : {
       'amount0_received' : bigint,
-      'principal' : Principal,
       'liquidity_delta' : bigint,
+      'timestamp' : bigint,
       'amount1_received' : bigint,
       'modified_position' : CandidPositionKey,
     }
   } |
   {
     'MintedPosition' : {
-      'principal' : Principal,
       'amount0_paid' : bigint,
       'liquidity' : bigint,
       'created_position' : CandidPositionKey,
       'amount1_paid' : bigint,
+      'timestamp' : bigint,
     }
   };
+export type CandidErc20TwinLedgerSuiteFee = { 'Icp' : bigint } |
+  { 'Appic' : bigint };
+export type CandidErc20TwinLedgerSuiteStatus = { 'PendingApproval' : null } |
+  { 'Created' : null } |
+  { 'Installed' : null };
 export interface CandidEvmToIcp {
   'status' : EvmToIcpStatus,
   'principal' : Principal,
@@ -171,6 +168,7 @@ export interface CandidIcpToEvm {
 export interface CandidIcpToken {
   'fee' : bigint,
   'decimals' : number,
+  'listed_on_appic_dex' : [] | [boolean],
   'usd_price' : string,
   'logo' : string,
   'name' : string,
@@ -196,10 +194,14 @@ export interface CandidPoolId {
 }
 export interface CandidPositionKey {
   'owner' : Principal,
-  'pool' : CandidPoolId,
   'tick_lower' : bigint,
+  'pool_id' : CandidPoolId,
   'tick_upper' : bigint,
 }
+export type CandidSwapType = { 'ExactOutput' : Array<CandidPoolId> } |
+  { 'ExactInput' : Array<CandidPoolId> } |
+  { 'ExactOutputSingle' : CandidPoolId } |
+  { 'ExactInputSingle' : CandidPoolId };
 export interface EvmSearchQuery { 'query' : string, 'chain_id' : bigint }
 export type EvmToIcpStatus = { 'Invalid' : string } |
   { 'PendingVerification' : null } |
@@ -245,10 +247,6 @@ export type Result = { 'Ok' : null } |
   { 'Err' : AddEvmToIcpTxError };
 export type Result_1 = { 'Ok' : null } |
   { 'Err' : AddIcpToEvmTxError };
-export type SwapType = { 'ExactOutput' : Array<CandidPoolId> } |
-  { 'ExactInput' : Array<CandidPoolId> } |
-  { 'ExactOutputSingle' : CandidPoolId } |
-  { 'ExactInputSingle' : CandidPoolId };
 export interface TokenPair {
   'operator' : Operator,
   'evm_token' : CandidEvmToken,
@@ -258,7 +256,8 @@ export interface TopVolumeTokens {
   'chain' : bigint,
   'tokens' : Array<CandidEvmToken>,
 }
-export type Transaction = { 'EvmToIcp' : CandidEvmToIcp } |
+export type Transaction = { 'DexAction' : CandidDexAction } |
+  { 'EvmToIcp' : CandidEvmToIcp } |
   { 'IcpToEvm' : CandidIcpToEvm };
 export type TransactionSearchParam = { 'TxWithdrawalId' : bigint } |
   { 'TxMintId' : bigint } |
@@ -280,7 +279,7 @@ export interface _SERVICE {
   'get_bridge_pairs' : ActorMethod<[], Array<TokenPair>>,
   'get_dex_actions_for_principal' : ActorMethod<
     [Principal],
-    Array<CandidEvent>
+    Array<CandidDexAction>
   >,
   'get_erc20_twin_ls_requests_by_creator' : ActorMethod<
     [Principal],
