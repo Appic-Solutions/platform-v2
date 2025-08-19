@@ -154,6 +154,11 @@ export async function fetchICPQuote(
     }
   } catch (error) {
     console.error('Error fetching ICP quote:', error);
-    throw error;
+		 return {
+        success: false,
+        message: `${error}`,
+        result: undefined,
+      };
+
   }
 }
