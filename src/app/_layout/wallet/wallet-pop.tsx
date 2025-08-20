@@ -12,11 +12,12 @@ import {
   getFormattedWalletAddress,
 } from '@/lib/utils';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import WalletChart from './wallet-chart';
 import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
 import WalletPopSkeletonDesktop from './wallet-pop-skeleton-dektop';
 import { Avatar } from '@/components/common/ui/avatar';
+import BigNumber from 'bignumber.js';
 
 export type WalletBalance =
   | {
@@ -64,26 +65,37 @@ export function WalletPop({
     copyToClipboard(address).then((res) => {
       if (res) {
         setShowCopyPopover(true);
-        setTimeout(() => {
-          setShowCopyPopover(false);
-        }, 2000);
+        setTimeout(() => setShowCopyPopover(false), 2000);
       }
     });
   };
 
+  const formattedTokens = useMemo(() => {
+    if (!balance) return [];
+
+    return [...balance.tokens]
+      .sort((a, b) => new BigNumber(b.usdBalance || '0').minus(a.usdBalance || '0').toNumber())
+      .map((token) => ({
+        ...token,
+        displayUsd: getCountedNumber(Number(token.usdBalance), 2),
+        chainName: getChainName(token.chainId),
+        chainLogo: getChainLogo(token.chainId),
+      }));
+  }, [balance]);
+
   return (
     <>
-      {/* mobile size */}
+      {/* mobile */}
       <div className="flex items-center justify-center md:hidden">
         <Drawer>
           <DrawerTrigger>
-            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-h-6 min-w-6" />
+            <Image src={logo} alt={title} width={24} height={24} className="min-h-6 min-w-6" />
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader className="pl-10">
               {title}
               <ArrowPathIcon
-                onClick={() => refetchBalance()}
+                onClick={refetchBalance}
                 className={cn(
                   'absolute left-4 top-14',
                   isLoading
@@ -97,7 +109,9 @@ export function WalletPop({
               <WalletPopSkeletonMobile />
             ) : (
               <>
-                {balance.tokens.length > 0 && <WalletChart balance={balance} />}
+                {formattedTokens.length > 0 && <WalletChart balance={balance} />}
+
+                {/* address + copy */}
                 <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
                   <span>{getFormattedWalletAddress(address)}</span>
                   <button className="relative" onClick={() => copyToClipboardHandler(address)}>
@@ -109,14 +123,15 @@ export function WalletPop({
                     )}
                   </button>
                 </div>
-                {balance.tokens.length > 0 ? (
+
+                {formattedTokens.length > 0 ? (
                   <>
                     <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
                       <span>Token</span>
                       Value
                     </div>
                     <div className="flex flex-col gap-y-5">
-                      {balance.tokens.map((token, idx) => (
+                      {formattedTokens.map((token, idx) => (
                         <div
                           key={idx}
                           className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
@@ -124,12 +139,12 @@ export function WalletPop({
                           <div className="relative flex items-center gap-x-5">
                             <Avatar src={token.logo} className="h-8 w-8" />
                             <Avatar
-                              src={getChainLogo(token.chainId)}
+                              src={token.chainLogo}
                               className="absolute left-8 top-5 h-3.5 w-3.5"
                             />
-                            <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
+                            <span>{`${token.symbol} (${token.chainName})`}</span>
                           </div>
-                          <span>$ {getCountedNumber(Number(token.usdBalance), 2)}</span>
+                          <span>$ {token.displayUsd}</span>
                         </div>
                       ))}
                     </div>
@@ -143,15 +158,17 @@ export function WalletPop({
                     No tokens found
                   </div>
                 )}
+
                 {hasMoreToken && (
                   <button
-                    onClick={() => loadMoreHandler()}
+                    onClick={loadMoreHandler}
                     className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                     disabled={isLoading}
                   >
                     Load More
                   </button>
                 )}
+
                 <button
                   onClick={disconnect}
                   className="rounded-[10px] px-4 py-2 text-sm font-semibold text-fail duration-200 hover:bg-fail hover:text-white"
@@ -164,11 +181,11 @@ export function WalletPop({
         </Drawer>
       </div>
 
-      {/* desktop size */}
+      {/* desktop */}
       <div className="hidden items-center justify-center md:flex">
         <Popover>
           <PopoverTrigger>
-            <Image src={logo} alt="ICP Wallet" width={24} height={24} className="min-h-6 min-w-6" />
+            <Image src={logo} alt={title} width={24} height={24} className="min-h-6 min-w-6" />
           </PopoverTrigger>
           <PopoverContent
             className="flex w-[360px] translate-y-4 flex-col gap-y-4 px-10"
@@ -180,7 +197,7 @@ export function WalletPop({
               </PopoverClose>
               {title}
               <ArrowPathIcon
-                onClick={() => refetchBalance()}
+                onClick={refetchBalance}
                 className={cn(
                   'absolute left-4 top-4',
                   isLoading
@@ -192,9 +209,11 @@ export function WalletPop({
 
             {!balance ? (
               <WalletPopSkeletonDesktop />
-            ) : balance ? (
+            ) : (
               <>
-                {balance && balance.tokens.length > 0 && <WalletChart balance={balance} />}
+                {formattedTokens.length > 0 && <WalletChart balance={balance} />}
+
+                {/* address + copy */}
                 <div className="flex items-center justify-center gap-x-2 text-sm text-black dark:text-white">
                   <span>{getFormattedWalletAddress(address)}</span>
                   <button className="relative" onClick={() => copyToClipboardHandler(address)}>
@@ -206,14 +225,15 @@ export function WalletPop({
                     )}
                   </button>
                 </div>
-                {balance.tokens.length > 0 ? (
+
+                {formattedTokens.length > 0 ? (
                   <>
                     <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
                       <span>Token</span>
                       Value
                     </div>
                     <div className="flex max-h-56 flex-col gap-y-5 overflow-y-auto">
-                      {balance.tokens.map((token, idx) => (
+                      {formattedTokens.map((token, idx) => (
                         <div
                           key={idx}
                           className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
@@ -221,12 +241,12 @@ export function WalletPop({
                           <div className="relative flex items-center gap-x-5">
                             <Avatar src={token.logo} className="h-9 w-9" />
                             <Avatar
-                              src={getChainLogo(token.chainId)}
+                              src={token.chainLogo}
                               className="absolute left-7 top-5 h-4 w-4"
                             />
-                            <span>{`${token.symbol} (${getChainName(token.chainId)})`}</span>
+                            <span>{`${token.symbol} (${token.chainName})`}</span>
                           </div>
-                          <span>$ {getCountedNumber(Number(token.usdBalance), 2)}</span>
+                          <span>$ {token.displayUsd}</span>
                         </div>
                       ))}
                     </div>
@@ -240,15 +260,17 @@ export function WalletPop({
                     No tokens found
                   </div>
                 )}
+
                 {hasMoreToken && (
                   <button
-                    onClick={() => loadMoreHandler()}
+                    onClick={loadMoreHandler}
                     className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                     disabled={isLoading}
                   >
                     Load More
                   </button>
                 )}
+
                 <button
                   onClick={disconnect}
                   className="rounded-[10px] px-4 py-2 text-sm font-semibold text-fail duration-200 hover:bg-fail hover:text-white"
@@ -256,7 +278,7 @@ export function WalletPop({
                   Disconnect
                 </button>
               </>
-            ) : null}
+            )}
           </PopoverContent>
         </Popover>
       </div>

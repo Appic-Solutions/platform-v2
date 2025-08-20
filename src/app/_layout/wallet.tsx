@@ -353,9 +353,9 @@ const WalletPage = () => {
             disconnect={handleDisconnectIcp}
             isLoading={isIcpBalanceLoading}
             address={icpIdentity.toString()}
-            refetchBalance={fetchBalances}
+            refetchBalance={() => fetchBalances(false)}
             hasMoreToken
-            loadMoreHandler={fetchBalances}
+            loadMoreHandler={() => fetchBalances(false)}
           />
         )}
         {isEvmConnected && (
