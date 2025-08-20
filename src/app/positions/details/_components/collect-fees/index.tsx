@@ -66,6 +66,7 @@ const CollectFees = () => {
       if (mintStep.status === 'successful') {
         actions.resetTxState();
         router.push('/positions');
+        actions.setInitialState();
       } else if (mintStep.status === 'failed') {
         setIsFreshRequest(true);
         actions.resetTxState();
@@ -90,7 +91,7 @@ const CollectFees = () => {
               {selectedPosition.token0.symbol}
             </p>
             <p className="text-sm text-white/80 md:text-base">
-              {selectedPosition.fees_token0_owed} {selectedPosition.token0.symbol}
+              {selectedPosition.fees_token0_owed}
             </p>
           </div>
           {/* token1 */}
@@ -100,7 +101,7 @@ const CollectFees = () => {
               {selectedPosition.token1.symbol}
             </p>
             <p className="text-sm text-white/80 md:text-base">
-              {selectedPosition.fees_token1_owed} {selectedPosition.token1.symbol}
+              {selectedPosition.fees_token1_owed}
             </p>
           </div>
         </SolidCard>

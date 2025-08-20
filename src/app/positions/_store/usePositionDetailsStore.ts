@@ -1,11 +1,5 @@
 import { create } from 'zustand';
-import {
-  AddLiquidityStep,
-  CreatePositionStep,
-  FormattedPosition,
-  RemoveLiquidityStep,
-  Step,
-} from '../types';
+import { CreatePositionStep, FormattedPosition, Step } from '../types';
 
 interface State {
   // common
@@ -28,13 +22,14 @@ interface Action {
     setMintStep: (mintStep: CreatePositionStep) => void;
     setMintPrevStep: (mintPrevStep: CreatePositionStep) => void;
     resetTxState: () => void;
+    setInitialState: () => void;
     // add liquidity
     setToken0DepositAmount: (token0DepositAmount: string) => void;
     setToken1DepositAmount: (token1DepositAmount: string) => void;
   };
 }
 
-export const usePositionDetailsStore = create<State & Action>()((set) => ({
+export const usePositionDetailsStore = create<State & Action>()((set, get, store) => ({
   // common
   currentStep: 'positionDetail',
   selectedPosition: undefined,
@@ -66,6 +61,7 @@ export const usePositionDetailsStore = create<State & Action>()((set) => ({
           errorMessage: null,
         },
       }),
+    setInitialState: () => set(store.getInitialState()),
     // add liquidity
     setToken0DepositAmount: (token0DepositAmount) => set({ token0DepositAmount }),
     setToken1DepositAmount: (token1DepositAmount) => set({ token1DepositAmount }),

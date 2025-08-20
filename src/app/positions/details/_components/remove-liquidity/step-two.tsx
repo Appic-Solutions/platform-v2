@@ -55,6 +55,7 @@ export default function RemoveLiquidityStepTwo({
       if (mintStep.status === 'successful') {
         actions.resetTxState();
         router.push('/positions');
+        actions.setInitialState();
       } else if (mintStep.status === 'failed') {
         setIsFreshRequest(true);
         actions.resetTxState();
@@ -214,7 +215,7 @@ export default function RemoveLiquidityStepTwo({
           </button>
         </div>
       </div>
-      <DialogTitle />
+      <DialogTitle className="hidden" />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
           aria-describedby={undefined}

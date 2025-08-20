@@ -21,8 +21,8 @@ export const PositionStep = ({
   const { actions } = usePositionDetailsStore();
 
   const onNavigateToHistory = () => {
-    actions.resetTxState();
     router.push('/positions');
+    actions.setInitialState();
   };
 
   return (

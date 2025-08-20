@@ -113,6 +113,7 @@ export default function AddLiquidityStepTwo() {
       if (mintStep.status === 'successful') {
         actions.resetTxState();
         router.push('/positions');
+        actions.setInitialState();
       } else if (mintStep.status === 'failed') {
         setIsFreshRequest(true);
         actions.resetTxState();
