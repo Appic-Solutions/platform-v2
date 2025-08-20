@@ -106,7 +106,7 @@ export default function RemoveLiquidityStepTwo({
       fetchIcpBalances({
         unAuthenticatedAgent,
         principal: icpIdentity,
-        top_tokens: true,
+        top_tokens: false,
       }).then((res) => {
         setIcpBalance(res);
       });

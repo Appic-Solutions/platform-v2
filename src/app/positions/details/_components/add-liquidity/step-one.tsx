@@ -7,6 +7,7 @@ import AddLiquidityInput from './add-liquidity-input';
 import AvatarGroup from '@/app/positions/_components/AvatarGroup';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { useRouter } from 'next/navigation';
+import { BigNumber } from 'bignumber.js';
 
 const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
   const [isDisabled, setIsDisabled] = useState(true);
@@ -40,23 +41,23 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
   }, [icpBalance, icpIdentity]);
 
   useEffect(() => {
-    console.log({
-      userTokenBalances,
-      token0DepositAmount,
-      token1DepositAmount,
-    });
-    if (
-      userTokenBalances &&
-      userTokenBalances.token0Balance &&
-      userTokenBalances.token1Balance &&
-      Number(token0DepositAmount) > 0 &&
-      Number(token1DepositAmount) > 0 &&
-      userTokenBalances?.token0Balance >= token0DepositAmount &&
-      userTokenBalances?.token1Balance >= token1DepositAmount
-    ) {
-      setIsDisabled(false);
-      return;
+    if (!userTokenBalances) return;
+
+    try {
+      const deposit0 = new BigNumber(token0DepositAmount || '0');
+      const deposit1 = new BigNumber(token1DepositAmount || '0');
+
+      const balance0 = new BigNumber(userTokenBalances.token0Balance || '0');
+      const balance1 = new BigNumber(userTokenBalances.token1Balance || '0');
+
+      if (deposit0.gt(0) && deposit1.gt(0) && balance0.gte(deposit0) && balance1.gte(deposit1)) {
+        setIsDisabled(false);
+        return;
+      }
+    } catch (e) {
+      console.error('BigNumber conversion error:', e);
     }
+
     setIsDisabled(true);
   }, [userTokenBalances, token0DepositAmount, token1DepositAmount]);
 

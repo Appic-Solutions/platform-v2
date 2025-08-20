@@ -92,7 +92,7 @@ export default function AddLiquidityStepTwo() {
         fetchIcpBalances({
           unAuthenticatedAgent,
           principal: icpIdentity,
-          top_tokens: true,
+          top_tokens: false,
         }).then((res) => {
           setIcpBalance(res);
         });
@@ -182,7 +182,7 @@ export default function AddLiquidityStepTwo() {
           </button>
         </div>
       </div>
-      <DialogTitle />
+      <DialogTitle className="hidden" />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
           aria-describedby={undefined}

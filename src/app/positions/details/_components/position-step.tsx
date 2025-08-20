@@ -78,7 +78,7 @@ export const PositionStep = ({
           </p>
         </div>
       )}
-      {currentStep.step === 2 && (
+      {currentStep.step === 2 && currentStep.status === 'successful' && (
         <>
           <p className="pb-2 text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
             You can safely close this window
