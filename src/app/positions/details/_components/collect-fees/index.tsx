@@ -76,6 +76,8 @@ const CollectFees = () => {
     }
   };
 
+  console.log(Number(selectedPosition.total_fees_owed_usd));
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <div className="flex h-full w-full animate-fade flex-col gap-6">
@@ -117,9 +119,8 @@ const CollectFees = () => {
           </button>
           <button
             disabled={
-              !selectedPosition.total_fees_owed_usd ||
-              selectedPosition.total_fees_owed_usd === '0' ||
-              selectedPosition.total_fees_owed_usd === '0.00'
+              // !selectedPosition.total_fees_owed_usd ||
+              Number(selectedPosition.total_fees_owed_usd) === 0
             }
             onClick={openModalHandler}
             className="mt-auto h-full w-full select-none rounded-[15px] bg-primary-buttons text-white duration-200 hover:opacity-85 disabled:opacity-50 md:mt-0"
@@ -128,8 +129,7 @@ const CollectFees = () => {
           </button>
         </div>
       </div>
-
-      <DialogTitle />
+      <DialogTitle className="hidden" />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
           aria-describedby={undefined}
