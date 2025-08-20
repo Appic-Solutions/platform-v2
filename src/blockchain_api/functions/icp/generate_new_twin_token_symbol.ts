@@ -5,7 +5,7 @@ import { CandidEvmToken } from '@/blockchain_api/did/appic/appic_helper/appic_he
 
 export const generate_twin_token_symbol = async (evm_symbol: string, chain_id: number) => {
 	const chain = chains.find((chain) => chain.chainId == chain_id)!;
-	return `ic${evm_symbol.toUpperCase()}.${chain.twin_handle!}`;
+	return `ic${evm_symbol.toUpperCase()}`;
 };
 
 export const generate_twin_token_transfer_fee = async (

@@ -73,8 +73,9 @@ const WalletPage = () => {
   const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
   const [isFetching, setIsFetching] = useState(false);
+  const [isFirstIcpFetch, setIsFirstIcpFetch] = useState(true);
 
-  const fetchBalances = async () => {
+  const fetchBalances = async (getIcpTopToken: boolean = false) => {
     if (isFetching) return null;
     setIsFetching(true);
 
@@ -92,7 +93,11 @@ const WalletPage = () => {
       setUnAuthenticatedAgent(unAuthenticatedAgent);
       setIsIcpBalanceLoading(true);
       try {
-        const icpRes = await fetchIcpBalances({ unAuthenticatedAgent, principal: icpIdentity });
+        const icpRes = await fetchIcpBalances({
+          unAuthenticatedAgent,
+          principal: icpIdentity,
+          top_tokens: getIcpTopToken,
+        });
         setIcpBalance(icpRes);
       } finally {
         setIsIcpBalanceLoading(false);
@@ -100,21 +105,18 @@ const WalletPage = () => {
     }
 
     setIsFetching(false);
+    if (isFirstIcpFetch) setIsFirstIcpFetch(false);
     return null;
   };
 
-  useEffect(() => {
-    if (evmAddress || icpIdentity) {
-      fetchBalances();
-    }
-  }, [evmAddress, icpIdentity]);
-
   useQuery({
     queryKey: ['fetch-wallet-balances'],
-    queryFn: fetchBalances,
+    queryFn: () => fetchBalances(isFirstIcpFetch),
     refetchInterval: 1000 * 90,
+    staleTime: 0,
     gcTime: 1000 * 60,
-    staleTime: 1000 * 60,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
     enabled: !!(evmAddress || icpIdentity),
   });
 
@@ -201,17 +203,17 @@ const WalletPage = () => {
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
 
-      await get_icp_tokens(unAuthenticatedAgent).then((res) => {
-        if (res.result) {
-          setStorageItem('icpTokens', JSON.stringify(res.result));
-        }
+      const res = await get_icp_tokens(unAuthenticatedAgent);
+
+      if (res.result) {
+        setStorageItem('icpTokens', JSON.stringify(res.result));
         return res.result;
-      });
+      }
 
       return [];
     },
     enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60,
@@ -352,6 +354,8 @@ const WalletPage = () => {
             isLoading={isIcpBalanceLoading}
             address={icpIdentity.toString()}
             refetchBalance={fetchBalances}
+            hasMoreToken
+            loadMoreHandler={fetchBalances}
           />
         )}
         {isEvmConnected && (

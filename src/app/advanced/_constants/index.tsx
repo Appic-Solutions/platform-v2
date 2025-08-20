@@ -5,35 +5,35 @@ import { ModalStepDataReturn } from '../_types';
 export const Step2Data = (newTwinMeta: NewTwinMetadata | undefined) => [
   {
     title: 'Original Token Name:',
-    value: newTwinMeta?.evm_base_token.name,
+    value: newTwinMeta?.base_token.name,
   },
   {
     title: 'Original Token Symbol:',
-    value: newTwinMeta?.evm_base_token.symbol,
+    value: newTwinMeta?.base_token.symbol,
   },
   {
     title: 'Original Blockchain:',
-    value: getChainName(newTwinMeta?.evm_base_token.chain_id),
+    value: getChainName(newTwinMeta?.base_chain.chainId),
   },
   {
     title: 'Twin Token Name:',
-    value: newTwinMeta?.icp_twin_token.name,
+    value: newTwinMeta?.twin_token.name,
   },
   {
     title: 'Twin Token Symbol:',
-    value: newTwinMeta?.icp_twin_token.symbol,
+    value: newTwinMeta?.twin_token.symbol,
   },
   {
     title: 'Twin Token Blockchain:',
-    value: `${getChainName(newTwinMeta?.icp_twin_token.chain_id)}`,
+    value: `${getChainName(newTwinMeta?.twin_chain.chainId)}`,
   },
   {
     title: 'Twin Token Creation Fee:',
-    value: `${newTwinMeta?.human_readable_creation_fee} ICP`,
+    value: `${newTwinMeta?.human_readable_creation_fee} ${newTwinMeta?.creation_fee_token}`,
   },
-  {
+  Number(newTwinMeta?.twin_token?.human_readable_transfer_fee) > 0 && {
     title: 'Twin Token Transfer Fee:',
-    value: `${newTwinMeta?.icp_twin_token.human_readable_transfer_fee} ${newTwinMeta?.icp_twin_token.symbol}`,
+    value: `${newTwinMeta?.twin_token.human_readable_transfer_fee} ${newTwinMeta?.twin_token.symbol}`,
   },
 ];
 

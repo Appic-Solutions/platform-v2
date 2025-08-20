@@ -2,10 +2,11 @@ import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { ProcessModalProps } from '../_types';
 import Stepper from '@/app/_layout/Stepper';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn, getChainLogo } from '@/lib/utils';
 import { CloseIcon } from '@/components/icons';
 import Link from 'next/link';
 import HistoryIcon from '@/components/icons/history';
+import { useWatch } from 'react-hook-form';
 
 export default function ProcessModal({
   isOpen,
@@ -43,8 +44,8 @@ export default function ProcessModal({
           )}
         >
           <Image
-            src={'/images/logo/icp-logo.svg'}
-            alt={newTwinMeta?.evm_base_token.symbol || ''}
+            src={getChainLogo(newTwinMeta?.twin_chain.chainId)}
+            alt={newTwinMeta?.twin_token.symbol || ''}
             height={80}
             width={80}
             className="min-h-min-w-20 min-w-20 rounded-full"

@@ -29,7 +29,6 @@ import { encode_deploy_erc20_function_data, get_gas_price } from './get_bridge_o
 import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
 
-
 const erc20_deployment_gas_limit = 1_300_000;
 
 const icp_transfer_fee = 10_000;
@@ -49,8 +48,8 @@ export interface NewTwinMetadata {
 		transfer_fee: string;
 		human_readable_transfer_fee: string;
 	};
-	base_chain: Chain,
-	twin_chain: Chain,
+	base_chain: Chain;
+	twin_chain: Chain;
 	creation_fee: string;
 	creation_fee_token: string;
 	creation_fee_token_address: string;
@@ -66,18 +65,18 @@ export const get_evm_token_and_generate_twin_token = async (
 	twin_chain: Chain,
 	canister_id_or_token_address: string,
 	unauthenticated_agent: HttpAgent,
-	all_icp_tokens: IcpToken[]
+	all_icp_tokens: IcpToken[],
 ): Promise<Response<NewTwinMetadata | undefined>> => {
-
-
 	const lsm_actor = Actor.createActor(lsmIdlFactory, {
 		agent: unauthenticated_agent,
 		canisterId: lsm_ledger_id,
 	});
+	console.log("rwezsss");
+
 
 	try {
-		if (base_chain.type == "EVM") {
-			if (twin_chain.type != "ICP") throw "EVM tokens can only be wrapped on ICP";
+		if (base_chain.type == 'EVM') {
+			if (twin_chain.type != 'ICP') throw 'EVM tokens can only be wrapped on ICP';
 
 			const lsm_info = (await lsm_actor.get_lsm_info()) as LedgerManagerInfo;
 			const creation_fee = new BigNumber(lsm_info.ls_creation_icp_fee.toString()).plus(
@@ -86,7 +85,7 @@ export const get_evm_token_and_generate_twin_token = async (
 			const human_readable_creation_fee = creation_fee.dividedBy(10 ** 8).toFixed();
 			const evm_token_result = await get_evm_token_info(
 				canister_id_or_token_address,
-				twin_chain.chainId.toString(),
+				base_chain.chainId.toString(),
 				unauthenticated_agent,
 			);
 			if (evm_token_result.result.length == 0) {
@@ -127,23 +126,23 @@ export const get_evm_token_and_generate_twin_token = async (
 					},
 					base_chain,
 					twin_chain,
-					creation_fee_token: "ICP",
+					creation_fee_token: 'ICP',
 					creation_fee: creation_fee.toFixed(),
 					human_readable_creation_fee,
-					creation_fee_token_address: "ryjl3-tyaaa-aaaaa-aaaba-cai",
-					max_fee_per_gas: "0",
-					max_priority_fee_per_gas: "0"
+					creation_fee_token_address: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
+					max_fee_per_gas: '0',
+					max_priority_fee_per_gas: '0',
 				},
 				success: true,
-			}
-
+			};
 		} else {
+			let icp_topken = all_icp_tokens.find(
+				(token) => token.canisterId.toLowerCase() == canister_id_or_token_address.toLowerCase(),
+			);
 
-			let icp_topken = all_icp_tokens.find(token => token.canisterId == canister_id_or_token_address);
-			if (typeof icp_topken == undefined) {
-				throw "Failed to find ICP token for canister_id";
-			} else {
-
+			console.log(icp_topken);
+			if (typeof icp_topken == undefined || !icp_topken || typeof icp_topken == "undefined") {
+				return { result: undefined, message: "No token available for provided canister id", success: false };
 			}
 
 			let creation_fee_token = twin_chain.nativeTokenSymbol;
@@ -152,9 +151,10 @@ export const get_evm_token_and_generate_twin_token = async (
 				twin_chain.rpc_url,
 			);
 
-			let creation_fee = new BigNumber(erc20_deployment_gas_limit).multipliedBy(max_fee_per_gas).toFixed();
+			let creation_fee = new BigNumber(erc20_deployment_gas_limit)
+				.multipliedBy(max_fee_per_gas)
+				.toFixed();
 			let human_readable_creation_fee = BigNumber(creation_fee).dividedBy(BigNumber(10).pow(18));
-
 
 			return {
 				message: '',
@@ -165,8 +165,8 @@ export const get_evm_token_and_generate_twin_token = async (
 						logo: icp_topken!.logo,
 						name: icp_topken!.name,
 						symbol: icp_topken!.symbol,
-						human_readable_transfer_fee: "0",
-						transfer_fee: "0",
+						human_readable_transfer_fee: '0',
+						transfer_fee: '0',
 					},
 					base_chain,
 					twin_chain,
@@ -175,15 +175,13 @@ export const get_evm_token_and_generate_twin_token = async (
 					human_readable_creation_fee: human_readable_creation_fee.toFixed(),
 					creation_fee_token_address: creation_fee_token,
 					max_fee_per_gas,
-					max_priority_fee_per_gas
+					max_priority_fee_per_gas,
 				},
 				success: true,
-
-			}
-
+			};
 		}
-
 	} catch (error) {
+		console.log(error);
 		return {
 			message: `${error}`,
 			result: undefined,
@@ -192,19 +190,13 @@ export const get_evm_token_and_generate_twin_token = async (
 	}
 };
 
-
-
-
-
-
 // Step 2
 export const approve_icp_or_native_token = async (
 	new_twin_metadata: NewTwinMetadata,
 	authenticated_agent: Agent,
 ): Promise<Response<string>> => {
 	try {
-
-		if (new_twin_metadata.base_chain.type == "EVM") {
+		if (new_twin_metadata.base_chain.type == 'EVM') {
 			const icp_actor = Actor.createActor(IcrcIdlFactory, {
 				agent: authenticated_agent,
 				canisterId: icp_ledger,
@@ -231,11 +223,9 @@ export const approve_icp_or_native_token = async (
 					message: `Failed to approve allowance:${JSON.stringify(icp_approve_result.Err)}`,
 				};
 			}
-		}
-		else {
+		} else {
 			return { result: '', success: true, message: '' };
 		}
-
 	} catch (error) {
 		console.log(error);
 		return {
@@ -251,10 +241,8 @@ export const request_new_twin = async (
 	new_twin_metadata: NewTwinMetadata,
 	authenticated_agent: Agent,
 ): Promise<Response<string>> => {
-
-
 	try {
-		if (new_twin_metadata.base_chain.type == "EVM") {
+		if (new_twin_metadata.base_chain.type == 'EVM') {
 			const lsm_actor = Actor.createActor(lsmIdlFactory, {
 				agent: authenticated_agent,
 				canisterId: lsm_ledger_id,
@@ -296,8 +284,6 @@ export const request_new_twin = async (
 				transport: custom(ethereum!),
 			});
 
-
-
 			//await walletClient.addChain({ chain: bridge_option.viem_chain });
 
 			await walletClient.switchChain({ id: new_twin_metadata.twin_chain.chainId });
@@ -305,11 +291,14 @@ export const request_new_twin = async (
 			let base_token = new_twin_metadata.base_token as IcpToken;
 			let base_token_bytes = principal_to_bytes32(base_token.canisterId);
 
-			let encoded_data = encode_deploy_erc20_function_data(base_token.name, base_token.symbol, base_token.decimals, base_token_bytes);
+			let encoded_data = encode_deploy_erc20_function_data(
+				base_token.name,
+				base_token.symbol,
+				base_token.decimals,
+				base_token_bytes,
+			);
 
 			const [account] = await walletClient.getAddresses();
-
-
 
 			const prepared_transaction = await walletClient.prepareTransactionRequest({
 				chain: new_twin_metadata.twin_chain.viem_config,
@@ -356,7 +345,6 @@ export const request_new_twin = async (
 					success: false,
 				};
 			}
-
 		}
 	} catch (error) {
 		return {
@@ -380,7 +368,7 @@ export const check_new_twin_ls_request = async (
 		canisterId: lsm_ledger_id,
 	});
 	try {
-		if (new_twin_metadata.base_chain.type == "EVM") {
+		if (new_twin_metadata.base_chain.type == 'EVM') {
 			let base_token = new_twin_metadata.base_token as CandidEvmToken;
 			const erc2_contract = {
 				address: base_token.erc20_contract_address,
@@ -401,7 +389,11 @@ export const check_new_twin_ls_request = async (
 				};
 			}
 		} else {
-			return { result: 'Successfully new twin token for the icp token', success: true, message: '' };
+			return {
+				result: 'Successfully new twin token for the icp token',
+				success: true,
+				message: '',
+			};
 		}
 	} catch (error) {
 		return {

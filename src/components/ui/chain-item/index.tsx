@@ -8,6 +8,7 @@ export default function ChainItem({ chain, selectedId, disabled, onClick }: Chai
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger
+          disabled={disabled}
           className={cn(
             'flex h-12 w-12 cursor-pointer select-none items-center justify-center rounded-full',
             selectedId === chain.chainId && 'ring-primary-buttons ring-4',

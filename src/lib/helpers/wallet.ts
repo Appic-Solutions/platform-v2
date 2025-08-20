@@ -7,9 +7,11 @@ import { Principal } from '@dfinity/principal';
 export const fetchIcpBalances = async ({
   unAuthenticatedAgent,
   principal,
+  top_tokens,
 }: {
   unAuthenticatedAgent: HttpAgent | null;
   principal: Principal | null;
+  top_tokens: boolean;
 }) => {
   try {
     if (unAuthenticatedAgent && principal) {
@@ -17,6 +19,7 @@ export const fetchIcpBalances = async ({
       const icp_balance = await get_icp_wallet_tokens_balances(
         principal.toString(),
         JSON.parse(all_tokens || '[]'),
+        top_tokens,
         unAuthenticatedAgent,
       ).then((res) => res.result);
       return icp_balance;
@@ -29,10 +32,11 @@ export const fetchIcpBalances = async ({
 export const fetchEvmBalances = async ({ evmAddress }: { evmAddress: string | undefined }) => {
   try {
     if (evmAddress) {
-			const bridge_pairs=getStorageItem("bridge-pairs");
-      const evm_balance = await get_evm_wallet_tokens_balances(evmAddress,JSON.parse(bridge_pairs || '[]')).then(
-        (res) => res.result,
-      );
+      const bridge_pairs = getStorageItem('bridge-pairs');
+      const evm_balance = await get_evm_wallet_tokens_balances(
+        evmAddress,
+        JSON.parse(bridge_pairs || '[]'),
+      ).then((res) => res.result);
       return evm_balance;
     }
   } catch (error) {

@@ -20,7 +20,6 @@ export default function AdvancedPage() {
     closeModalHandler,
     methods,
     onSubmit,
-    chainIdWatch,
   } = LogicHelper();
 
   const { title, subTitle } = getModalStepText(creationStep, status, errorMessage);
@@ -31,9 +30,7 @@ export default function AdvancedPage() {
         onSubmit={methods.handleSubmit(onSubmit)}
         className="h-full w-full overflow-y-auto md:flex md:items-center md:justify-center"
       >
-        {step === 1 && (
-          <Step1 methods={methods} chainIdWatch={chainIdWatch} isLoading={isLoading} />
-        )}
+        {step === 1 && <Step1 methods={methods} isLoading={isLoading} />}
         {step === 2 && (
           <Step2
             isLoading={isLoading}

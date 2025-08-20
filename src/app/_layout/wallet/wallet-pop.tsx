@@ -28,7 +28,7 @@ export type WalletBalance =
       totalBalanceUsd: string;
     };
 
-interface WalletCardProps {
+type WalletCardProps = {
   logo: string;
   title: string;
   balance: WalletBalance | undefined;
@@ -36,7 +36,16 @@ interface WalletCardProps {
   isLoading: boolean;
   address: string;
   refetchBalance: () => void;
-}
+} & (
+  | {
+      hasMoreToken?: true;
+      loadMoreHandler: () => void;
+    }
+  | {
+      loadMoreHandler?: never;
+      hasMoreToken?: false;
+    }
+);
 
 export function WalletPop({
   logo,
@@ -46,6 +55,8 @@ export function WalletPop({
   address,
   isLoading,
   refetchBalance,
+  hasMoreToken,
+  loadMoreHandler,
 }: WalletCardProps) {
   const [showCopyPopover, setShowCopyPopover] = useState(false);
 
@@ -72,7 +83,7 @@ export function WalletPop({
             <DrawerHeader className="pl-10">
               {title}
               <ArrowPathIcon
-                onClick={refetchBalance}
+                onClick={() => refetchBalance()}
                 className={cn(
                   'absolute left-4 top-14',
                   isLoading
@@ -132,6 +143,15 @@ export function WalletPop({
                     No tokens found
                   </div>
                 )}
+                {hasMoreToken && (
+                  <button
+                    onClick={() => loadMoreHandler()}
+                    className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    Load More
+                  </button>
+                )}
                 <button
                   onClick={disconnect}
                   className="rounded-[10px] px-4 py-2 text-sm font-semibold text-fail duration-200 hover:bg-fail hover:text-white"
@@ -160,7 +180,7 @@ export function WalletPop({
               </PopoverClose>
               {title}
               <ArrowPathIcon
-                onClick={refetchBalance}
+                onClick={() => refetchBalance()}
                 className={cn(
                   'absolute left-4 top-4',
                   isLoading
@@ -219,6 +239,15 @@ export function WalletPop({
                   <div className="flex items-center justify-center text-sm font-semibold text-white">
                     No tokens found
                   </div>
+                )}
+                {hasMoreToken && (
+                  <button
+                    onClick={() => loadMoreHandler()}
+                    className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    Load More
+                  </button>
                 )}
                 <button
                   onClick={disconnect}

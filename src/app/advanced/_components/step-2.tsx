@@ -8,16 +8,22 @@ import { Avatar } from '@/components/common/ui/avatar';
 import Spinner from '@/components/ui/spinner';
 
 export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
-  const { icpIdentity, icpBalance } = useSharedStore();
+  const { icpIdentity, icpBalance, evmBalance } = useSharedStore();
 
   const isWalletConnected = Boolean(icpIdentity);
-  const token = icpBalance?.tokens.find(
-    (token) => token.canisterId === newTwinMeta?.icp_canister_id,
-  );
+
+  const token =
+    icpBalance?.tokens.find((t) => t.canisterId === newTwinMeta?.creation_fee_token_address) ||
+    evmBalance?.tokens.find(
+      (t) =>
+        t.contractAddress?.toLowerCase() === newTwinMeta?.creation_fee_token_address?.toLowerCase(),
+    );
+
   const hasSufficientBalance = token
     ? parseFloat(token.balance || '0') >=
       parseFloat(newTwinMeta?.human_readable_creation_fee || '0')
     : false;
+
   const buttonText = !isWalletConnected ? (
     'Connect Wallet'
   ) : !hasSufficientBalance ? (
@@ -51,32 +57,34 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
       {/* Main Content */}
       <div className="flex items-center gap-4 self-start">
         <div className="relative">
-          <Avatar src={newTwinMeta?.icp_twin_token.logo} className="h-12 w-12" />
+          <Avatar src={newTwinMeta?.base_token.logo} className="h-12 w-12" />
           <Avatar
-            src={getChainLogo(newTwinMeta?.icp_twin_token.chain_id)}
+            src={getChainLogo(newTwinMeta?.twin_chain.chainId)}
             className="absolute -right-1 bottom-0 h-4 w-4 shadow-[0_0_3px_0_rgba(0,0,0,0.5)] dark:shadow-[0_0_3px_0_rgba(255,255,255,0.5)]"
           />
         </div>
         <div className="text-white dark:text-white md:text-black">
-          <p className="text-xl">{newTwinMeta?.icp_twin_token?.symbol}</p>
-          <p>{'on ' + getChainName(newTwinMeta?.icp_twin_token.chain_id)}</p>
+          <p className="text-xl">{newTwinMeta?.base_token.symbol}</p>
+          <p>{'on ' + getChainName(newTwinMeta?.twin_chain.chainId)}</p>
         </div>
       </div>
 
       <div className="flex w-full flex-col gap-y-3 rounded-xl bg-white/10 p-6 text-white dark:text-white md:text-black">
-        {Step2Data(newTwinMeta).map((item, idx) => (
-          <div
-            key={idx}
-            className={cn(
-              'flex items-center justify-between gap-x-1',
-              'text-sm font-medium md:text-base',
-              idx === 2 && 'border-b border-white/15 pb-4',
-            )}
-          >
-            <p>{item.title}</p>
-            <p className={cn((idx === 6 || idx === 7) && 'text-[#27AE60]')}>{item.value}</p>
-          </div>
-        ))}
+        {Step2Data(newTwinMeta).map((item, idx) =>
+          item ? (
+            <div
+              key={idx}
+              className={cn(
+                'flex items-center justify-between gap-x-1',
+                'text-sm font-medium md:text-base',
+                idx === 2 && 'border-b border-white/15 pb-4',
+              )}
+            >
+              <p>{item.title}</p>
+              <p className={cn((idx === 6 || idx === 7) && 'text-[#27AE60]')}>{item.value}</p>
+            </div>
+          ) : null,
+        )}
       </div>
 
       <button
