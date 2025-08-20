@@ -15,8 +15,8 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
     return (
       <Box
         className={cn(
-          'h-full animate-slide-in justify-normal opacity-0',
-          'gap-6 md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
+          'h-full w-fit animate-slide-in justify-normal opacity-0',
+          'gap-6 md:h-[607px] md:max-w-[612px]',
         )}
       >
         <BoxHeader title="Swap Review" onBack={() => setActiveStep(1)} />

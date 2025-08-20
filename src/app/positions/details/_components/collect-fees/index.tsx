@@ -9,17 +9,17 @@ import { useRouter } from 'next/navigation';
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { collectFeesStepsDetails } from '@/lib/constants/positions';
 import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
-import { useSharedStore } from '@/store/store';
-import { QueryClient } from '@tanstack/react-query';
+import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
+import { fetchIcpBalances } from '@/lib/helpers/wallet';
 
 const CollectFees = () => {
   const [isFreshRequest, setIsFreshRequest] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const { selectedPosition, actions, mintStep } = usePositionDetailsStore();
-  const { authenticatedAgent } = useSharedStore();
+  const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
+  const { setIcpBalance } = useSharedStoreActions();
   const router = useRouter();
-  const queryClient = new QueryClient();
 
   if (!selectedPosition) {
     router.push('/positions');
@@ -27,7 +27,7 @@ const CollectFees = () => {
   }
 
   const collectFeesHandler = async () => {
-    if (authenticatedAgent) {
+    if (authenticatedAgent && unAuthenticatedAgent && icpIdentity) {
       const result = await collect_fees({ position: selectedPosition }, authenticatedAgent);
 
       if (!result.success || !result.result) {
@@ -43,8 +43,13 @@ const CollectFees = () => {
           errorMessage: null,
         });
       }
-
-      queryClient.invalidateQueries({ queryKey: ['fetch-wallet-balances'] });
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        principal: icpIdentity,
+        top_tokens: true,
+      }).then((res) => {
+        setIcpBalance(res);
+      });
     }
   };
 

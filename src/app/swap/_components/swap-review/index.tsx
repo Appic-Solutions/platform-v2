@@ -6,14 +6,17 @@ import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
 import { depositStepsDetails } from '@/lib/constants/bridge';
 import { icpSwapStepsDetails } from '@/lib/constants/swap';
-import { useSharedStore } from '@/store/store';
+import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { approve_token_in, swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
+import { useQueryClient } from '@tanstack/react-query';
+import { fetchIcpBalances } from '@/lib/helpers/wallet';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [steps, setSteps] = useState<TxStep[]>();
   const { tokenIn, txStep, swapQuote, actions } = useSwapStore();
   const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
+  const { setIcpBalance } = useSharedStoreActions();
   const {
     setAmount,
     setActiveStep,
@@ -22,6 +25,7 @@ export const StepperContainer = () => {
     setToWalletAddress,
     setWithdrawalId,
   } = useSwapActions();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (tokenIn?.chain_type === 'EVM') {
@@ -56,8 +60,8 @@ export const StepperContainer = () => {
     }
   };
 
-  async function swapHandler() {
-    if (swapQuote && swapQuote.quote && unAuthenticatedAgent) {
+  const swapHandler = async () => {
+    if (swapQuote && swapQuote.quote && unAuthenticatedAgent && icpIdentity) {
       if (tokenIn?.chain_type === 'ICP' && authenticatedAgent && icpIdentity) {
         // step1
         const approveRes = await approve_token_in(
@@ -94,8 +98,15 @@ export const StepperContainer = () => {
           status: 'successful',
         });
       }
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        principal: icpIdentity,
+        top_tokens: false,
+      }).then((res) => {
+        setIcpBalance(res);
+      });
     }
-  }
+  };
 
   const onOpenModal = () => {
     setIsOpen(true);
@@ -108,6 +119,7 @@ export const StepperContainer = () => {
       <DialogTitle />
       <DialogOverlay onClick={(e) => e.stopPropagation()}>
         <DialogContent
+          aria-describedby={undefined}
           onInteractOutside={(e) => e.preventDefault()}
           className="h-[350] w-fit min-w-80"
         >

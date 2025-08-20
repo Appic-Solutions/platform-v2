@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/
 import { removeLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useSharedStore } from '@/store/store';
+import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import {
   generate_decrease_liquidity_args,
@@ -16,8 +16,8 @@ import {
 } from '@/blockchain_api/functions/icp/dex/tx/remove_liquidity';
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { DecreaseLiquidityArgs } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
-import { QueryClient } from '@tanstack/react-query';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
+import { fetchIcpBalances } from '@/lib/helpers/wallet';
 
 interface Props {
   position: FormattedPosition;
@@ -32,10 +32,10 @@ export default function RemoveLiquidityStepTwo({
 }: Props) {
   const [isFreshRequest, setIsFreshRequest] = useState(true);
   const { actions, selectedPosition, mintStep } = usePositionDetailsStore();
-  const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
+  const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
+  const { setIcpBalance } = useSharedStoreActions();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const queryClient = new QueryClient();
 
   if (!selectedPosition) {
     router.push('/positions');
@@ -66,7 +66,7 @@ export default function RemoveLiquidityStepTwo({
   };
 
   const removeLiquidityHandler = async () => {
-    if (authenticatedAgent && unAuthenticatedAgent && selectedPosition) {
+    if (authenticatedAgent && unAuthenticatedAgent && selectedPosition && icpIdentity) {
       const generatedArgs = generate_decrease_liquidity_args({
         position: selectedPosition,
         percentage: Number(percentValue.slice(0, -1)),
@@ -103,7 +103,13 @@ export default function RemoveLiquidityStepTwo({
         status: 'successful',
         errorMessage: null,
       });
-      queryClient.invalidateQueries({ queryKey: ['fetch-wallet-balances'] });
+      fetchIcpBalances({
+        unAuthenticatedAgent,
+        principal: icpIdentity,
+        top_tokens: true,
+      }).then((res) => {
+        setIcpBalance(res);
+      });
     }
   };
 

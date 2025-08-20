@@ -123,6 +123,7 @@ export const BridgeLogic = () => {
       fetchIcpBalances({
         unAuthenticatedAgent,
         principal: icpIdentity,
+        top_tokens: true,
       }).then((res) => {
         setIcpBalance(res);
       });

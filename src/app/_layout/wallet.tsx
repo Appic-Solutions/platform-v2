@@ -112,7 +112,7 @@ const WalletPage = () => {
   useQuery({
     queryKey: ['fetch-wallet-balances'],
     queryFn: () => fetchBalances(isFirstIcpFetch),
-    refetchInterval: 1000 * 90,
+    refetchInterval: 1000 * 120,
     staleTime: 0,
     gcTime: 1000 * 60,
     refetchOnMount: true,

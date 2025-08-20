@@ -43,12 +43,12 @@ export default function SwapSelectTokenPage() {
   } = useQuery({
     queryKey: ['swap-quot', tokenIn, tokenOut, amount],
     queryFn: () => fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount),
-    enabled: !!tokenIn && !!tokenOut && !!amount,
+    enabled: !!tokenIn && !!tokenOut && !!amount && !isNaN(Number(amount)) && Number(amount) > 0,
     refetchInterval: 20000,
   });
 
   useEffect(() => {
-    if (!isFetched) return;
+    if (!isFetched || !(Number(amount) > 0) || isNaN(Number(amount))) return;
 
     if (isSuccess && swapQuoteData?.result && swapQuoteData.success) {
       setSwapQuote({ message: '', quote: swapQuoteData.result });

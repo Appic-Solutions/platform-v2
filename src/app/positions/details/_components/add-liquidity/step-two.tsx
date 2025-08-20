@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/
 import { addLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
-import { useSharedStore } from '@/store/store';
+import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import {
   generate_args_and_approve_add_liquidity,
   increase_liquidity,
@@ -14,6 +14,7 @@ import {
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { useRouter } from 'next/navigation';
 import { QueryClient } from '@tanstack/react-query';
+import { fetchIcpBalances } from '@/lib/helpers/wallet';
 
 export default function AddLiquidityStepTwo() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,14 +30,15 @@ export default function AddLiquidityStepTwo() {
     mintStep,
   } = usePositionDetailsStore();
 
-  const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
+  const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
+  const { setIcpBalance } = useSharedStoreActions();
   if (!position) {
     router.push('/positions');
     return null;
   }
 
   const addLiquidityHandler = async () => {
-    if (authenticatedAgent && unAuthenticatedAgent) {
+    if (authenticatedAgent && unAuthenticatedAgent && icpIdentity) {
       // step1
       const increaseLiquidityArgs = await generate_args_and_approve_add_liquidity(
         {
@@ -87,7 +89,13 @@ export default function AddLiquidityStepTwo() {
           status: 'successful',
           errorMessage: null,
         });
-        queryClient.invalidateQueries({ queryKey: ['fetch-wallet-balances'] });
+        fetchIcpBalances({
+          unAuthenticatedAgent,
+          principal: icpIdentity,
+          top_tokens: true,
+        }).then((res) => {
+          setIcpBalance(res);
+        });
       }
     }
   };

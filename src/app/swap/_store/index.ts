@@ -58,7 +58,7 @@ type Action = {
 export const useSwapStore = create<swapState & Action>()((set) => ({
   activeStep: 1,
   txStep: {
-    count: 2,
+    count: 1,
     status: 'pending' as Status,
   },
   prevTxStep: {
