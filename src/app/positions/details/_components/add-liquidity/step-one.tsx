@@ -40,6 +40,11 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
   }, [icpBalance, icpIdentity]);
 
   useEffect(() => {
+    console.log({
+      userTokenBalances,
+      token0DepositAmount,
+      token1DepositAmount,
+    });
     if (
       userTokenBalances &&
       userTokenBalances.token0Balance &&

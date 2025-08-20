@@ -6,10 +6,9 @@ import TokenCard from './token-card';
 import BoxHeader from '@/components/ui/box-header';
 import TokenSkeleton from './token-skeleton';
 import { TokenType, useSwapActions, useSwapStore } from '../../_store';
-import { ChainTokenListLogic } from './_logic';
+import { useChainListLogic } from './_logic';
 import { useSharedStore } from '@/store/store';
 import { useState } from 'react';
-import { IcpToken } from '@/blockchain_api/types/tokens';
 
 export default function TokenListPage() {
   // store
@@ -25,7 +24,7 @@ export default function TokenListPage() {
     query,
     updatedIcpTokens,
     setQuery,
-  } = ChainTokenListLogic();
+  } = useChainListLogic();
   const { setActiveStep } = useSwapActions();
   const [searchQuery, setSearchQuery] = useState('');
 

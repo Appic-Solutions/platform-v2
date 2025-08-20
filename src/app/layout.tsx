@@ -45,10 +45,10 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
             <main className="mb-28 flex w-full flex-1 xl:mb-0">{children}</main>
             <NavbarPage />
             <Toaster />
+            <ThemeSwitch />
           </body>
         </WalletWrapper>
       </Providers>
-      <ThemeSwitch />
     </html>
   );
 };

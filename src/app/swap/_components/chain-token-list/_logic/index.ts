@@ -6,7 +6,7 @@ import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useSharedStore } from '@/store/store';
 import { useEffect, useMemo, useState } from 'react';
 
-export function ChainTokenListLogic() {
+export const useChainListLogic = () => {
   // Swap Actions
   const { setTokenIn, setTokenOut, setAmount } = useSwapActions();
   // Swap Store
@@ -129,4 +129,4 @@ export function ChainTokenListLogic() {
     selectedChainId,
     setSelectedChainId,
   };
-}
+};

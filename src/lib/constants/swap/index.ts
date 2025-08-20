@@ -2,7 +2,7 @@ import { TxStep } from '@/app/swap/_api/types';
 
 export const icpSwapStepsDetails: TxStep[] = [
   {
-    title: 'transaction approval',
+    title: 'Step 1',
     statuses: {
       pending: {
         statusTitle: 'Pending',
@@ -19,7 +19,7 @@ export const icpSwapStepsDetails: TxStep[] = [
     },
   },
   {
-    title: 'sending the swap transaction',
+    title: 'Step 2',
     statuses: {
       pending: {
         statusTitle: 'Pending',

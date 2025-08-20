@@ -10,11 +10,17 @@ import ActionButton from './action-button';
 import SwapOptionsList from './swap-quote-list';
 import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { useSwapActions, useSwapStore } from '../../_store';
+import { useQuery } from '@tanstack/react-query';
+import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
+import { IcpToken } from '@/blockchain_api/types/tokens';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/lib/hooks/use-toast';
 
 export default function SwapSelectTokenPage() {
   // swap store
   const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError } = useSwapStore();
-  const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } = useSwapActions();
+  const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError, setSwapQuote } =
+    useSwapActions();
   // Logic
   const {
     changeStep,
@@ -24,6 +30,52 @@ export default function SwapSelectTokenPage() {
     actionButtonHandler,
     actionButtonStatus,
   } = useSwapSelectTokenLogic();
+  const { toast } = useToast();
+
+  const {
+    data: swapQuoteData,
+    isSuccess,
+    isError,
+    isFetched,
+    refetch,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ['swap-quot', tokenIn, tokenOut, amount],
+    queryFn: () => fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount),
+    enabled: !!tokenIn && !!tokenOut && !!amount,
+    refetchInterval: 20000,
+  });
+
+  useEffect(() => {
+    if (!isFetched) return;
+
+    if (isSuccess && swapQuoteData?.result && swapQuoteData.success) {
+      setSwapQuote({ message: '', quote: swapQuoteData.result });
+    } else {
+      toast({
+        title: 'No route found for selected tokens',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  }, [isFetched, isSuccess, swapQuoteData, toast, setSwapQuote]);
+
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: 'Failed to fetch quote',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  }, [isError, toast]);
+
+  useEffect(() => {
+    if (amount) {
+      refetch();
+    }
+  }, [amount, tokenIn, tokenOut]);
 
   return (
     <Box
@@ -32,7 +84,9 @@ export default function SwapSelectTokenPage() {
         'md:w-fit md:max-w-[617px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        Number(amount) > 0 && 'lg:w-[1060px] lg:max-w-[1060px]',
+        Number(amount) > 0 && (swapQuoteData?.result || isLoading || isFetching)
+          ? 'lg:w-[1060px] lg:max-w-[1060px]'
+          : '',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
       )}
     >
@@ -132,7 +186,9 @@ export default function SwapSelectTokenPage() {
         </div>
 
         {/* SWAP OPTIONS */}
-        {Number(amount) > 0 && <SwapOptionsList />}
+        {Number(amount) > 0 && (swapQuoteData?.result || isLoading || isFetching) ? (
+          <SwapOptionsList isLoading={isLoading || isFetching} />
+        ) : null}
       </div>
       {/* MOBILE ACTION BUTTONS */}
       <div className="flex w-full items-center gap-x-2 lg:hidden">
