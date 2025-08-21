@@ -39,6 +39,10 @@ const DepositTokenInputs = () => {
   const isToken1Disabled =
     !(initialPrice && parseFloat(initialPrice) > 0) || !isToken1DepositAmountActive;
 
+  console.log({
+    userTokenBalances,
+  });
+
   return (
     <div>
       <h3 className="mb-2 text-lg font-bold lg:text-xl">Deposit tokens</h3>
@@ -61,7 +65,7 @@ const DepositTokenInputs = () => {
               <p className="text-ellipsis text-[#FFFFFF] lg:text-xl">{token0?.symbol || 'N/A'}</p>
             </div>
 
-            {icpIdentity && (
+            {icpIdentity && userTokenBalances && (
               <SetUserWalletBalanceButton
                 onMaxClick={(balance) => {
                   handleDepositAmountInput({
@@ -116,7 +120,7 @@ const DepositTokenInputs = () => {
             </div>
 
             {/* user wallet balance */}
-            {icpIdentity && (
+            {icpIdentity && userTokenBalances && (
               <SetUserWalletBalanceButton
                 onMaxClick={(balance) => {
                   handleDepositAmountInput({
@@ -125,7 +129,7 @@ const DepositTokenInputs = () => {
                   });
                 }}
                 token={token1}
-                userTokenBalance={userTokenBalances?.token1Balance}
+                userTokenBalance={userTokenBalances.token1Balance}
               />
             )}
             {/* input and usd price */}

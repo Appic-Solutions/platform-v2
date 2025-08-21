@@ -146,7 +146,7 @@ export default function PriceRangeChart({
         <div
           className={cn(
             'flex w-full flex-row items-start justify-between gap-4 lg:items-center',
-            'absolute -bottom-24 lg:-bottom-16',
+            'absolute -bottom-16 lg:-bottom-16',
           )}
         >
           <button

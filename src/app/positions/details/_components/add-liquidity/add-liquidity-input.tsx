@@ -22,6 +22,7 @@ const AddLiquidityInput = ({ position, userTokenBalance, isAmountZero }: Props) 
 
   const setTokenFn = isAmountZero ? actions.setToken0DepositAmount : actions.setToken1DepositAmount;
   const currentAmount = isAmountZero ? token0DepositAmount : token1DepositAmount;
+
   const handleDepositAmountInput = ({
     amount,
     isAmountZero,
@@ -74,7 +75,7 @@ const AddLiquidityInput = ({ position, userTokenBalance, isAmountZero }: Props) 
         'group rounded-[20px] bg-box-border-gradient p-0.5 text-black backdrop-blur-[30px] dark:text-white',
       )}
     >
-      <div className="flex w-full items-center justify-between rounded-[20px] bg-box-background-secondary px-5 py-4 lg:px-7">
+      <div className="flex w-full items-center justify-between gap-4 rounded-[20px] bg-box-background-secondary px-5 py-4 lg:px-7">
         <div className="flex h-full w-2/3 flex-col justify-between font-semibold">
           <input
             type="text"

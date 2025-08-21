@@ -140,9 +140,7 @@ export default function CreatePositionStepThree() {
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5 font-semibold">
                 <p className="text-[13px] text-white/50 md:text-sm">Depositing</p>
-                <p className="text-white md:text-lg">
-                  {token0DepositAmount} {token0.symbol}
-                </p>
+                <p className="text-white md:text-lg">{token0DepositAmount}</p>
                 <p className="text-xs text-white/50">
                   ${Number(token0DepositAmountInUsd).toFixed(2)}
                 </p>
@@ -163,9 +161,7 @@ export default function CreatePositionStepThree() {
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5 font-semibold">
                 <p className="text-[13px] text-white/50 md:text-sm">Depositing</p>
-                <p className="text-white md:text-lg">
-                  {token1DepositAmount} {token1.symbol}
-                </p>
+                <p className="text-white md:text-lg">{token1DepositAmount}</p>
                 <p className="text-xs text-white/50">${token1DepositAmountInUsd.toFixed(2)}</p>
               </div>
               <div
