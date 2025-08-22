@@ -26,14 +26,14 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
       <Box
         className={cn(
           'h-full animate-slide-in justify-normal opacity-0',
-          'md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
+          'gap-6 md:h-[607px] md:max-w-[546px]',
         )}
       >
         <BoxHeader title="Bridge Review" onBack={() => setActiveStep(1)} />
         <div className="flex h-full w-full flex-col justify-between gap-y-4">
           <Card
             className={cn(
-              'min-w-[300px] flex-col items-start justify-between gap-3 overflow-hidden rounded-[20px] border !py-4 px-4',
+              'flex-col items-start justify-between gap-3 overflow-hidden rounded-[20px] border !py-4 px-4',
               'md:rounded-[36px] md:px-6',
               'transition duration-300',
               'bg-highlighted-card',
@@ -60,16 +60,17 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                   <div className={cn('relative h-7 w-7', 'lg:h-10 lg:w-10')}>
                     <Image
                       src={toToken.logo}
+                      fill
                       alt="btc"
                       className="rounded-full object-contain"
-                      fill
                     />
                   </div>
                 </div>
                 <p
                   className={cn(
-                    'text-base lg:text-xl',
-                    option.human_readable_estimated_return.length > 7 && 'w-min text-ellipsis',
+                    'text-lg font-semibold md:text-xl',
+                    option.human_readable_estimated_return.length > 7 &&
+                      'w-fit text-ellipsis md:w-56',
                   )}
                 >
                   ~{' '}

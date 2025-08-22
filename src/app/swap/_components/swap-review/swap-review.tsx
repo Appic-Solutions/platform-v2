@@ -15,8 +15,8 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
     return (
       <Box
         className={cn(
-          'h-full w-fit animate-slide-in justify-normal opacity-0',
-          'gap-6 md:h-[607px] md:max-w-[612px]',
+          'h-full animate-slide-in justify-normal opacity-0',
+          'gap-6 md:h-[607px] md:max-w-[546px]',
         )}
       >
         <BoxHeader title="Swap Review" onBack={() => setActiveStep(1)} />
@@ -113,8 +113,9 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Minimum Received:</span>
-                    <span>
-                      {swapQuote.quote.minAmountOut} {swapQuote.quote.tokenOut.symbol}
+                    <span className="flex gap-2">
+                      <span className="text-ellipsis">{swapQuote.quote.minAmountOut}</span>
+                      <span>{swapQuote.quote.tokenOut.symbol}</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
