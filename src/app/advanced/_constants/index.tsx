@@ -33,7 +33,9 @@ export const Step2Data = (newTwinMeta: NewTwinMetadata | undefined) => [
   },
   Number(newTwinMeta?.twin_token?.human_readable_transfer_fee) > 0 && {
     title: 'Twin Token Transfer Fee:',
-    value: `${newTwinMeta?.twin_token.human_readable_transfer_fee} ${newTwinMeta?.twin_token.symbol}`,
+    value: `${(
+      Math.ceil(Number(newTwinMeta?.twin_token?.human_readable_transfer_fee) * 1e5) / 1e5
+    ).toFixed(5)} ${newTwinMeta?.twin_token?.symbol}`,
   },
 ];
 

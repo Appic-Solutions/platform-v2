@@ -16,7 +16,9 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
     icpBalance?.tokens.find((t) => t.canisterId === newTwinMeta?.creation_fee_token_address) ||
     evmBalance?.tokens.find(
       (t) =>
-        t.contractAddress?.toLowerCase() === newTwinMeta?.creation_fee_token_address?.toLowerCase(),
+        t.contractAddress?.toLowerCase() ===
+          newTwinMeta?.creation_fee_token_address?.toLowerCase() &&
+        t.chainId === newTwinMeta?.twin_chain?.chainId,
     );
 
   const hasSufficientBalance = token
