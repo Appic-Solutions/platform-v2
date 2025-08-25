@@ -105,3 +105,8 @@ export interface ExecuteRemoveLiquidityParams {
   args: DecreaseLiquidityArgs | BurnPositionArgs;
   authenticated_agent: HttpAgent;
 }
+
+export interface GetNewTokenDataParams {
+  canisterId: string;
+  unAuthenticatedAgent: HttpAgent;
+}

@@ -6,8 +6,9 @@ import {
 } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Agent, HttpAgent } from '@dfinity/agent';
-import { useMutation } from '@tanstack/react-query';
-import { GetChartDataArgs } from '../types';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { GetChartDataArgs, GetNewTokenDataParams } from '../types';
+import { createIcpTokenFromCanister } from '@/blockchain_api/functions/icp/search_token';
 
 export const fetchAllPools = async (agent: HttpAgent, tokens: IcpToken[]) => {
   const response = await get_all_pools(agent, tokens);
@@ -35,5 +36,13 @@ export const useGetChartData = () => {
     mutationKey: ['chart-data'],
     mutationFn: (params: GetChartDataArgs) =>
       get_active_liquidity(params.args, params.unauthenticated_agent),
+  });
+};
+
+export const useGetNewTokenData = () => {
+  return useMutation({
+    mutationKey: ['new-token'],
+    mutationFn: ({ canisterId, unAuthenticatedAgent }: GetNewTokenDataParams) =>
+      createIcpTokenFromCanister(canisterId, unAuthenticatedAgent),
   });
 };

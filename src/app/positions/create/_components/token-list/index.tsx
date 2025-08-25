@@ -9,6 +9,12 @@ import TokenCard from '@/app/auto-invest/_components/chain-token-list/token-card
 import { useSharedStore } from '@/store/store';
 import { CreatePositionFormDefaultValues } from '../../schema';
 import { TokenListPageProps } from '@/app/positions/types';
+import { useState } from 'react';
+import { isValidIcpAddress } from '@/lib/helpers/validation';
+import { AddIcpToken } from './add-icp-token';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { getStorageItem } from '@/lib/helpers/localstorage';
+import { localStorageTemplate } from '@/lib/constants/local-storage';
 
 export default function TokenListPage({
   stateBackHandler,
@@ -20,8 +26,18 @@ export default function TokenListPage({
     control,
     name: ['searchTokenQuery', 'token0', 'token1'],
   });
+  const [showAddIcpTokenComp, setShowAddIcpTokenComp] = useState(false);
 
   const { icpTokens } = useSharedStore();
+
+  if (!icpTokens) {
+    return null;
+  }
+
+  const sortedUserAddedTokens = getStorageItem(localStorageTemplate.userAddedTokens);
+  const userAddedRawTokens = sortedUserAddedTokens
+    ? (JSON.parse(sortedUserAddedTokens) as IcpToken[])
+    : [];
 
   const currentSelected = selectedTokenType === 1 ? token0 : token1;
   const otherSelected = selectedTokenType === 1 ? token1 : token0;
@@ -33,9 +49,12 @@ export default function TokenListPage({
     token.symbol.toLowerCase().includes(lowerQuery) ||
     token.canisterId.toLowerCase().includes(lowerQuery);
 
-  const filteredTokens = icpTokens?.filter(
-    (token) => token.canisterId !== otherSelected?.canisterId && matchesSearch(token),
-  );
+  const filteredTokens = Array.from(
+    // prevent duplicate tokens using Map
+    new Map(
+      [...userAddedRawTokens, ...icpTokens].map((token) => [token.canisterId, token]),
+    ).values(),
+  ).filter((token) => token.canisterId !== otherSelected?.canisterId && matchesSearch(token));
 
   const handleTokenClick = (token: IcpToken) => {
     selectTokenHandler({
@@ -61,20 +80,32 @@ export default function TokenListPage({
         )}
       />
 
-      <div className="mt-4 flex h-full w-full flex-col gap-2 overflow-y-auto">
-        {filteredTokens?.length ? (
-          filteredTokens.map((token) => (
-            <TokenCard
-              key={token.canisterId}
-              token={token}
-              isSelected={token.canisterId === currentSelected?.canisterId}
-              onClick={() => handleTokenClick(token)}
-            />
-          ))
-        ) : (
-          <div className="text-muted-foreground text-center text-sm">No tokens found.</div>
-        )}
-      </div>
+      <Dialog onOpenChange={() => setShowAddIcpTokenComp(!showAddIcpTokenComp)}>
+        <div className="mt-4 flex h-full w-full flex-col gap-2 overflow-y-auto">
+          {query && isValidIcpAddress(query) && showAddIcpTokenComp && (
+            <AddIcpToken onClose={() => setShowAddIcpTokenComp(false)} canisterId={query} />
+          )}
+          {filteredTokens?.length ? (
+            filteredTokens.map((token) => (
+              <TokenCard
+                key={token.canisterId}
+                token={token}
+                isSelected={token.canisterId === currentSelected?.canisterId}
+                onClick={() => handleTokenClick(token)}
+              />
+            ))
+          ) : query && isValidIcpAddress(query) ? (
+            <div className="text-muted-foreground flex flex-col items-center gap-4 text-center text-sm">
+              <p>The token is not found in the list, do you want to import it?</p>
+              <DialogTrigger className="flex items-center gap-2 rounded-lg border border-gray-200 bg-card-background p-2 text-primary shadow-lg transition-all hover:opacity-90 hover:shadow-md">
+                import
+              </DialogTrigger>
+            </div>
+          ) : (
+            <div className="text-muted-foreground text-center text-sm">No tokens found.</div>
+          )}
+        </div>
+      </Dialog>
     </div>
   );
 }

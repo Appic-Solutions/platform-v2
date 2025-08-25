@@ -13,7 +13,7 @@ const SolidCard = ({
   return (
     <div
       className={cn(
-        'w-full bg-[#222222]',
+        'w-full bg-[#222222] text-primary',
         size === 'sm'
           ? 'rounded-lg px-1.5 py-px'
           : size === 'md'
