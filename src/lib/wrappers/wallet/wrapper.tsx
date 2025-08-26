@@ -42,6 +42,8 @@ const IdentityKitCustomSignerAuthType = {
 	[Stoic.id]: IdentityKitAuthType.DELEGATION, // does not support icrc27_accounts
 };
 
+// const targets = process.env.NODE_ENV == "production" ? ["4ati2-naaaa-aaaad-qg6la-cai", "2ztvj-yaaaa-aaaap-ahiza-cai"] : [];
+
 
 export const WalletWrapper = ({
 	children,
@@ -53,7 +55,7 @@ export const WalletWrapper = ({
 			<IdentityKitProvider
 				authType={IdentityKitCustomSignerAuthType}
 				signers={[OISY, NFIDW, InternetIdentity, Stoic]}
-				signerClientOptions={{ targets: ["4ati2-naaaa-aaaad-qg6la-cai", "2ztvj-yaaaa-aaaap-ahiza-cai"] }}
+				signerClientOptions={{ targets: ["2ztvj-yaaaa-aaaap-ahiza-cai"] }}
 			>
 				{children}
 			</IdentityKitProvider>

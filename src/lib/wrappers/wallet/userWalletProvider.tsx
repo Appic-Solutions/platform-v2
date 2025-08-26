@@ -3,7 +3,7 @@ import { useAuthenticatedAgent } from '@/lib/hooks/useAuthenticatedAgent';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useSharedStoreActions } from '@/store/store';
 import { Principal } from '@dfinity/principal';
-import { useAccounts, useDelegationType, useIdentity } from '@nfid/identitykit/react';
+import { useAccounts, useIdentity } from '@nfid/identitykit/react';
 import { useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
 
 export const UserWalletProvider = () => {
@@ -20,12 +20,15 @@ export const UserWalletProvider = () => {
 	const icpAccounts = useAccounts();
 	const icpIdentity = useIdentity();
 
+	console.log(icpIdentity, icpAccounts);
+
 	// EVM Wallet Hooks
 	const { isConnected: isEvmConnected, address: evmAddress } = useAppKitAccount();
 	const { chainId } = useAppKitNetwork();
 
 	// Agents
 	const authenticatedAgent = useAuthenticatedAgent();
+	console.log("auth principal", authenticatedAgent?.getPrincipal().then(value => console.log("auth principal value:", value.toText())));
 	const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
 

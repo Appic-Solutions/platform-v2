@@ -313,6 +313,8 @@ export const request_withdraw = async (
 	recipient: string, // Users evm wallet address
 	authenticated_agent: Agent,
 ): Promise<Response<WithdrawalId>> => {
+	console.log(bridge_option);
+	console.log(recipient);
 	// Check if the operator is Appic
 	if (bridge_option.operator === 'Appic') {
 		// Create an actor for the Appic minter
