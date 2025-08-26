@@ -13,17 +13,17 @@ export interface PageParamsItem {
 
 export const PAGE_PARAMS_DATA: PageParamsItem[] = [
   {
+    name: 'dex',
+    icon: <ArrowsUpDownIcon width={20} height={20} className="min-h-5 min-w-5" />,
+  },
+  {
     name: 'bridge',
     icon: <ParkOutlineBridgeIcon width={20} height={20} className="min-h-5 min-w-5" />,
   },
-  {
-    name: 'auto-invest',
-    icon: <BlockchainIcon width={20} height={20} className="min-h-5 min-w-5" />,
-  },
-  {
-    name: 'swap',
-    icon: <ArrowsUpDownIcon width={20} height={20} className="min-h-5 min-w-5" />,
-  },
+  // {
+  //   name: 'auto-invest',
+  //   icon: <BlockchainIcon width={20} height={20} className="min-h-5 min-w-5" />,
+  // },
   {
     name: 'advanced',
     icon: <LockIcon width={20} height={20} className="min-h-5 min-w-5" />,
