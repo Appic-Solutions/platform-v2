@@ -24,7 +24,7 @@ import {
 	generate_twin_token_transfer_fee,
 } from './generate_new_twin_token_symbol';
 import { Chain } from '@/blockchain_api/types/chains';
-import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+import { IcpToken } from '@/blockchain_api/types/tokens';
 import { encode_deploy_erc20_function_data, get_gas_price } from './get_bridge_options';
 import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import { principal_to_bytes32 } from './utils/principal_to_hex';

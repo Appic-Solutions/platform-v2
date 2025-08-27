@@ -1,7 +1,7 @@
 
 import { Actor, Agent } from '@dfinity/agent';
 import { appic_dex } from '@/canister_ids.json';
-import { Result_1 as CollectFeeResult, Balance } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { Result_9 as WithdrawResult, Balance } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { Response } from '@/blockchain_api/types/response';
 import { IcpToken } from '@/blockchain_api/types/tokens';
@@ -25,7 +25,7 @@ export async function withdraw_funds_from_appic_dex(
 
 	try {
 		let withdraw_amount = BigNumber(amount).multipliedBy(BigNumber(10).pow(token.decimals)).decimalPlaces(0).toFixed();
-		let withdraw_result = (await dex_actor.withdraw({ amount: BigInt(withdraw_amount), token: Principal.fromText(token.canisterId) } as Balance)) as CollectFeeResult;
+		let withdraw_result = (await dex_actor.withdraw({ amount: BigInt(withdraw_amount), token: Principal.fromText(token.canisterId) } as Balance)) as WithdrawResult;
 		if ('Err' in withdraw_result) {
 			console.log(withdraw_result.Err);
 			return {
