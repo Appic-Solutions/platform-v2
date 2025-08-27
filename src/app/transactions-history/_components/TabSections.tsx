@@ -7,6 +7,7 @@ import { useSharedStore } from '@/store/store';
 import Image from 'next/image';
 import BridgeContent from './bridge-content';
 import AdvancedContent from './advanced-content';
+import DexContent from './dex-content';
 
 const NeedConnectWallet = ({ title, description }: { title: string; description: string }) => {
   return (
@@ -51,7 +52,18 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
           </TabsTrigger>
         ))}
       </TabsList>
-
+      <TabsContent value="dex" asChild>
+        {evmBalance || icpBalance ? (
+          <div className="flex flex-col items-center justify-center gap-y-6 md:px-2">
+            <DexContent />
+          </div>
+        ) : (
+          <NeedConnectWallet
+            title="Connect your wallet to access history"
+            description="To access the full history of your wallet transactions, please connect your wallet. It’s quick, secure, and easy."
+          />
+        )}
+      </TabsContent>
       <TabsContent value="bridge" asChild>
         {evmBalance || icpBalance ? (
           <div className="flex flex-col items-center justify-center gap-y-6 md:px-2">

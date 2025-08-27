@@ -13,28 +13,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import useLogic from '../_logic';
-import { HttpAgent } from '@dfinity/agent';
-import { get_transaction_history } from '@/blockchain_api/functions/icp/get_bridge_history';
-import { useQuery } from '@tanstack/react-query';
 import { Avatar } from '@/components/common/ui/avatar';
 import Spinner from '@/components/ui/spinner';
 
 export default function BridgeContent() {
   const [itemId, setItemId] = useState<null | number>(null);
-  const { bridgePairs, evmAddress, icpIdentity, unAuthenticatedAgent } = useLogic();
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['bridge-history'],
-    queryFn: async () =>
-      get_transaction_history(
-        evmAddress,
-        icpIdentity,
-        unAuthenticatedAgent as HttpAgent,
-        bridgePairs,
-      ),
-    refetchInterval: 1000 * 60,
-    enabled: !!(bridgePairs && unAuthenticatedAgent && (evmAddress || icpIdentity)),
-  });
+  const { bridgeData, isLoading, isError } = useLogic();
 
   const expandHandler = (id: number) => {
     if (itemId === id) {
@@ -61,7 +45,7 @@ export default function BridgeContent() {
         <Spinner />
       </div>
     );
-  } else if (data?.result.length === 0) {
+  } else if (bridgeData?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
         <Image src="/images/empty.png" alt="" width={100} height={100} />
@@ -69,7 +53,7 @@ export default function BridgeContent() {
       </div>
     );
   } else {
-    return data?.result.map((item, idx) => (
+    return bridgeData?.map((item, idx) => (
       <div
         key={idx}
         className={cn(
@@ -197,7 +181,7 @@ export default function BridgeContent() {
               <div
                 key={idx}
                 className={cn(
-                  'group flex items-center justify-between gap-x-4 h-9',
+                  'group flex h-9 items-center justify-between gap-x-4',
                   'text-sm font-semibold max-md:text-[#898989] md:text-[#6E6E6E] md:dark:text-[#898989]',
                 )}
               >
