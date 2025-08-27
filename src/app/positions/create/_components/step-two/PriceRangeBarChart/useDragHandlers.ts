@@ -1,5 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ScaleLinear } from 'd3-scale';
+import { useWatch } from 'react-hook-form';
+import { useCreatePosition } from '../../../_context/CreatePositionContext';
+import { NORMALIZATION_FACTOR } from '.';
+import BigNumber from 'bignumber.js';
+
+/**
+ * When editing values, use form values directly without making any requests (do not use minOrMaxHandler).
+ * When submitting values, call minOrMaxHandler.
+ * Submit triggers:
+ *   - Price inputs: onBlur event
+ *   - Chart: onMouseUp event
+ **/
 
 export default function useDragHandlers(
   containerRef: React.RefObject<HTMLDivElement>,
@@ -15,14 +27,33 @@ export default function useDragHandlers(
   const startLeftPrice = useRef(leftPrice);
   const startRightPrice = useRef(rightPrice);
 
+  const { createPositionForm, maxOrMinPriceHandler } = useCreatePosition();
+
+  const [formMinPrice, formMaxPrice] = useWatch({
+    control: createPositionForm.control,
+    name: ['minPrice', 'maxPrice'],
+  });
+
+  useEffect(() => {
+    if (BigNumber(formMaxPrice).comparedTo(BigNumber(formMinPrice)) === -1) return;
+
+    const normalizedMinPrice = +formMinPrice / NORMALIZATION_FACTOR;
+    const normalizedMaxPrice = +formMaxPrice / NORMALIZATION_FACTOR;
+
+    setLeftPrice(normalizedMinPrice);
+    setRightPrice(normalizedMaxPrice);
+  }, [formMinPrice, formMaxPrice]);
+
   const handleLeftDrag = useCallback(
     (clientX: number) => {
       if (!containerRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
-      const x = clientX - rect.left;
+      const margin = 2;
+      const minX = rect.left + margin;
+      const maxX = rect.right - margin;
+      const x = Math.max(minX, Math.min(clientX, maxX)) - rect.left;
       let newPrice = xScale.invert(x);
-
       newPrice = Math.min(newPrice, rightPrice);
       setLeftPrice(newPrice);
       debouncedSetPrices(newPrice, rightPrice);
@@ -33,12 +64,14 @@ export default function useDragHandlers(
   const handleRightDrag = useCallback(
     (clientX: number) => {
       if (!containerRef.current) return;
+
       const rect = containerRef.current.getBoundingClientRect();
-      const x = clientX - rect.left;
+      const margin = 2;
+      const minX = rect.left + margin;
+      const maxX = rect.right - margin;
+      const x = Math.max(minX, Math.min(clientX, maxX)) - rect.left;
       let newPrice = xScale.invert(x);
-
       newPrice = Math.max(newPrice, leftPrice);
-
       setRightPrice(newPrice);
       debouncedSetPrices(leftPrice, newPrice);
     },
@@ -68,8 +101,13 @@ export default function useDragHandlers(
   );
 
   const handleMouseUp = useCallback(() => {
+    maxOrMinPriceHandler({
+      maxValue: formMaxPrice !== '0' && formMaxPrice !== '' ? formMaxPrice : 'max',
+      minValue: formMinPrice !== '0' && formMinPrice !== '' ? formMinPrice : 'min',
+    });
+
     setDragging(null);
-  }, []);
+  }, [formMinPrice, formMaxPrice]);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent, handle: 'left' | 'right') => {

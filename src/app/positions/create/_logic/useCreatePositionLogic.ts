@@ -156,6 +156,12 @@ export default function useCreatePositionLogic() {
     const effectiveMinPrice = minValue === '0' ? 'min' : minValue || 'min';
     const effectiveMaxPrice = maxValue === '0' ? 'max' : maxValue || 'max';
 
+    if (
+      createPositionForm.formState.errors.maxPrice ||
+      createPositionForm.formState.errors.minPrice
+    )
+      return;
+
     const alignedPrice = alignMinOrMaxPrice({
       is_token0_selected: isToken0Selected,
       pool_sqrt_x98_price: sqrtPriceX96,
