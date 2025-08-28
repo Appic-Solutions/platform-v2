@@ -44,7 +44,7 @@ const CollectFees = () => {
           errorMessage: null,
         });
       }
-      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
     }
   };
 

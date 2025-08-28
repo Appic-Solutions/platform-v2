@@ -1,3 +1,4 @@
+import { BalanceType } from '@/app/_layout/wallet/_types';
 import { TxStep } from '@/app/swap/_api/types';
 
 export const icpSwapStepsDetails: TxStep[] = [
@@ -34,5 +35,16 @@ export const icpSwapStepsDetails: TxStep[] = [
         description: 'Failed to swap transaction',
       },
     },
+  },
+];
+
+export const tabs: { value: BalanceType; label: string }[] = [
+  {
+    label: 'Wallet',
+    value: 'wallet',
+  },
+  {
+    label: 'Appic dex balance',
+    value: 'dex',
   },
 ];

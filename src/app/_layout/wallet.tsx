@@ -1,27 +1,12 @@
 'use client';
 
-/** What are we doing currently in wallet?
- * LOGIC =====>
- *	1- icp and evm wallet connection logic
- * UI =======>
- * mobile wallet connection (navbar buttons) +
- * desktop wallet connection (navbar buttons) +
- * evm tokens wallet popup +
- * icp tokens wallet popup +
- *
- *  **/
-
-import { cn, getChainLogo } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@nfid/identitykit/react';
-import { useAppKit, useDisconnect } from '@reown/appkit/react';
+import { useDisconnect } from '@reown/appkit/react';
 
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
 
-import WalletCard from './wallet/wallet-card';
 import { WalletPop } from './wallet/wallet-pop';
-import { CloseIcon } from '@/components/icons';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
-import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
@@ -29,6 +14,7 @@ import { getStorageItem } from '@/lib/helpers/localstorage';
 import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { Principal } from '@dfinity/principal';
 import { get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
+import { WalletConnectButtons } from './wallet-connect-buttons';
 
 const WalletPage = () => {
   const [isFirstIcpFetch, setIsFirstIcpFetch] = useState(true);
@@ -37,7 +23,6 @@ const WalletPage = () => {
     icpIdentity,
     evmAddress,
     isEvmConnected,
-    chainId,
     icpBalance,
     evmBalance,
     isEvmBalanceLoading,
@@ -121,8 +106,6 @@ const WalletPage = () => {
     refetchInterval: 1000 * 120,
     staleTime: 0,
     gcTime: 1000 * 60,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
     enabled: !!icpIdentity && !!unAuthenticatedAgent,
   });
 
@@ -137,8 +120,7 @@ const WalletPage = () => {
     enabled: !!evmAddress,
   });
 
-  const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
-  const { open: openEvmModal } = useAppKit();
+  const { disconnect: disconnectIcp } = useAuth();
   const { disconnect: disconnectEvm } = useDisconnect();
 
   const handleDisconnectIcp = () => {
@@ -165,70 +147,7 @@ const WalletPage = () => {
         '*:rounded-full',
       )}
     >
-      {(!icpIdentity || !isEvmConnected) && (
-        <>
-          {/* Mobile wallet connection */}
-          <div className="md:hidden">
-            <Drawer>
-              <DrawerTrigger className="w-full px-3 py-2 text-sm font-medium text-white">
-                {icpIdentity || isEvmConnected ? 'Add Wallet' : 'Connect Wallet'}
-              </DrawerTrigger>
-              <DrawerContent>
-                <DrawerHeader>Select Wallet</DrawerHeader>
-                <div className="flex flex-col gap-4">
-                  {!icpIdentity && (
-                    <WalletCard
-                      connectWallet={connectIcp}
-                      walletLogo="/images/logo/wallet_logos/icp.svg"
-                      walletTitle="Connect ICP Wallet"
-                    />
-                  )}
-                  {!isEvmConnected && (
-                    <WalletCard
-                      connectWallet={openEvmModal}
-                      walletLogo={getChainLogo(chainId)}
-                      walletTitle="Connect EVM Wallet"
-                    />
-                  )}
-                </div>
-              </DrawerContent>
-            </Drawer>
-          </div>
-
-          {/* Desktop wallet connection */}
-          <div className="hidden md:block">
-            <Popover>
-              <PopoverTrigger className="w-full px-3 py-2 text-sm font-medium text-white">
-                {icpIdentity || isEvmConnected ? 'Add Wallet' : 'Connect Wallet'}
-              </PopoverTrigger>
-              <PopoverContent className="flex w-72 translate-y-4 flex-col gap-y-4" align="end">
-                <div className="flex items-center justify-center font-medium text-white">
-                  <PopoverClose className="absolute right-4 top-4">
-                    <CloseIcon width={20} height={20} />
-                  </PopoverClose>
-                  Select Wallet
-                </div>
-                <div className="flex flex-col gap-4">
-                  {!icpIdentity && (
-                    <WalletCard
-                      connectWallet={connectIcp}
-                      walletLogo="/images/logo/wallet_logos/icp.svg"
-                      walletTitle="Connect ICP Wallet"
-                    />
-                  )}
-                  {!isEvmConnected && (
-                    <WalletCard
-                      connectWallet={openEvmModal}
-                      walletLogo="/images/logo/chains-logos/ethereum.svg"
-                      walletTitle="Connect EVM Wallet"
-                    />
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </>
-      )}
+      {(!icpIdentity || !isEvmConnected) && <WalletConnectButtons />}
 
       {icpIdentity && isEvmConnected && (
         <span className="w-full px-3 py-2 text-sm font-medium text-white">Connected Wallets</span>

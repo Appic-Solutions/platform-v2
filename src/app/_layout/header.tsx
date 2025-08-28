@@ -1,20 +1,12 @@
 import Image from 'next/image';
 import Wallet from './wallet';
 import { cn } from '@/lib/utils';
-import { useEffect, useMemo } from 'react';
-import {
-  getPendingTransaction,
-  PendingTransaction,
-  removePendingTransaction,
-} from '@/lib/helpers/session';
-import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { useEffect } from 'react';
+import { getPendingTransaction, PendingTransaction } from '@/lib/helpers/session';
+import { TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
-import { useBridgeActions, useBridgeStore } from '../bridge/_store';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  check_deposit_status,
-  check_withdraw_status,
-} from '@/blockchain_api/functions/icp/bridge_transactions';
+import { useBridgeActions } from '../bridge/_store';
+import { useQuery } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
 import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
@@ -25,10 +17,15 @@ import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_poo
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
   const { setPools, setIcpTokens, setDexData } = useSharedStoreActions();
-  const { pendingTx } = useBridgeStore();
   const { setPendingTx } = useBridgeActions();
 
-  const queryClient = useQueryClient();
+  useEffect(() => {
+    const stored = getStorageItem('icpTokens');
+    if (stored) {
+      const parsedTokens = JSON.parse(stored) as IcpToken[];
+      setIcpTokens(parsedTokens);
+    }
+  }, [setIcpTokens]);
 
   useEffect(() => {
     const pending = getPendingTransaction() as PendingTransaction;
@@ -39,60 +36,7 @@ export default function HeaderPage() {
     }
   }, [evmAddress, icpIdentity, setPendingTx]);
 
-  useQuery({
-    queryKey: ['check-pending-deposit-status'],
-    queryFn: async () => {
-      const res = await check_deposit_status(
-        pendingTx?.id as `0x${string}`,
-        pendingTx?.bridge_option as BridgeOption,
-        unAuthenticatedAgent as HttpAgent,
-      );
-
-      if (!res.success || ['Minted', 'Invalid', 'Quarantined'].includes(res.result)) {
-        setPendingTx(undefined);
-        removePendingTransaction();
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['bridge-history', 'fetch-wallet-balances'] });
-      return res;
-    },
-    refetchInterval: 5000,
-    enabled:
-      !!pendingTx &&
-      !!unAuthenticatedAgent &&
-      pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
-      !!evmAddress,
-  });
-
-  useQuery({
-    queryKey: ['check-pending-withdrawal-status'],
-    queryFn: async () => {
-      const res = await check_withdraw_status(
-        pendingTx?.id as string,
-        pendingTx?.bridge_option as BridgeOption,
-        unAuthenticatedAgent as HttpAgent,
-      );
-
-      if (
-        !res.success ||
-        ['Successful', 'QuarantinedReimbursement', 'Reimbursed'].includes(res.result)
-      ) {
-        setPendingTx(undefined);
-        removePendingTransaction();
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['bridge-history', 'fetch-wallet-balances'] });
-      return res;
-    },
-    refetchInterval: 5000,
-    enabled:
-      !!pendingTx &&
-      !!unAuthenticatedAgent &&
-      pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
-      !!icpIdentity,
-  });
-
-  useQuery({
+  const { data: icpTokens } = useQuery({
     queryKey: ['IcpTokens'],
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
@@ -101,6 +45,7 @@ export default function HeaderPage() {
 
       if (res.result) {
         setStorageItem('icpTokens', JSON.stringify(res.result));
+        setIcpTokens(res.result);
         return res.result;
       }
 
@@ -114,19 +59,14 @@ export default function HeaderPage() {
     gcTime: 1000 * 60 * 10,
   });
 
-  const rawIcpTokens = useMemo(() => {
-    const stored = getStorageItem('icpTokens');
-    return stored ? (JSON.parse(stored) as IcpToken[]) : [];
-  }, []);
-
   const { data: allPools } = useQuery({
     queryKey: ['icp-pools'],
     queryFn: async () => {
-      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, rawIcpTokens);
+      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
       if (!response.success) throw new Error('Failed to fetch all pools');
       return response.result;
     },
-    enabled: !!unAuthenticatedAgent && rawIcpTokens.length > 0,
+    enabled: !!unAuthenticatedAgent && !!icpTokens?.length,
     retry: false,
   });
 
@@ -135,13 +75,13 @@ export default function HeaderPage() {
     queryFn: async () => {
       const response = await get_dex_data(
         unAuthenticatedAgent as HttpAgent,
-        rawIcpTokens,
+        icpTokens || [],
         allPools as Pool[],
       );
       if (!response.success) throw new Error('Failed to fetch dex data');
       return response.result;
     },
-    enabled: !!unAuthenticatedAgent && rawIcpTokens.length > 0 && !!allPools?.length,
+    enabled: !!unAuthenticatedAgent && !!icpTokens?.length && !!allPools?.length,
     retry: false,
   });
 
@@ -152,12 +92,6 @@ export default function HeaderPage() {
   useEffect(() => {
     if (dexData) setDexData(dexData);
   }, [dexData, setDexData]);
-
-  useEffect(() => {
-    if (rawIcpTokens.length > 0) {
-      setIcpTokens(rawIcpTokens);
-    }
-  }, [rawIcpTokens, setIcpTokens]);
 
   return (
     <header className={cn('flex w-full items-center justify-between', 'mb-5 xl:mt-4')}>

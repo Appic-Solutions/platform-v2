@@ -1,6 +1,6 @@
 import { Avatar } from '@/components/common/ui/avatar';
 import React from 'react';
-import { FormattedToken } from './wallet-pop';
+import { FormattedToken } from './_types';
 
 export const WalletBalanceItems = ({ tokens }: { tokens: FormattedToken[] }) => {
   return (

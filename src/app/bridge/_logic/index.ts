@@ -59,8 +59,8 @@ export const BridgeLogic = () => {
         });
         setTxHash(undefined);
       }
-      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
-      queryClient.refetchQueries({ queryKey: ['fetch-evm-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
       return res;
     },
     refetchInterval: 1000 * 5,

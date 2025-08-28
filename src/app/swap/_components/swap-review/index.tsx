@@ -96,7 +96,7 @@ export const StepperContainer = () => {
           status: 'successful',
         });
       }
-      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
     }
   };
 

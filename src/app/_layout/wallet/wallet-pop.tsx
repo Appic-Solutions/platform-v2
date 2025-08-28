@@ -11,7 +11,7 @@ import {
   getCountedNumber,
   getFormattedWalletAddress,
 } from '@/lib/utils';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import WalletChart from './wallet-chart';
 
 import WalletPopSkeletonDesktop from './wallet-pop-skeleton-dektop';
@@ -21,50 +21,9 @@ import { DexBalanceItems } from './dex-balance-items';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
 import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
-import { IcpTokensBalances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { useQueryClient } from '@tanstack/react-query';
-
-export type WalletBalance =
-  | IcpTokensBalances
-  | {
-      tokens: EvmToken[];
-      totalBalanceUsd: string;
-    };
-
-export type WalletCardProps = {
-  logo: string;
-  title: string;
-  balance: WalletBalance | undefined;
-  disconnect: () => void;
-  isLoading: boolean;
-  address: string;
-} & (
-  | {
-      hasMoreToken?: true;
-    }
-  | {
-      hasMoreToken?: false;
-    }
-);
-
-export type FormattedToken = (IcpToken | EvmToken) & {
-  displayUsd: string;
-  chainName: string;
-  chainLogo: string;
-};
-
-type BalanceType = 'wallet' | 'dex';
-
-const tabs: { value: BalanceType; label: string }[] = [
-  {
-    label: 'Wallet',
-    value: 'wallet',
-  },
-  {
-    label: 'Appic dex balance',
-    value: 'dex',
-  },
-];
+import { BalanceType, FormattedToken, WalletCardProps } from './_types';
+import { tabs } from '@/lib/constants/swap';
 
 export function WalletPop({
   logo,
@@ -77,17 +36,22 @@ export function WalletPop({
 }: WalletCardProps) {
   const [showCopyPopover, setShowCopyPopover] = useState(false);
   const [activeTab, setActiveTab] = useState<BalanceType>('wallet');
+  const [isIcpWallet, setIsIcpWallet] = useState(false);
   const queryClient = useQueryClient();
 
-  const isIcpWallet = balance && 'dex_tokens' in balance;
+  useEffect(() => {
+    if (balance && 'dex_tokens' in balance) {
+      setIsIcpWallet(true);
+    } else {
+      setIsIcpWallet(false);
+    }
+  }, [balance]);
 
   const refetchBalanceHandler = () => {
     if (isIcpWallet) {
-      console.log(queryClient.getQueryCache().findAll());
-
-      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
     } else {
-      queryClient.refetchQueries({ queryKey: ['fetch-evm-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
     }
   };
 
@@ -107,7 +71,7 @@ export function WalletPop({
 
     if (isIcpWallet && activeTab === 'wallet') {
       mainTokens = balance.tokens;
-    } else if (isIcpWallet && activeTab === 'dex') {
+    } else if ('dex_tokens' in balance && activeTab === 'dex') {
       mainTokens = balance.dex_tokens;
     } else {
       mainTokens = balance.tokens;
@@ -125,6 +89,7 @@ export function WalletPop({
 
   return (
     <>
+      {/* mobile */}
       <div className="flex items-center justify-center md:hidden">
         <Drawer>
           <DrawerTrigger>
@@ -163,21 +128,23 @@ export function WalletPop({
                   </button>
                 </div>
 
-                <div className="flex w-full justify-between text-primary">
-                  {tabs.map((tab) => (
-                    <Button
-                      key={tab.value}
-                      onClick={() => setActiveTab(tab.value)}
-                      variant={'ghost'}
-                      className={cn(
-                        'w-full rounded-none border-b',
-                        activeTab === tab.value ? 'border-b-primary' : 'border-b-transparent',
-                      )}
-                    >
-                      {tab.label}
-                    </Button>
-                  ))}
-                </div>
+                {isIcpWallet && (
+                  <div className="flex w-full justify-between text-primary">
+                    {tabs.map((tab) => (
+                      <Button
+                        key={tab.value}
+                        onClick={() => setActiveTab(tab.value)}
+                        variant={'ghost'}
+                        className={cn(
+                          'w-full rounded-none border-b',
+                          activeTab === tab.value ? 'border-b-primary' : 'border-b-transparent',
+                        )}
+                      >
+                        {tab.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
@@ -262,21 +229,23 @@ export function WalletPop({
                   </button>
                 </div>
 
-                <div className="flex w-full justify-between text-primary">
-                  {tabs.map((tab) => (
-                    <Button
-                      key={tab.value}
-                      onClick={() => setActiveTab(tab.value)}
-                      variant={'ghost'}
-                      className={cn(
-                        'w-full rounded-none border-b',
-                        activeTab === tab.value ? 'border-b-primary' : 'border-b-transparent',
-                      )}
-                    >
-                      {tab.label}
-                    </Button>
-                  ))}
-                </div>
+                {isIcpWallet && 'dex_tokens' in balance && balance.dex_tokens.length && (
+                  <div className="flex w-full justify-between text-primary">
+                    {tabs.map((tab) => (
+                      <Button
+                        key={tab.value}
+                        onClick={() => setActiveTab(tab.value)}
+                        variant={'ghost'}
+                        className={cn(
+                          'w-full rounded-none border-b',
+                          activeTab === tab.value ? 'border-b-primary' : 'border-b-transparent',
+                        )}
+                      >
+                        {tab.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
@@ -296,7 +265,7 @@ export function WalletPop({
 
                 <hr className="bg-[#494949]" />
                 <div className="text-dark flex items-center justify-between text-sm font-semibold dark:text-white">
-                  {activeTab === 'dex' && isIcpWallet ? (
+                  {activeTab === 'dex' && 'dex_tokens' in balance ? (
                     <>
                       <span>Dex Total :</span>
                       <span>$ {getCountedNumber(Number(balance.totalDexBalances), 2)}</span>
