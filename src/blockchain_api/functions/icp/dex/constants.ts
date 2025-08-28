@@ -7,11 +7,11 @@ export const FEE_TIERS = [
 ] as const;
 
 export const FEE_TIERS_DESC_MAP = new Map<number, string>()
-  .set(100, 'Best for very stable pairs.')
-  .set(500, 'Best for stable pairs.')
-  .set(1000, 'Good for stable pairs.')
-  .set(3000, 'Best for most pairs.')
-  .set(10000, 'Best for exotic pairs.');
+  .set(100, 'Lowest fees for ultra-stable pairs.')
+  .set(500, 'Low fees for stable pairs.')
+  .set(1000, 'Great for stable pairs with low fees.')
+  .set(3000, 'Best for most trading pairs.')
+  .set(10000, 'Ideal for exotic, volatile pairs.');
 
 export function getTickSpacing(fee: number): number | undefined {
   const tickSpacingMap: { [key: number]: number } = {
