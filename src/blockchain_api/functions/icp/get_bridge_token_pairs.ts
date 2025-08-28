@@ -154,6 +154,7 @@ async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken |
 					bridgePairs: [],
 					usdPrice: final_usd_price,
 					rank: 1,
+					listed_on_appic_dex: icp_token.listed_on_appic_dex[0] || false
 				});
 			}
 

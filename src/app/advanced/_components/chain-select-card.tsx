@@ -8,20 +8,23 @@ interface ChainSelectCardProps {
   value?: Chain | undefined;
   onClick: () => void;
   error?: string;
+  selectedAllTokens: boolean;
 }
 
-export default function ChainSelectCard({ label, value, onClick, error }: ChainSelectCardProps) {
+export default function ChainSelectCard({
+  label,
+  value,
+  onClick,
+  error,
+  selectedAllTokens,
+}: ChainSelectCardProps) {
   const chainId = value?.chainId;
   const hasValue = chainId || chainId === 0;
 
   return (
     <div className="flex w-full flex-col gap-y-1">
       <Card
-        className={cn(
-          'max-h-[133px] md:max-h-[155px]',
-          'flex-col items-start justify-center gap-2',
-          'cursor-pointer',
-        )}
+        className={cn('flex-col items-start justify-center gap-2', 'cursor-pointer')}
         onClick={onClick}
       >
         <p className="text-sm font-semibold">{label}</p>
@@ -31,9 +34,7 @@ export default function ChainSelectCard({ label, value, onClick, error }: ChainS
             src={getChainLogo(chainId)}
             className="h-12 w-12"
           />
-          <p
-            className={cn('text-nowrap', getChainName(chainId).length > 3 && 'w-40 text-ellipsis')}
-          >
+          <p className={cn(selectedAllTokens ? 'line-clamp-1 md:w-20' : '')}>
             {hasValue ? `${getChainName(chainId)} (${getChainSymbol(chainId)})` : 'Select Chain'}
           </p>
         </div>

@@ -29,11 +29,11 @@ const types = [
   { label: 'All', value: 'All' },
   { label: 'Swap', value: 'Swap' },
   { label: 'Collected Fees', value: 'CollectedFees' },
-  { label: 'Created Pool', value: 'CreatedPool' },
-  { label: 'Burnt Position', value: 'BurntPosition' },
+  { label: 'Created Pools', value: 'CreatedPool' },
+  { label: 'Burnt Positions', value: 'BurntPosition' },
   { label: 'Increased Liquidity', value: 'IncreasedLiquidity' },
   { label: 'Decreased Liquidity', value: 'DecreasedLiquidity' },
-  { label: 'Minted Position', value: 'MintedPosition' },
+  { label: 'Minted Positions', value: 'MintedPosition' },
 ];
 
 export default function DexContent() {
@@ -87,10 +87,11 @@ export default function DexContent() {
 
       {filteredData && filteredData.length > 0 ? (
         filteredData.map((item, idx) => {
-          const { date, time, status, type } = item;
+          const { date, time, status, type, label } = item;
 
           return (
             <div
+              key={idx}
               className={cn(
                 'overflow-hidden',
                 'flex w-full flex-col gap-y-4 bg-input-fields bg-cover bg-center bg-no-repeat shadow-md',
@@ -184,55 +185,57 @@ export default function DexContent() {
               )}
 
               {/* Footer */}
-              <div
-                className={cn(
-                  'flex items-center justify-between gap-x-4 text-xs font-bold',
-                  'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
-                  '*:flex *:flex-1 *:flex-col *:justify-center',
-                )}
-              >
-                <div>
-                  <p>
-                    {type === 'Swap'
-                      ? `${item.token_in.symbol} on ${getChainName(item.token_in.chainId)}`
-                      : `${item.token0.symbol} Amount`}
-                  </p>
-                  <p className="text-xl leading-7 max-md:text-white">
-                    {type === 'Swap'
-                      ? Number(item.human_readable_final_amount_in).toFixed(5)
-                      : 'human_readable_amount0_paid' in item
-                        ? Number(item.human_readable_amount0_paid).toFixed(5)
-                        : 'human_readable_amount0_received' in item
-                          ? Number(item.human_readable_amount0_received).toFixed(5)
-                          : 'human_readable_amount0_collected' in item
-                            ? Number(item.human_readable_amount0_collected).toFixed(5)
-                            : ''}
-                  </p>
-                </div>
+              {type === 'CreatedPool' ? null : (
+                <div
+                  className={cn(
+                    'flex items-center justify-between gap-x-4 text-xs font-bold',
+                    'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
+                    '*:flex *:flex-1 *:flex-col *:justify-center',
+                  )}
+                >
+                  <div>
+                    <p>
+                      {type === 'Swap'
+                        ? `${item.token_in.symbol} on ${getChainName(item.token_in.chainId)}`
+                        : `${item.token0.symbol} Amount`}
+                    </p>
+                    <p className="text-xl leading-7 max-md:text-white">
+                      {type === 'Swap'
+                        ? Number(item.human_readable_final_amount_in).toFixed(5)
+                        : 'human_readable_amount0_paid' in item
+                          ? Number(item.human_readable_amount0_paid).toFixed(5)
+                          : 'human_readable_amount0_received' in item
+                            ? Number(item.human_readable_amount0_received).toFixed(5)
+                            : 'human_readable_amount0_collected' in item
+                              ? Number(item.human_readable_amount0_collected).toFixed(5)
+                              : ''}
+                    </p>
+                  </div>
 
-                <div className="items-center text-center max-md:hidden">
-                  {status === 'Successful' ? `Successful ${type}` : `${type} Failed`}
-                </div>
+                  <div className="items-center text-center max-md:hidden">
+                    {status === 'Successful' ? `Successful ${type}` : `${type} Failed`}
+                  </div>
 
-                <div className="items-end">
-                  <p>
-                    {type === 'Swap'
-                      ? `${item.token_out.symbol} on ${getChainName(item.token_out.chainId)}`
-                      : `${item.token1.symbol} Amount`}
-                  </p>
-                  <p className="text-xl leading-7 max-md:text-white">
-                    {type === 'Swap'
-                      ? Number(item.human_readable_final_amount_out).toFixed(5)
-                      : 'human_readable_amount1_paid' in item
-                        ? Number(item.human_readable_amount1_paid).toFixed(5)
-                        : 'human_readable_amount1_received' in item
-                          ? Number(item.human_readable_amount1_received).toFixed(5)
-                          : 'human_readable_amount1_collected' in item
-                            ? Number(item.human_readable_amount1_collected).toFixed(5)
-                            : ''}
-                  </p>
+                  <div className="items-end">
+                    <p>
+                      {type === 'Swap'
+                        ? `${item.token_out.symbol} on ${getChainName(item.token_out.chainId)}`
+                        : `${item.token1.symbol} Amount`}
+                    </p>
+                    <p className="text-xl leading-7 max-md:text-white">
+                      {type === 'Swap'
+                        ? Number(item.human_readable_final_amount_out).toFixed(5)
+                        : 'human_readable_amount1_paid' in item
+                          ? Number(item.human_readable_amount1_paid).toFixed(5)
+                          : 'human_readable_amount1_received' in item
+                            ? Number(item.human_readable_amount1_received).toFixed(5)
+                            : 'human_readable_amount1_collected' in item
+                              ? Number(item.human_readable_amount1_collected).toFixed(5)
+                              : ''}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           );
         })

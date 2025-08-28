@@ -48,8 +48,10 @@ export const UserWalletProvider = () => {
 			}
 		}
 		if (icpIdentity != undefined && authenticatedAgent) {
-			setIcpIdentity(icpIdentity.getPrincipal());
-			setAuthenticatedAgent(authenticatedAgent);
+			if (icpIdentity.getPrincipal() !== Principal.anonymous()) {
+				setIcpIdentity(icpIdentity.getPrincipal());
+				setAuthenticatedAgent(authenticatedAgent);
+			}
 		}
 
 	}, [icpAccounts, icpIdentity, authenticatedAgent, setIcpIdentity, setAuthenticatedAgent]);

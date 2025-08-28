@@ -37,7 +37,7 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
   );
 
   return (
-    <Box className="h-full justify-between gap-y-5 md:h-auto md:max-w-[533px]">
+    <Box className="h-full justify-between gap-y-5 md:h-auto md:max-w-[537px]">
       {/* Header */}
       <div
         className={cn(
