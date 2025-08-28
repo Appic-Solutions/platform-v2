@@ -29,11 +29,11 @@ const types = [
   { label: 'All', value: 'All' },
   { label: 'Swap', value: 'Swap' },
   { label: 'Collected Fees', value: 'CollectedFees' },
-  { label: 'Created Pool', value: 'CreatedPool' },
-  { label: 'Burnt Position', value: 'BurntPosition' },
+  { label: 'Created Pools', value: 'CreatedPool' },
+  { label: 'Burnt Positions', value: 'BurntPosition' },
   { label: 'Increased Liquidity', value: 'IncreasedLiquidity' },
   { label: 'Decreased Liquidity', value: 'DecreasedLiquidity' },
-  { label: 'Minted Position', value: 'MintedPosition' },
+  { label: 'Minted Positions', value: 'MintedPosition' },
 ];
 
 export default function DexContent() {
@@ -87,7 +87,7 @@ export default function DexContent() {
 
       {filteredData && filteredData.length > 0 ? (
         filteredData.map((item, idx) => {
-          const { date, time, status, type } = item;
+          const { date, time, status, type, label } = item;
 
           return (
             <div
