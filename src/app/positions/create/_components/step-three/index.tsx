@@ -18,12 +18,20 @@ import CreatePositionStepper from './create-position-stepper';
 import { createPositionStepsDetails } from '@/lib/constants/positions';
 import { useSharedStore } from '@/store/store';
 import { Principal } from '@dfinity/principal';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreatePositionStepThree() {
-  const { isToken0Selected, createPositionForm, setStep, executeMintPosition, existPool } =
-    useCreatePosition();
+  const {
+    isToken0Selected,
+    createPositionForm,
+    setStep,
+    executeMintPosition,
+    existPool,
+    resetTransaction,
+  } = useCreatePosition();
   const [isOpen, setIsOpen] = useState(false);
   const { authenticatedAgent, unAuthenticatedAgent } = useSharedStore();
+  const queryClient = useQueryClient();
 
   const [
     token0,
@@ -59,10 +67,10 @@ export default function CreatePositionStepThree() {
   const token0DepositAmountInUsd = parseFloat(token0DepositAmount) * parseFloat(token0.usdPrice);
   const token1DepositAmountInUsd = parseFloat(token1DepositAmount) * parseFloat(token1.usdPrice);
 
-  const openModalHandler = () => {
+  const openModalHandler = async () => {
     setIsOpen(true);
     if (authenticatedAgent && unAuthenticatedAgent) {
-      executeMintPosition({
+      await executeMintPosition({
         amount0_max: token0DepositAmount,
         amount1_max: token1DepositAmount,
         authenticatedAgent,
@@ -81,7 +89,13 @@ export default function CreatePositionStepThree() {
         token1,
         unAuthenticatedAgent,
       });
+      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
     }
+  };
+
+  const onCloseModal = () => {
+    setIsOpen(false);
+    resetTransaction();
   };
 
   return (
@@ -206,10 +220,7 @@ export default function CreatePositionStepThree() {
           onInteractOutside={(e) => e.preventDefault()}
           className="h-[350] w-fit min-w-80"
         >
-          <CreatePositionStepper
-            onCloseModal={() => setIsOpen(false)}
-            steps={createPositionStepsDetails}
-          />
+          <CreatePositionStepper onCloseModal={onCloseModal} steps={createPositionStepsDetails} />
         </DialogContent>
       </DialogOverlay>
     </Dialog>

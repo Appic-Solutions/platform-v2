@@ -38,7 +38,7 @@ export const TransactionStep = ({
 
   const onNavigateToHistory = () => {
     onCloseModal();
-    router.push('/transactions-history/bridge');
+    router.push('/transactions-history/dex');
     actions.setTxStep({ count: 1, status: 'pending' });
     actions.setPrevTxStep({
       count: 0,

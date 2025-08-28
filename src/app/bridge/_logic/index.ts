@@ -9,7 +9,6 @@ import {
   check_withdraw_status,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
 
@@ -60,8 +59,8 @@ export const BridgeLogic = () => {
         });
         setTxHash(undefined);
       }
-      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
-      fetchWalletBalances();
+      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.refetchQueries({ queryKey: ['fetch-evm-balances'] });
       return res;
     },
     refetchInterval: 1000 * 5,
@@ -103,32 +102,15 @@ export const BridgeLogic = () => {
         });
         setWithdrawalId(undefined);
       }
-      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
-      fetchWalletBalances();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] }),
+        queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] }),
+      ]);
       return res;
     },
     refetchInterval: 1000 * 5,
     enabled: !!withdrawalId && !!selectedOption && !!unAuthenticatedAgent,
   });
-
-  function fetchWalletBalances() {
-    if (evmAddress && unAuthenticatedAgent) {
-      fetchEvmBalances({
-        evmAddress,
-      }).then((res) => {
-        setEvmBalance(res);
-      });
-    }
-    if (unAuthenticatedAgent && icpIdentity) {
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        principal: icpIdentity,
-        top_tokens: true,
-      }).then((res) => {
-        setIcpBalance(res);
-      });
-    }
-  }
 
   // set data and last fetch time in localstorage
   function setBridgePairsWithTime(data: (EvmToken | IcpToken)[]) {

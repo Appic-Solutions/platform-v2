@@ -13,14 +13,13 @@ import {
 } from '@/blockchain_api/functions/icp/dex/tx/add_liquidity';
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { useRouter } from 'next/navigation';
-import { QueryClient } from '@tanstack/react-query';
-import { fetchIcpBalances } from '@/lib/helpers/wallet';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AddLiquidityStepTwo() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFreshRequest, setIsFreshRequest] = useState(true);
   const router = useRouter();
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
 
   const {
     token0DepositAmount,
@@ -89,13 +88,7 @@ export default function AddLiquidityStepTwo() {
           status: 'successful',
           errorMessage: null,
         });
-        fetchIcpBalances({
-          unAuthenticatedAgent,
-          principal: icpIdentity,
-          top_tokens: false,
-        }).then((res) => {
-          setIcpBalance(res);
-        });
+        queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
       }
     }
   };

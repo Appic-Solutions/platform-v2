@@ -11,7 +11,7 @@ import { collectFeesStepsDetails } from '@/lib/constants/positions';
 import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
-import { fetchIcpBalances } from '@/lib/helpers/wallet';
+import { useQueryClient } from '@tanstack/react-query';
 
 const CollectFees = () => {
   const [isFreshRequest, setIsFreshRequest] = useState(true);
@@ -20,6 +20,7 @@ const CollectFees = () => {
   const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
   const { setIcpBalance } = useSharedStoreActions();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   if (!selectedPosition) {
     router.push('/positions');
@@ -43,13 +44,7 @@ const CollectFees = () => {
           errorMessage: null,
         });
       }
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        principal: icpIdentity,
-        top_tokens: false,
-      }).then((res) => {
-        setIcpBalance(res);
-      });
+      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
     }
   };
 

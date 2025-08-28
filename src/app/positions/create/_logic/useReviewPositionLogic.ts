@@ -1,5 +1,4 @@
 import { GenerateMintPositionArgsParams } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
-import { Position } from '@/blockchain_api/functions/icp/dex/get_positions';
 import {
   generate_args_and_approve_mint_position,
   mint_position,

@@ -83,9 +83,11 @@ export function WalletPop({
 
   const refetchBalanceHandler = () => {
     if (isIcpWallet) {
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+      console.log(queryClient.getQueryCache().findAll());
+
+      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
     } else {
-      queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
+      queryClient.refetchQueries({ queryKey: ['fetch-evm-balances'] });
     }
   };
 
@@ -309,9 +311,7 @@ export function WalletPop({
 
                 {hasMoreToken && (
                   <button
-                    onClick={() => {
-                      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
-                    }}
+                    onClick={refetchBalanceHandler}
                     className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                     disabled={isLoading}
                   >

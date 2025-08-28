@@ -9,6 +9,7 @@ import { icpSwapStepsDetails } from '@/lib/constants/swap';
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { approve_token_in, swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
 import { fetchIcpBalances } from '@/app/_layout/wallet/_api';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +25,7 @@ export const StepperContainer = () => {
     setToWalletAddress,
     setWithdrawalId,
   } = useSwapActions();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (tokenIn?.chain_type === 'EVM') {
@@ -94,13 +96,7 @@ export const StepperContainer = () => {
           status: 'successful',
         });
       }
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        principal: icpIdentity,
-        top_tokens: false,
-      }).then((res) => {
-        setIcpBalance(res);
-      });
+      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
     }
   };
 

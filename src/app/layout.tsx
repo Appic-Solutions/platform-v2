@@ -13,13 +13,6 @@ import NavbarPage from './_layout/navbar';
 
 import { Lora, Rethink_Sans } from 'next/font/google';
 
-const lora = Lora({
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-lora',
-});
-
 const rethinkSans = Rethink_Sans({
   subsets: ['latin'],
   display: 'swap',

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/
 import { removeLiquidityStepsDetails } from '@/lib/constants/positions';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useSharedStore, useSharedStoreActions } from '@/store/store';
+import { useSharedStore } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import {
   generate_decrease_liquidity_args,
@@ -17,7 +17,7 @@ import {
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { DecreaseLiquidityArgs } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
-import { fetchIcpBalances } from '@/lib/helpers/wallet';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   position: FormattedPosition;
@@ -33,9 +33,9 @@ export default function RemoveLiquidityStepTwo({
   const [isFreshRequest, setIsFreshRequest] = useState(true);
   const { actions, selectedPosition, mintStep } = usePositionDetailsStore();
   const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
-  const { setIcpBalance } = useSharedStoreActions();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   if (!selectedPosition) {
     router.push('/positions');
@@ -104,13 +104,7 @@ export default function RemoveLiquidityStepTwo({
         status: 'successful',
         errorMessage: null,
       });
-      fetchIcpBalances({
-        unAuthenticatedAgent,
-        principal: icpIdentity,
-        top_tokens: false,
-      }).then((res) => {
-        setIcpBalance(res);
-      });
+      queryClient.refetchQueries({ queryKey: ['fetch-icp-balances'] });
     }
   };
 
