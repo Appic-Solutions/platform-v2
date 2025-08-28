@@ -13,7 +13,7 @@ export default function TransactionsHistoryPage({ params }: { params: PageParams
     <Box
       className={cn(
         'flex h-full flex-col justify-start gap-4 overflow-visible duration-300 ease-in-out',
-        'gap-y-6 md:max-h-[750px] md:min-h-[10vh] md:max-w-[510px] lg:max-w-[533px]',
+        'gap-y-6 md:max-h-[650px] md:min-h-[10vh] md:max-w-[510px] lg:max-w-[533px]',
       )}
     >
       {/* Head Title */}

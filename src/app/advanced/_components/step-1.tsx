@@ -50,6 +50,8 @@ export default function Step1({ methods, isLoading }: Step1Props) {
 
   const handleClose = () => setActiveField(null);
 
+  const selectedAllTokens = !!twinChain && !!baseChain;
+
   if (activeField) {
     return (
       <TokenListPage
@@ -76,32 +78,30 @@ export default function Step1({ methods, isLoading }: Step1Props) {
       </div>
 
       <div className="flex w-full flex-col gap-y-4">
-        {/* Base Chain */}
-        <ChainSelectCard
-          label="From Chain"
-          value={baseChain}
-          onClick={() => handleOpen('baseChain')}
-          error={formState.errors.baseChain?.message}
-        />
+        <div className={cn('flex flex-col gap-4', selectedAllTokens && 'md:flex-row')}>
+          {/* Base Chain */}
+          <ChainSelectCard
+            label="From Chain"
+            value={baseChain}
+            onClick={() => handleOpen('baseChain')}
+            error={formState.errors.baseChain?.message}
+            selectedAllTokens={selectedAllTokens}
+          />
 
-        {/* Twin Chain */}
-        <ChainSelectCard
-          label="To Chain"
-          value={twinChain}
-          onClick={() => handleOpen('twinChain')}
-          error={formState.errors.twinChain?.message}
-        />
+          {/* Twin Chain */}
+          <ChainSelectCard
+            label="To Chain"
+            value={twinChain}
+            onClick={() => handleOpen('twinChain')}
+            error={formState.errors.twinChain?.message}
+            selectedAllTokens={selectedAllTokens}
+          />
+        </div>
 
         {/* Input */}
         {baseChain && (
           <div className="flex w-full flex-col gap-y-1">
-            <Card
-              className={cn(
-                'max-h-[133px] md:max-h-[155px]',
-                'flex-col items-start justify-center gap-2',
-                'cursor-pointer',
-              )}
-            >
+            <Card className={cn('flex-col items-start justify-center gap-2', 'cursor-pointer')}>
               <p className="text-sm font-semibold">{inputLabel}</p>
               <RHFInput
                 name="canisterIdOrTokenAddress"
