@@ -128,7 +128,7 @@ export function WalletPop({
                   </button>
                 </div>
 
-                {isIcpWallet && (
+                {isIcpWallet && 'dex_tokens' in balance && balance.dex_tokens.length && (
                   <div className="flex w-full justify-between text-primary">
                     {tabs.map((tab) => (
                       <Button
