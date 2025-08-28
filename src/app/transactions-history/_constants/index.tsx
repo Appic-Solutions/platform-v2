@@ -14,7 +14,7 @@ export interface PageParamsItem {
 export const PAGE_PARAMS_DATA: PageParamsItem[] = [
   {
     name: 'dex',
-    icon: <ArrowsUpDownIcon width={20} height={20} className="min-h-5 min-w-5" />,
+    icon: <BlockchainIcon width={20} height={20} className="min-h-5 min-w-5" />,
   },
   {
     name: 'bridge',
