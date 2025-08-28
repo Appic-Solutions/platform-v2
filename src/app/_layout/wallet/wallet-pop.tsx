@@ -11,42 +11,60 @@ import {
   getCountedNumber,
   getFormattedWalletAddress,
 } from '@/lib/utils';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
 import { useMemo, useState } from 'react';
 import WalletChart from './wallet-chart';
-import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
+
 import WalletPopSkeletonDesktop from './wallet-pop-skeleton-dektop';
-import { Avatar } from '@/components/common/ui/avatar';
 import BigNumber from 'bignumber.js';
+import { WalletBalanceItems } from './wallet-balance-items';
+import { DexBalanceItems } from './dex-balance-items';
+import { Button } from '@/components/ui/button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
+import WalletPopSkeletonMobile from './wallet-pop-skeleton-mobile';
+import { IcpTokensBalances } from '@/blockchain_api/functions/icp/get_icp_balances';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type WalletBalance =
-  | {
-      tokens: IcpToken[];
-      totalBalanceUsd: string;
-    }
+  | IcpTokensBalances
   | {
       tokens: EvmToken[];
       totalBalanceUsd: string;
     };
 
-type WalletCardProps = {
+export type WalletCardProps = {
   logo: string;
   title: string;
   balance: WalletBalance | undefined;
   disconnect: () => void;
   isLoading: boolean;
   address: string;
-  refetchBalance: () => void;
 } & (
   | {
       hasMoreToken?: true;
-      loadMoreHandler: () => void;
     }
   | {
-      loadMoreHandler?: never;
       hasMoreToken?: false;
     }
 );
+
+export type FormattedToken = (IcpToken | EvmToken) & {
+  displayUsd: string;
+  chainName: string;
+  chainLogo: string;
+};
+
+type BalanceType = 'wallet' | 'dex';
+
+const tabs: { value: BalanceType; label: string }[] = [
+  {
+    label: 'Wallet',
+    value: 'wallet',
+  },
+  {
+    label: 'Appic dex balance',
+    value: 'dex',
+  },
+];
 
 export function WalletPop({
   logo,
@@ -55,11 +73,21 @@ export function WalletPop({
   disconnect,
   address,
   isLoading,
-  refetchBalance,
   hasMoreToken,
-  loadMoreHandler,
 }: WalletCardProps) {
   const [showCopyPopover, setShowCopyPopover] = useState(false);
+  const [activeTab, setActiveTab] = useState<BalanceType>('wallet');
+  const queryClient = useQueryClient();
+
+  const isIcpWallet = balance && 'dex_tokens' in balance;
+
+  const refetchBalanceHandler = () => {
+    if (isIcpWallet) {
+      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+    } else {
+      queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
+    }
+  };
 
   const copyToClipboardHandler = (address: string) => {
     copyToClipboard(address).then((res) => {
@@ -70,10 +98,20 @@ export function WalletPop({
     });
   };
 
-  const formattedTokens = useMemo(() => {
+  const formattedTokens: FormattedToken[] = useMemo(() => {
     if (!balance) return [];
 
-    return [...balance.tokens]
+    let mainTokens: IcpToken[] | EvmToken[];
+
+    if (isIcpWallet && activeTab === 'wallet') {
+      mainTokens = balance.tokens;
+    } else if (isIcpWallet && activeTab === 'dex') {
+      mainTokens = balance.dex_tokens;
+    } else {
+      mainTokens = balance.tokens;
+    }
+
+    return [...mainTokens]
       .sort((a, b) => new BigNumber(b.usdBalance || '0').minus(a.usdBalance || '0').toNumber())
       .map((token) => ({
         ...token,
@@ -81,11 +119,10 @@ export function WalletPop({
         chainName: getChainName(token.chainId),
         chainLogo: getChainLogo(token.chainId),
       }));
-  }, [balance]);
+  }, [balance, activeTab]);
 
   return (
     <>
-      {/* mobile */}
       <div className="flex items-center justify-center md:hidden">
         <Drawer>
           <DrawerTrigger>
@@ -95,7 +132,7 @@ export function WalletPop({
             <DrawerHeader className="pl-10">
               {title}
               <ArrowPathIcon
-                onClick={refetchBalance}
+                onClick={refetchBalanceHandler}
                 className={cn(
                   'absolute left-4 top-14',
                   isLoading
@@ -124,44 +161,41 @@ export function WalletPop({
                   </button>
                 </div>
 
-                {formattedTokens.length > 0 ? (
-                  <>
-                    <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-                      <span>Token</span>
-                      Value
-                    </div>
-                    <div className="flex flex-col gap-y-5">
-                      {formattedTokens.map((token, idx) => (
-                        <div
-                          key={idx}
-                          className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
-                        >
-                          <div className="relative flex items-center gap-x-5">
-                            <Avatar src={token.logo} className="h-8 w-8" />
-                            <Avatar
-                              src={token.chainLogo}
-                              className="absolute left-8 top-5 h-3.5 w-3.5"
-                            />
-                            <span>{`${token.symbol} (${token.chainName})`}</span>
-                          </div>
-                          <span>$ {token.displayUsd}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <hr className="bg-[#494949]" />
-                    <div className="text-dark flex items-center justify-between text-sm font-semibold dark:text-white">
-                      <span>Total :</span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center text-sm font-semibold text-white">
-                    No tokens found
+                <div className="flex w-full justify-between text-primary">
+                  {tabs.map((tab) => (
+                    <Button
+                      key={tab.value}
+                      onClick={() => setActiveTab(tab.value)}
+                      variant={'ghost'}
+                      className={cn(
+                        'w-full rounded-none border-b',
+                        activeTab === tab.value ? 'border-b-primary' : 'border-b-transparent',
+                      )}
+                    >
+                      {tab.label}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+                    <span>Token</span>
+                    Value
                   </div>
-                )}
+                  {formattedTokens.length > 0 && isIcpWallet && activeTab === 'dex' ? (
+                    <DexBalanceItems tokens={formattedTokens} />
+                  ) : formattedTokens.length > 0 ? (
+                    <WalletBalanceItems tokens={formattedTokens} />
+                  ) : (
+                    <div className="flex items-center justify-center text-sm font-semibold text-white">
+                      No tokens found
+                    </div>
+                  )}
+                </div>
 
                 {hasMoreToken && (
                   <button
-                    onClick={loadMoreHandler}
+                    onClick={refetchBalanceHandler}
                     className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                     disabled={isLoading}
                   >
@@ -182,7 +216,7 @@ export function WalletPop({
       </div>
 
       {/* desktop */}
-      <div className="hidden items-center justify-center md:flex">
+      <div className="hidden items-center justify-center text-primary md:flex">
         <Popover>
           <PopoverTrigger>
             <Image src={logo} alt={title} width={24} height={24} className="min-h-6 min-w-6" />
@@ -197,7 +231,7 @@ export function WalletPop({
               </PopoverClose>
               {title}
               <ArrowPathIcon
-                onClick={refetchBalance}
+                onClick={refetchBalanceHandler}
                 className={cn(
                   'absolute left-4 top-4',
                   isLoading
@@ -226,44 +260,58 @@ export function WalletPop({
                   </button>
                 </div>
 
-                {formattedTokens.length > 0 ? (
-                  <>
-                    <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
-                      <span>Token</span>
-                      Value
-                    </div>
-                    <div className="flex max-h-56 flex-col gap-y-5 overflow-y-auto">
-                      {formattedTokens.map((token, idx) => (
-                        <div
-                          key={idx}
-                          className="text-dark flex items-center justify-between gap-x-4 text-sm dark:text-white"
-                        >
-                          <div className="relative flex items-center gap-x-5">
-                            <Avatar src={token.logo} className="h-9 w-9" />
-                            <Avatar
-                              src={token.chainLogo}
-                              className="absolute left-7 top-5 h-4 w-4"
-                            />
-                            <span>{`${token.symbol} (${token.chainName})`}</span>
-                          </div>
-                          <span>$ {token.displayUsd}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <hr className="bg-[#494949]" />
-                    <div className="text-dark flex items-center justify-between text-sm font-semibold dark:text-white">
-                      <span>Total :</span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center text-sm font-semibold text-white">
-                    No tokens found
+                <div className="flex w-full justify-between text-primary">
+                  {tabs.map((tab) => (
+                    <Button
+                      key={tab.value}
+                      onClick={() => setActiveTab(tab.value)}
+                      variant={'ghost'}
+                      className={cn(
+                        'w-full rounded-none border-b',
+                        activeTab === tab.value ? 'border-b-primary' : 'border-b-transparent',
+                      )}
+                    >
+                      {tab.label}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-sm text-[#5A5555] dark:text-[#919191]">
+                    <span>Token</span>
+                    Value
                   </div>
-                )}
+                  {formattedTokens.length > 0 && isIcpWallet && activeTab === 'dex' ? (
+                    <DexBalanceItems tokens={formattedTokens} />
+                  ) : formattedTokens.length > 0 ? (
+                    <WalletBalanceItems tokens={formattedTokens} />
+                  ) : (
+                    <div className="flex items-center justify-center text-sm font-semibold text-white">
+                      No tokens found
+                    </div>
+                  )}
+                </div>
+
+                <hr className="bg-[#494949]" />
+                <div className="text-dark flex items-center justify-between text-sm font-semibold dark:text-white">
+                  {activeTab === 'dex' && isIcpWallet ? (
+                    <>
+                      <span>Dex Total :</span>
+                      <span>$ {getCountedNumber(Number(balance.totalDexBalances), 2)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Total :</span>
+                      <span>$ {getCountedNumber(Number(balance.totalBalanceUsd), 2)}</span>
+                    </>
+                  )}
+                </div>
 
                 {hasMoreToken && (
                   <button
-                    onClick={loadMoreHandler}
+                    onClick={() => {
+                      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+                    }}
                     className="rounded-[10px] bg-primary-buttons px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                     disabled={isLoading}
                   >

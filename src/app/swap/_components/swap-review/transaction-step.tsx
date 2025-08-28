@@ -13,10 +13,12 @@ export const TransactionStep = ({
   currentStep,
   step,
   index,
+  onCloseModal,
 }: {
   step: TxStep;
   currentStep: TxStepType;
   index: number;
+  onCloseModal: () => void;
 }) => {
   const { txErrorMessage, tokenIn, tokenOut, actions, txStep } = useSwapStore();
   const router = useRouter();
@@ -35,12 +37,13 @@ export const TransactionStep = ({
   };
 
   const onNavigateToHistory = () => {
+    onCloseModal();
+    router.push('/transactions-history/bridge');
     actions.setTxStep({ count: 1, status: 'pending' });
     actions.setPrevTxStep({
       count: 0,
       status: 'pending',
     });
-    router.push('/transactions-history/bridge');
   };
 
   return (

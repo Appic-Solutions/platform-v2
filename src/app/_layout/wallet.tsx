@@ -1,42 +1,38 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { HttpAgent } from '@dfinity/agent';
+/** What are we doing currently in wallet?
+ * LOGIC =====>
+ *	1- icp and evm wallet connection logic
+ * UI =======>
+ * mobile wallet connection (navbar buttons) +
+ * desktop wallet connection (navbar buttons) +
+ * evm tokens wallet popup +
+ * icp tokens wallet popup +
+ *
+ *  **/
 
 import { cn, getChainLogo } from '@/lib/utils';
-import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
-import { fetchEvmBalances, fetchIcpBalances } from '@/lib/helpers/wallet';
-import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit, useDisconnect } from '@reown/appkit/react';
 
-import {
-  check_deposit_status,
-  check_withdraw_status,
-} from '@/blockchain_api/functions/icp/bridge_transactions';
-import { get_all_pools, Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
-import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
-import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
-import { IcpToken } from '@/blockchain_api/types/tokens';
-
-import {
-  getPendingTransaction,
-  PendingTransaction,
-  removePendingTransaction,
-} from '@/lib/helpers/session';
-
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
-import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 
 import WalletCard from './wallet/wallet-card';
 import { WalletPop } from './wallet/wallet-pop';
 import { CloseIcon } from '@/components/icons';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from '@/components/ui/drawer';
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from '@/components/ui/popover';
-import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { HttpAgent } from '@dfinity/agent';
+import { getStorageItem } from '@/lib/helpers/localstorage';
+import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
+import { Principal } from '@dfinity/principal';
+import { get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
 
 const WalletPage = () => {
+  const [isFirstIcpFetch, setIsFirstIcpFetch] = useState(true);
+
   const {
     icpIdentity,
     evmAddress,
@@ -46,79 +42,104 @@ const WalletPage = () => {
     evmBalance,
     isEvmBalanceLoading,
     isIcpBalanceLoading,
+    unAuthenticatedAgent,
   } = useSharedStore();
 
   const {
     setIcpBalance,
-    setIcpTokens,
     setEvmBalance,
-    setUnAuthenticatedAgent,
     setIsEvmConnected,
     setChainId,
     setIcpIdentity,
     setEvmAddress,
     setIsEvmBalanceLoading,
     setIsIcpBalanceLoading,
-    setPools,
-    setDexData,
   } = useSharedStoreActions();
 
-  const { pendingTx } = useBridgeStore();
-  const { setPendingTx } = useBridgeActions();
-
-  const queryClient = useQueryClient();
-  const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
-  const { open: openEvmModal } = useAppKit();
-  const { disconnect: disconnectEvm } = useDisconnect();
-  const unAuthenticatedAgent = useUnAuthenticatedAgent();
-
-  const [isFetching, setIsFetching] = useState(false);
-  const [isFirstIcpFetch, setIsFirstIcpFetch] = useState(true);
-
-  const fetchBalances = async (getIcpTopToken: boolean = false) => {
-    if (isFetching) return null;
-    setIsFetching(true);
-
-    if (evmAddress) {
-      setIsEvmBalanceLoading(true);
-      try {
-        const evmRes = await fetchEvmBalances({ evmAddress });
-        setEvmBalance(evmRes);
-      } finally {
-        setIsEvmBalanceLoading(false);
-      }
-    }
-
-    if (icpIdentity && unAuthenticatedAgent) {
-      setUnAuthenticatedAgent(unAuthenticatedAgent);
-      setIsIcpBalanceLoading(true);
-      try {
-        const icpRes = await fetchIcpBalances({
+  const fetchIcpBalances = async ({
+    unAuthenticatedAgent,
+    principal,
+    top_tokens,
+  }: {
+    unAuthenticatedAgent: HttpAgent | null;
+    principal: Principal | null;
+    top_tokens: boolean;
+  }) => {
+    setIsIcpBalanceLoading(true);
+    try {
+      if (unAuthenticatedAgent && principal) {
+        const allIcpTokens = getStorageItem('icpTokens');
+        const icpBalanceRes = await get_icp_wallet_tokens_balances(
+          principal.toString(),
+          JSON.parse(allIcpTokens || '[]'),
+          top_tokens,
           unAuthenticatedAgent,
-          principal: icpIdentity,
-          top_tokens: getIcpTopToken,
-        });
-        setIcpBalance(icpRes);
-      } finally {
-        setIsIcpBalanceLoading(false);
-      }
-    }
+        );
 
-    setIsFetching(false);
-    if (isFirstIcpFetch) setIsFirstIcpFetch(false);
-    return null;
+        if (icpBalanceRes && icpBalanceRes.result) {
+          setIcpBalance(icpBalanceRes.result);
+        }
+
+        return icpBalanceRes;
+      }
+    } catch (error) {
+      console.log('Get ICP Balance Error => ', error);
+    } finally {
+      setIsIcpBalanceLoading(false);
+      if (isFirstIcpFetch) setIsFirstIcpFetch(false);
+    }
+  };
+
+  const fetchEvmBalances = async ({ evmAddress }: { evmAddress: string | undefined }) => {
+    try {
+      setIsEvmBalanceLoading(true);
+      if (evmAddress) {
+        const bridge_pairs = getStorageItem('bridge-pairs');
+        const evmBalanceData = await get_evm_wallet_tokens_balances(
+          evmAddress,
+          JSON.parse(bridge_pairs || '[]'),
+        );
+        if (evmBalanceData && evmBalanceData.result) {
+          setEvmBalance(evmBalanceData.result);
+        }
+      }
+    } catch (error) {
+      console.log('Get EVM Balance Error => ', error);
+    } finally {
+      setIsEvmBalanceLoading(false);
+    }
   };
 
   useQuery({
-    queryKey: ['fetch-wallet-balances'],
-    queryFn: () => fetchBalances(isFirstIcpFetch),
+    queryKey: ['fetch-icp-balances'],
+    queryFn: () =>
+      fetchIcpBalances({
+        unAuthenticatedAgent: unAuthenticatedAgent!,
+        principal: icpIdentity!,
+        top_tokens: isFirstIcpFetch,
+      }),
     refetchInterval: 1000 * 120,
     staleTime: 0,
     gcTime: 1000 * 60,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    enabled: !!(evmAddress || icpIdentity),
+    enabled: !!icpIdentity && !!unAuthenticatedAgent,
   });
+
+  useQuery({
+    queryKey: ['fetch-evm-balances'],
+    queryFn: () => fetchEvmBalances({ evmAddress }),
+    refetchInterval: 1000 * 120,
+    staleTime: 0,
+    gcTime: 1000 * 60,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    enabled: !!evmAddress,
+  });
+
+  const { connect: connectIcp, disconnect: disconnectIcp } = useAuth();
+  const { open: openEvmModal } = useAppKit();
+  const { disconnect: disconnectEvm } = useDisconnect();
 
   const handleDisconnectIcp = () => {
     disconnectIcp();
@@ -133,137 +154,6 @@ const WalletPage = () => {
     setChainId(undefined);
     setEvmAddress(undefined);
   };
-
-  useEffect(() => {
-    const pending = getPendingTransaction() as PendingTransaction;
-    if (pending?.bridge_option.bridge_tx_type === TxType.Deposit && evmAddress) {
-      setPendingTx(pending);
-    } else if (pending?.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
-      setPendingTx(pending);
-    }
-  }, [evmAddress, icpIdentity, setPendingTx]);
-
-  useQuery({
-    queryKey: ['check-pending-deposit-status'],
-    queryFn: async () => {
-      const res = await check_deposit_status(
-        pendingTx?.id as `0x${string}`,
-        pendingTx?.bridge_option as BridgeOption,
-        unAuthenticatedAgent as HttpAgent,
-      );
-
-      if (!res.success || ['Minted', 'Invalid', 'Quarantined'].includes(res.result)) {
-        setPendingTx(undefined);
-        removePendingTransaction();
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
-      fetchBalances();
-      return res;
-    },
-    refetchInterval: 5000,
-    enabled:
-      !!pendingTx &&
-      !!unAuthenticatedAgent &&
-      pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
-      !!evmAddress,
-  });
-
-  useQuery({
-    queryKey: ['check-pending-withdrawal-status'],
-    queryFn: async () => {
-      const res = await check_withdraw_status(
-        pendingTx?.id as string,
-        pendingTx?.bridge_option as BridgeOption,
-        unAuthenticatedAgent as HttpAgent,
-      );
-
-      if (
-        !res.success ||
-        ['Successful', 'QuarantinedReimbursement', 'Reimbursed'].includes(res.result)
-      ) {
-        setPendingTx(undefined);
-        removePendingTransaction();
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['bridge-history'] });
-      fetchBalances();
-      return res;
-    },
-    refetchInterval: 5000,
-    enabled:
-      !!pendingTx &&
-      !!unAuthenticatedAgent &&
-      pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
-      !!icpIdentity,
-  });
-
-  useQuery({
-    queryKey: ['IcpTokens'],
-    queryFn: async () => {
-      if (!unAuthenticatedAgent) return [];
-
-      const res = await get_icp_tokens(unAuthenticatedAgent);
-
-      if (res.result) {
-        setStorageItem('icpTokens', JSON.stringify(res.result));
-        return res.result;
-      }
-
-      return [];
-    },
-    enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 60,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 10,
-  });
-
-  const rawIcpTokens = useMemo(() => {
-    const stored = getStorageItem('icpTokens');
-    return stored ? (JSON.parse(stored) as IcpToken[]) : [];
-  }, []);
-
-  const { data: allPools } = useQuery({
-    queryKey: ['icp-pools'],
-    queryFn: async () => {
-      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, rawIcpTokens);
-      if (!response.success) throw new Error('Failed to fetch all pools');
-      return response.result;
-    },
-    enabled: !!unAuthenticatedAgent && rawIcpTokens.length > 0,
-    retry: false,
-  });
-
-  const { data: dexData } = useQuery({
-    queryKey: ['dex-data'],
-    queryFn: async () => {
-      const response = await get_dex_data(
-        unAuthenticatedAgent as HttpAgent,
-        rawIcpTokens,
-        allPools as Pool[],
-      );
-      if (!response.success) throw new Error('Failed to fetch dex data');
-      return response.result;
-    },
-    enabled: !!unAuthenticatedAgent && rawIcpTokens.length > 0 && !!allPools?.length,
-    retry: false,
-  });
-
-  useEffect(() => {
-    if (allPools) setPools(allPools);
-  }, [allPools, setPools]);
-
-  useEffect(() => {
-    if (dexData) setDexData(dexData);
-  }, [dexData, setDexData]);
-
-  useEffect(() => {
-    if (rawIcpTokens.length > 0) {
-      setIcpTokens(rawIcpTokens);
-    }
-  }, [rawIcpTokens, setIcpTokens]);
 
   return (
     <div
@@ -353,9 +243,7 @@ const WalletPage = () => {
             disconnect={handleDisconnectIcp}
             isLoading={isIcpBalanceLoading}
             address={icpIdentity.toString()}
-            refetchBalance={() => fetchBalances(false)}
             hasMoreToken
-            loadMoreHandler={() => fetchBalances(false)}
           />
         )}
         {isEvmConnected && (
@@ -366,7 +254,6 @@ const WalletPage = () => {
             disconnect={handleDisconnectEvm}
             isLoading={isEvmBalanceLoading}
             address={evmAddress || ''}
-            refetchBalance={fetchBalances}
           />
         )}
       </div>

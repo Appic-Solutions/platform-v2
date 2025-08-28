@@ -1,18 +1,14 @@
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { DexData } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { IcpTokensBalances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { HttpAgent, Agent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { create } from 'zustand';
 
 interface SharedState {
-  icpBalance:
-    | {
-        tokens: IcpToken[];
-        totalBalanceUsd: string;
-      }
-    | undefined;
+  icpBalance: IcpTokensBalances | undefined;
   icpTokens: undefined | IcpToken[];
   evmBalance: EvmTokensBalances | undefined;
   authenticatedAgent: Agent | undefined;

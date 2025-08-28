@@ -8,8 +8,7 @@ import { depositStepsDetails } from '@/lib/constants/bridge';
 import { icpSwapStepsDetails } from '@/lib/constants/swap';
 import { useSharedStore, useSharedStoreActions } from '@/store/store';
 import { approve_token_in, swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
-import { useQueryClient } from '@tanstack/react-query';
-import { fetchIcpBalances } from '@/lib/helpers/wallet';
+import { fetchIcpBalances } from '@/app/_layout/wallet/_api';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +24,6 @@ export const StepperContainer = () => {
     setToWalletAddress,
     setWithdrawalId,
   } = useSwapActions();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (tokenIn?.chain_type === 'EVM') {
@@ -45,18 +43,16 @@ export const StepperContainer = () => {
   };
 
   const onCloseModal = () => {
-    if (txStep.count === 2) {
-      if (txStep.status === 'successful') {
-        setIsOpen(false);
-        setActiveStep(1);
-        setAmount('');
-        setToWalletAddress('');
-        setWithdrawalId(undefined);
-        resetTxState();
-      } else if (txStep.status === 'failed') {
-        setIsOpen(false);
-        resetTxState();
-      }
+    if (txStep.status === 'successful') {
+      setIsOpen(false);
+      setActiveStep(1);
+      setAmount('');
+      setToWalletAddress('');
+      setWithdrawalId(undefined);
+      resetTxState();
+    } else if (txStep.status === 'failed') {
+      resetTxState();
+      setIsOpen(false);
     }
   };
 

@@ -28,6 +28,7 @@ export default function SwapTransactionStepper({ steps, onCloseModal }: Props) {
       <div className="flex flex-col items-center justify-center gap-y-16 py-5 md:flex-row md:items-start md:gap-x-16">
         {steps.map((step, index) => (
           <TransactionStep
+            onCloseModal={onCloseModal}
             key={index}
             currentStep={
               prevTxStep.count === 0 || prevTxStep.count === txStep.count ? txStep : prevTxStep
