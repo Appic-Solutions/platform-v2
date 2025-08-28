@@ -92,7 +92,7 @@ export default function SwapSelectTokenPage() {
     >
       <div className="flex w-full items-center justify-between text-white md:text-black md:dark:text-white">
         <h1 className="text-2xl font-bold md:text-3xl">Swap</h1>
-        <Link href="/transactions-history/swap" className="flex items-center gap-x-2 text-sm">
+        <Link href="/transactions-history/dex" className="flex items-center gap-x-2 text-sm">
           <HistoryIcon width={20} height={20} />
           History
         </Link>
