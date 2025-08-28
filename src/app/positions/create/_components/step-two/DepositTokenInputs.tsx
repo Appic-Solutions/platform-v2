@@ -39,10 +39,6 @@ const DepositTokenInputs = () => {
   const isToken1Disabled =
     !(initialPrice && parseFloat(initialPrice) > 0) || !isToken1DepositAmountActive;
 
-  console.log({
-    userTokenBalances,
-  });
-
   return (
     <div>
       <h3 className="mb-2 text-lg font-bold lg:text-xl">Deposit tokens</h3>

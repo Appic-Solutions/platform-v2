@@ -16,6 +16,9 @@ const tabs: ChartType[] = [
   { label: 'Custom range', value: 'customRange' },
 ];
 
+// TODO: handle this position:
+// when we are on fullRange and user edit the prices so should switch to custom range
+
 const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   const { mutateAsync: getChartData, isPending } = useGetChartData();
   const [chartData, setChartData] = useState<ActiveTick[]>();
@@ -27,9 +30,9 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   const { unAuthenticatedAgent } = useSharedStore();
   const { icpTokens } = useSharedStore();
 
-  const [token0, token1] = useWatch({
+  const [token0, token1, minPrice, maxPrice] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1'],
+    name: ['token0', 'token1', 'minPrice', 'maxPrice'],
   });
 
   const initialPrice = useMemo(() => {
@@ -141,18 +144,6 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
             resetToFullRange={resetToFullRange}
             initialPrice={initialPrice}
             chartData={chartData}
-            setMaxPrice={(price) => {
-              maxOrMinPriceHandler({
-                maxValue: price.toString() !== '0' ? price.toString() : 'max',
-                minValue: createPositionForm.getValues('minPrice'),
-              });
-            }}
-            setMinPrice={(price) => {
-              maxOrMinPriceHandler({
-                minValue: price.toString() !== '0' ? price.toString() : 'min',
-                maxValue: createPositionForm.getValues('maxPrice'),
-              });
-            }}
             selectedTab={selectedTab}
           />
         ) : (

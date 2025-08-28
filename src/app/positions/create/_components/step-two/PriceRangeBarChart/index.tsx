@@ -9,6 +9,15 @@ import usePriceRange from './usePriceRange';
 import useDragHandlers from './useDragHandlers';
 import { RefreshIcon, ZoomInIcon, ZoomOutIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { useCreatePosition } from '../../../_context/CreatePositionContext';
+
+/**
+ * TODO: handle out of view state
+ * When range state is outOfView?
+ * xAxisNumber[0] > minPrice => direction = "left"
+ * xAxisNumbers[xAxisNumbers.length - 1] < maxPrice => direction = "right"
+ * if both => direction = "full"
+ * **/
 
 export interface ChartType {
   label: string;
@@ -17,24 +26,33 @@ export interface ChartType {
 
 interface PriceRangeChartProps {
   selectedTab?: ChartType;
-  setMinPrice: (price: number) => void;
-  setMaxPrice: (price: number) => void;
   chartData: ActiveTick[];
   initialPrice: string;
   resetToFullRange: () => void;
 }
 
+export type RangeStateType =
+  | {
+      isOutOfView: true;
+      direction: 'right' | 'left' | 'full';
+    }
+  | {
+      isOutOfView: false;
+    };
+
 export const NORMALIZATION_FACTOR = 1e35;
 
 export default function PriceRangeChart({
   selectedTab,
-  setMinPrice,
-  setMaxPrice,
   chartData,
   initialPrice,
   resetToFullRange,
 }: PriceRangeChartProps) {
+  const [rangeState, setRangeState] = useState<RangeStateType>({
+    isOutOfView: false,
+  });
   const containerRef = useRef<HTMLDivElement>(null);
+  const { createPositionForm } = useCreatePosition();
   const { chartWidth } = useChartResize(containerRef);
   const {
     leftPrice,
@@ -47,9 +65,9 @@ export default function PriceRangeChart({
     zoomIn,
     zoomOut,
     zoomLevel,
-    debouncedSetPrices,
     setZoomLevel,
-  } = usePriceRange(chartData, initialPrice, chartWidth, setMinPrice, setMaxPrice);
+    debouncedSetPrices,
+  } = usePriceRange(chartData, initialPrice, chartWidth);
   const { dragging, setDragging } = useDragHandlers(
     containerRef,
     xScale,
@@ -70,12 +88,20 @@ export default function PriceRangeChart({
       const normalizedMaxPrice = normalizedInitialPrice + normalizedInitialPrice * 0.2;
       setLeftPrice(normalizedMinPrice);
       setRightPrice(normalizedMaxPrice);
-      setMaxPrice(parseFloat(initialPrice) * 1.2);
-      setMinPrice(parseFloat(initialPrice) * 0.8);
+      createPositionForm.setValue('minPrice', (parseFloat(initialPrice) * 0.8).toString(), {
+        shouldValidate: true,
+      });
+      createPositionForm.setValue('maxPrice', (parseFloat(initialPrice) * 1.2).toString(), {
+        shouldValidate: true,
+      });
     }
     if (selectedTab?.value === 'fullRange') {
-      setMaxPrice(0);
-      setMinPrice(0);
+      createPositionForm.setValue('minPrice', 'min', {
+        shouldValidate: true,
+      });
+      createPositionForm.setValue('maxPrice', 'max', {
+        shouldValidate: true,
+      });
     }
   }, [selectedTab, initialPrice]);
 
@@ -83,7 +109,7 @@ export default function PriceRangeChart({
     if (selectedTab?.value === 'customRange') {
       debouncedSetPrices(leftPrice, rightPrice);
     }
-  }, [leftPrice, rightPrice, debouncedSetPrices]);
+  }, [leftPrice, rightPrice]);
 
   useEffect(() => {
     const normalizedMinPrice =
@@ -133,6 +159,7 @@ export default function PriceRangeChart({
         <InitialPriceLine initialPrice={initialPrice} xScale={xScale} />
         {selectedTab?.value === 'customRange' && (
           <PriceRangeOverlay
+            rangeState={rangeState}
             leftPrice={leftPrice}
             rightPrice={rightPrice}
             minPercentage={minPercentage}

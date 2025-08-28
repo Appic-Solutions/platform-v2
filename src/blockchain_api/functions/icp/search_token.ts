@@ -8,7 +8,7 @@ import { Response } from '@/blockchain_api/types/response';
 
 
 // Service function to fetch metadata and create IcpToken
-export async function createIcpTokenFromCanister( canisterId: string, unAuthenticated_agent: HttpAgent): Promise<Response<IcpToken | null>> {
+export async function createIcpTokenFromCanister(canisterId: string, unAuthenticated_agent: HttpAgent): Promise<Response<IcpToken | null>> {
 	try {
 		const tokenActor = Actor.createActor(IcrcIdlFactory, {
 			agent: unAuthenticated_agent,
@@ -58,7 +58,8 @@ export async function createIcpTokenFromCanister( canisterId: string, unAuthenti
 			fee: feeValue.Nat.toString(),
 			tokenType: 'ICRC1', // Assuming ICRC1; adjust if needed
 			rank: undefined, // As per the type
-			operator: 'Dfinity', // Assuming for ICP tokens
+			operator: 'Dfinity', // Assuming for ICP tokens,
+			listed_on_appic_dex:false,
 		};
 
 		return { result: token, message: "", success: true };

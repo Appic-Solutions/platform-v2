@@ -2,8 +2,14 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { ActiveTick } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { NORMALIZATION_FACTOR } from './index';
+import { useCreatePosition } from '../../../_context/CreatePositionContext';
 
-const debounce = <T extends (...args: any[]) => void>(func: T, wait: number) => {
+/**
+ * in chart we divide numbers to NORMALIZATION_FACTOR, then we use them.
+ * so, if we wanna use a number from chart to form we should multiple it it NORMALIZATION_FACTOR
+ **/
+
+export const debounce = <T extends (...args: any[]) => void>(func: T, wait: number) => {
   let timeout: NodeJS.Timeout | null = null;
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
@@ -15,9 +21,8 @@ export default function usePriceRange(
   chartData: ActiveTick[],
   initialPrice: string,
   chartWidth: number,
-  setMinPrice: (price: number) => void,
-  setMaxPrice: (price: number) => void,
 ) {
+  const { createPositionForm } = useCreatePosition();
   const validPrices = chartData
     .map((tick) => parseFloat(tick.price))
     .filter((price) => !isNaN(price) && isFinite(price))
@@ -58,9 +63,13 @@ export default function usePriceRange(
 
   const debouncedSetPrices = useRef(
     debounce((left: number, right: number) => {
-      setMinPrice(left * NORMALIZATION_FACTOR);
-      setMaxPrice(right * NORMALIZATION_FACTOR);
-    }, 100),
+      createPositionForm.setValue('minPrice', (left * NORMALIZATION_FACTOR).toString(), {
+        shouldValidate: true,
+      });
+      createPositionForm.setValue('maxPrice', (right * NORMALIZATION_FACTOR).toString(), {
+        shouldValidate: true,
+      });
+    }, 1),
   ).current;
 
   useEffect(() => {

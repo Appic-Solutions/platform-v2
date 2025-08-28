@@ -57,9 +57,10 @@ const PriceRangeInputs = () => {
                     createPositionForm.setValue('minPrice', '');
                   }
                 }}
-                onChange={(e) =>
-                  createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value))
-                }
+                onChange={(e) => {
+                  createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value));
+                  createPositionForm.trigger(['minPrice', 'maxPrice']);
+                }}
                 onBlur={(e) =>
                   maxOrMinPriceHandler({
                     minValue:
@@ -98,9 +99,10 @@ const PriceRangeInputs = () => {
                     createPositionForm.setValue('maxPrice', '');
                   }
                 }}
-                onChange={(e) =>
-                  createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value))
-                }
+                onChange={(e) => {
+                  createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value));
+                  createPositionForm.trigger(['minPrice', 'maxPrice']);
+                }}
                 onBlur={(e) => {
                   maxOrMinPriceHandler({
                     minValue: minPrice,

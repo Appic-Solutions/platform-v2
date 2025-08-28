@@ -28,7 +28,6 @@ export default function XAxisLabels({
   chartWidth,
   zoomLevel,
 }: XAxisLabelsProps) {
-  const baseSpacing = 50;
   const minLabelSpacing = Math.min(100, Math.max(20, 50 / Math.max(0.1, zoomLevel)));
 
   const filteredLabels = xAxisNumbers.reduce((acc: number[], price, index) => {
