@@ -35,13 +35,26 @@ export default function useDragHandlers(
   });
 
   useEffect(() => {
-    if (BigNumber(formMaxPrice).comparedTo(BigNumber(formMinPrice)) === -1) return;
+    try {
+      const bnMin = formMinPrice === 'min' ? new BigNumber(0) : new BigNumber(formMinPrice);
+      const bnMax = formMaxPrice === 'max' ? new BigNumber(Infinity) : new BigNumber(formMaxPrice);
 
-    const normalizedMinPrice = +formMinPrice / NORMALIZATION_FACTOR;
-    const normalizedMaxPrice = +formMaxPrice / NORMALIZATION_FACTOR;
+      const compareResult = bnMax.comparedTo(bnMin);
+      if (compareResult === null || compareResult === -1) return;
 
-    setLeftPrice(normalizedMinPrice);
-    setRightPrice(normalizedMaxPrice);
+      const numMin = formMinPrice === 'min' ? 0 : BigNumber(formMinPrice).toNumber();
+      const numMax = formMaxPrice === 'max' ? Infinity : BigNumber(formMaxPrice).toNumber();
+
+      if (isNaN(numMin) || isNaN(numMax)) return;
+
+      const normalizedMin = numMin / NORMALIZATION_FACTOR;
+      const normalizedMax = numMax / NORMALIZATION_FACTOR;
+
+      setLeftPrice(normalizedMin);
+      setRightPrice(normalizedMax);
+    } catch (e) {
+      return;
+    }
   }, [formMinPrice, formMaxPrice]);
 
   const handleLeftDrag = useCallback(

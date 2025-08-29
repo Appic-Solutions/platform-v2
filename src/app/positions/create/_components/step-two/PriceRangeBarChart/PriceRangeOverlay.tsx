@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScaleLinear } from 'd3-scale';
-import { RangeStateType } from '.';
 import { cn } from '@/lib/utils';
+import { RangeStateType } from './usePriceRange';
 
 interface PriceRangeOverlayProps {
   leftPrice: number;
@@ -55,7 +55,7 @@ export default function PriceRangeOverlay({
           'pointer-events-auto absolute top-0 h-[98%] cursor-ew-resize bg-blue-400',
           leftOutOfView || fullOutOfView ? 'hidden' : 'block',
         )}
-        style={{ left: `${xScale(leftPrice) + 10}px` }}
+        style={{ left: `${xScale(leftPrice)}px` }}
         onMouseDown={() => setDragging('left')}
         onTouchStart={() => setDragging('left')}
       >
@@ -78,7 +78,7 @@ export default function PriceRangeOverlay({
           'pointer-events-auto absolute top-0 h-[98%] cursor-ew-resize',
           rightOutOfView || fullOutOfView ? 'hidden' : 'block',
         )}
-        style={{ left: `${xScale(rightPrice) - 10}px` }}
+        style={{ left: `${xScale(rightPrice)}px` }}
         onMouseDown={() => setDragging('right')}
         onTouchStart={() => setDragging('right')}
       >

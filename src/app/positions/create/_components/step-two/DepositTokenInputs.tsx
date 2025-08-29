@@ -2,7 +2,6 @@
 
 import { Avatar } from '@/components/common/ui/avatar';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
-import React, { useEffect, useState } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 import { cn, limitDecimalPlaces } from '@/lib/utils';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
@@ -11,7 +10,7 @@ import SetUserWalletBalanceButton from '../SetUserWalletBalanceButton';
 
 const DepositTokenInputs = () => {
   const { handleDepositAmountInput, createPositionForm, userTokenBalances } = useCreatePosition();
-  const { icpBalance, icpIdentity } = useSharedStore();
+  const { icpIdentity } = useSharedStore();
 
   const [
     token0,

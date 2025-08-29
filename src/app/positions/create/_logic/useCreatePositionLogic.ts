@@ -122,13 +122,9 @@ export default function useCreatePositionLogic() {
   };
 
   const handleSelectedTokenChange = () => {
-    createPositionForm.setValue('token0DepositAmount', '');
-    createPositionForm.setValue('token1DepositAmount', '');
-    createPositionForm.setValue('minPrice', 'min');
-    createPositionForm.setValue('maxPrice', 'max');
+    setIsToken0Selected(!isToken0Selected);
 
     const price = BigNumber(initialPrice);
-
     if (!price || price.lte(0) || price.isNaN()) {
       createPositionForm.resetField('initialPrice');
       setIsToken0Selected(!isToken0Selected);
@@ -137,13 +133,15 @@ export default function useCreatePositionLogic() {
 
     const newPrice = BigNumber(1).div(price).decimalPlaces(10).toString();
 
-    setIsToken0Selected(!isToken0Selected);
-
     createPositionForm.setValue('initialPrice', newPrice, {
       shouldValidate: true,
       shouldDirty: true,
     });
 
+    createPositionForm.setValue('token0DepositAmount', '');
+    createPositionForm.setValue('token1DepositAmount', '');
+    createPositionForm.setValue('minPrice', 'min');
+    createPositionForm.setValue('maxPrice', 'max');
     createPositionForm.trigger('initialPrice');
   };
 
@@ -154,13 +152,19 @@ export default function useCreatePositionLogic() {
 
   const maxOrMinPriceHandler = ({ minValue, maxValue }: { minValue: string; maxValue: string }) => {
     const effectiveMinPrice = minValue === '0' ? 'min' : minValue || 'min';
-    const effectiveMaxPrice = maxValue === '0' ? 'max' : maxValue || 'max';
+    const effectiveMaxPrice =
+      maxValue === '0' || maxValue === 'Infinity' ? 'max' : maxValue || 'max';
+
+    createPositionForm.setValue('minPrice', effectiveMinPrice, { shouldValidate: true });
+    createPositionForm.setValue('maxPrice', effectiveMaxPrice, { shouldValidate: true });
 
     if (
       createPositionForm.formState.errors.maxPrice ||
       createPositionForm.formState.errors.minPrice
-    )
+    ) {
+      console.log('errors:', createPositionForm.formState.errors);
       return;
+    }
 
     const alignedPrice = alignMinOrMaxPrice({
       is_token0_selected: isToken0Selected,
