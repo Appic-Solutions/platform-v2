@@ -3,7 +3,7 @@ import { useAuthenticatedAgent } from '@/lib/hooks/useAuthenticatedAgent';
 import { useUnAuthenticatedAgent } from '@/lib/hooks/useUnauthenticatedAgent';
 import { useSharedStoreActions } from '@/store/store';
 import { Principal } from '@dfinity/principal';
-import { useAccounts, useIdentity } from '@nfid/identitykit/react';
+import { useAccounts, useAuth, useIdentity } from '@nfid/identitykit/react';
 import { useAppKitAccount, useAppKitNetwork } from '@reown/appkit/react';
 
 export const UserWalletProvider = () => {
@@ -14,11 +14,14 @@ export const UserWalletProvider = () => {
 		setChainId,
 		setAuthenticatedAgent,
 		setUnAuthenticatedAgent,
+
 	} = useSharedStoreActions();
 
 	// ICP Wallet Hooks
 	const icpAccounts = useAccounts();
 	const icpIdentity = useIdentity();
+	const { disconnect } = useAuth();
+
 
 	console.log(icpIdentity, icpAccounts);
 
@@ -45,12 +48,16 @@ export const UserWalletProvider = () => {
 			if (icpAccounts[0].principal.compareTo(Principal.anonymous()) != "eq") {
 				setIcpIdentity(icpAccounts[0].principal);
 				setAuthenticatedAgent(authenticatedAgent);
+			} else {
+				disconnect()
 			}
 		}
 		if (icpIdentity != undefined && authenticatedAgent) {
 			if (icpIdentity.getPrincipal().compareTo(Principal.anonymous()) != "eq") {
 				setIcpIdentity(icpIdentity.getPrincipal());
 				setAuthenticatedAgent(authenticatedAgent);
+			} else {
+				disconnect()
 			}
 		}
 

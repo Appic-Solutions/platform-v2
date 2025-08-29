@@ -54,6 +54,7 @@ export interface IcpQuote {
 	usdDifference: string; // Difference between USD out and USD in
 	tokenInPriceInTokenOut: string; // Price of tokenIn in terms of tokenOut (how many tokenOut per 1 tokenIn)
 	tokenOutPriceInTokenIn: string; // Price of tokenOut in terms of tokenIn (how many tokenIn per 1 tokenOut)
+	transfer_approval_fees_usd: string;
 }
 
 /**
@@ -71,6 +72,11 @@ export async function fetchICPQuote(
 	const bn10 = BigNumber(10);
 	const feeIn = tokenIn.fee || '0';
 	const feeOut = tokenOut.fee || '0';
+	const feeInDec = BigNumber(feeIn).dividedBy(BigNumber(10).pow(tokenIn.decimals));
+	const feeOutDec = BigNumber(feeOut).dividedBy(BigNumber(10).pow(tokenOut.decimals));
+
+
+	const transfer_approval_fees_usd = (feeInDec.multipliedBy(2).multipliedBy(tokenIn.usdPrice)).plus(feeOutDec.multipliedBy(tokenOut.usdPrice)).toFixed(2);
 
 	const approvalAmount = BigNumber(amount)
 		.multipliedBy(bn10.pow(tokenIn.decimals))
@@ -121,6 +127,7 @@ export async function fetchICPQuote(
 			const usdValueMinOut = minAmountOutDec.multipliedBy(tokenOut.usdPrice || '0').toFixed(2);
 			const usdDifference = BigNumber(usdValueOut).minus(usdValueIn).toFixed(2);
 
+
 			// Map to IcpQuote with additional calculated fields
 			const quote: IcpQuote = {
 				protocol: data.protocol,
@@ -144,6 +151,7 @@ export async function fetchICPQuote(
 				usdDifference,
 				tokenInPriceInTokenOut,
 				tokenOutPriceInTokenIn,
+				transfer_approval_fees_usd,
 			};
 
 			return { result: quote, message: '', success: true };

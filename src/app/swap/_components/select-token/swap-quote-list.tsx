@@ -6,6 +6,7 @@ import { ClockIcon, FireIcon } from '@/components/icons';
 import { RadialCountDown } from './radial-count-down';
 import SwapQuoteSkeleton from './swap-quote-skeleton';
 import { useSwapStore } from '../../_store';
+import { swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
 
 const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
 	const { tokenOut, swapQuote } = useSwapStore();
@@ -88,9 +89,7 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
 						<div className="flex w-full items-end justify-end gap-x-4">
 							<span className="flex w-max items-center gap-x-1">
 								<p className="text-xs font-thin text-primary">
-									{/* TODO: Replace fee */}
-									FEE HERE
-									{/* ${Number(swapQuote.quote..total_fee_usd_price).toFixed(2)} */}
+									~	${swapQuote.quote.transfer_approval_fees_usd}
 								</p>
 								<FireIcon width={15} height={15} className="text-primary" />
 							</span>
@@ -121,8 +120,8 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
 										</span>
 									</div>
 									<div className="flex justify-between text-sm">
-										<span className="text-muted">Network Fee:</span>
-										<span>~ $0</span>
+										<span className="text-muted">Total Fees:</span>
+										<span>~ ${swapQuote.quote.transfer_approval_fees_usd}</span>
 									</div>
 									<div className="flex justify-between text-sm">
 										<span className="text-muted">Estimated Time:</span>
