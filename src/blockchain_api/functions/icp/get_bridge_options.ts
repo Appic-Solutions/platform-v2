@@ -488,11 +488,11 @@ export const get_gas_price = async (
 
 		// Optionally round the result to 9 decimals (common for gas prices)
 		// and add 10% buffer
-		const maxFeePerGas = latestBaseFee.plus(averagePriorityFee).multipliedBy(1.1).toFixed();
+		const maxFeePerGas = latestBaseFee.plus(averagePriorityFee).multipliedBy(1.1).decimalPlaces(0).toFixed();
 
 		return {
 			max_fee_per_gas: maxFeePerGas,
-			max_priority_fee_per_gas: averagePriorityFee.toFixed(),
+			max_priority_fee_per_gas: averagePriorityFee.decimalPlaces(0).toFixed(),
 		};
 	} catch (error) {
 		console.error('Error fetching gas price:', error);
@@ -745,7 +745,7 @@ const calculate_bridge_options = async (
 
 		const total_native_fee = new BigNumber(minter_fee)
 			.plus(estimated_network_fee)
-			.plus(approve_native_fee)
+			.plus(approve_native_fee).decimalPlaces(0)
 			.toFixed();
 
 		const estimated_return = bridge_metadata.is_native

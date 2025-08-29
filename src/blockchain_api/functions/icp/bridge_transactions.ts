@@ -291,6 +291,8 @@ export const icrc2_approve = async (
 			}
 		}
 	} catch (error) {
+				console.log(error);
+
 		return {
 			result: '',
 			success: false,
@@ -329,7 +331,7 @@ export const request_withdraw = async (
 				const native_withdrawal_result = (await appic_minter_actor.withdraw_native_token({
 					amount: BigInt(
 						new BigNumber(bridge_option.amount)
-							.minus(bridge_option.fees.approval_fee_in_native_token)
+							.minus(bridge_option.fees.approval_fee_in_native_token).decimalPlaces(0)
 							.toString(),
 					),
 					recipient,
@@ -349,6 +351,8 @@ export const request_withdraw = async (
 					};
 				}
 			} catch (error) {
+						console.log(error);
+
 				return {
 					result: '',
 					message: `Failed to withdraw native token from Appic minter: ${error}`,
@@ -362,7 +366,7 @@ export const request_withdraw = async (
 				const erc20_withdrawal_result = (await appic_minter_actor.withdraw_erc20({
 					amount: BigInt(
 						new BigNumber(bridge_option.amount)
-							.minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+							.minus(bridge_option.fees.approval_fee_in_erc20_tokens).decimalPlaces(0)
 							.toString(),
 					),
 					erc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
@@ -397,13 +401,13 @@ export const request_withdraw = async (
 				console.log(appic_minter_actor);
 				console.log(BigInt(
 					new BigNumber(bridge_option.amount)
-						.minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+						.minus(bridge_option.fees.approval_fee_in_erc20_tokens).decimalPlaces(0)
 						.toFixed(),
 				));
 				const icrc_wrap_result = (await appic_minter_actor.wrap_icrc({
 					amount: BigInt(
 						new BigNumber(bridge_option.amount)
-							.minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+							.minus(bridge_option.fees.approval_fee_in_erc20_tokens).decimalPlaces(0)
 							.toString(),
 					),
 					icrc_ledger_id: Principal.fromText(bridge_option.from_token_id),
@@ -453,7 +457,7 @@ export const request_withdraw = async (
 				const native_withdrawal_result = await dfinity_minter_actor.withdraw_eth({
 					amount: BigInt(
 						new BigNumber(bridge_option.amount)
-							.minus(bridge_option.fees.approval_fee_in_native_token)
+							.minus(bridge_option.fees.approval_fee_in_native_token).decimalPlaces(0)
 							.toString(),
 					),
 					recipient,
@@ -474,6 +478,8 @@ export const request_withdraw = async (
 					};
 				}
 			} catch (error) {
+						console.log(error);
+
 				return {
 					result: '',
 					message: `Failed to withdraw native token from Dfinity minter: ${error}`,
@@ -486,7 +492,7 @@ export const request_withdraw = async (
 				const erc20_withdrawal_result = await dfinity_minter_actor.withdraw_erc20({
 					amount: BigInt(
 						new BigNumber(bridge_option.amount)
-							.minus(bridge_option.fees.approval_fee_in_erc20_tokens)
+							.minus(bridge_option.fees.approval_fee_in_erc20_tokens).decimalPlaces(0)
 							.toString(),
 					),
 					ckerc20_ledger_id: Principal.fromText(bridge_option.from_token_id),
@@ -509,6 +515,8 @@ export const request_withdraw = async (
 					};
 				}
 			} catch (error) {
+						console.log(error);
+
 				return {
 					result: '',
 					message: `Failed to withdraw ERC20 token from Dfinity minter: ${error}`,
@@ -583,6 +591,8 @@ export const notify_appic_helper_withdrawal = async (
 			};
 		}
 	} catch (error) {
+				console.log(error);
+
 		return {
 			result: '',
 			success: false,
@@ -654,6 +664,8 @@ export const check_withdraw_status = async (
 			};
 		}
 	} catch (error) {
+				console.log(error);
+
 		return {
 			result: 'Call Failed',
 			message: `Canister call error ${JSON.stringify(error)}`,
@@ -723,6 +735,8 @@ export const create_wallet_client = async (
 
 		return walletClient;
 	} catch (error) {
+				console.log(error);
+
 		throw error;
 	}
 };
@@ -794,7 +808,7 @@ export const approve_erc20 = async (
 			if (tx_status.status == 'success') {
 				return {
 					result: hash,
-					message: 'Failed to get erc20 approval',
+					message: '',
 					success: true,
 				};
 			} else {
@@ -805,6 +819,8 @@ export const approve_erc20 = async (
 				};
 			}
 		} catch (error) {
+					console.log(error);
+
 			return {
 				result: false,
 				message: `Failed to get erc20 approval ${error}`,
@@ -886,6 +902,8 @@ export const request_deposit = async (
 			};
 		}
 	} catch (error) {
+				console.log(error);
+
 		return {
 			result: '0x',
 			message: `Failed to request deposit ${error}`,
@@ -1053,6 +1071,7 @@ export const check_deposit_status = async (
 			}
 		}
 	} catch (error) {
+		console.log(error);
 		return {
 			result: 'PendingVerification',
 			message: `Canister call error ${error}`,
