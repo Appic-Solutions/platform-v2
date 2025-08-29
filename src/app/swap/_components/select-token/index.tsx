@@ -15,10 +15,12 @@ import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/lib/hooks/use-toast';
+import BigNumber from 'bignumber.js';
 
 export default function SwapSelectTokenPage() {
   // swap store
-  const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError } = useSwapStore();
+  const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError, swapQuote } =
+    useSwapStore();
   const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError, setSwapQuote } =
     useSwapActions();
   // Logic
@@ -49,10 +51,27 @@ export default function SwapSelectTokenPage() {
 
   useEffect(() => {
     if (!isFetched || !(Number(amount) > 0) || isNaN(Number(amount))) return;
-
-    if (isSuccess && swapQuoteData?.result && swapQuoteData.success) {
+    console.log({ swapQuoteData });
+    if (
+      isSuccess &&
+      swapQuoteData?.result &&
+      swapQuoteData.success &&
+      !BigNumber(swapQuoteData.result.amountOut).isNegative()
+    ) {
       setSwapQuote({ message: '', quote: swapQuoteData.result });
+    } else if (
+      swapQuoteData &&
+      swapQuoteData.result &&
+      BigNumber(swapQuoteData.result.amountOut).isNegative()
+    ) {
+      setSwapQuote({ message: '', quote: undefined });
+      toast({
+        title: 'Amount too low',
+        variant: 'destructive',
+        duration: 3000,
+      });
     } else {
+      setSwapQuote({ message: '', quote: undefined });
       toast({
         title: 'No route found for selected tokens',
         variant: 'destructive',
@@ -84,7 +103,7 @@ export default function SwapSelectTokenPage() {
         'md:w-full md:max-w-[537px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        Number(amount) > 0 && (swapQuoteData?.result || isLoading || isFetching)
+        Number(amount) > 0 && (swapQuote.quote || isLoading || isFetching)
           ? 'lg:w-[1060px] lg:max-w-[1060px]'
           : '',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
@@ -186,7 +205,7 @@ export default function SwapSelectTokenPage() {
         </div>
 
         {/* SWAP OPTIONS */}
-        {Number(amount) > 0 && (swapQuoteData?.result || isLoading || isFetching) ? (
+        {Number(amount) > 0 && (swapQuote.quote || isLoading || isFetching) ? (
           <SwapOptionsList isLoading={isLoading || isFetching} />
         ) : null}
       </div>

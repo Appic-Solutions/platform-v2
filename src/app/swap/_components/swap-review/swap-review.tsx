@@ -84,11 +84,7 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
             {/* bottom section */}
             <div className="flex w-full items-end justify-end gap-x-4">
               <span className="flex w-max items-center gap-x-1">
-                <p className="text-xs font-thin text-primary">
-                  {/* TODO: Replace fee */}
-                  FEE HERE
-                  {/* ${Number(swapQuote.quote..total_fee_usd_price).toFixed(2)} */}
-                </p>
+                <p className="text-xs font-thin text-primary">~ $0</p>
                 <FireIcon width={15} height={15} className="text-primary" />
               </span>
               <span className="flex w-max items-center gap-x-1">
