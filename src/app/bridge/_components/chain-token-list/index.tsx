@@ -30,7 +30,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
   const { setActiveStep } = useBridgeActions();
 
   return (
-    <Box className="animate-slide-in justify-normal gap-y-6 opacity-0 md:h-[607px] md:max-w-[533px]">
+    <Box className="animate-slide-in justify-normal gap-y-6 opacity-0 md:h-[607px] md:max-w-[537px]">
       <BoxHeader
         title={selectedTokenType === 'from' ? 'Bridge From' : 'Bridge To'}
         onBack={() => setActiveStep(1)}

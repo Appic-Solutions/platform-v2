@@ -75,7 +75,7 @@ export default function ExplorePage() {
             <FormProvider {...methods}>
               <form className="flex items-center gap-3">
                 <Link
-                  href="/pool/create"
+                  href="/positions/create"
                   className={cn(
                     'flex min-w-fit items-center justify-center',
                     'h-[42px] text-sm font-medium',

@@ -44,7 +44,7 @@ const useGetBridgePairs = (agent: HttpAgent | undefined) => {
   };
 
   return useQuery({
-    queryKey: ['bridge-pairs'],
+    queryKey: ['bridgePairs'],
     queryFn: fetchBridgePairs,
     refetchInterval: refetchTime,
     enabled: !!agent,

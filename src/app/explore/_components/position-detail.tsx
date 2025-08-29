@@ -252,7 +252,7 @@ export default function PositionDetail({
                 <SwapHorizontalIcon width={20} height={20} />
                 Swap
               </Link>
-              <Link href="/pool/create">
+              <Link href="/positions/create">
                 <PlusIcon width={20} height={20} />
                 Add liquidity
               </Link>

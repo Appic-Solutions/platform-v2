@@ -39,7 +39,7 @@ const DrawerContent = React.forwardRef<
       ref={ref}
       className={cn(
         'absolute inset-x-0 bottom-0 z-[99] rounded-t-[22px]',
-        'mt-24 flex flex-col gap-y-6 px-4 py-6 backdrop-blur-md',
+        'mt-24 flex flex-col gap-y-6 px-4 pb-[75px] pt-6 backdrop-blur-md',
         'border-[5px] border-box-border *:z-10',
         'bg-box-background bg-cover bg-center bg-no-repeat',
         'h-fit max-h-[80vh] overflow-y-auto after:hidden',

@@ -2,7 +2,7 @@ import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balanc
 import { DexData } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { IcpTokensBalances } from '@/blockchain_api/functions/icp/get_icp_balances';
-import { IcpToken } from '@/blockchain_api/types/tokens';
+import { BridgePair, EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { HttpAgent, Agent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { create } from 'zustand';
@@ -21,6 +21,7 @@ interface SharedState {
   chainId: number | string | undefined;
   pools: undefined | Pool[];
   dexData: undefined | DexData;
+  bridgePairs: undefined | (EvmToken | IcpToken)[];
 }
 
 type Action = {
@@ -38,6 +39,7 @@ type Action = {
     setIsEvmBalanceLoading: (isPending: SharedState['isEvmBalanceLoading']) => void;
     setPools: (pools: SharedState['pools']) => void;
     setDexData: (dex: SharedState['dexData']) => void;
+    setBridgePairs: (bridgePairs: SharedState['bridgePairs']) => void;
   };
 };
 
@@ -55,6 +57,7 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
   isEvmBalanceLoading: false,
   pools: undefined,
   dexData: undefined,
+  bridgePairs: undefined,
   actions: {
     setIcpBalance: (balance) => set({ icpBalance: balance }),
     setIcpTokens: (tokens) => set({ icpTokens: tokens }),
@@ -69,6 +72,7 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
     setIsEvmBalanceLoading: (isEvmPending) => set({ isEvmBalanceLoading: isEvmPending }),
     setPools: (pools) => set({ pools }),
     setDexData: (dexData) => set({ dexData }),
+    setBridgePairs: (bridgePairs) => set({ bridgePairs }),
   },
 }));
 

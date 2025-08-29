@@ -55,7 +55,7 @@ export default function AutoInvestTokenListPage({
     <Box
       className={cn(
         'animate-slide-in justify-normal opacity-0',
-        'md:h-[607px] md:max-w-[612px] md:px-9 md:py-8',
+        'md:h-[607px] md:max-w-[537px] md:px-9 md:py-8',
       )}
     >
       <BoxHeader title="Select Token" onBack={prevStepHandler} />

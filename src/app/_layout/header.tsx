@@ -10,13 +10,14 @@ import { useQuery } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
 import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
-import { IcpToken } from '@/blockchain_api/types/tokens';
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { get_all_pools, Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
+import { get_bridge_pairs } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
-  const { setPools, setIcpTokens, setDexData } = useSharedStoreActions();
+  const { setPools, setIcpTokens, setDexData, setBridgePairs } = useSharedStoreActions();
   const { setPendingTx } = useBridgeActions();
 
   useEffect(() => {
@@ -26,6 +27,14 @@ export default function HeaderPage() {
       setIcpTokens(parsedTokens);
     }
   }, [setIcpTokens]);
+
+  useEffect(() => {
+    const stored = getStorageItem('bridgePairs');
+    if (stored) {
+      const parsedBridgePairs = JSON.parse(stored) as (EvmToken | IcpToken)[];
+      setBridgePairs(parsedBridgePairs);
+    }
+  }, [setBridgePairs]);
 
   useEffect(() => {
     const pending = getPendingTransaction() as PendingTransaction;
@@ -46,6 +55,29 @@ export default function HeaderPage() {
       if (res.result) {
         setStorageItem('icpTokens', JSON.stringify(res.result));
         setIcpTokens(res.result);
+        return res.result;
+      }
+
+      return [];
+    },
+    enabled: !!unAuthenticatedAgent,
+    refetchInterval: 1000 * 60,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60,
+    gcTime: 1000 * 60 * 10,
+  });
+
+  useQuery({
+    queryKey: ['bridgePairs'],
+    queryFn: async () => {
+      if (!unAuthenticatedAgent) return [];
+
+      const res = await get_bridge_pairs(unAuthenticatedAgent);
+
+      if (res.result) {
+        setStorageItem('bridgePairs', JSON.stringify(res.result));
+        setBridgePairs(res.result);
         return res.result;
       }
 

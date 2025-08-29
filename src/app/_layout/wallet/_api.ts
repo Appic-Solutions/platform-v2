@@ -36,7 +36,7 @@ export const fetchIcpBalances = async ({
 export const fetchEvmBalances = async ({ evmAddress }: { evmAddress: string | undefined }) => {
   try {
     if (evmAddress) {
-      const bridge_pairs = getStorageItem('bridge-pairs');
+      const bridge_pairs = getStorageItem('bridgePairs');
       const evm_balance = await get_evm_wallet_tokens_balances(
         evmAddress,
         JSON.parse(bridge_pairs || '[]'),

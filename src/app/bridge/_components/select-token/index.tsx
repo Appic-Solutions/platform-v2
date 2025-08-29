@@ -35,7 +35,7 @@ export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: Select
     <Box
       className={cn(
         'flex h-full flex-col gap-6 md:h-fit',
-        'md:w-fit md:max-w-[617px]',
+        'md:w-full md:max-w-[537px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         Number(amount) > 0 &&
