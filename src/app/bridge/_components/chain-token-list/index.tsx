@@ -7,15 +7,12 @@ import BoxHeader from '@/components/ui/box-header';
 import TokenSkeleton from './token-skeleton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { ChainTokenListLogic } from './_logic';
+import { useSharedStore } from '@/store/store';
 
-interface TokenListProps {
-  isPending: boolean;
-  isError: boolean;
-}
-
-export default function TokenListPage({ isPending, isError }: TokenListProps) {
+export default function TokenListPage() {
   // store
-  const { bridgePairs: tokens, selectedTokenType } = useBridgeStore();
+  const { selectedTokenType } = useBridgeStore();
+  const { bridgePairs } = useSharedStore();
   // Logic
   const {
     isTokenSelected,
@@ -50,17 +47,7 @@ export default function TokenListPage({ isPending, isError }: TokenListProps) {
         )}
       />
       <div className="flex h-full w-full flex-col gap-y-6 overflow-y-scroll">
-        {isPending ? (
-          <>
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-            <TokenSkeleton />
-          </>
-        ) : isError ? (
-          <div>Error While loading. Please try again</div>
-        ) : tokens && filteredTokens && filteredTokens.length > 0 ? (
+        {bridgePairs && filteredTokens && filteredTokens.length > 0 ? (
           sortTokens(filteredTokens)?.map((token, idx) => (
             <TokenCard
               key={idx}

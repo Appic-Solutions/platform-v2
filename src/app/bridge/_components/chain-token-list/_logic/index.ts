@@ -10,9 +10,9 @@ export function ChainTokenListLogic() {
   // Bridge Actions
   const { setFromToken, setToToken, setAmount } = useBridgeActions();
   // Bridge Store
-  const { selectedTokenType, fromToken, toToken, bridgePairs } = useBridgeStore();
+  const { selectedTokenType, fromToken, toToken } = useBridgeStore();
   // shared store
-  const { evmBalance, icpBalance } = useSharedStore();
+  const { evmBalance, icpBalance, bridgePairs } = useSharedStore();
 
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
   const [updatedBridgePairs, setUpdatedBridgePairs] = useState<TokenType[]>();

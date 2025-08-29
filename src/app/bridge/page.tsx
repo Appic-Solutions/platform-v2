@@ -2,27 +2,21 @@
 import BridgeSelectTokenPage from './_components/select-token';
 import TokenListPage from './_components/chain-token-list';
 import { useEffect } from 'react';
-import { useGetBridgeOptions, useGetBridgePairs } from './_api/index';
+import { useGetBridgeOptions } from './_api/index';
 import { BridgeOptionsListRequest } from './_api/types/request';
 import { useBridgeActions, useBridgeStore } from './_store';
 import { useSharedStore } from '@/store/store';
 import { StepperContainer } from './_components/bridge-review';
 import MinimizeProgressBarWidget from '@/app/_layout/minimize-progress-bar-widget';
 import { ParkOutlineBridgeIcon } from '@/components/icons';
-import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 const BridgeHome = () => {
-  const { unAuthenticatedAgent } = useSharedStore();
-  const { amount, fromToken, toToken, bridgePairs, activeStep, pendingTx } = useBridgeStore();
-  const { setBridgePairs, setBridgeOptions } = useBridgeActions();
+  const { unAuthenticatedAgent, bridgePairs } = useSharedStore();
+  const { amount, fromToken, toToken, activeStep, pendingTx } = useBridgeStore();
+  const { setBridgeOptions } = useBridgeActions();
 
-  const { data: bridgePairsData, isPending, isError } = useGetBridgePairs(unAuthenticatedAgent);
   const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } =
     useGetBridgeOptions();
-
-  useEffect(() => {
-    if (bridgePairsData) setBridgePairs(bridgePairsData);
-  }, [bridgePairsData, setBridgePairs]);
 
   useEffect(() => {
     if (amount && unAuthenticatedAgent && fromToken && toToken && bridgePairs) {
@@ -59,7 +53,7 @@ const BridgeHome = () => {
       case 1:
         return <BridgeSelectTokenPage isPendingBridgeOptions={isPendingBridgeOptions} />;
       case 2:
-        return <TokenListPage isPending={isPending} isError={isError} />;
+        return <TokenListPage />;
       case 3:
         return <StepperContainer />;
       default:
