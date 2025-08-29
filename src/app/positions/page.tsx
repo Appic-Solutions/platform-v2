@@ -71,7 +71,7 @@ export default function PositionsPage() {
   return (
     <Box
       className={cn(
-        'h-max text-white transition-all md:max-h-[570px] md:max-w-[533px] md:text-black md:dark:text-white',
+        'h-max text-white transition-all md:max-h-[570px] md:max-w-[537px] md:text-black md:dark:text-white',
       )}
     >
       <div className="h-full w-full animate-fade">

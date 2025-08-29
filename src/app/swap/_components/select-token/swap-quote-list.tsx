@@ -6,7 +6,6 @@ import { ClockIcon, FireIcon } from '@/components/icons';
 import { RadialCountDown } from './radial-count-down';
 import SwapQuoteSkeleton from './swap-quote-skeleton';
 import { useSwapStore } from '../../_store';
-import { swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
 
 const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
 	const { tokenOut, swapQuote } = useSwapStore();

@@ -25,7 +25,6 @@ interface BridgeState {
     message: string;
   };
   selectedOption: BridgeOption | undefined;
-  bridgePairs: (EvmToken | IcpToken)[] | undefined;
   selectedTokenBalance: string;
   toWalletAddress: string;
   toWalletValidationError: string;
@@ -44,7 +43,6 @@ type Action = {
     setSelectedTokenType: (type: SelectionType) => void;
     setAmount: (amount: string) => void;
     setSelectedOption: (option: BridgeOption) => void;
-    setBridgePairs: (bridgePairs: (EvmToken | IcpToken)[]) => void;
     setBridgeOptions: (params: { options: BridgeOption[] | undefined; message: string }) => void;
     setUsdPrice: (usdPrice: string) => void;
     setToWalletAddress: (walletAddress: string) => void;
@@ -78,7 +76,6 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     options: undefined,
     message: '',
   },
-  bridgePairs: undefined,
   fromToken: undefined,
   selectedOption: undefined,
   selectedTokenType: 'from' as SelectionType,
@@ -98,7 +95,6 @@ export const useBridgeStore = create<BridgeState & Action>()((set) => ({
     setToToken: (toToken) => set({ toToken }),
     setAmount: (amount) => set({ amount }),
     setSelectedOption: (selectedOption) => set({ selectedOption }),
-    setBridgePairs: (bridgePairs) => set({ bridgePairs }),
     setBridgeOptions: (bridgeOptions) => set({ bridgeOptions }),
     setUsdPrice: (usdPrice) => set({ usdPrice }),
     setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),

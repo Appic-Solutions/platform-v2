@@ -3,11 +3,21 @@ import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { ActiveTick } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { NORMALIZATION_FACTOR } from './index';
 import { useCreatePosition } from '../../../_context/CreatePositionContext';
+import BigNumber from 'bignumber.js';
 
 /**
- * in chart we divide numbers to NORMALIZATION_FACTOR, then we use them.
+ * HINT: in chart we divide numbers to NORMALIZATION_FACTOR, then we use them.
  * so, if we wanna use a number from chart to form we should multiple it it NORMALIZATION_FACTOR
  **/
+
+export type RangeStateType =
+  | {
+      isOutOfView: true;
+      direction: 'right' | 'left' | 'full';
+    }
+  | {
+      isOutOfView: false;
+    };
 
 export const debounce = <T extends (...args: any[]) => void>(func: T, wait: number) => {
   let timeout: NodeJS.Timeout | null = null;
@@ -33,9 +43,9 @@ export default function usePriceRange(
 
   const normalizedMinPrice = minPrice / NORMALIZATION_FACTOR;
   const normalizedMaxPrice = maxPrice / NORMALIZATION_FACTOR;
-  const normalizedInitialPrice = parseFloat(initialPrice) / NORMALIZATION_FACTOR;
+  const normalizedInitialPrice = parseFloat(initialPrice) / NORMALIZATION_FACTOR || 0;
 
-  const initialZoomFactor = 0.2;
+  const initialZoomFactor = 0.5;
   const [zoomLevel, setZoomLevel] = useState(1);
 
   const zoomFactor = initialZoomFactor / zoomLevel;
@@ -55,6 +65,9 @@ export default function usePriceRange(
   const [rightPrice, setRightPrice] = useState(defaultRightPrice);
   const [minPercentage, setMinPercentage] = useState(0);
   const [maxPercentage, setMaxPercentage] = useState(100);
+  const [rangeState, setRangeState] = useState<RangeStateType>({
+    isOutOfView: false,
+  });
 
   const xScale: ScaleLinear<number, number> = useMemo(
     () => scaleLinear().domain([zoomedMinPrice, zoomedMaxPrice]).range([0, chartWidth]).clamp(true),
@@ -63,33 +76,57 @@ export default function usePriceRange(
 
   const debouncedSetPrices = useRef(
     debounce((left: number, right: number) => {
-      createPositionForm.setValue('minPrice', (left * NORMALIZATION_FACTOR).toString(), {
+      const maxPrice =
+        right === Infinity || right === 0
+          ? 'max'
+          : BigNumber(right).multipliedBy(NORMALIZATION_FACTOR).decimalPlaces(13).toString();
+      const minPrice = BigNumber(left)
+        .multipliedBy(NORMALIZATION_FACTOR)
+        .decimalPlaces(13)
+        .toString();
+      createPositionForm.setValue('minPrice', minPrice, {
         shouldValidate: true,
       });
-      createPositionForm.setValue('maxPrice', (right * NORMALIZATION_FACTOR).toString(), {
+      createPositionForm.setValue('maxPrice', maxPrice, {
         shouldValidate: true,
       });
-    }, 1),
+    }, 10),
   ).current;
 
   useEffect(() => {
-    const clampedLeftPrice = Math.max(zoomedMinPrice, Math.min(leftPrice, rightPrice));
-    const clampedRightPrice = Math.max(leftPrice, Math.min(rightPrice, zoomedMaxPrice));
-
-    if (clampedLeftPrice !== leftPrice) {
-      setLeftPrice(clampedLeftPrice);
-    }
-    if (clampedRightPrice !== rightPrice) {
-      setRightPrice(clampedRightPrice);
+    if (
+      BigNumber(rightPrice).comparedTo(BigNumber(zoomedMaxPrice)) === 1 &&
+      BigNumber(zoomedMinPrice).comparedTo(BigNumber(leftPrice)) === 1
+    ) {
+      setRangeState({
+        isOutOfView: true,
+        direction: 'full',
+      });
+    } else if (
+      BigNumber(rightPrice).comparedTo(BigNumber(zoomedMaxPrice)) === 1 &&
+      BigNumber(zoomedMinPrice).comparedTo(BigNumber(leftPrice)) === -1
+    ) {
+      setRangeState({
+        isOutOfView: true,
+        direction: 'right',
+      });
+    } else if (
+      BigNumber(zoomedMinPrice).comparedTo(BigNumber(leftPrice)) === 1 &&
+      BigNumber(rightPrice).comparedTo(BigNumber(zoomedMaxPrice)) === -1
+    ) {
+      setRangeState({
+        isOutOfView: true,
+        direction: 'left',
+      });
+    } else {
+      setRangeState({
+        isOutOfView: false,
+      });
     }
 
     if (normalizedInitialPrice > 0) {
-      setMinPercentage(
-        ((clampedLeftPrice - normalizedInitialPrice) / normalizedInitialPrice) * 100,
-      );
-      setMaxPercentage(
-        ((clampedRightPrice - normalizedInitialPrice) / normalizedInitialPrice) * 100,
-      );
+      setMinPercentage(((leftPrice - normalizedInitialPrice) / normalizedInitialPrice) * 100);
+      setMaxPercentage(((rightPrice - normalizedInitialPrice) / normalizedInitialPrice) * 100);
     } else {
       setMinPercentage(0);
       setMaxPercentage(100);
@@ -126,5 +163,6 @@ export default function usePriceRange(
     zoomLevel,
     setZoomLevel,
     debouncedSetPrices,
+    rangeState,
   };
 }

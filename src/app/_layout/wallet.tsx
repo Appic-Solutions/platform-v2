@@ -28,6 +28,7 @@ const WalletPage = () => {
     isEvmBalanceLoading,
     isIcpBalanceLoading,
     unAuthenticatedAgent,
+    bridgePairs,
   } = useSharedStore();
 
   const {
@@ -78,12 +79,8 @@ const WalletPage = () => {
   const fetchEvmBalances = async ({ evmAddress }: { evmAddress: string | undefined }) => {
     try {
       setIsEvmBalanceLoading(true);
-      if (evmAddress) {
-        const bridge_pairs = getStorageItem('bridge-pairs');
-        const evmBalanceData = await get_evm_wallet_tokens_balances(
-          evmAddress,
-          JSON.parse(bridge_pairs || '[]'),
-        );
+      if (evmAddress && bridgePairs) {
+        const evmBalanceData = await get_evm_wallet_tokens_balances(evmAddress, bridgePairs);
         if (evmBalanceData && evmBalanceData.result) {
           setEvmBalance(evmBalanceData.result);
         }

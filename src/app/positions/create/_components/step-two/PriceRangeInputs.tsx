@@ -21,6 +21,7 @@ const PriceRangeInputs = () => {
 
     const [intPart, decimalPart] = value.split('.');
     const trimmedDecimal = decimalPart.slice(0, 6);
+
     return `${intPart}.${trimmedDecimal}`;
   };
 
@@ -61,15 +62,18 @@ const PriceRangeInputs = () => {
                   createPositionForm.setValue('minPrice', handleDecimalInput(e.target.value));
                   createPositionForm.trigger(['minPrice', 'maxPrice']);
                 }}
-                onBlur={(e) =>
+                onBlur={(e) => {
+                  if (minPrice === '' || minPrice === '0') {
+                    createPositionForm.setValue('minPrice', 'min', { shouldValidate: true });
+                  }
                   maxOrMinPriceHandler({
                     minValue:
                       e.target.value === '0' || e.target.value === '' || e.target.value === 'min'
                         ? 'min'
                         : e.target.value,
                     maxValue: maxPrice,
-                  })
-                }
+                  });
+                }}
                 placeholder="0"
               />
               <p className="text-xs text-[#FFFFFF7A] lg:text-sm">
@@ -93,23 +97,38 @@ const PriceRangeInputs = () => {
                 disabled={isDisabled}
                 type="text"
                 className="border-none bg-transparent text-lg outline-none lg:text-xl"
-                value={maxPrice === 'max' ? '\u221E' : maxPrice}
+                value={maxPrice === 'max' || maxPrice === 'Infinity' ? '\u221E' : maxPrice}
                 onFocus={(e) => {
                   if (e.target.value === '\u221E') {
                     createPositionForm.setValue('maxPrice', '');
                   }
                 }}
                 onChange={(e) => {
-                  createPositionForm.setValue('maxPrice', handleDecimalInput(e.target.value));
+                  const inputValue = e.target.value;
+
+                  if (inputValue === '') {
+                    createPositionForm.setValue('maxPrice', '');
+                  } else {
+                    createPositionForm.setValue(
+                      'maxPrice',
+
+                      handleDecimalInput(inputValue) || 'max',
+                    );
+                  }
+
                   createPositionForm.trigger(['minPrice', 'maxPrice']);
                 }}
                 onBlur={(e) => {
+                  const inputValue = e.target.value;
+                  if (maxPrice === '' || maxPrice === 'Infinity') {
+                    createPositionForm.setValue('maxPrice', 'max', { shouldValidate: true });
+                  }
                   maxOrMinPriceHandler({
                     minValue: minPrice,
                     maxValue:
-                      e.target.value === '\u221E' || e.target.value === '0' || e.target.value === ''
+                      inputValue === '' || inputValue === '0' || inputValue === '\u221E'
                         ? 'max'
-                        : e.target.value,
+                        : inputValue,
                   });
                 }}
                 placeholder="∞"

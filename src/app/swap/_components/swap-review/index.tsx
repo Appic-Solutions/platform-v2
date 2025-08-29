@@ -6,9 +6,8 @@ import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
 import { depositStepsDetails } from '@/lib/constants/bridge';
 import { icpSwapStepsDetails } from '@/lib/constants/swap';
-import { useSharedStore, useSharedStoreActions } from '@/store/store';
+import { useSharedStore } from '@/store/store';
 import { approve_token_in, swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
-import { fetchIcpBalances } from '@/app/_layout/wallet/_api';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const StepperContainer = () => {
@@ -16,7 +15,6 @@ export const StepperContainer = () => {
   const [steps, setSteps] = useState<TxStep[]>();
   const { tokenIn, txStep, swapQuote, actions } = useSwapStore();
   const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
-  const { setIcpBalance } = useSharedStoreActions();
   const {
     setAmount,
     setActiveStep,

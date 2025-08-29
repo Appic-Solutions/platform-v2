@@ -11,14 +11,6 @@ import { RefreshIcon, ZoomInIcon, ZoomOutIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useCreatePosition } from '../../../_context/CreatePositionContext';
 
-/**
- * TODO: handle out of view state
- * When range state is outOfView?
- * xAxisNumber[0] > minPrice => direction = "left"
- * xAxisNumbers[xAxisNumbers.length - 1] < maxPrice => direction = "right"
- * if both => direction = "full"
- * **/
-
 export interface ChartType {
   label: string;
   value: 'fullRange' | 'customRange';
@@ -31,15 +23,6 @@ interface PriceRangeChartProps {
   resetToFullRange: () => void;
 }
 
-export type RangeStateType =
-  | {
-      isOutOfView: true;
-      direction: 'right' | 'left' | 'full';
-    }
-  | {
-      isOutOfView: false;
-    };
-
 export const NORMALIZATION_FACTOR = 1e35;
 
 export default function PriceRangeChart({
@@ -48,9 +31,6 @@ export default function PriceRangeChart({
   initialPrice,
   resetToFullRange,
 }: PriceRangeChartProps) {
-  const [rangeState, setRangeState] = useState<RangeStateType>({
-    isOutOfView: false,
-  });
   const containerRef = useRef<HTMLDivElement>(null);
   const { createPositionForm } = useCreatePosition();
   const { chartWidth } = useChartResize(containerRef);
@@ -67,8 +47,9 @@ export default function PriceRangeChart({
     zoomLevel,
     setZoomLevel,
     debouncedSetPrices,
+    rangeState,
   } = usePriceRange(chartData, initialPrice, chartWidth);
-  const { dragging, setDragging } = useDragHandlers(
+  const { setDragging } = useDragHandlers(
     containerRef,
     xScale,
     leftPrice,
@@ -116,7 +97,7 @@ export default function PriceRangeChart({
       Math.min(...chartData.map((tick) => parseFloat(tick.price) || 1e-18)) / NORMALIZATION_FACTOR;
     const normalizedMaxPrice =
       Math.max(...chartData.map((tick) => parseFloat(tick.price) || 1e-18)) / NORMALIZATION_FACTOR;
-    const zoomFactor = 0.2 / zoomLevel;
+    const zoomFactor = 0.5 / zoomLevel;
     const normalizedInitialPrice = parseFloat(initialPrice) / NORMALIZATION_FACTOR;
     const zoomedMinPrice = Math.max(normalizedMinPrice, normalizedInitialPrice * (1 - zoomFactor));
     const zoomedMaxPrice = Math.min(normalizedMaxPrice, normalizedInitialPrice * (1 + zoomFactor));
@@ -149,6 +130,9 @@ export default function PriceRangeChart({
   return (
     <>
       <div className="relative h-max min-h-[250px] w-full animate-fade" ref={containerRef}>
+        {selectedTab && selectedTab.value === 'customRange' && rangeState.isOutOfView && (
+          <p className="absolute -top-8 right-4 animate-fade text-orange-500">range out of view</p>
+        )}
         <ChartContainer chartData={filteredChartData} chartWidth={chartWidth} xScale={xScale} />
         <XAxisLabels
           xAxisNumbers={xAxisNumbers}

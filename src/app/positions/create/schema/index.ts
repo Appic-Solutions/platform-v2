@@ -63,7 +63,11 @@ export const CreatePositionFormSchema = z
     const isToken0DepositAmountActive = data.isToken0DepositAmountActive;
     const isToken1DepositAmountActive = data.isToken1DepositAmountActive;
 
-    if (isNaN(parseFloat(min)) && data.minPrice !== 'min') {
+    const isValidNumber = (value: any) => {
+      return /^[0-9]+(\.[0-9]+)?$/.test(value);
+    };
+
+    if (min !== 'min' && !isValidNumber(min)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['minPrice'],
@@ -72,7 +76,7 @@ export const CreatePositionFormSchema = z
       return;
     }
 
-    if (parseFloat(min) < 0 && data.minPrice !== 'min') {
+    if (min !== 'min' && Number(min) < 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['minPrice'],
@@ -83,7 +87,7 @@ export const CreatePositionFormSchema = z
     if (max === 'max' || max === '\u221E') {
       return;
     } else {
-      if (isNaN(parseFloat(max))) {
+      if (!isValidNumber(max)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['maxPrice'],
@@ -91,14 +95,16 @@ export const CreatePositionFormSchema = z
         });
         return;
       }
-      if (parseFloat(min) >= parseFloat(max)) {
+
+      if (Number(min) >= Number(max)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['minPrice'],
           message: 'Min price must be less than max price',
         });
       }
-      if (parseFloat(min) === parseFloat(max)) {
+
+      if (Number(min) === Number(max)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['minPrice'],
@@ -107,7 +113,6 @@ export const CreatePositionFormSchema = z
       }
     }
 
-    // deposit amount validation
     if (isToken0DepositAmountActive && (token0DepositAmount === '0' || !token0DepositAmount)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -115,6 +120,7 @@ export const CreatePositionFormSchema = z
         message: 'Amount must be greater than 0',
       });
     }
+
     if (isToken1DepositAmountActive && (token1DepositAmount === '0' || !token1DepositAmount)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

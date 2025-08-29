@@ -227,11 +227,11 @@ describe('Bridge Functions', () => {
       });
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'bridge-pairs',
+        'bridgePairs',
         JSON.stringify(mockBridgePairs),
       );
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'bridge-pairs-last-fetch-time',
+        'bridgePairs-last-fetch-time',
         expect.any(String),
       );
     });

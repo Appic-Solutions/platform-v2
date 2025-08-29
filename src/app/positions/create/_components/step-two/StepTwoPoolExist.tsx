@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
 import { ActiveTick } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
@@ -30,7 +30,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   const { unAuthenticatedAgent } = useSharedStore();
   const { icpTokens } = useSharedStore();
 
-  const [token0, token1, minPrice, maxPrice] = useWatch({
+  const [token0, token1] = useWatch({
     control: createPositionForm.control,
     name: ['token0', 'token1', 'minPrice', 'maxPrice'],
   });
