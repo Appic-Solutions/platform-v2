@@ -1,8 +1,6 @@
 'use client';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Principal } from '@dfinity/principal';
 import { get_single_pool_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { useSharedStore } from '@/store/store';
 import { HttpAgent } from '@dfinity/agent';
@@ -14,41 +12,40 @@ import Link from 'next/link';
 import { PlusIcon, SwapHorizontalIcon } from '@/components/icons';
 import { Avatar } from '@/components/common/ui/avatar';
 import { CopyIcon } from 'lucide-react';
-import ChartSection from '../_components/chart-section';
-import SkeletonSection from '../_components/skeleton';
+import ChartSection from './chart-section';
+import SkeletonSection from './skeleton';
+import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 
-export default function ExploreDetailPage() {
+interface PositionDetailProps extends CandidPoolId {
+  clearDataHandler: () => void;
+}
+
+export default function PositionDetail({
+  token0,
+  token1,
+  fee,
+  clearDataHandler,
+}: PositionDetailProps) {
   const { unAuthenticatedAgent, icpTokens, pools } = useSharedStore();
   const [isTokenSwap, setIsTokenSwap] = useState(false);
 
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const token0Id = searchParams.get('token0');
-  const token1Id = searchParams.get('token1');
-  const fee = searchParams.get('fee');
-
-  const token0 = token0Id ? Principal.fromText(token0Id) : undefined;
-  const token1 = token1Id ? Principal.fromText(token1Id) : undefined;
-  const feeBigInt = fee ? BigInt(fee) : undefined;
-
   useEffect(() => {
-    if (!token0Id || !token1Id || !fee) {
-      router.push('/explore');
+    if (!token0 || !token1 || !fee) {
+      clearDataHandler();
     }
-  }, [token0Id, token1Id, fee]);
+  }, [token0, token1, fee]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['explore-data', token0Id, token1Id, fee],
+    queryKey: ['explore-data', token0, token1],
     queryFn: async () => {
-      if (!token0 || !token1 || !feeBigInt) return undefined;
+      if (!token0 || !token1 || !fee) return undefined;
 
       return await get_single_pool_data(
         unAuthenticatedAgent as HttpAgent,
         {
           token0,
           token1,
-          fee: feeBigInt,
+          fee,
         },
         icpTokens as IcpToken[],
         pools as Pool[],
@@ -60,7 +57,7 @@ export default function ExploreDetailPage() {
       !!pools?.length &&
       !!token0 &&
       !!token1 &&
-      !!feeBigInt,
+      !!fee,
   });
 
   const value0 = Number(data?.result?.pool?.reserves0_usd ?? 0);
@@ -255,7 +252,7 @@ export default function ExploreDetailPage() {
                 <SwapHorizontalIcon width={20} height={20} />
                 Swap
               </Link>
-              <Link href="/pool/create">
+              <Link href="/positions/create">
                 <PlusIcon width={20} height={20} />
                 Add liquidity
               </Link>

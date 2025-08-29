@@ -1,3 +1,4 @@
+import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { useSharedStore } from '@/store/store';
 import { useState, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -8,6 +9,7 @@ export default function ExplorePageLogic() {
   const [sortCriteria, setSortCriteria] = useState<
     { field: 'tvl' | 'apr'; direction: 'asc' | 'desc' }[]
   >([]);
+  const [detailData, setDetailData] = useState<CandidPoolId | undefined>(undefined);
 
   const methods = useForm({ defaultValues: { search: '' } });
   const search = useWatch({ control: methods.control, name: 'search' });
@@ -76,5 +78,7 @@ export default function ExplorePageLogic() {
     isLoading: !dexData,
     handleSort,
     sortCriteria,
+    detailData,
+    setDetailData,
   };
 }

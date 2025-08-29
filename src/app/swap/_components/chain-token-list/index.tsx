@@ -53,7 +53,7 @@ export default function TokenListPage() {
   };
 
   return (
-    <Box className="animate-slide-in justify-normal gap-y-6 opacity-0 md:h-[607px] md:max-w-[533px]">
+    <Box className="animate-slide-in justify-normal gap-y-6 opacity-0 md:h-[607px] md:max-w-[537px]">
       <BoxHeader
         title={selectedTokenType === 'in' ? 'Sell' : 'Buy'}
         onBack={() => setActiveStep(1)}

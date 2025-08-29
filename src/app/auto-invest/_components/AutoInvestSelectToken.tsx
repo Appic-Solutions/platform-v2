@@ -72,7 +72,7 @@ const AutoInvestSelectToken = ({
     <Box
       className={cn(
         'flex h-full flex-col gap-4 md:min-h-[10vh]',
-        'md:max-w-[617px] md:px-[65px] md:py-[55px]',
+        'md:max-w-[537px] md:px-[65px] md:py-[55px]',
         'overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
         showDetails && 'lg:max-w-[1200px]',

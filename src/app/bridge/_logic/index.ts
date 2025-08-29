@@ -115,14 +115,14 @@ export const BridgeLogic = () => {
   // set data and last fetch time in localstorage
   function setBridgePairsWithTime(data: (EvmToken | IcpToken)[]) {
     const currentTime = new Date().getTime();
-    setStorageItem('bridge-pairs', JSON.stringify(data));
-    setStorageItem('bridge-pairs-last-fetch-time', currentTime.toString());
+    setStorageItem('bridgePairs', JSON.stringify(data));
+    setStorageItem('bridgePairs-last-fetch-time', currentTime.toString());
   }
 
   // get data and last fetch time from localstorage
   function getBridgePairsFromLocalStorage() {
-    const rawData = getStorageItem('bridge-pairs');
-    const lastFetchTime = getStorageItem('bridge-pairs-last-fetch-time');
+    const rawData = getStorageItem('bridgePairs');
+    const lastFetchTime = getStorageItem('bridgePairs-last-fetch-time');
     let parsedData: (EvmToken | IcpToken)[] | null = null;
     try {
       if (rawData?.length && rawData?.length > 0) {

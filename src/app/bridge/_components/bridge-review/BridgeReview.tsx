@@ -26,7 +26,7 @@ const BridgeReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
       <Box
         className={cn(
           'h-full animate-slide-in justify-normal opacity-0',
-          'gap-6 md:h-[607px] md:max-w-[546px]',
+          'gap-6 md:h-[607px] md:max-w-[537px]',
         )}
       >
         <BoxHeader title="Bridge Review" onBack={() => setActiveStep(1)} />

@@ -42,13 +42,13 @@ export const UserWalletProvider = () => {
 	// Set ICP identity and authenticated agent
 	useEffect(() => {
 		if (icpAccounts != undefined && authenticatedAgent) {
-			if (icpAccounts[0].principal !== Principal.anonymous()) {
+			if (icpAccounts[0].principal.compareTo(Principal.anonymous()) != "eq") {
 				setIcpIdentity(icpAccounts[0].principal);
 				setAuthenticatedAgent(authenticatedAgent);
 			}
 		}
 		if (icpIdentity != undefined && authenticatedAgent) {
-			if (icpIdentity.getPrincipal() !== Principal.anonymous()) {
+			if (icpIdentity.getPrincipal().compareTo(Principal.anonymous()) != "eq") {
 				setIcpIdentity(icpIdentity.getPrincipal());
 				setAuthenticatedAgent(authenticatedAgent);
 			}

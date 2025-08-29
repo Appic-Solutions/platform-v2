@@ -1,10 +1,9 @@
 import { TokenType, useSwapActions, useSwapStore } from '@/app/swap/_store';
-import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useSharedStore } from '@/store/store';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useChainListLogic = () => {
   // Swap Actions
