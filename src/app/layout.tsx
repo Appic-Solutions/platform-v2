@@ -11,7 +11,7 @@ import ThemeSwitch from './_layout/theme-switch';
 import { cn } from '@/lib/utils';
 import NavbarPage from './_layout/navbar';
 
-import { Lora, Rethink_Sans } from 'next/font/google';
+import { Rethink_Sans } from 'next/font/google';
 
 const rethinkSans = Rethink_Sans({
   subsets: ['latin'],

@@ -10,9 +10,6 @@
 @import './scrollbar.css';
 
 @layer base {
-  html {
-    font-family: 'RethinkSans', sans-serif;
-  }
   body {
     height: 100% !important;
   }
