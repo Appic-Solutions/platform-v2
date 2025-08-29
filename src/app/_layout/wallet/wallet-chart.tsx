@@ -6,9 +6,9 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { TokenType } from '@/app/bridge/_store';
-import { WalletBalance } from './wallet-pop';
 import { Pie, PieChart } from 'recharts';
 import { getStorageItem } from '@/lib/helpers/localstorage';
+import { WalletBalance } from './_types';
 
 const lightColorsPalette = ['#F15A24', '#ED1E79', '#592784', '#3B00B9', '#FBB03B', '#932380'];
 
