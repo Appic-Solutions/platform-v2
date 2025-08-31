@@ -83,7 +83,9 @@ const WalletPage = () => {
         const evmBalanceData = await get_evm_wallet_tokens_balances(evmAddress, bridgePairs);
         if (evmBalanceData && evmBalanceData.result) {
           setEvmBalance(evmBalanceData.result);
+          return evmBalanceData.result;
         }
+        return evmBalanceData;
       }
     } catch (error) {
       console.log('Get EVM Balance Error => ', error);

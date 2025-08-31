@@ -84,7 +84,9 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
             {/* bottom section */}
             <div className="flex w-full items-end justify-end gap-x-4">
               <span className="flex w-max items-center gap-x-1">
-                <p className="text-xs font-thin text-primary">~ $0</p>
+                <p className="text-xs font-thin text-primary">
+                  ~ $ {swapQuote.quote.transfer_approval_fees_usd}
+                </p>
                 <FireIcon width={15} height={15} className="text-primary" />
               </span>
               <span className="flex w-max items-center gap-x-1">
@@ -116,7 +118,7 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Network Fee:</span>
-                    <span>~ $0</span>
+                    <span>~ $ {swapQuote.quote.transfer_approval_fees_usd}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Estimated Time:</span>

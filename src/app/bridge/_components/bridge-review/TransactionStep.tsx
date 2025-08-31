@@ -45,7 +45,7 @@ export const TransactionStep = ({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-2 text-center',
+        'flex w-full flex-col items-center justify-center gap-2 text-center',
         'w-64 duration-500 ease-in-out',
         'md:animate-slide-in-from-right',
         'animate-slide-in-from-top',
@@ -82,7 +82,7 @@ export const TransactionStep = ({
         />
       </div>
       {currentStep.status && (
-        <div className="flex flex-col gap-y-2">
+        <div className="flex w-full flex-col gap-y-2">
           <p className="text-lg font-bold text-[#333333] dark:text-white">
             {' '}
             {step.statuses[currentStep.status].statusTitle}

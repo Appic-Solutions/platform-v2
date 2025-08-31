@@ -203,9 +203,9 @@ const BridgeReviewLogic = () => {
   }
 
   function executeTransaction() {
-    //  1. Withdrawal Transactions (ICP -> EVM)
+    //  1. Withdrawal Transactions (ICP -> EVM) => 4 steps
     // recipient should be evmAddress or toWalletAddress
-    //  2. Deposit Transactions (EVM -> ICP)
+    //  2. Deposit Transactions (EVM -> ICP) => 5 steps
     // recipient should be icpIdentity.getPrincipal() or toWalletAddress
     setTxErrorMessage('');
     setTxHash(undefined);
