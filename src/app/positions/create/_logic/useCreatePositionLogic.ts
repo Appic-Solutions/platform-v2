@@ -365,8 +365,8 @@ export default function useCreatePositionLogic() {
       !userTokenBalances ||
       !userTokenBalances.token0Balance ||
       !userTokenBalances.token1Balance ||
-      +userTokenBalances.token0Balance < +token0DepositAmount ||
-      +userTokenBalances.token1Balance < +token1DepositAmount
+      BigNumber(token0DepositAmount).comparedTo(BigNumber(userTokenBalances.token0Balance)) ||
+      BigNumber(token1DepositAmount).comparedTo(BigNumber(userTokenBalances.token1Balance))
     ) {
       return {
         buttonText: 'Not Enough Balance',
@@ -451,7 +451,7 @@ export default function useCreatePositionLogic() {
       token0Balance: userToken0?.balance ?? '0',
       token1Balance: userToken1?.balance ?? '0',
     });
-  }, [icpBalance, icpIdentity]);
+  }, [icpBalance, icpIdentity, Token0, Token1]);
 
   return {
     step,
