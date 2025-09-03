@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import StepTwoPoolNotExist from './StepTwoPoolNotExist';
 import { useWatch } from 'react-hook-form';
 import SolidCard from '@/components/ui/cards/SolidCard';
@@ -29,6 +29,7 @@ const CreatePositionStepTwo = () => {
     } else {
       setExistPool(undefined);
     }
+    console.log({ fee, selectedFee });
   }, [fee, feeTiers]);
 
   return (

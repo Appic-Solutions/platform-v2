@@ -137,7 +137,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
             </p>
           </div>
         </div>
-        {isPending ? (
+        {/* {isPending ? (
           <ChartSkeleton />
         ) : chartData ? (
           <PriceRangeBarChart
@@ -148,7 +148,7 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
           />
         ) : (
           'Failed to load chart data. please try again'
-        )}
+        )} */}
       </div>
     </>
   );

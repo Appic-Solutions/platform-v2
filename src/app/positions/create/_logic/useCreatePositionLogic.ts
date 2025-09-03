@@ -284,7 +284,6 @@ export default function useCreatePositionLogic() {
     createPositionForm.setValue('initialPrice', '');
     createPositionForm.setValue('sqrtPriceX96', '');
     createPositionForm.setValue('tickSpacing', 0);
-    createPositionForm.setValue('fee', 3000);
     createPositionForm.setValue(name, value);
     createPositionForm.clearErrors();
   };
@@ -327,6 +326,8 @@ export default function useCreatePositionLogic() {
     isButtonDisabled: boolean;
     buttonText: string;
   } => {
+    console.log();
+
     if (isIcpBalanceLoading) {
       return {
         isButtonDisabled: true,
@@ -363,10 +364,8 @@ export default function useCreatePositionLogic() {
 
     if (
       !userTokenBalances ||
-      !userTokenBalances.token0Balance ||
-      !userTokenBalances.token1Balance ||
-      BigNumber(token0DepositAmount).comparedTo(BigNumber(userTokenBalances.token0Balance)) ||
-      BigNumber(token1DepositAmount).comparedTo(BigNumber(userTokenBalances.token1Balance))
+      BigNumber(token0DepositAmount).isGreaterThan(userTokenBalances.token0Balance) ||
+      BigNumber(token1DepositAmount).isGreaterThan(userTokenBalances.token1Balance)
     ) {
       return {
         buttonText: 'Not Enough Balance',
