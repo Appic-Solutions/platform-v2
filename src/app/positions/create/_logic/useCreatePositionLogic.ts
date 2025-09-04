@@ -52,6 +52,7 @@ export default function useCreatePositionLogic() {
       token1DepositAmount: '',
       isToken0DepositAmountActive: true,
       isToken1DepositAmountActive: true,
+      isFeeManuallySelected: false,
     },
     resolver: zodResolver(CreatePositionFormSchema),
     mode: 'onChange',
@@ -117,6 +118,7 @@ export default function useCreatePositionLogic() {
 
   const resetFormHandler = () => {
     createPositionForm.reset();
+    createPositionForm.setValue('isFeeManuallySelected', false);
     setFeeTiers([]);
     setStep(0);
   };
@@ -289,8 +291,8 @@ export default function useCreatePositionLogic() {
   };
 
   const selectFeeHandler = (value: SelectFeeHandlerProps) => {
-    feeManuallySelected.current = true;
     createPositionForm.setValue('fee', value);
+    createPositionForm.setValue('isFeeManuallySelected', true);
     createPositionForm.clearErrors('fee');
     getTickSpacingHandler(value);
   };
@@ -379,10 +381,21 @@ export default function useCreatePositionLogic() {
     };
   };
 
+  const previousTokens = useRef<{ token0CanisterId?: string; token1CanisterId?: string }>({});
+
   useEffect(() => {
     if (!Token0 || !Token1 || !Token0.canisterId || !Token1.canisterId) return;
 
     const { token0, token1 } = sortTokens(Token0, Token1);
+
+    const tokensChanged =
+      previousTokens.current.token0CanisterId !== token0.canisterId ||
+      previousTokens.current.token1CanisterId !== token1.canisterId;
+
+    previousTokens.current = {
+      token0CanisterId: token0.canisterId,
+      token1CanisterId: token1.canisterId,
+    };
 
     if (token0.canisterId !== Token0.canisterId || token1.canisterId !== Token1.canisterId) {
       createPositionForm.setValue('token0', token0);
@@ -415,7 +428,7 @@ export default function useCreatePositionLogic() {
 
     setFeeTiers(updatedFeeTiers);
 
-    if (!feeManuallySelected.current && updatedFeeTiers.length > 0) {
+    if (tokensChanged && !createPositionForm.getValues('isFeeManuallySelected')) {
       const feeTiersWithTvl = updatedFeeTiers
         .map((tier) => ({
           ...tier,
@@ -430,10 +443,10 @@ export default function useCreatePositionLogic() {
         const currentFee = createPositionForm.getValues('fee');
         if (currentFee !== highestTvlFee) {
           createPositionForm.setValue('fee', highestTvlFee);
+          createPositionForm.setValue('isFeeManuallySelected', false);
         }
       }
     }
-    feeManuallySelected.current = false;
 
     getTickSpacingHandler(createPositionForm.getValues('fee'));
   }, [Token0, Token1]);

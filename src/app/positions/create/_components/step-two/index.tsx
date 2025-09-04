@@ -29,7 +29,6 @@ const CreatePositionStepTwo = () => {
     } else {
       setExistPool(undefined);
     }
-    console.log({ fee, selectedFee });
   }, [fee, feeTiers]);
 
   return (

@@ -7,6 +7,7 @@ import TokenList from '../token-list';
 import { useWatch } from 'react-hook-form';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import { FeeTier } from '@/app/positions/types';
+import BigNumber from 'bignumber.js';
 
 export default function CreatePositionStepOne() {
   const {
@@ -30,6 +31,15 @@ export default function CreatePositionStepOne() {
   });
 
   useEffect(() => {
+    if (Token0 && Token1 && !Fee && feeTiers.length > 0) {
+      const defaultTier = feeTiers.find((tier) => Number(tier.fee) === 3000);
+      if (defaultTier) {
+        setSelectedFeeTier(defaultTier);
+      }
+    }
+  }, [Token0, Token1, Fee, feeTiers]);
+
+  useEffect(() => {
     if (Token0 && Token1 && Fee) {
       setIsFormValid(true);
       setSelectedFeeTier(feeTiers.find((tier) => Number(tier.fee) === Fee));
@@ -39,10 +49,10 @@ export default function CreatePositionStepOne() {
   }, [Token0, Token1, Fee]);
 
   const isSelectedHighestTvl = (selectedTvl: string) => {
-    feeTiers.map((tier) => {
-      if (Number(tier.tvl) && Number(tier.tvl) > Number(selectedTvl)) return false;
-    });
-    return true;
+    const existsBigger = feeTiers.some(
+      (tier) => Number(tier.tvl) > 0 && BigNumber(tier.tvl).isGreaterThan(selectedTvl),
+    );
+    return !existsBigger;
   };
 
   switch (activePage) {
@@ -184,7 +194,7 @@ export default function CreatePositionStepOne() {
                 {selectedFeeTier &&
                   Number(selectedFeeTier.tvl) > 0 &&
                   isSelectedHighestTvl(selectedFeeTier.tvl) && (
-                    <span className="rounded-full bg-[#2060D5]/30 text-[9px] font-medium text-[#7DABFF]">
+                    <span className="rounded-full bg-[#2060D5]/30 px-1 py-0.5 text-[9px] font-medium text-[#7DABFF]">
                       HighestTVL
                     </span>
                   )}

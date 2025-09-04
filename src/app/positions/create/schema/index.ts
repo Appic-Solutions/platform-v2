@@ -11,6 +11,7 @@ export const CreatePositionFormSchema = z
       required_error: 'Fee is required',
       invalid_type_error: 'Fee must be a number',
     }),
+    isFeeManuallySelected: z.boolean(),
 
     initialPrice: z
       .string({
