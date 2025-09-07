@@ -47,7 +47,7 @@ const Details = () => {
   }, []);
 
   return (
-    <div className="flex w-full animate-fade flex-col gap-6 overflow-hidden lg:flex-row">
+    <div className="flex w-full max-w-xl animate-fade flex-col gap-6 overflow-hidden md:overflow-y-scroll lg:max-w-full lg:flex-row">
       {/* Left */}
       <div className="flex h-full w-full flex-col lg:w-[55%] lg:gap-5">
         <Link

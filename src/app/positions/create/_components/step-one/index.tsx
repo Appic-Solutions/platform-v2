@@ -103,7 +103,7 @@ export default function CreatePositionStepOne() {
             </p>
           </div>
           {/* token selection */}
-          <div className="flex w-full gap-2 md:gap-3">
+          <div className="flex w-full flex-col gap-2 md:flex-row md:gap-3">
             <div
               className={cn(
                 'group relative cursor-pointer overflow-clip',
@@ -179,6 +179,7 @@ export default function CreatePositionStepOne() {
             </div>
           </div>
 
+          {/* Fee Tier Box */}
           <div className="flex w-full flex-col">
             <p className="text-lg font-bold md:text-xl">Fee tier</p>
             <p className="max-w-[424px] text-xs leading-none text-muted md:text-sm">
@@ -186,7 +187,6 @@ export default function CreatePositionStepOne() {
               and strategy.
             </p>
           </div>
-          {/* Fee Tier Box */}
           <div className="flex w-full items-center justify-between gap-4 rounded-[10px] bg-[#22222261] px-4 py-2">
             <div className="">
               <div className="flex items-center gap-x-2.5 md:gap-x-3.5">

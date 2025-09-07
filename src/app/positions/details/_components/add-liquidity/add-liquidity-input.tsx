@@ -108,7 +108,7 @@ const AddLiquidityInput = ({ position, userTokenBalance, isAmountZero }: Props) 
           </p>
         </div>
 
-        <div className="flex w-max flex-col gap-2">
+        <div className="flex w-max flex-col items-end gap-2">
           <div className={cn('relative', 'flex gap-x-1.5 self-end')}>
             <Avatar src={token.logo} className="h-5 w-5 md:h-6 md:w-6" />
             <p className="text-sm font-semibold text-white md:text-xl">{token.symbol}</p>
