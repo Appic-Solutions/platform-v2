@@ -1,7 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSharedStore } from '@/store/store';
-import { useGetPositions } from './_api';
 import { usePositionDetailsStore } from './_store/usePositionDetailsStore';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
@@ -11,6 +10,9 @@ import { useAuth } from '@nfid/identitykit/react';
 import Image from 'next/image';
 import PositionCard from './_components/PositionCard';
 import Spinner from '@/components/ui/spinner';
+import { useQuery } from '@tanstack/react-query';
+import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
+import { usePathname } from 'next/navigation';
 
 const NeedConnectWallet = () => {
   const { connect } = useAuth();
@@ -30,43 +32,48 @@ const NeedConnectWallet = () => {
 };
 
 export default function PositionsPage() {
-  const { icpIdentity, icpTokens, pools, unAuthenticatedAgent, isIcpBalanceLoading } =
-    useSharedStore();
+  const { icpIdentity, icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
   const { actions, userPositionsList } = usePositionDetailsStore();
+  const pathname = usePathname();
 
-  const { mutateAsync: getPositions, isPending, isPaused } = useGetPositions();
+  const { isPending, data: positionsData } = useQuery({
+    queryKey: ['fetch-positions'],
+    queryFn: () =>
+      getPositionsByOwner({
+        icpTokens: icpTokens!,
+        pools: pools!,
+        owner: icpIdentity!,
+        unAuthenticatedAgent: unAuthenticatedAgent!,
+      }),
+    refetchInterval: 1000 * 30,
+    staleTime: 0,
+    gcTime: 1000 * 60,
+    enabled:
+      !!icpIdentity &&
+      !!unAuthenticatedAgent &&
+      !!pools &&
+      !!icpTokens &&
+      (pathname === '/positions' || pathname === '/positions/details'),
+  });
 
   useEffect(() => {
-    const getPositionsHandler = async () => {
-      if (!icpTokens || !pools || !unAuthenticatedAgent || !icpIdentity) {
-        return;
-      }
-      const res = await getPositions({
-        icpTokens,
-        pools,
-        owner: icpIdentity,
-        unAuthenticatedAgent,
+    if (positionsData && positionsData.success && positionsData.result && icpTokens) {
+      const formattedPositionsArray = positionsData.result.map((position) => {
+        const positionToken0 = icpTokens.find(
+          (token) => token.canisterId === position.key.pool.token0.toString(),
+        );
+        const positionToken1 = icpTokens.find(
+          (token) => token.canisterId === position.key.pool.token1.toString(),
+        );
+        return {
+          ...position,
+          token0: positionToken0!,
+          token1: positionToken1!,
+        };
       });
-
-      if (res.success && res.result) {
-        const formattedPositionsArray = res.result.map((position) => {
-          const positionToken0 = icpTokens.find(
-            (token) => token.canisterId === position.key.pool.token0.toString(),
-          );
-          const positionToken1 = icpTokens.find(
-            (token) => token.canisterId === position.key.pool.token1.toString(),
-          );
-          return {
-            ...position,
-            token0: positionToken0!,
-            token1: positionToken1!,
-          };
-        });
-        actions.setUserPositionsList(formattedPositionsArray);
-      }
-    };
-    getPositionsHandler();
-  }, [icpTokens, pools, unAuthenticatedAgent, getPositions, icpIdentity]);
+      actions.setUserPositionsList(formattedPositionsArray);
+    }
+  }, [positionsData]);
 
   return (
     <Box
@@ -118,12 +125,12 @@ export default function PositionsPage() {
             'flex h-full w-full flex-1 flex-col gap-3',
             'pt-6',
             'border-t border-white/20',
-            'max-h-[290px] overflow-y-auto',
+            'overflow-y-auto md:max-h-[290px]',
           )}
         >
           {!icpIdentity ? (
             <NeedConnectWallet />
-          ) : isPending || isIcpBalanceLoading ? (
+          ) : isPending ? (
             <Spinner className="my-16" />
           ) : !userPositionsList || !userPositionsList.length ? (
             <div className="flex h-full flex-col items-center justify-center gap-2">

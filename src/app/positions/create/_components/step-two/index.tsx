@@ -7,6 +7,7 @@ import DepositTokenInputs from './DepositTokenInputs';
 import StepTwoPoolExist from './StepTwoPoolExist';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import AvatarGroup from '@/app/positions/_components/AvatarGroup';
+import { ArrowLeftIcon } from '@/components/icons';
 
 const CreatePositionStepTwo = () => {
   const {
@@ -16,6 +17,7 @@ const CreatePositionStepTwo = () => {
     actionButtonHandler,
     existPool,
     setExistPool,
+    setStep,
   } = useCreatePosition();
   const [token0, token1, fee] = useWatch({
     control: createPositionForm.control,
@@ -38,6 +40,10 @@ const CreatePositionStepTwo = () => {
         {/* header */}
         <div className="flex w-full items-center justify-between">
           <div className="flex w-full items-center gap-2 lg:gap-4">
+            <ArrowLeftIcon
+              onClick={() => setStep(0)}
+              className="z-10 inline-block cursor-pointer lg:hidden"
+            />
             <AvatarGroup avatar0={token0.logo} avatar1={token1.logo} />
             <h3 className="max-w-96 text-ellipsis text-2xl font-bold lg:text-3xl">
               {token0.symbol}/{token1.symbol}
@@ -50,7 +56,7 @@ const CreatePositionStepTwo = () => {
           </div>
         </div>
 
-        {existPool ? <StepTwoPoolExist matchedPool={existPool} /> : <StepTwoPoolNotExist />}
+        {existPool ? <StepTwoPoolExist /> : <StepTwoPoolNotExist />}
       </div>
 
       <div className="flex h-full w-full select-none flex-col gap-6 text-white lg:w-[41%]">

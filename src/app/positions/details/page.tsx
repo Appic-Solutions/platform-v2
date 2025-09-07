@@ -1,21 +1,81 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Box from '@/components/ui/box';
 import { cn } from '@/lib/utils';
 import { ArrowLeftIcon } from '@/components/icons';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSharedStore } from '@/store/store';
 import AddLiquidity from './_components/add-liquidity';
 import RemoveLiquidity from './_components/remove-liquidity';
 import CollectFees from './_components/collect-fees';
 import Details from './_components/Details';
 import { usePositionDetailsStore } from '../_store/usePositionDetailsStore';
+import { useQuery } from '@tanstack/react-query';
+import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
 
 const PositionDetails = () => {
   const { currentStep, actions, selectedPosition } = usePositionDetailsStore();
-  const { icpIdentity } = useSharedStore();
+  const { icpIdentity, icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
   const router = useRouter();
+
+  const pathname = usePathname();
+
+  const { isPending, data: positionsData } = useQuery({
+    queryKey: ['fetch-details-positions'],
+    queryFn: () =>
+      getPositionsByOwner({
+        icpTokens: icpTokens!,
+        pools: pools!,
+        owner: icpIdentity!,
+        unAuthenticatedAgent: unAuthenticatedAgent!,
+      }),
+    refetchInterval: 1000 * 30,
+    staleTime: 0,
+    gcTime: 1000 * 60,
+    enabled:
+      !!icpIdentity &&
+      !!unAuthenticatedAgent &&
+      !!pools &&
+      !!icpTokens &&
+      (pathname === '/positions' || pathname === '/positions/details'),
+  });
+
+  useEffect(() => {
+    if (
+      positionsData &&
+      positionsData.success &&
+      positionsData.result &&
+      icpTokens &&
+      icpIdentity
+    ) {
+      const formattedPositionsArray = positionsData.result.map((position) => {
+        const positionToken0 = icpTokens.find(
+          (token) => token.canisterId === position.key.pool.token0.toString(),
+        );
+        const positionToken1 = icpTokens.find(
+          (token) => token.canisterId === position.key.pool.token1.toString(),
+        );
+        return {
+          ...position,
+          token0: positionToken0!,
+          token1: positionToken1!,
+        };
+      });
+      // TODO: Find the position with a unique position key
+      // currently handle with some parameters that I don't sure about them
+      const updatedPosition = formattedPositionsArray.find(
+        (position) =>
+          position.key.tick_lower === selectedPosition?.key.tick_lower &&
+          position.key.tick_upper === selectedPosition?.key.tick_upper &&
+          position.key.pool.fee === selectedPosition?.key.pool.fee &&
+          position.key.pool.token1.toText() === selectedPosition?.key.pool.token1.toText() &&
+          position.key.pool.token0.toText() === selectedPosition?.key.pool.token0.toText() &&
+          position.key.pool.token1.toText() === selectedPosition?.key.pool.token1.toText(),
+      );
+      actions.setUserPositionsList(formattedPositionsArray);
+    }
+  }, [positionsData]);
 
   if (!selectedPosition || !icpIdentity) {
     router.push('/positions');

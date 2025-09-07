@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
 import { ActiveTick } from '@/blockchain_api/functions/icp/dex/get_active_ticks';
 import { useWatch } from 'react-hook-form';
-import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
 import PriceRangeBarChart, { ChartType } from './PriceRangeBarChart';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
@@ -19,13 +18,18 @@ const tabs: ChartType[] = [
 // TODO: handle this position:
 // when we are on fullRange and user edit the prices so should switch to custom range
 
-const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
+const StepTwoPoolExist = () => {
   const { mutateAsync: getChartData, isPending } = useGetChartData();
   const [chartData, setChartData] = useState<ActiveTick[]>();
   const [selectedTab, setSelectedTab] = useState<ChartType>(tabs[0]);
 
-  const { isToken0Selected, createPositionForm, handleInitialPriceInput, maxOrMinPriceHandler } =
-    useCreatePosition();
+  const {
+    isToken0Selected,
+    createPositionForm,
+    handleInitialPriceInput,
+    maxOrMinPriceHandler,
+    existPool,
+  } = useCreatePosition();
 
   const { unAuthenticatedAgent } = useSharedStore();
   const { icpTokens } = useSharedStore();
@@ -36,12 +40,12 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
   });
 
   const initialPrice = useMemo(() => {
-    return isToken0Selected && matchedPool.token0_price_in_token1
-      ? matchedPool.token0_price_in_token1
-      : matchedPool.token1_price_in_token0
-        ? matchedPool.token1_price_in_token0
+    return isToken0Selected && existPool!.token0_price_in_token1
+      ? existPool!.token0_price_in_token1
+      : existPool!.token1_price_in_token0
+        ? existPool!.token1_price_in_token0
         : '0';
-  }, [matchedPool, isToken0Selected, selectedTab]);
+  }, [existPool!, isToken0Selected, selectedTab]);
 
   useEffect(() => {
     if (!unAuthenticatedAgent) return;
@@ -49,8 +53,8 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
     const getChartDataHandler = async () => {
       const data = await getChartData({
         args: {
-          is_token0_selected: true,
-          pool_id: matchedPool.pool_id,
+          is_token0_selected: isToken0Selected,
+          pool_id: existPool!.pool_id,
           token0: token0,
           token1: token1,
         },
@@ -61,17 +65,19 @@ const StepTwoPoolExist = ({ matchedPool }: { matchedPool: Pool }) => {
         setChartData(data.result);
         maxOrMinPriceHandler({ minValue: 'min', maxValue: 'max' });
         handleInitialPriceInput(initialPrice);
-        if (createPositionForm.getValues('sqrtPriceX96') === '') {
-          createPositionForm.setValue('sqrtPriceX96', matchedPool.sqrt_price_x96);
-        }
       }
     };
 
     getChartDataHandler();
-  }, [unAuthenticatedAgent]);
+  }, [unAuthenticatedAgent, isToken0Selected]);
 
   useEffect(() => {
-    if (!matchedPool.sqrt_price_x96) return;
+    console.log('<============== sqrtPrice update every 30 seconds ================>');
+    createPositionForm.setValue('sqrtPriceX96', existPool!.sqrt_price_x96);
+  }, [existPool!]);
+
+  useEffect(() => {
+    if (!existPool!.sqrt_price_x96) return;
     maxOrMinPriceHandler({ minValue: 'min', maxValue: 'max' });
   }, []);
 

@@ -90,6 +90,7 @@ export default function CreatePositionStepThree() {
         unAuthenticatedAgent,
       });
       queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: ['fetch-positions'] });
     }
   };
 

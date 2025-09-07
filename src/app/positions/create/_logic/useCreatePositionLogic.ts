@@ -328,8 +328,6 @@ export default function useCreatePositionLogic() {
     isButtonDisabled: boolean;
     buttonText: string;
   } => {
-    console.log();
-
     if (isIcpBalanceLoading) {
       return {
         isButtonDisabled: true,
@@ -449,7 +447,7 @@ export default function useCreatePositionLogic() {
     }
 
     getTickSpacingHandler(createPositionForm.getValues('fee'));
-  }, [Token0, Token1]);
+  }, [Token0, Token1, pools]);
 
   const actionButtonStatus = getActionButtonStatus();
 
