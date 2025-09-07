@@ -14,11 +14,13 @@ import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { get_all_pools, Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { get_bridge_pairs } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
+import { useToast } from '@/lib/hooks/use-toast';
 
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
   const { setPools, setIcpTokens, setDexData, setBridgePairs } = useSharedStoreActions();
   const { setPendingTx } = useBridgeActions();
+  const { toast } = useToast();
 
   useEffect(() => {
     const stored = getStorageItem('icpTokens');
@@ -124,6 +126,23 @@ export default function HeaderPage() {
   useEffect(() => {
     if (dexData) setDexData(dexData);
   }, [dexData, setDexData]);
+
+  useEffect(() => {
+    const handleOffline = () => {
+      toast({ title: 'Internet connection lost', variant: 'destructive' });
+    };
+    const handleOnline = () => {
+      toast({ title: 'Internet connection restored', variant: 'success' });
+    };
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [toast]);
 
   return (
     <header className={cn('flex w-full items-center justify-between', 'mb-5 xl:mt-4')}>
