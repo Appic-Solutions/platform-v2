@@ -9,7 +9,7 @@ import { IcpToken } from '@/blockchain_api/types/tokens';
 import Box from '@/components/ui/box';
 import { cn, copyToClipboard } from '@/lib/utils';
 import Link from 'next/link';
-import { PlusIcon, SwapHorizontalIcon } from '@/components/icons';
+import { ArrowLeftIcon, PlusIcon, SwapHorizontalIcon } from '@/components/icons';
 import { Avatar } from '@/components/common/ui/avatar';
 import { CopyIcon } from 'lucide-react';
 import ChartSection from './chart-section';
@@ -85,7 +85,11 @@ export default function PositionDetail({
                   'text-2xl font-bold text-white md:text-3xl',
                 )}
               >
-                <div className="flex">
+                <div className="flex items-center gap-x-2">
+                  <ArrowLeftIcon
+                    onClick={() => clearDataHandler()}
+                    className="z-10 cursor-pointer"
+                  />
                   <Avatar
                     src={isTokenSwap ? data.result?.token1.logo : data.result?.token0.logo}
                     className="h-8 w-8 md:h-12 md:w-12"
