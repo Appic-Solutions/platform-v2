@@ -83,7 +83,7 @@ const DepositTokenInputs = () => {
                     type="text"
                     disabled={isToken0Disabled}
                     inputMode="decimal"
-                    className="border-none bg-transparent text-lg outline-none lg:text-xl"
+                    className="w-28 border-none bg-transparent text-lg outline-none md:w-full lg:text-xl"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = limitDecimalPlaces(e.target.value);
@@ -137,7 +137,7 @@ const DepositTokenInputs = () => {
                     type="text"
                     disabled={isToken1Disabled}
                     inputMode="decimal"
-                    className="border-none bg-transparent text-lg outline-none lg:text-xl"
+                    className="w-28 border-none bg-transparent text-lg outline-none md:w-full lg:text-xl"
                     value={field.value || ''}
                     onChange={(e) => {
                       const value = limitDecimalPlaces(e.target.value);
@@ -156,7 +156,7 @@ const DepositTokenInputs = () => {
         </GradientBorderCard>
         {createPositionForm.formState.errors.token0DepositAmount ||
         createPositionForm.formState.errors.token1DepositAmount ? (
-          <p className="absolute bottom-[-12%] text-[10px] text-[#EE5D5D] lg:text-sm">
+          <p className="absolute bottom-[-12%] text-[#EE5D5D] lg:text-sm">
             {createPositionForm.formState.errors.token0DepositAmount?.message ??
               createPositionForm.formState.errors.token1DepositAmount?.message}
           </p>

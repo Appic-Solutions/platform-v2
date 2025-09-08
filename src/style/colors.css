@@ -86,7 +86,7 @@
 
   --box-background: radial-gradient(100% 249.45% at 0% 2.78%, #151515 0%, #080808 100%);
 
-  --box-border-gradient: linear-gradient(170deg, #414141 18.37%, rgba(41, 41, 41, 0.3) 70.34%);
+  --box-border-gradient: linear-gradient(150deg, #414141 30.37%, rgba(41, 41, 41, 0.3) 70.34%);
 
   --highlighted-card: linear-gradient(154.24deg, rgba(0, 33, 94, 0.672) 9.35%, rgb(0, 0, 0) 157.6%);
 

@@ -36,7 +36,7 @@ const PriceRangeInputs = () => {
   return (
     <div>
       <h3 className="mb-4 text-lg font-bold lg:text-xl">Set Price range</h3>
-      <div className="relative flex justify-start gap-4 lg:justify-between">
+      <div className="relative flex justify-start gap-2 md:gap-4 lg:justify-between">
         {/* min price */}
         <GradientBorderCard
           className={cn(
@@ -51,7 +51,7 @@ const PriceRangeInputs = () => {
               <input
                 disabled={isDisabled}
                 type="text"
-                className="border-none bg-transparent text-lg outline-none lg:text-xl"
+                className="w-28 border-none bg-transparent text-lg outline-none md:w-full lg:text-xl"
                 value={minPrice === 'min' ? '0' : minPrice}
                 onFocus={(e) => {
                   if (e.target.value === '0') {
@@ -96,7 +96,7 @@ const PriceRangeInputs = () => {
               <input
                 disabled={isDisabled}
                 type="text"
-                className="border-none bg-transparent text-lg outline-none lg:text-xl"
+                className="w-28 border-none bg-transparent text-lg outline-none md:w-full lg:text-xl"
                 value={maxPrice === 'max' || maxPrice === 'Infinity' ? '\u221E' : maxPrice}
                 onFocus={(e) => {
                   if (e.target.value === '\u221E') {
@@ -142,7 +142,7 @@ const PriceRangeInputs = () => {
         </GradientBorderCard>
         {createPositionForm.formState.errors.maxPrice ||
         createPositionForm.formState.errors.minPrice ? (
-          <p className="absolute bottom-[-12%] text-[10px] text-[#EE5D5D] lg:text-sm">
+          <p className="absolute bottom-[-12%] text-sm text-[#EE5D5D]">
             {createPositionForm.formState.errors.maxPrice?.message ??
               createPositionForm.formState.errors.minPrice?.message}
           </p>

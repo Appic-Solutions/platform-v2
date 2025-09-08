@@ -97,7 +97,7 @@ const StepTwoPoolNotExist = () => {
         <GradientBorderCard className="h-[148px] md:h-40">
           <div className="flex h-full w-full flex-col justify-between font-semibold">
             <div className="flex items-start justify-between">
-              <p className="text-base text-[#FFFFFFB8] lg:text-xl">Initial price</p>
+              <p className="text-now text-base text-[#FFFFFFB8] lg:text-xl">Initial price</p>
               <TokenSwitcher />
             </div>
             <div className="flex flex-col gap-2">
@@ -115,7 +115,7 @@ const StepTwoPoolNotExist = () => {
 
       <SolidCard>
         <div className="flex w-full flex-col items-start gap-1 text-sm font-medium lg:flex-row lg:items-center lg:justify-between lg:text-lg">
-          <h3 className="w-3/4 text-ellipsis">Market Price: {marketPriceText}</h3>
+          <h3 className="w-full text-ellipsis md:w-3/4">Market Price: {marketPriceText}</h3>
           <button
             type="button"
             className="text-base text-[#FFFFFFC9] disabled:opacity-50"

@@ -45,9 +45,10 @@ const CreatePositionStepTwo = () => {
               className="z-10 inline-block cursor-pointer lg:hidden"
             />
             <AvatarGroup avatar0={token0.logo} avatar1={token1.logo} />
-            <h3 className="max-w-96 text-ellipsis text-2xl font-bold lg:text-3xl">
-              {token0.symbol}/{token1.symbol}
-            </h3>
+            <div className="flex text-2xl font-bold lg:text-3xl">
+              <h3 className="max-w-24 text-ellipsis xs:max-w-40 md:max-w-96">{token0.symbol}</h3>/
+              <h3 className="max-w-24 text-ellipsis xs:max-w-40 md:max-w-96">{token1.symbol}</h3>
+            </div>
           </div>
           <div className="flex items-center gap-x-1">
             <SolidCard size="sm">
