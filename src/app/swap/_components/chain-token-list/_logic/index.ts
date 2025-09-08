@@ -1,21 +1,26 @@
 import { TokenType, useSwapActions, useSwapStore } from '@/app/swap/_store';
+import { get_top_evm_tokens } from '@/blockchain_api/functions/evm/get_top_evm_tokens';
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useSharedStore } from '@/store/store';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 
 export const useChainListLogic = () => {
-  // Swap Actions
-  const { setTokenIn, setTokenOut, setAmount } = useSwapActions();
-  // Swap Store
-  const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
-  // shared store
-  const { evmBalance, icpBalance, icpTokens } = useSharedStore();
-
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
-  const [updatedIcpTokens, setUpdatedIcpTokens] = useState<TokenType[]>();
+  const [updatedSwapTokensList, setUpdatedSwapTokensList] = useState<TokenType[]>();
   const [query, setQuery] = useState('');
+
+  const { setTokenIn, setTokenOut, setAmount } = useSwapActions();
+  const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
+  const { evmBalance, icpBalance, icpTokens, unAuthenticatedAgent } = useSharedStore();
+
+  const { data: topEvmTokensData } = useQuery({
+    queryKey: ['top-evm-tokens'],
+    queryFn: () => get_top_evm_tokens(unAuthenticatedAgent!),
+    enabled: !!unAuthenticatedAgent,
+  });
 
   // select token function in chain token list
   function selectToken(token: EvmToken | IcpToken) {
@@ -44,60 +49,61 @@ export const useChainListLogic = () => {
   }
 
   useEffect(() => {
-    if ((icpBalance || evmBalance) && icpTokens) {
-      setUpdatedIcpTokens((prevTokens) => {
-        let updatedTokenList = prevTokens || icpTokens;
+    if (icpTokens && topEvmTokensData?.result)
+      if (icpBalance || evmBalance) {
+        setUpdatedSwapTokensList((prevTokens) => {
+          let updatedTokenList = prevTokens || [...icpTokens, ...topEvmTokensData.result];
 
-        if (icpBalance === undefined) {
-          updatedTokenList = updatedTokenList.map((token) =>
-            token.chain_type === 'ICP'
-              ? { ...token, balance: undefined, usdBalance: undefined }
-              : token,
-          );
-        }
+          if (icpBalance === undefined) {
+            updatedTokenList = updatedTokenList.map((token) =>
+              token.chain_type === 'ICP'
+                ? { ...token, balance: undefined, usdBalance: undefined }
+                : token,
+            );
+          }
 
-        if (evmBalance === undefined) {
-          updatedTokenList = updatedTokenList.map((token) =>
-            token.chain_type === 'EVM'
-              ? { ...token, balance: undefined, usdBalance: undefined }
-              : token,
-          );
-        }
+          if (evmBalance === undefined) {
+            updatedTokenList = updatedTokenList.map((token) =>
+              token.chain_type === 'EVM'
+                ? { ...token, balance: undefined, usdBalance: undefined }
+                : token,
+            );
+          }
 
-        if (icpBalance) {
-          updatedTokenList = updatedTokenList.map((token) => {
-            const foundToken = icpBalance.tokens.find((item) => {
-              if (token.chain_type === 'ICP' && token.chainId === item.chainId)
-                return item.canisterId === token.canisterId;
+          if (icpBalance) {
+            updatedTokenList = updatedTokenList.map((token) => {
+              const foundToken = icpBalance.tokens.find((item) => {
+                if (token.chain_type === 'ICP' && token.chainId === item.chainId)
+                  return item.canisterId === token.canisterId;
+              });
+              return foundToken
+                ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance }
+                : token;
             });
-            return foundToken
-              ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance }
-              : token;
-          });
-        }
+          }
 
-        if (evmBalance) {
-          updatedTokenList = updatedTokenList.map((token) => {
-            const foundToken = evmBalance.tokens.find((item) => {
-              if (
-                token.contractAddress?.toLowerCase() === item.contractAddress.toLowerCase() &&
-                token.chainId === item.chainId
-              ) {
-                return true;
-              }
+          if (evmBalance) {
+            updatedTokenList = updatedTokenList.map((token) => {
+              const foundToken = evmBalance.tokens.find((item) => {
+                if (
+                  token.contractAddress?.toLowerCase() === item.contractAddress.toLowerCase() &&
+                  token.chainId === item.chainId
+                ) {
+                  return true;
+                }
+              });
+              return foundToken
+                ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance }
+                : token;
             });
-            return foundToken
-              ? { ...token, balance: foundToken.balance, usdBalance: foundToken.usdBalance }
-              : token;
-          });
-        }
+          }
 
-        return updatedTokenList;
-      });
-    } else {
-      setUpdatedIcpTokens(icpTokens);
-    }
-  }, [evmBalance, icpBalance, icpTokens]);
+          return updatedTokenList;
+        });
+      } else {
+        setUpdatedSwapTokensList([...icpTokens, ...topEvmTokensData.result]);
+      }
+  }, [evmBalance, icpBalance, icpTokens, topEvmTokensData?.result]);
 
   // set selected chain id
   useEffect(() => {
@@ -108,6 +114,21 @@ export const useChainListLogic = () => {
       setSelectedChainId(chains[0].chainId);
     }
   }, [selectedTokenType, tokenIn, tokenOut]);
+
+  // filter tokens
+  const filteredTokens = useMemo(() => {
+    const searchQuery = query.toLowerCase();
+    const filtered = updatedSwapTokensList
+      ?.filter((token) => token.chainId === selectedChainId)
+      .filter(
+        (token) =>
+          token.name.toLowerCase().includes(searchQuery) ||
+          token.symbol.toLowerCase().includes(searchQuery) ||
+          token.contractAddress?.toLowerCase().includes(searchQuery) ||
+          token.canisterId?.toLowerCase().includes(searchQuery),
+      );
+    return filtered;
+  }, [query, selectedChainId, updatedSwapTokensList, tokenIn, selectedTokenType, tokenOut]);
 
   // sort items based on balance
   const sortTokens = (tokens: TokenType[]) => {
@@ -121,10 +142,11 @@ export const useChainListLogic = () => {
   return {
     selectToken,
     isTokenSelected,
-    updatedIcpTokens,
+    updatedSwapTokensList,
     sortTokens,
     query,
     setQuery,
+    filteredTokens,
     selectedChainId,
     setSelectedChainId,
   };

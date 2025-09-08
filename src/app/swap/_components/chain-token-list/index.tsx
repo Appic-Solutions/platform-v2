@@ -4,51 +4,27 @@ import { cn } from '@/lib/utils';
 import ChainBoxPage from './chain-box';
 import TokenCard from './token-card';
 import BoxHeader from '@/components/ui/box-header';
-import TokenSkeleton from './token-skeleton';
 import { TokenType, useSwapActions, useSwapStore } from '../../_store';
 import { useChainListLogic } from './_logic';
 import { useSharedStore } from '@/store/store';
-import { useState } from 'react';
 
 export default function TokenListPage() {
-  // store
   const { icpTokens } = useSharedStore();
-  const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
-  // Logic
+  const { selectedTokenType } = useSwapStore();
+  const { setActiveStep } = useSwapActions();
   const {
     selectToken,
-    // filteredTokens,
     sortTokens,
     selectedChainId,
     setSelectedChainId,
     query,
-    updatedIcpTokens,
+    filteredTokens,
+    isTokenSelected,
     setQuery,
   } = useChainListLogic();
-  const { setActiveStep } = useSwapActions();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const currentSelected = selectedTokenType === 'in' ? tokenIn : tokenOut;
-  const otherSelected = selectedTokenType === 'in' ? tokenOut : tokenIn;
-
-  const lowerQuery = query?.toLowerCase() || '';
-
-  const matchesSearch = (token: TokenType) =>
-    token.name.toLowerCase().includes(lowerQuery) ||
-    token.symbol.toLowerCase().includes(lowerQuery) ||
-    (token.canisterId
-      ? token.canisterId.toLowerCase().includes(lowerQuery)
-      : token.contractAddress
-        ? token.contractAddress.toLowerCase().includes(lowerQuery)
-        : null);
-
-  const filteredTokens = updatedIcpTokens?.filter(
-    (token) => token.canisterId !== otherSelected?.canisterId && matchesSearch(token),
-  );
 
   const handleTokenClick = (token: TokenType) => {
     selectToken(token);
-    setSearchQuery('');
     setActiveStep(1);
   };
 
@@ -79,7 +55,7 @@ export default function TokenListPage() {
               key={idx}
               token={token}
               onClick={() => handleTokenClick(token)}
-              isSelected={token.canisterId === currentSelected?.canisterId}
+              isSelected={isTokenSelected(token)}
             />
           ))
         ) : (
