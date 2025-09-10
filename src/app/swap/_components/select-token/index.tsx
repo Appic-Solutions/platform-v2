@@ -12,10 +12,11 @@ import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { useSwapActions, useSwapStore } from '../../_store';
 import { useQuery } from '@tanstack/react-query';
 import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
-import { IcpToken } from '@/blockchain_api/types/tokens';
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/lib/hooks/use-toast';
 import BigNumber from 'bignumber.js';
+import { fetchCrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 
 export default function SwapSelectTokenPage() {
   // swap store
@@ -34,6 +35,20 @@ export default function SwapSelectTokenPage() {
   } = useSwapSelectTokenLogic();
   const { toast } = useToast();
 
+  const getQuote = async () => {
+    let response;
+    if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
+      response = await fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount);
+      return response;
+    }
+    response = await fetchCrossChainQuote({
+      amount,
+      tokenIn: tokenIn as IcpToken | EvmToken,
+      tokenOut: tokenOut as IcpToken | EvmToken,
+    });
+    return response;
+  };
+
   const {
     data: swapQuoteData,
     isSuccess,
@@ -44,7 +59,7 @@ export default function SwapSelectTokenPage() {
     isFetching,
   } = useQuery({
     queryKey: ['swap-quot', tokenIn, tokenOut, amount],
-    queryFn: () => fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount),
+    queryFn: () => getQuote(),
     enabled: !!tokenIn && !!tokenOut && !!amount && !isNaN(Number(amount)) && Number(amount) > 0,
     refetchInterval: 20000,
   });

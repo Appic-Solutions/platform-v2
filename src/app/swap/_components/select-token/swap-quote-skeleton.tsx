@@ -3,7 +3,7 @@ import Skeleton from '@/components/ui/skeleton';
 
 const SwapQuoteSkeleton = () => {
   return (
-    <Card className="h-[343px] w-full flex-col items-start gap-4 px-4 py-0">
+    <Card className="w-full flex-col items-start gap-4 !py-4 px-4">
       {/* top section */}
       <div className="flex w-full items-center justify-between">
         <div className="flex-1">
@@ -41,12 +41,20 @@ const SwapQuoteSkeleton = () => {
             <Skeleton className="h-4 w-24" />
           </div>
           <div className="flex justify-between text-sm">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+          <div className="flex justify-between text-sm">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-28" />
           </div>
           <div className="flex justify-between text-sm">
             <Skeleton className="h-4 w-20" />
             <Skeleton className="h-4 w-12" />
+          </div>
+          <div className="flex justify-between text-sm">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-28" />
           </div>
         </div>
       </div>
