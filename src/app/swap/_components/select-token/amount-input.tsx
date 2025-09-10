@@ -12,7 +12,7 @@ const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
   const { isWalletConnected } = useSwapSelectTokenLogic();
 
-  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote, tokenOut } = useSwapStore();
+  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
   const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
 
@@ -47,8 +47,10 @@ const AmountInput = () => {
   }, [amount]);
 
   const handleAmountChange = (value: string) => {
-    const usdPrice = new BigNumber(value == '' ? '0' : value).multipliedBy(tokenIn?.usdPrice || 0);
-    setUsdPrice(usdPrice.toFixed(2));
+    const usdPrice = new BigNumber(value == '' ? '0' : value)
+      .multipliedBy(tokenIn?.usdPrice || 0)
+      .toFixed(2);
+    setUsdPrice(usdPrice);
     setAmount(value);
   };
 

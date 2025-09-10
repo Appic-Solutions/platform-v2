@@ -21,7 +21,7 @@ export const useSwapSelectTokenLogic = () => {
     selectedTokenBalance,
     swapQuote,
   } = useSwapStore();
-  const { setActiveStep, setTokenIn, setTokenOut } = useSwapActions();
+  const { setActiveStep, setTokenIn, setTokenOut, setUsdPrice } = useSwapActions();
 
   const {
     isEvmBalanceLoading,
@@ -48,6 +48,10 @@ export const useSwapSelectTokenLogic = () => {
     const temp = tokenIn;
     setTokenIn(tokenOut);
     setTokenOut(temp);
+    const usdPrice = new BigNumber(amount == '' ? '0' : amount)
+      .multipliedBy(tokenOut?.usdPrice || 0)
+      .toFixed(2);
+    setUsdPrice(usdPrice);
   }
 
   function isWalletConnected(type: 'from' | 'to') {

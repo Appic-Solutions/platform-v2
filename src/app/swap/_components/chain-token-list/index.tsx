@@ -7,10 +7,11 @@ import BoxHeader from '@/components/ui/box-header';
 import { TokenType, useSwapActions, useSwapStore } from '../../_store';
 import { useChainListLogic } from './_logic';
 import { useSharedStore } from '@/store/store';
+import { useToast } from '@/lib/hooks/use-toast';
 
 export default function TokenListPage() {
   const { icpTokens } = useSharedStore();
-  const { selectedTokenType } = useSwapStore();
+  const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
   const { setActiveStep } = useSwapActions();
   const {
     selectToken,
@@ -22,8 +23,19 @@ export default function TokenListPage() {
     isTokenSelected,
     setQuery,
   } = useChainListLogic();
+  const { toast } = useToast();
 
   const handleTokenClick = (token: TokenType) => {
+    if (
+      (token.chain_type === 'EVM' &&
+        (token.contractAddress === tokenIn?.contractAddress ||
+          token.contractAddress === tokenOut?.contractAddress)) ||
+      (token.chain_type === 'ICP' &&
+        (token.canisterId === tokenIn?.canisterId || token.canisterId === tokenOut?.canisterId))
+    ) {
+      toast({ title: 'Select different token', variant: 'default', duration: 3000 });
+      return;
+    }
     selectToken(token);
     setActiveStep(1);
   };

@@ -25,11 +25,8 @@ export const useChainListLogic = () => {
   // select token function in chain token list
   function selectToken(token: EvmToken | IcpToken) {
     const setToken = selectedTokenType === 'in' ? setTokenIn : setTokenOut;
-    if (tokenIn && tokenOut) {
-      setTokenIn(undefined);
-      setTokenOut(undefined);
-      setAmount('');
-    }
+    setAmount('');
+
     setToken(token);
   }
 
