@@ -1,6 +1,7 @@
 import { TxHash } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { IcpQuote } from '@/blockchain_api/quoter/icp';
+import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { PendingTransaction } from '@/lib/helpers/session';
 import { create } from 'zustand';
@@ -22,7 +23,7 @@ interface swapState {
   tokenOut: TokenType | undefined;
   amount: string;
   swapQuote: {
-    quote: IcpQuote | CrossChainQuote | undefined;
+    quote: IcpQuote | CrossChainQuote | SameChainQuote | undefined;
     message: string;
   };
   selectedTokenBalance: string;
@@ -41,7 +42,7 @@ type Action = {
     setSelectedTokenType: (type: SelectionType) => void;
     setAmount: (amount: string) => void;
     setSwapQuote: (params: {
-      quote: IcpQuote | CrossChainQuote | undefined;
+      quote: IcpQuote | CrossChainQuote | SameChainQuote | undefined;
       message: string;
     }) => void;
     setUsdPrice: (usdPrice: string) => void;
