@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { get_single_pool_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { useSharedStore } from '@/store/store';
 import { HttpAgent } from '@dfinity/agent';
@@ -15,6 +15,7 @@ import { CopyIcon } from 'lucide-react';
 import ChartSection from './chart-section';
 import SkeletonSection from './skeleton';
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface PositionDetailProps extends CandidPoolId {
   clearDataHandler: () => void;
@@ -26,8 +27,10 @@ export default function PositionDetail({
   fee,
   clearDataHandler,
 }: PositionDetailProps) {
-  const { unAuthenticatedAgent, icpTokens, pools } = useSharedStore();
+  const { unAuthenticatedAgent, icpTokens } = useSharedStore();
   const [isTokenSwap, setIsTokenSwap] = useState(false);
+  const queryClient = useQueryClient();
+  const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
 
   useEffect(() => {
     if (!token0 || !token1 || !fee) {
@@ -48,13 +51,13 @@ export default function PositionDetail({
           fee,
         },
         icpTokens as IcpToken[],
-        pools as Pool[],
+        icpPools as Pool[],
       );
     },
     enabled:
       !!unAuthenticatedAgent &&
       !!icpTokens?.length &&
-      !!pools?.length &&
+      !!icpPools?.length &&
       !!token0 &&
       !!token1 &&
       !!fee,

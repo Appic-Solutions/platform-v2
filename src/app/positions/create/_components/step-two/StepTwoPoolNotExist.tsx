@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import { ErrorIcon } from '@/components/icons';
@@ -8,11 +8,16 @@ import { useSharedStore } from '@/store/store';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 import TokenSwitcher from './TokenSwitcher';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 const StepTwoPoolNotExist = () => {
-  const { handleSelectedTokenChange, isToken0Selected, createPositionForm } = useCreatePosition();
+  const { isToken0Selected, createPositionForm } = useCreatePosition();
+  const queryClient = useQueryClient();
+  const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
 
-  const { icpTokens, pools } = useSharedStore();
+  const { icpTokens } = useSharedStore();
 
   const [token0, token1, initialPrice] = useWatch({
     control: createPositionForm.control,
@@ -36,7 +41,7 @@ const StepTwoPoolNotExist = () => {
     console.log('updated sqrtPrice every 30 seconds PoolNotExist ======>');
 
     return result.text;
-  }, [token0, token1, isToken0Selected, initialPrice, pools]);
+  }, [token0, token1, isToken0Selected, initialPrice, icpPools]);
 
   const marketPriceText = useMemo(() => {
     if (!token0 || !token1 || !icpTokens) return 'Market price unavailable';

@@ -1,8 +1,6 @@
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
-import { DexData } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
-import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { IcpTokensBalances } from '@/blockchain_api/functions/icp/get_icp_balances';
-import { BridgePair, EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { HttpAgent, Agent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
 import { create } from 'zustand';
@@ -19,8 +17,6 @@ interface SharedState {
   isEvmBalanceLoading: boolean;
   evmAddress: string | undefined;
   chainId: number | string | undefined;
-  pools: undefined | Pool[];
-  dexData: undefined | DexData;
   bridgePairs: undefined | (EvmToken | IcpToken)[];
 }
 
@@ -37,8 +33,6 @@ type Action = {
     setChainId: (chainId: SharedState['chainId']) => void;
     setIsIcpBalanceLoading: (isPending: SharedState['isIcpBalanceLoading']) => void;
     setIsEvmBalanceLoading: (isPending: SharedState['isEvmBalanceLoading']) => void;
-    setPools: (pools: SharedState['pools']) => void;
-    setDexData: (dex: SharedState['dexData']) => void;
     setBridgePairs: (bridgePairs: SharedState['bridgePairs']) => void;
   };
 };
@@ -56,7 +50,6 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
   isIcpBalanceLoading: false,
   isEvmBalanceLoading: false,
   pools: undefined,
-  dexData: undefined,
   bridgePairs: undefined,
   actions: {
     setIcpBalance: (balance) => set({ icpBalance: balance }),
@@ -70,8 +63,6 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
     setChainId: (chainId) => set({ chainId }),
     setIsIcpBalanceLoading: (isIcpPending) => set({ isIcpBalanceLoading: isIcpPending }),
     setIsEvmBalanceLoading: (isEvmPending) => set({ isEvmBalanceLoading: isEvmPending }),
-    setPools: (pools) => set({ pools }),
-    setDexData: (dexData) => set({ dexData }),
     setBridgePairs: (bridgePairs) => set({ bridgePairs }),
   },
 }));

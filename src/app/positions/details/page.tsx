@@ -11,12 +11,16 @@ import RemoveLiquidity from './_components/remove-liquidity';
 import CollectFees from './_components/collect-fees';
 import Details from './_components/Details';
 import { usePositionDetailsStore } from '../_store/usePositionDetailsStore';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 
 const PositionDetails = () => {
   const { currentStep, actions, selectedPosition } = usePositionDetailsStore();
-  const { icpIdentity, icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
+  const { icpIdentity, icpTokens, unAuthenticatedAgent } = useSharedStore();
+  const queryClient = useQueryClient();
+  const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
   const router = useRouter();
 
   const pathname = usePathname();
@@ -26,7 +30,7 @@ const PositionDetails = () => {
     queryFn: () =>
       getPositionsByOwner({
         icpTokens: icpTokens!,
-        pools: pools!,
+        pools: icpPools!,
         owner: icpIdentity!,
         unAuthenticatedAgent: unAuthenticatedAgent!,
       }),
@@ -36,7 +40,7 @@ const PositionDetails = () => {
     enabled:
       !!icpIdentity &&
       !!unAuthenticatedAgent &&
-      !!pools &&
+      !!icpPools &&
       !!icpTokens &&
       (pathname === '/positions' || pathname === '/positions/details'),
   });

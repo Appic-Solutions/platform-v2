@@ -15,10 +15,11 @@ import { get_all_pools, Pool } from '@/blockchain_api/functions/icp/dex/get_pool
 import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { get_bridge_pairs } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import { useToast } from '@/lib/hooks/use-toast';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
-  const { setPools, setIcpTokens, setDexData, setBridgePairs } = useSharedStoreActions();
+  const { setIcpTokens, setBridgePairs } = useSharedStoreActions();
   const { setPendingTx } = useBridgeActions();
   const { toast } = useToast();
 
@@ -71,7 +72,7 @@ export default function HeaderPage() {
   });
 
   useQuery({
-    queryKey: ['bridgePairs'],
+    queryKey: queryKeys.bridgePairs,
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
 
@@ -94,7 +95,7 @@ export default function HeaderPage() {
   });
 
   const { data: allPools } = useQuery({
-    queryKey: ['icp-pools'],
+    queryKey: queryKeys.icpPools,
     queryFn: async () => {
       const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
       if (!response.success) throw new Error('Failed to fetch all pools');
@@ -105,7 +106,7 @@ export default function HeaderPage() {
   });
 
   const { data: dexData } = useQuery({
-    queryKey: ['dex-data'],
+    queryKey: queryKeys.dexData,
     queryFn: async () => {
       const response = await get_dex_data(
         unAuthenticatedAgent as HttpAgent,
@@ -118,14 +119,6 @@ export default function HeaderPage() {
     enabled: !!unAuthenticatedAgent && !!icpTokens?.length && !!allPools?.length,
     retry: false,
   });
-
-  useEffect(() => {
-    if (allPools) setPools(allPools);
-  }, [allPools, setPools]);
-
-  useEffect(() => {
-    if (dexData) setDexData(dexData);
-  }, [dexData, setDexData]);
 
   useEffect(() => {
     const handleOffline = () => {

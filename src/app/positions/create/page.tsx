@@ -13,19 +13,19 @@ import { get_all_pools } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { HttpAgent } from '@dfinity/agent';
 import { useSharedStore } from '@/store/store';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function PoolCreatePage() {
   const { step, createPositionForm, submitHandler } = useCreatePosition();
-  const { unAuthenticatedAgent, icpTokens, actions } = useSharedStore();
+  const { unAuthenticatedAgent, icpTokens } = useSharedStore();
 
   const pathname = usePathname();
 
-  const { data: allPools } = useQuery({
-    queryKey: ['icp-pools-create'],
+  useQuery({
+    queryKey: queryKeys.icpPoolsCreatePosition,
     queryFn: async () => {
       const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
-      if (!response.success) throw new Error('Failed to fetch all pools');
+      if (!response.success) throw new Error('Failed to fetch icp pools (create position)');
       return response.result;
     },
     refetchInterval: 1000 * 30,
@@ -33,12 +33,6 @@ export default function PoolCreatePage() {
     gcTime: 1000 * 60,
     enabled: !!unAuthenticatedAgent && !!icpTokens?.length && pathname === '/positions/create',
   });
-
-  useEffect(() => {
-    if (allPools) {
-      actions.setPools(allPools);
-    }
-  }, [allPools]);
 
   return (
     <FormProvider {...createPositionForm}>
