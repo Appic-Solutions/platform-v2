@@ -12,6 +12,7 @@ export type WalletCardProps = {
   logo: string;
   title: string;
   balance: WalletBalance | undefined;
+  queryKey: string;
   disconnect: () => void;
   isLoading: boolean;
   address: string;

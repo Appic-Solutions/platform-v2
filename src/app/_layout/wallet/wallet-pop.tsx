@@ -33,6 +33,7 @@ export function WalletPop({
   address,
   isLoading,
   hasMoreToken,
+  queryKey,
 }: WalletCardProps) {
   const [showCopyPopover, setShowCopyPopover] = useState(false);
   const [activeTab, setActiveTab] = useState<BalanceType>('wallet');
@@ -48,11 +49,7 @@ export function WalletPop({
   }, [balance]);
 
   const refetchBalanceHandler = () => {
-    if (isIcpWallet) {
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
-    } else {
-      queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
-    }
+    queryClient.invalidateQueries({ queryKey: [queryKey] });
   };
 
   const copyToClipboardHandler = (address: string) => {

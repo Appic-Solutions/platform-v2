@@ -10,11 +10,11 @@ import { useAuth } from '@nfid/identitykit/react';
 import Image from 'next/image';
 import PositionCard from './_components/PositionCard';
 import Spinner from '@/components/ui/spinner';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { usePathname } from 'next/navigation';
 import { queryKeys } from '@/lib/constants/query-keys';
-import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const NeedConnectWallet = () => {
   const { connect } = useAuth();
@@ -36,12 +36,11 @@ const NeedConnectWallet = () => {
 export default function PositionsPage() {
   const { icpIdentity, icpTokens, unAuthenticatedAgent } = useSharedStore();
   const { actions, userPositionsList } = usePositionDetailsStore();
-	const pathname = usePathname();
-	const queryClient = useQueryClient();
-	const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
+  const pathname = usePathname();
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
 
   const { isPending, data: positionsData } = useQuery({
-    queryKey: queryKeys.positions,
+    queryKey: [queryKeys.positions],
     queryFn: () =>
       getPositionsByOwner({
         icpTokens: icpTokens!,

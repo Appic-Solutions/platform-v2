@@ -7,6 +7,8 @@ import { useSwapActions, useSwapStore } from '@/app/swap/_store';
 import BigNumber from 'bignumber.js';
 import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { Avatar } from '@/components/common/ui/avatar';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
@@ -14,7 +16,9 @@ const AmountInput = () => {
 
   const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
-  const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
+  const { isEvmConnected, icpIdentity } = useSharedStore();
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   useEffect(() => {
     if (tokenIn?.chain_type === 'EVM' && evmBalance) {

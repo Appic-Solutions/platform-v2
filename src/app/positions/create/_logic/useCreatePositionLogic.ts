@@ -21,11 +21,11 @@ import { limitDecimalPlaces } from '@/lib/utils';
 import BigNumber from 'bignumber.js';
 import { useAuth } from '@nfid/identitykit/react';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
-import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 export default function useCreatePositionLogic() {
-  const { icpBalance, icpIdentity, isIcpBalanceLoading } = useSharedStore();
+  const { icpIdentity, isIcpBalanceLoading } = useSharedStore();
   const [userTokenBalances, setUserTokenBalances] = useState<{
     token0Balance: string;
     token1Balance: string;
@@ -35,8 +35,8 @@ export default function useCreatePositionLogic() {
   const [existPool, setExistPool] = useState<Pool>();
   const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
   const [isToken0Selected, setIsToken0Selected] = useState(true);
-  const queryClient = useQueryClient();
-  const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
 
   const createPositionForm = useForm<CreatePositionFormDefaultValues>({
     defaultValues: {

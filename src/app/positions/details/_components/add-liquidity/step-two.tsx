@@ -30,7 +30,6 @@ export default function AddLiquidityStepTwo() {
   } = usePositionDetailsStore();
 
   const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
-  const { setIcpBalance } = useSharedStoreActions();
   if (!position) {
     router.push('/positions');
     return null;

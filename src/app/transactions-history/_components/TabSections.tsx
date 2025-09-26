@@ -8,6 +8,8 @@ import Image from 'next/image';
 import BridgeContent from './bridge-content';
 import AdvancedContent from './advanced-content';
 import DexContent from './dex-content';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const NeedConnectWallet = ({ title, description }: { title: string; description: string }) => {
   return (
@@ -26,7 +28,8 @@ const NeedConnectWallet = ({ title, description }: { title: string; description:
 
 export default function TabSection({ defaultValue }: { defaultValue: string }) {
   const router = useRouter();
-  const { icpBalance, evmBalance } = useSharedStore();
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   return (
     <Tabs

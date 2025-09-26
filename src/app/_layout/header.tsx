@@ -72,7 +72,7 @@ export default function HeaderPage() {
   });
 
   useQuery({
-    queryKey: queryKeys.bridgePairs,
+    queryKey: [queryKeys.bridgePairs],
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
 
@@ -95,7 +95,7 @@ export default function HeaderPage() {
   });
 
   const { data: allPools } = useQuery({
-    queryKey: queryKeys.icpPools,
+    queryKey: [queryKeys.icpPools],
     queryFn: async () => {
       const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
       if (!response.success) throw new Error('Failed to fetch all pools');
@@ -105,8 +105,8 @@ export default function HeaderPage() {
     retry: false,
   });
 
-  const { data: dexData } = useQuery({
-    queryKey: queryKeys.dexData,
+  useQuery({
+    queryKey: [queryKeys.dexData],
     queryFn: async () => {
       const response = await get_dex_data(
         unAuthenticatedAgent as HttpAgent,

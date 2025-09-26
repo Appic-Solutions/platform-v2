@@ -1,4 +1,6 @@
 import { TokenType, useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useSharedStore } from '@/store/store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
@@ -24,14 +26,11 @@ const SelectTokenLogic = () => {
   } = useBridgeStore();
   const { setActiveStep, setFromToken, setToToken } = useBridgeActions();
 
-  const {
-    isEvmBalanceLoading,
-    isIcpBalanceLoading,
-    isEvmConnected,
-    evmBalance,
-    icpBalance,
-    icpIdentity,
-  } = useSharedStore();
+  const { isEvmBalanceLoading, isIcpBalanceLoading, isEvmConnected, icpIdentity } =
+    useSharedStore();
+
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   function changeStep(direction: 'next' | 'prev' | number) {
     const currentStep = typeof direction === 'number' ? direction : activeStep;

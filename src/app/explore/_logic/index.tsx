@@ -1,7 +1,6 @@
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
-import { DexData } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { queryKeys } from '@/lib/constants/query-keys';
-import { useQueryClient } from '@tanstack/react-query';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useState, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -10,8 +9,7 @@ export default function ExplorePageLogic() {
     { field: 'tvl' | 'apr'; direction: 'asc' | 'desc' }[]
   >([]);
   const [detailData, setDetailData] = useState<CandidPoolId | undefined>(undefined);
-  const queryClient = useQueryClient();
-  const dexData = queryClient.getQueryData(queryKeys.dexData) as DexData | undefined;
+  const dexData = useTypedQueryData(queryKeys.dexData);
 
   const methods = useForm({ defaultValues: { search: '' } });
   const search = useWatch({ control: methods.control, name: 'search' });

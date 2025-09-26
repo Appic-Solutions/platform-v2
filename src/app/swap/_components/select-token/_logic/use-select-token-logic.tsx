@@ -1,4 +1,6 @@
 import { TokenType, useSwapActions, useSwapStore } from '@/app/swap/_store';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useSharedStore } from '@/store/store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
@@ -23,14 +25,11 @@ export const useSwapSelectTokenLogic = () => {
   } = useSwapStore();
   const { setActiveStep, setTokenIn, setTokenOut, setUsdPrice } = useSwapActions();
 
-  const {
-    isEvmBalanceLoading,
-    isIcpBalanceLoading,
-    isEvmConnected,
-    evmBalance,
-    icpBalance,
-    icpIdentity,
-  } = useSharedStore();
+  const { isEvmBalanceLoading, isIcpBalanceLoading, isEvmConnected, icpIdentity } =
+    useSharedStore();
+
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   function changeStep(direction: 'next' | 'prev' | number) {
     const currentStep = typeof direction === 'number' ? direction : activeStep;

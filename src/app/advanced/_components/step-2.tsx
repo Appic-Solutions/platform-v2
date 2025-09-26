@@ -6,11 +6,16 @@ import { Step2Data } from '../_constants';
 import { useSharedStore } from '@/store/store';
 import { Avatar } from '@/components/common/ui/avatar';
 import Spinner from '@/components/ui/spinner';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
-  const { icpIdentity, icpBalance, evmBalance } = useSharedStore();
+  const { icpIdentity } = useSharedStore();
 
   const isWalletConnected = Boolean(icpIdentity);
+
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   const token =
     icpBalance?.tokens.find((t) => t.canisterId === newTwinMeta?.creation_fee_token_address) ||

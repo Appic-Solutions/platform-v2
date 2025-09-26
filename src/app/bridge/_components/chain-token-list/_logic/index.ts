@@ -3,16 +3,17 @@ import { get_bridge_pairs_for_token } from '@/blockchain_api/functions/icp/get_b
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useSharedStore } from '@/store/store';
 import { useEffect, useMemo, useState } from 'react';
 
 export function ChainTokenListLogic() {
-  // Bridge Actions
   const { setFromToken, setToToken, setAmount } = useBridgeActions();
-  // Bridge Store
   const { selectedTokenType, fromToken, toToken } = useBridgeStore();
-  // shared store
-  const { evmBalance, icpBalance, bridgePairs } = useSharedStore();
+  const { bridgePairs } = useSharedStore();
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   const [selectedChainId, setSelectedChainId] = useState<Chain['chainId']>(0);
   const [updatedBridgePairs, setUpdatedBridgePairs] = useState<TokenType[]>();

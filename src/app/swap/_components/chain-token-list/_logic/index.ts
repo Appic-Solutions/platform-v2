@@ -3,6 +3,8 @@ import { get_top_evm_tokens } from '@/blockchain_api/functions/evm/get_top_evm_t
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useSharedStore } from '@/store/store';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -14,7 +16,10 @@ export const useChainListLogic = () => {
 
   const { setTokenIn, setTokenOut, setAmount } = useSwapActions();
   const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
-  const { evmBalance, icpBalance, icpTokens, unAuthenticatedAgent } = useSharedStore();
+  const { icpTokens, unAuthenticatedAgent } = useSharedStore();
+
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   const { data: topEvmTokensData } = useQuery({
     queryKey: ['top-evm-tokens'],

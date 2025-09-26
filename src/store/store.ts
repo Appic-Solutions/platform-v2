@@ -6,9 +6,7 @@ import { Principal } from '@dfinity/principal';
 import { create } from 'zustand';
 
 interface SharedState {
-  icpBalance: IcpTokensBalances | undefined;
   icpTokens: undefined | IcpToken[];
-  evmBalance: EvmTokensBalances | undefined;
   authenticatedAgent: Agent | undefined;
   unAuthenticatedAgent: HttpAgent | undefined;
   icpIdentity: Principal | undefined;
@@ -22,9 +20,7 @@ interface SharedState {
 
 type Action = {
   actions: {
-    setIcpBalance: (balance: SharedState['icpBalance']) => void;
     setIcpTokens: (tokens: SharedState['icpTokens']) => void;
-    setEvmBalance: (balance: SharedState['evmBalance']) => void;
     setAuthenticatedAgent: (agent: SharedState['authenticatedAgent']) => void;
     setUnAuthenticatedAgent: (agent: SharedState['unAuthenticatedAgent']) => void;
     setIcpIdentity: (identity: SharedState['icpIdentity']) => void;
@@ -38,9 +34,7 @@ type Action = {
 };
 
 export const useSharedStore = create<SharedState & Action>()((set) => ({
-  icpBalance: undefined,
   icpTokens: undefined,
-  evmBalance: undefined,
   authenticatedAgent: undefined,
   unAuthenticatedAgent: undefined,
   icpIdentity: undefined,
@@ -52,9 +46,7 @@ export const useSharedStore = create<SharedState & Action>()((set) => ({
   pools: undefined,
   bridgePairs: undefined,
   actions: {
-    setIcpBalance: (balance) => set({ icpBalance: balance }),
     setIcpTokens: (tokens) => set({ icpTokens: tokens }),
-    setEvmBalance: (balance) => set({ evmBalance: balance }),
     setAuthenticatedAgent: (agent) => set({ authenticatedAgent: agent }),
     setUnAuthenticatedAgent: (agent) => set({ unAuthenticatedAgent: agent }),
     setIcpIdentity: (identity) => set({ icpIdentity: identity }),

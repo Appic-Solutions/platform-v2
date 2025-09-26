@@ -8,14 +8,12 @@ import { useSharedStore } from '@/store/store';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 import TokenSwitcher from './TokenSwitcher';
-import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/constants/query-keys';
-import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const StepTwoPoolNotExist = () => {
   const { isToken0Selected, createPositionForm } = useCreatePosition();
-  const queryClient = useQueryClient();
-  const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
 
   const { icpTokens } = useSharedStore();
 

@@ -8,6 +8,8 @@ import AvatarGroup from '@/app/positions/_components/AvatarGroup';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { useRouter } from 'next/navigation';
 import { BigNumber } from 'bignumber.js';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
   const [isDisabled, setIsDisabled] = useState(true);
@@ -27,7 +29,8 @@ const AddLiquidityStepOne = ({ onNext }: { onNext: () => void }) => {
     token0Balance: string;
     token1Balance: string;
   }>();
-  const { icpBalance, icpIdentity } = useSharedStore();
+  const { icpIdentity } = useSharedStore();
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
 
   useEffect(() => {
     if (!icpBalance || !icpIdentity) return;

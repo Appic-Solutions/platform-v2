@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { collectFeesStepsDetails } from '@/lib/constants/positions';
 import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees';
-import { useSharedStore, useSharedStoreActions } from '@/store/store';
+import { useSharedStore } from '@/store/store';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -18,7 +18,6 @@ const CollectFees = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { selectedPosition, actions, mintStep } = usePositionDetailsStore();
   const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
-  const { setIcpBalance } = useSharedStoreActions();
   const router = useRouter();
   const queryClient = useQueryClient();
 

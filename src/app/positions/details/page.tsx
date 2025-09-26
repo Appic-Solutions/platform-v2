@@ -11,21 +11,20 @@ import RemoveLiquidity from './_components/remove-liquidity';
 import CollectFees from './_components/collect-fees';
 import Details from './_components/Details';
 import { usePositionDetailsStore } from '../_store/usePositionDetailsStore';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { queryKeys } from '@/lib/constants/query-keys';
-import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const PositionDetails = () => {
   const { currentStep, actions, selectedPosition } = usePositionDetailsStore();
   const { icpIdentity, icpTokens, unAuthenticatedAgent } = useSharedStore();
-  const queryClient = useQueryClient();
-  const icpPools = queryClient.getQueryData(queryKeys.icpPools) as Pool[];
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
   const router = useRouter();
 
   const pathname = usePathname();
 
-  const { isPending, data: positionsData } = useQuery({
+  const { data: positionsData } = useQuery({
     queryKey: ['fetch-details-positions'],
     queryFn: () =>
       getPositionsByOwner({
