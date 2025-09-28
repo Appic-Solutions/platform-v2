@@ -131,64 +131,36 @@ export const get_bridge_options = async (
 
 	try {
 		// const value = bridge_metadata.is_native ? amount : '0';
-		const value = bridge_metadata.is_native ? '1' : '0';
 		const { max_fee_per_gas, max_priority_fee_per_gas } = await get_gas_price(
 			bridge_metadata.viem_chain,
 			bridge_metadata.rpc_url,
 		);
 
 		if (bridge_metadata.tx_type == TxType.Deposit) {
-			const principal_bytes = principal_to_bytes32(
-				// cspell:ignore gplx utvsz jggch hhico 7tydb qtwu6 yiyhn
-				'6gplx-n62xg-ky6br-utvsz-l3vfe-jggch-hhico-7tydb-qtwu6-yiyhn-gqe',
-			);
 
 			// In case of native deposit we need to keep some native tokens in users wallet, otherwise the transaction will be rejected by wallet
 			if (bridge_metadata.is_native && bridge_metadata.chain_id == 8453) {
 				amount = new BigNumber(amount).minus(base_l1_fee).toFixed();
 			}
 
-			const encoded_function_data = encode_burn_or_deposit_function_data(
-				from_token.contractAddress!,
-				bridge_metadata.operator,
-				bridge_metadata.is_native,
-				principal_bytes,
-				'1',
-			);
-			const encoded_approval_data = encode_approval_function_data(
-				bridge_metadata.deposit_helper_contract,
-				amount,
-			);
-
-			// const { max_fee_per_gas } = await get_gas_price(bridge_metadata.viem_chain, bridge_metadata.rpc_url);
-
-			const { approval_gas, total_approval_fee } = await estimate_deposit_approval_fee(
-				encoded_approval_data,
-				from_token.contractAddress! as `0x${string}`,
+			const { approval_gas, total_approval_fee } = estimate_approval_fee(
 				max_fee_per_gas,
 				bridge_metadata.is_native,
-				bridge_metadata.viem_chain,
-				bridge_metadata.rpc_url,
 			);
 
 			console.log('Approval', approval_gas, total_approval_fee);
 
-			const { total_deposit_fee, deposit_gas } = await estimate_deposit_fee(
-				value,
-				encoded_function_data,
-				bridge_metadata.deposit_helper_contract,
+			const { total_gas_fee, required_gas } = estimate_gas_fee(
 				max_fee_per_gas,
-				bridge_metadata.is_native,
-				bridge_metadata.viem_chain,
-				bridge_metadata.rpc_url,
+				bridge_metadata.is_native ? "40000" : "80000",
 			);
 
-			console.log('Deposit', deposit_gas, total_deposit_fee);
+			console.log('Deposit', required_gas, total_gas_fee);
 
 			if (bridge_metadata.is_native) {
-				if (new BigNumber(total_deposit_fee).plus(total_approval_fee).isGreaterThan(amount)) {
+				if (new BigNumber(total_gas_fee).plus(total_approval_fee).isGreaterThan(amount)) {
 					return {
-						message: `Minimum amount: ${new BigNumber(total_deposit_fee)
+						message: `Minimum amount: ${new BigNumber(total_gas_fee)
 							.plus(total_approval_fee)
 							.dividedBy(10 ** 18)
 							.toFixed()}`,
@@ -212,7 +184,7 @@ export const get_bridge_options = async (
 				to_token.decimals.toFixed(),
 				agent,
 				bridge_metadata,
-				total_deposit_fee,
+				total_gas_fee,
 				total_approval_fee,
 				estimated_approval_erc20_fee,
 				amount,
@@ -220,7 +192,7 @@ export const get_bridge_options = async (
 				max_fee_per_gas,
 				max_priority_fee_per_gas,
 				approval_gas,
-				deposit_gas,
+				required_gas,
 			);
 			return { result: bridge_options, message: '', success: true };
 		} else if (bridge_metadata.tx_type == TxType.Withdrawal) {
@@ -503,94 +475,47 @@ export const get_gas_price = async (
 /**
  * Estimate gas for a deposit transaction.
  */
-const estimate_deposit_fee = async (
-	value: string,
-	encoded_function_data: `0x${string}`,
-	deposit_helper_contract: `0x${string}`,
+export const estimate_gas_fee = (
 	max_fee_per_gas: string,
-	is_native: boolean,
-	chain: ViemChain,
-	rpc_url: string,
-): Promise<{ deposit_gas: string; total_deposit_fee: string }> => {
-	try {
-		if (is_native) {
-			// const client = createPublicClient({ transport: http(rpc_url), chain });
-			// const estimated_gas = await client.estimateGas({
-			//   account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
-			//   to: deposit_helper_contract,
-			//   value: value == '0' ? undefined : BigInt(value),
-			//   type: 'eip1559',
-			//   data: encoded_function_data,
-			// });
+	required_gas: string,
+): { required_gas: string; total_gas_fee: string } => {
+	// const client = createPublicClient({ transport: http(rpc_url), chain });
+	// const estimated_gas = await client.estimateGas({
+	//   account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
+	//   to: deposit_helper_contract,
+	//   value: value == '0' ? undefined : BigInt(value),
+	//   type: 'eip1559',
+	//   data: encoded_function_data,
+	// });
 
-			// const estimated_gas_plus_1_percent = new BigNumber(estimated_gas.toString())
-			//   .plus(new BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
-			//   .toFixed(); // plus 1 percent in case gas consumption is higher
-			// console.log(estimated_gas_plus_1_percent);
+	// const estimated_gas_plus_1_percent = new BigNumber(estimated_gas.toString())
+	//   .plus(new BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
+	//   .toFixed(); // plus 1 percent in case gas consumption is higher
+	// console.log(estimated_gas_plus_1_percent);
 
-			const required_gas = '40000';
-			console.log(
-				'Deposit Fee:',
-				new BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
-			);
-			return {
-				total_deposit_fee: new BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
-				deposit_gas: required_gas,
-			};
-		} else {
-			const required_gas = '80000';
-			return {
-				deposit_gas: required_gas,
-				total_deposit_fee: new BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
-			};
-		}
-	} catch (error) {
-		console.error('Error estimating deposit gas:', error);
-		throw error;
+	return {
+		total_gas_fee: new BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
+		required_gas: required_gas,
 	}
 };
 
 /**
  * Estimate gas for a deposit approval in case of erc20 tokens.
  */
-const estimate_deposit_approval_fee: (
-	encoded_function_data: `0x${string}`,
-	token_contract_address: `0x${string}`,
+export const estimate_approval_fee=  (
 	max_fee_per_gas: string,
 	is_native: boolean,
-	chain: ViemChain,
-	rpc_url: string,
-) => Promise<{ approval_gas: string; total_approval_fee: string }> = async (
-	encoded_function_data,
-	token_contract_address,
-	max_fee_per_gas,
-	is_native,
-	chain,
-	rpc_url,
-) => {
-		if (is_native) {
-			return { approval_gas: '0', total_approval_fee: '0' };
-		}
-		try {
-			const client = createPublicClient({ transport: http(rpc_url), chain });
-			const estimated_gas = await client.estimateGas({
-				account: '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
-				to: token_contract_address,
-				type: 'eip1559',
-				data: encoded_function_data,
-			});
-			console.log(estimated_gas);
-			return {
-				total_approval_fee: new BigNumber(estimated_gas.toString())
-					.multipliedBy(max_fee_per_gas)
-					.toFixed(),
-				approval_gas: estimated_gas.toString(),
-			};
-		} catch (error) {
-			console.error('Error estimating deposit gas:', error);
-			throw error;
-		}
+) : { approval_gas: string; total_approval_fee: string } => {
+	if (is_native) {
+		return { approval_gas: '0', total_approval_fee: '0' };
+	}
+	return {
+		total_approval_fee: new BigNumber("50000")
+			.multipliedBy(max_fee_per_gas)
+			.toFixed(),
+		approval_gas: "50000",
 	};
+}
 
 /**
  * Get metadata for the bridge transaction.
@@ -699,7 +624,7 @@ export const encode_deploy_erc20_function_data = (name: string, symbol: string, 
 	return encodeFunctionData({
 		abi: appic_minter_abi_v2,
 		functionName: "deployERC20",
-		args: [name,symbol,BigInt(decimals),base_token_bytes]
+		args: [name, symbol, BigInt(decimals), base_token_bytes]
 	})
 
 }

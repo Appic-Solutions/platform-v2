@@ -1,15 +1,9 @@
 import axios from 'axios';
 import { Response } from '../types/response';
 import { EvmToken } from '../types/tokens';
+import {QswapData, Route} from "./quote_types";
 import BigNumber from 'bignumber.js';
 
-interface SameChainRoute {
-  protocol: string;
-  fee: string;
-  sell_token: string;
-  buy_token: string;
-  pool_address: string;
-}
 
 interface SameChainQuoteData {
   bestRoute: {
@@ -20,7 +14,7 @@ interface SameChainQuoteData {
     amountIn: string;
     amountOut: string;
     executionPrice: string;
-    route: SameChainRoute[];
+    route: Route[];
     path: string[];
     score: number;
     gasLimit: string;
@@ -31,11 +25,7 @@ interface SameChainQuoteData {
     slippage: string;
     estimatedTime: string;
     isICP: boolean;
-    qswapData: {
-      commands: number[];
-      commandData: string[];
-      deadline: number;
-    };
+    qswapData: QswapData;
     gasPriceUSD: string;
   };
   alternativeRoutes: [];
@@ -65,7 +55,7 @@ export interface SameChainQuote {
   amountOut: string;
   amountOutUSD: string;
   routeString: string;
-  route: SameChainRoute[];
+  route: Route[];
   score: number;
   minAmountOutRaw: string;
   minAmountOut: string;
