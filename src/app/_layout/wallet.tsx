@@ -10,19 +10,20 @@ import { WalletPop } from './wallet/wallet-pop';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
-import { getStorageItem } from '@/lib/helpers/localstorage';
 import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { Principal } from '@dfinity/principal';
 import { get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { WalletConnectButtons } from './wallet-connect-buttons';
 import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const WalletPage = () => {
   const [isFirstIcpFetch, setIsFirstIcpFetch] = useState(true);
   const queryClient = useQueryClient();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
+  const bridgePairs = useTypedQueryData(queryKeys.bridgePairs);
 
-  const { icpIdentity, evmAddress, isEvmConnected, unAuthenticatedAgent, bridgePairs } =
-    useSharedStore();
+  const { icpIdentity, evmAddress, isEvmConnected, unAuthenticatedAgent } = useSharedStore();
 
   const { setIsEvmConnected, setChainId, setIcpIdentity, setEvmAddress } = useSharedStoreActions();
 
@@ -36,11 +37,10 @@ const WalletPage = () => {
     top_tokens: boolean;
   }) => {
     try {
-      if (unAuthenticatedAgent && principal) {
-        const allIcpTokens = getStorageItem('icpTokens');
+      if (unAuthenticatedAgent && principal && icpTokens) {
         const icpBalanceRes = await get_icp_wallet_tokens_balances(
           principal.toString(),
-          JSON.parse(allIcpTokens || '[]'),
+          icpTokens,
           top_tokens,
           unAuthenticatedAgent,
         );

@@ -14,15 +14,18 @@ import { HttpAgent } from '@dfinity/agent';
 import { useSharedStore } from '@/store/store';
 import { usePathname } from 'next/navigation';
 import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 export default function PoolCreatePage() {
   const { step, createPositionForm, submitHandler } = useCreatePosition();
-  const { unAuthenticatedAgent, icpTokens } = useSharedStore();
+  const { unAuthenticatedAgent } = useSharedStore();
+
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   const pathname = usePathname();
 
   useQuery({
-    queryKey: queryKeys.icpPoolsCreatePosition,
+    queryKey: [queryKeys.icpPoolsCreatePosition],
     queryFn: async () => {
       const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
       if (!response.success) throw new Error('Failed to fetch icp pools (create position)');

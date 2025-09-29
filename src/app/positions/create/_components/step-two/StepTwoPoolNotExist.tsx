@@ -4,7 +4,6 @@ import GradientBorderCard from '@/components/ui/cards/GradientBorderCard';
 import { ErrorIcon } from '@/components/icons';
 import { useWatch } from 'react-hook-form';
 import { calculate_price, get_market_price } from '@/blockchain_api/functions/icp/dex/utils/price';
-import { useSharedStore } from '@/store/store';
 import { useCreatePosition } from '../../_context/CreatePositionContext';
 import BigNumber from 'bignumber.js';
 import TokenSwitcher from './TokenSwitcher';
@@ -14,8 +13,7 @@ import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 const StepTwoPoolNotExist = () => {
   const { isToken0Selected, createPositionForm } = useCreatePosition();
   const icpPools = useTypedQueryData(queryKeys.icpPools);
-
-  const { icpTokens } = useSharedStore();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   const [token0, token1, initialPrice] = useWatch({
     control: createPositionForm.control,

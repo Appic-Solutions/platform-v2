@@ -15,6 +15,8 @@ import { AddIcpToken } from './add-icp-token';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { getStorageItem } from '@/lib/helpers/localstorage';
 import { localStorageTemplate } from '@/lib/constants/local-storage';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function TokenListPage({
   stateBackHandler,
@@ -28,7 +30,7 @@ export default function TokenListPage({
   });
   const [showAddIcpTokenComp, setShowAddIcpTokenComp] = useState(false);
 
-  const { icpTokens } = useSharedStore();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   if (!icpTokens) {
     return null;

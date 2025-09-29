@@ -9,6 +9,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '../validation';
 import { Chain } from '@/blockchain_api/types/chains';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function LogicHelper(): UseLogicReturn {
   // State
@@ -23,7 +25,8 @@ export default function LogicHelper(): UseLogicReturn {
   const [isLoading, setIsLoading] = useState(false);
 
   // Store
-  const { unAuthenticatedAgent, authenticatedAgent, icpTokens } = useSharedStore();
+  const { unAuthenticatedAgent, authenticatedAgent } = useSharedStore();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   // Form
   const methods = useForm<DefaultValuesType>({

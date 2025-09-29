@@ -16,8 +16,9 @@ export const useChainListLogic = () => {
 
   const { setTokenIn, setTokenOut, setAmount } = useSwapActions();
   const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
-  const { icpTokens, unAuthenticatedAgent } = useSharedStore();
+  const { unAuthenticatedAgent } = useSharedStore();
 
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
   const icpBalance = useTypedQueryData(queryKeys.icpBalance);
   const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 

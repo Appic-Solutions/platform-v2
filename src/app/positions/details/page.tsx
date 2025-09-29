@@ -18,8 +18,9 @@ import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const PositionDetails = () => {
   const { currentStep, actions, selectedPosition } = usePositionDetailsStore();
-  const { icpIdentity, icpTokens, unAuthenticatedAgent } = useSharedStore();
+  const { icpIdentity, unAuthenticatedAgent } = useSharedStore();
   const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
   const router = useRouter();
 
   const pathname = usePathname();

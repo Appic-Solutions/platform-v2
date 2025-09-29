@@ -28,9 +28,10 @@ export default function PositionDetail({
   fee,
   clearDataHandler,
 }: PositionDetailProps) {
-  const { unAuthenticatedAgent, icpTokens } = useSharedStore();
+  const { unAuthenticatedAgent } = useSharedStore();
   const [isTokenSwap, setIsTokenSwap] = useState(false);
   const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   useEffect(() => {
     if (!token0 || !token1 || !fee) {

@@ -5,6 +5,7 @@ import { IcpTokensBalances } from '@/blockchain_api/functions/icp/get_icp_balanc
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 
 export const queryKeys = {
+  icpTokens: 'icp-tokens',
   icpPools: 'icp-pools',
   dexData: 'dex-data',
   bridgePairs: 'bridge-pairs',
@@ -17,6 +18,7 @@ export const queryKeys = {
 export type QueryKeys = typeof queryKeys;
 export type QueryKeyName = keyof QueryKeys;
 export type QueryReturnTypes = {
+  [queryKeys.icpTokens]: IcpToken[];
   [queryKeys.icpBalance]: IcpTokensBalances;
   [queryKeys.evmBalance]: EvmTokensBalances;
   [queryKeys.icpPools]: Pool[];

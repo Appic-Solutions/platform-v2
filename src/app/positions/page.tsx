@@ -34,10 +34,11 @@ const NeedConnectWallet = () => {
 };
 
 export default function PositionsPage() {
-  const { icpIdentity, icpTokens, unAuthenticatedAgent } = useSharedStore();
+  const { icpIdentity, unAuthenticatedAgent } = useSharedStore();
   const { actions, userPositionsList } = usePositionDetailsStore();
   const pathname = usePathname();
   const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   const { isPending, data: positionsData } = useQuery({
     queryKey: [queryKeys.positions],

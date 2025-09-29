@@ -4,15 +4,14 @@ import { cn } from '@/lib/utils';
 import ChainBoxPage from './chain-box';
 import TokenCard from './token-card';
 import BoxHeader from '@/components/ui/box-header';
-import TokenSkeleton from './token-skeleton';
 import { useBridgeActions, useBridgeStore } from '../../_store';
 import { ChainTokenListLogic } from './_logic';
-import { useSharedStore } from '@/store/store';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function TokenListPage() {
-  // store
   const { selectedTokenType } = useBridgeStore();
-  const { bridgePairs } = useSharedStore();
+  const bridgePairs = useTypedQueryData(queryKeys.bridgePairs);
   // Logic
   const {
     isTokenSelected,
