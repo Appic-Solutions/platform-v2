@@ -281,11 +281,13 @@ export async function fetchCrossChainQuote({
 
 
 			// Calculate total gas fees in USD from steps
-			let totalGasUSD = new BigNumber(0);
+			let totalGasUSD = new BigNumber(nativeTokenFees?.totalNativeFeeUSD || "0");
+
+
 			data.steps.forEach((step) => {
-				if (step.quote.rawGasEstimateUSD) {
-					totalGasUSD = totalGasUSD.plus(step.quote.rawGasEstimateUSD);
-				}
+				// if (step.quote.gasPriceUSD) {
+				// 	totalGasUSD = totalGasUSD.plus(step.quote.gasPriceUSD);
+				// }
 				if (step.quote.canisterFee) {
 					totalGasUSD = totalGasUSD.plus(step.quote.canisterFee);
 				}
