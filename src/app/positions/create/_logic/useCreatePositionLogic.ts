@@ -23,9 +23,10 @@ import { useAuth } from '@nfid/identitykit/react';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { useIsFetching } from '@tanstack/react-query';
 
 export default function useCreatePositionLogic() {
-  const { icpIdentity, isIcpBalanceLoading } = useSharedStore();
+  const { icpIdentity } = useSharedStore();
   const [userTokenBalances, setUserTokenBalances] = useState<{
     token0Balance: string;
     token1Balance: string;
@@ -37,6 +38,7 @@ export default function useCreatePositionLogic() {
   const [isToken0Selected, setIsToken0Selected] = useState(true);
   const icpPools = useTypedQueryData(queryKeys.icpPools);
   const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const isIcpBalanceFetching = useIsFetching({ queryKey: [queryKeys.icpBalance] });
 
   const createPositionForm = useForm<CreatePositionFormDefaultValues>({
     defaultValues: {
@@ -331,7 +333,7 @@ export default function useCreatePositionLogic() {
     isButtonDisabled: boolean;
     buttonText: string;
   } => {
-    if (isIcpBalanceLoading) {
+    if (isIcpBalanceFetching) {
       return {
         isButtonDisabled: true,
         buttonText: 'Fetching wallet balance',

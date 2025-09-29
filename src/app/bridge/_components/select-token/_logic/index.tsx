@@ -4,6 +4,7 @@ import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useSharedStore } from '@/store/store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
+import { useIsFetching } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 
@@ -26,11 +27,12 @@ const SelectTokenLogic = () => {
   } = useBridgeStore();
   const { setActiveStep, setFromToken, setToToken } = useBridgeActions();
 
-  const { isEvmBalanceLoading, isIcpBalanceLoading, isEvmConnected, icpIdentity } =
-    useSharedStore();
+  const { isEvmConnected, icpIdentity } = useSharedStore();
 
   const icpBalance = useTypedQueryData(queryKeys.icpBalance);
   const evmBalance = useTypedQueryData(queryKeys.evmBalance);
+  const isIcpBalanceFetching = useIsFetching({ queryKey: [queryKeys.icpBalance] });
+  const isEvmBalanceFetching = useIsFetching({ queryKey: [queryKeys.evmBalance] });
 
   function changeStep(direction: 'next' | 'prev' | number) {
     const currentStep = typeof direction === 'number' ? direction : activeStep;
@@ -85,7 +87,7 @@ const SelectTokenLogic = () => {
       };
     }
 
-    if (isEvmBalanceLoading || isIcpBalanceLoading) {
+    if (isEvmBalanceFetching || isIcpBalanceFetching) {
       return {
         isDisable: true,
         text: 'Fetching wallet balance',
