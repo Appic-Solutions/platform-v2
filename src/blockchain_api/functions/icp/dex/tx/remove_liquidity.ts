@@ -5,7 +5,7 @@ import {
 	DecreaseLiquidityArgs,
 	BurnPositionArgs,
 	Result as BurnLiquidityResult,
-	Result_3 as DecreaseLiquidityResult,
+	Result_4 as DecreaseLiquidityResult,
 } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { Response } from '@/blockchain_api/types/response';

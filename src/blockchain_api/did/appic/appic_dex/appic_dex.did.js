@@ -74,6 +74,43 @@ export const idlFactory = ({ IDL }) => {
     'Ok' : CandidPoolId,
     'Err' : CreatePoolError,
   });
+  const CrosschainSwapArgs = IDL.Record({
+    'encoded_swap_data' : IDL.Text,
+    'recipient' : IDL.Text,
+  });
+  const DepositError = IDL.Variant({
+    'TemporarilyUnavailable' : IDL.Text,
+    'InvalidDestination' : IDL.Text,
+    'InsufficientAllowance' : IDL.Record({ 'allowance' : IDL.Nat }),
+    'AmountTooLow' : IDL.Record({ 'min_withdrawal_amount' : IDL.Nat }),
+    'LockedPrincipal' : IDL.Null,
+    'AmountOverflow' : IDL.Null,
+    'InsufficientFunds' : IDL.Record({ 'balance' : IDL.Nat }),
+  });
+  const RlpDecodeError = IDL.Variant({
+    'InvalidAmount' : IDL.Null,
+    'InvalidTokenAddress' : IDL.Text,
+    'InvalidChainId' : IDL.Text,
+    'InvalidDataType' : IDL.Null,
+    'DataTooLarge' : IDL.Null,
+    'VersionMismatch' : IDL.Null,
+    'InvalidStructure' : IDL.Null,
+    'InvalidRlpData' : IDL.Null,
+    'MissingField' : IDL.Null,
+  });
+  const CrosschainSwapError = IDL.Variant({
+    'DepositError' : DepositError,
+    'InvalidEncodedData' : RlpDecodeError,
+    'InvalidToChain' : IDL.Null,
+    'InvalidTokenIn' : IDL.Null,
+    'InvalidRecipient' : IDL.Null,
+    'LockedPrincipal' : IDL.Null,
+    'InvalidIcpSwapStep' : IDL.Null,
+  });
+  const Result_3 = IDL.Variant({
+    'Ok' : IDL.Text,
+    'Err' : CrosschainSwapError,
+  });
   const DecreaseLiquidityArgs = IDL.Record({
     'amount1_min' : IDL.Nat,
     'pool' : CandidPoolId,
@@ -97,7 +134,7 @@ export const idlFactory = ({ IDL }) => {
     'AmountOverflow' : IDL.Null,
     'DecreasedPositionWithdrawalFailed' : WithdrawError,
   });
-  const Result_3 = IDL.Variant({
+  const Result_4 = IDL.Variant({
     'Ok' : IDL.Null,
     'Err' : DecreaseLiquidityError,
   });
@@ -106,16 +143,7 @@ export const idlFactory = ({ IDL }) => {
     'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
     'amount' : IDL.Nat,
   });
-  const DepositError = IDL.Variant({
-    'TemporarilyUnavailable' : IDL.Text,
-    'InvalidDestination' : IDL.Text,
-    'InsufficientAllowance' : IDL.Record({ 'allowance' : IDL.Nat }),
-    'AmountTooLow' : IDL.Record({ 'min_withdrawal_amount' : IDL.Nat }),
-    'LockedPrincipal' : IDL.Null,
-    'AmountOverflow' : IDL.Null,
-    'InsufficientFunds' : IDL.Record({ 'balance' : IDL.Nat }),
-  });
-  const Result_4 = IDL.Variant({ 'Ok' : IDL.Null, 'Err' : DepositError });
+  const Result_5 = IDL.Variant({ 'Ok' : IDL.Null, 'Err' : DepositError });
   const CandidTickInfo = IDL.Record({
     'fee_growth_outside_1_x128' : IDL.Nat,
     'liquidity_gross' : IDL.Nat,
@@ -133,10 +161,58 @@ export const idlFactory = ({ IDL }) => {
     'ExactOutputSingle' : CandidPoolId,
     'ExactInputSingle' : CandidPoolId,
   });
+  const MinterKey = IDL.Record({
+    'id' : IDL.Principal,
+    'chain_id' : IDL.Nat64,
+  });
+  const CandidRecipient = IDL.Variant({
+    'IcPrincipal' : IDL.Principal,
+    'EvmAddress' : IDL.Text,
+  });
+  const Blockchain = IDL.Variant({ 'Evm' : IDL.Nat64, 'ICP' : IDL.Null });
+  const CandidCrosschainStep = IDL.Record({
+    'gas_price_usd' : IDL.Opt(IDL.Text),
+    'canister_fee_usd' : IDL.Opt(IDL.Text),
+    'min_amount_out' : IDL.Opt(IDL.Nat),
+    'amount_out' : IDL.Nat,
+    'chain_id' : Blockchain,
+    'gas_limit' : IDL.Opt(IDL.Nat),
+    'amount_in' : IDL.Nat,
+    'max_gas_fee' : IDL.Opt(IDL.Nat),
+    'slippage' : IDL.Opt(IDL.Text),
+  });
+  const CandidCrosschainSwapOrder = IDL.Variant({
+    'EvmToEvm' : IDL.Record({
+      'tx_id' : IDL.Text,
+      'to_minter' : MinterKey,
+      'recipient' : CandidRecipient,
+      'icp_swap_request' : SwapType,
+      'from_minter' : MinterKey,
+      'from_address' : IDL.Text,
+      'evm_swap_step' : CandidCrosschainStep,
+    }),
+    'EvmToIcp' : IDL.Record({
+      'tx_id' : IDL.Text,
+      'recipient' : CandidRecipient,
+      'icp_swap_request' : SwapType,
+      'from_minter' : MinterKey,
+      'from_address' : IDL.Text,
+    }),
+    'IcpToEvm' : IDL.Record({
+      'tx_id' : IDL.Text,
+      'to_minter' : MinterKey,
+      'from' : IDL.Principal,
+      'recipient' : CandidRecipient,
+      'icp_swap_request' : SwapType,
+      'evm_swap_step' : CandidCrosschainStep,
+    }),
+  });
   const CandidEventType = IDL.Variant({
     'Swap' : IDL.Record({
       'principal' : IDL.Principal,
+      'tx_id' : IDL.Opt(IDL.Text),
       'token_in' : IDL.Principal,
+      'recipient' : IDL.Opt(IDL.Principal),
       'final_amount_in' : IDL.Nat,
       'final_amount_out' : IDL.Nat,
       'token_out' : IDL.Principal,
@@ -180,6 +256,10 @@ export const idlFactory = ({ IDL }) => {
       'liquidity' : IDL.Nat,
       'created_position' : CandidPositionKey,
       'amount1_paid' : IDL.Nat,
+    }),
+    'CrosschainSwap' : IDL.Record({
+      'swap_order' : CandidCrosschainSwapOrder,
+      'is_refunded' : IDL.Bool,
     }),
   });
   const CandidEvent = IDL.Record({
@@ -261,7 +341,7 @@ export const idlFactory = ({ IDL }) => {
     'LockedPrincipal' : IDL.Null,
     'AmountOverflow' : IDL.Null,
   });
-  const Result_5 = IDL.Variant({
+  const Result_6 = IDL.Variant({
     'Ok' : IDL.Nat,
     'Err' : IncreaseLiquidityError,
   });
@@ -288,7 +368,81 @@ export const idlFactory = ({ IDL }) => {
     'LockedPrincipal' : IDL.Null,
     'AmountOverflow' : IDL.Null,
   });
-  const Result_6 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : MintPositionError });
+  const Result_7 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : MintPositionError });
+  const ReceivedSwapOrderEvent = IDL.Record({
+    'encoded_swap_data' : IDL.Text,
+    'tx_id' : IDL.Text,
+    'token_in' : IDL.Text,
+    'recipient' : IDL.Text,
+    'amount_out' : IDL.Nat,
+    'from_address' : IDL.Text,
+    'amount_in' : IDL.Nat,
+    'token_out' : IDL.Text,
+  });
+  const SwapFailedReason = IDL.Variant({
+    'TooMuchRequested' : IDL.Null,
+    'InvalidAmount' : IDL.Null,
+    'PoolNotInitialized' : IDL.Null,
+    'InsufficientBalance' : IDL.Null,
+    'PriceLimitOutOfBounds' : IDL.Null,
+    'BalanceOverflow' : IDL.Null,
+    'TooLittleReceived' : IDL.Null,
+    'NoInRangeLiquidity' : IDL.Null,
+    'PriceLimitAlreadyExceeded' : IDL.Null,
+    'InvalidFeeForExactOutput' : IDL.Null,
+    'CalculationOverflow' : IDL.Null,
+  });
+  const SwapError = IDL.Variant({
+    'FailedToWithdraw' : IDL.Record({
+      'amount_out' : IDL.Nat,
+      'amount_in' : IDL.Nat,
+      'reason' : WithdrawError,
+    }),
+    'InvalidAmountOut' : IDL.Null,
+    'InvalidSwapChain' : IDL.Null,
+    'DepositError' : DepositError,
+    'InvalidAmountIn' : IDL.Null,
+    'InvalidAmountInMaximum' : IDL.Null,
+    'InvalidAmountOutMinimum' : IDL.Null,
+    'InvalidPoolFee' : IDL.Null,
+    'PoolNotInitialized' : IDL.Null,
+    'InvalidRoute' : IDL.Null,
+    'InvalidTokenIn' : IDL.Null,
+    'PathLengthTooSmall' : IDL.Record({
+      'minimum' : IDL.Nat8,
+      'received' : IDL.Nat8,
+    }),
+    'PathDuplicated' : IDL.Null,
+    'PathLengthTooBig' : IDL.Record({
+      'maximum' : IDL.Nat8,
+      'received' : IDL.Nat8,
+    }),
+    'LockedPrincipal' : IDL.Null,
+    'InvalidTokenOut' : IDL.Null,
+    'NoInRangeLiquidity' : IDL.Null,
+    'SwapFailedRefunded' : IDL.Record({
+      'refund_error' : IDL.Opt(WithdrawError),
+      'refund_amount' : IDL.Opt(IDL.Nat),
+      'failed_reason' : SwapFailedReason,
+    }),
+  });
+  const SwapOrderCreationError = IDL.Variant({
+    'InvalidOriginChain' : IDL.Null,
+    'InvalidAmountOut' : IDL.Null,
+    'InvalidFromAddress' : IDL.Null,
+    'InvalidOriginAndDestinationChain' : IDL.Null,
+    'InvalidToChain' : IDL.Null,
+    'InvalidTokenIn' : IDL.Null,
+    'InvalidMinter' : IDL.Null,
+    'InvalidRecipient' : IDL.Text,
+    'FailedRlpDecoding' : IDL.Null,
+    'InvalidRlpData' : RlpDecodeError,
+    'InvalidIcpSwapStep' : SwapError,
+  });
+  const Result_8 = IDL.Variant({
+    'Ok' : IDL.Null,
+    'Err' : SwapOrderCreationError,
+  });
   const CandidPathKey = IDL.Record({
     'fee' : IDL.Nat,
     'intermediary_token' : IDL.Principal,
@@ -320,10 +474,11 @@ export const idlFactory = ({ IDL }) => {
     'InvalidFeeForExactOutput' : IDL.Null,
     'CalculationOverflow' : IDL.Null,
   });
-  const Result_7 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : QuoteError });
+  const Result_9 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : QuoteError });
   const ExactOutputParams = IDL.Record({
     'amount_in_maximum' : IDL.Nat,
     'path' : IDL.Vec(CandidPathKey),
+    'recipient' : IDL.Opt(IDL.Principal),
     'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
     'amount_out' : IDL.Nat,
     'token_out' : IDL.Principal,
@@ -331,18 +486,21 @@ export const idlFactory = ({ IDL }) => {
   const ExactInputParams = IDL.Record({
     'token_in' : IDL.Principal,
     'path' : IDL.Vec(CandidPathKey),
+    'recipient' : IDL.Opt(IDL.Principal),
     'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
     'amount_out_minimum' : IDL.Nat,
     'amount_in' : IDL.Nat,
   });
   const ExactOutputSingleParams = IDL.Record({
     'amount_in_maximum' : IDL.Nat,
+    'recipient' : IDL.Opt(IDL.Principal),
     'zero_for_one' : IDL.Bool,
     'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
     'amount_out' : IDL.Nat,
     'pool_id' : CandidPoolId,
   });
   const ExactInputSingleParams = IDL.Record({
+    'recipient' : IDL.Opt(IDL.Principal),
     'zero_for_one' : IDL.Bool,
     'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
     'amount_out_minimum' : IDL.Nat,
@@ -359,62 +517,32 @@ export const idlFactory = ({ IDL }) => {
     'amount_out' : IDL.Nat,
     'amount_in' : IDL.Nat,
   });
-  const SwapFailedReason = IDL.Variant({
-    'TooMuchRequested' : IDL.Null,
-    'InvalidAmount' : IDL.Null,
-    'PoolNotInitialized' : IDL.Null,
-    'InsufficientBalance' : IDL.Null,
-    'PriceLimitOutOfBounds' : IDL.Null,
-    'BalanceOverflow' : IDL.Null,
-    'TooLittleReceived' : IDL.Null,
-    'NoInRangeLiquidity' : IDL.Null,
-    'PriceLimitAlreadyExceeded' : IDL.Null,
-    'InvalidFeeForExactOutput' : IDL.Null,
-    'CalculationOverflow' : IDL.Null,
+  const Result_10 = IDL.Variant({
+    'Ok' : CandidSwapSuccess,
+    'Err' : SwapError,
   });
-  const SwapError = IDL.Variant({
-    'FailedToWithdraw' : IDL.Record({
-      'amount_out' : IDL.Nat,
-      'amount_in' : IDL.Nat,
-      'reason' : WithdrawError,
-    }),
-    'InvalidAmountOut' : IDL.Null,
-    'DepositError' : DepositError,
-    'InvalidAmountIn' : IDL.Null,
-    'InvalidAmountInMaximum' : IDL.Null,
-    'InvalidAmountOutMinimum' : IDL.Null,
-    'InvalidPoolFee' : IDL.Null,
-    'PoolNotInitialized' : IDL.Null,
-    'PathLengthTooSmall' : IDL.Record({
-      'minimum' : IDL.Nat8,
-      'received' : IDL.Nat8,
-    }),
-    'PathDuplicated' : IDL.Null,
-    'PathLengthTooBig' : IDL.Record({
-      'maximum' : IDL.Nat8,
-      'received' : IDL.Nat8,
-    }),
-    'LockedPrincipal' : IDL.Null,
-    'NoInRangeLiquidity' : IDL.Null,
-    'SwapFailedRefunded' : IDL.Record({
-      'refund_error' : IDL.Opt(WithdrawError),
-      'refund_amount' : IDL.Opt(IDL.Nat),
-      'failed_reason' : SwapFailedReason,
-    }),
+  const CandidMinter = IDL.Record({
+    'id' : IDL.Principal,
+    'usdc_address' : IDL.Text,
+    'chain_id' : IDL.Nat64,
+    'twin_usdc_principal' : IDL.Principal,
   });
-  const Result_8 = IDL.Variant({ 'Ok' : CandidSwapSuccess, 'Err' : SwapError });
+  const UpgradeArgs = IDL.Record({
+    'upgrade_minters' : IDL.Opt(IDL.Vec(CandidMinter)),
+  });
   const UserBalanceArgs = IDL.Record({
     'token' : IDL.Principal,
     'user' : IDL.Principal,
   });
   const Balance = IDL.Record({ 'token' : IDL.Principal, 'amount' : IDL.Nat });
-  const Result_9 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : WithdrawError });
+  const Result_11 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : WithdrawError });
   return IDL.Service({
     'burn' : IDL.Func([BurnPositionArgs], [Result], []),
     'collect_fees' : IDL.Func([CandidPositionKey], [Result_1], []),
     'create_pool' : IDL.Func([CreatePoolArgs], [Result_2], []),
-    'decrease_liquidity' : IDL.Func([DecreaseLiquidityArgs], [Result_3], []),
-    'deposit' : IDL.Func([DepositArgs], [Result_4], []),
+    'cross_chain_swap' : IDL.Func([CrosschainSwapArgs], [Result_3], []),
+    'decrease_liquidity' : IDL.Func([DecreaseLiquidityArgs], [Result_4], []),
+    'deposit' : IDL.Func([DepositArgs], [Result_5], []),
     'get_active_ticks' : IDL.Func(
         [CandidPoolId],
         [IDL.Vec(CandidTickInfo)],
@@ -446,14 +574,20 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(CandidPositionKey, CandidPositionInfo))],
         ['query'],
       ),
-    'increase_liquidity' : IDL.Func([IncreaseLiquidityArgs], [Result_5], []),
-    'mint_position' : IDL.Func([MintPositionArgs], [Result_6], []),
-    'quote' : IDL.Func([QuoteArgs], [Result_7], ['query']),
-    'swap' : IDL.Func([SwapArgs], [Result_8], []),
+    'increase_liquidity' : IDL.Func([IncreaseLiquidityArgs], [Result_6], []),
+    'mint_position' : IDL.Func([MintPositionArgs], [Result_7], []),
+    'minter_order' : IDL.Func([ReceivedSwapOrderEvent], [Result_8], []),
+    'multi_quote' : IDL.Func(
+        [IDL.Vec(QuoteArgs)],
+        [IDL.Vec(Result_9)],
+        ['query'],
+      ),
+    'quote' : IDL.Func([QuoteArgs], [Result_9], ['query']),
+    'swap' : IDL.Func([SwapArgs], [Result_10], []),
+    'update_minters' : IDL.Func([UpgradeArgs], [], []),
     'user_balance' : IDL.Func([UserBalanceArgs], [IDL.Nat], ['query']),
     'user_balances' : IDL.Func([IDL.Principal], [IDL.Vec(Balance)], ['query']),
-    'withdraw' : IDL.Func([Balance], [Result_9], []),
+    'withdraw' : IDL.Func([Balance], [Result_11], []),
   });
 };
-
 export const init = ({ IDL }) => { return []; };

@@ -1,6 +1,6 @@
 import {
 	MintPositionArgs,
-	Result_6 as MintPositionResult,
+	Result_7 as MintPositionResult,
 	CreatePoolArgs,
 	Result_2 as CreatePoolResult,
 } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
