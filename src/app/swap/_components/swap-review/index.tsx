@@ -9,6 +9,7 @@ import { icpSwapStepsDetails } from '@/lib/constants/swap';
 import { useSharedStore } from '@/store/store';
 import { approve_token_in, swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
 import { useQueryClient } from '@tanstack/react-query';
+import { IcpQuote } from '@/blockchain_api/quoter/icp';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,11 +58,11 @@ export const StepperContainer = () => {
   };
 
   const swapHandler = async () => {
-    if (swapQuote && swapQuote.quote && unAuthenticatedAgent && icpIdentity) {
+    if (swapQuote && unAuthenticatedAgent && icpIdentity) {
       if (tokenIn?.chain_type === 'ICP' && authenticatedAgent && icpIdentity) {
         // step1
         const approveRes = await approve_token_in(
-          swapQuote.quote,
+          swapQuote as IcpQuote,
           authenticatedAgent,
           unAuthenticatedAgent,
         );

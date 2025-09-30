@@ -22,10 +22,7 @@ interface swapState {
   tokenIn: TokenType | undefined;
   tokenOut: TokenType | undefined;
   amount: string;
-  swapQuote: {
-    quote: IcpQuote | CrossChainQuote | SameChainQuote | undefined;
-    message: string;
-  };
+  swapQuote: IcpQuote | CrossChainQuote | SameChainQuote | undefined;
   selectedTokenBalance: string;
   toWalletAddress: string;
   toWalletValidationError: string;
@@ -41,10 +38,7 @@ type Action = {
     setActiveStep: (step: number) => void;
     setSelectedTokenType: (type: SelectionType) => void;
     setAmount: (amount: string) => void;
-    setSwapQuote: (params: {
-      quote: IcpQuote | CrossChainQuote | SameChainQuote | undefined;
-      message: string;
-    }) => void;
+    setSwapQuote: (quote: IcpQuote | CrossChainQuote | SameChainQuote | undefined) => void;
     setUsdPrice: (usdPrice: string) => void;
     setToWalletAddress: (walletAddress: string) => void;
     setToWalletValidationError: (toWalletValidationError: string) => void;
@@ -71,10 +65,7 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
     status: 'successful' as Status,
   },
   amount: '',
-  swapQuote: {
-    quote: undefined,
-    message: '',
-  },
+  swapQuote: undefined,
   tokenIn: undefined,
   selectedQuote: undefined,
   selectedTokenType: 'in',

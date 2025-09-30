@@ -11,7 +11,7 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { swapQuote, tokenOut } = useSwapStore();
   const { setActiveStep } = useSwapActions();
 
-  if (swapQuote && swapQuote.quote && tokenOut) {
+  if (swapQuote && swapQuote && tokenOut) {
     return (
       <Box
         className={cn(
@@ -58,19 +58,18 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                   <p
                     className={cn(
                       'text-lg font-semibold md:text-xl',
-                      swapQuote.quote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
+                      swapQuote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
                     )}
                   >
-                    ~{' '}
-                    {formatToSignificantFigures(swapQuote.quote.amountOut) + ' ' + tokenOut.symbol}
+                    ~ {formatToSignificantFigures(swapQuote.amountOut) + ' ' + tokenOut.symbol}
                   </p>
                   <p
                     className={cn(
                       'text-xs leading-none text-muted md:text-sm',
-                      swapQuote.quote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
+                      swapQuote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
                     )}
                   >
-                    ~ ${swapQuote.quote.amountOutUSD}
+                    ~ ${swapQuote.amountOutUSD}
                   </p>
                 </div>
               </div>
@@ -85,12 +84,12 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
             <div className="flex w-full items-end justify-end gap-x-4">
               <span className="flex w-max items-center gap-x-1">
                 <p className="text-xs font-thin text-primary">
-                  ~ $ {swapQuote.quote.transfer_approval_fees_usd}
+                  ~ $ {swapQuote.transfer_approval_fees_usd}
                 </p>
                 <FireIcon width={15} height={15} className="text-primary" />
               </span>
               <span className="flex w-max items-center gap-x-1">
-                <p className="text-xs font-thin text-primary">{swapQuote.quote.estimatedTime}</p>
+                <p className="text-xs font-thin text-primary">{swapQuote.estimatedTime}</p>
                 <ClockIcon width={15} height={15} className="text-primary" />
               </span>
             </div>
@@ -107,22 +106,22 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Route:</span>
-                    <span>{swapQuote.quote.routeString}</span>
+                    <span>{swapQuote.routeString}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Minimum Received:</span>
                     <span className="flex gap-2">
-                      <span className="text-ellipsis">{swapQuote.quote.minAmountOut}</span>
-                      <span>{swapQuote.quote.tokenOut.symbol}</span>
+                      <span className="text-ellipsis">{swapQuote.minAmountOut}</span>
+                      <span>{swapQuote.tokenOut.symbol}</span>
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Network Fee:</span>
-                    <span>~ $ {swapQuote.quote.transfer_approval_fees_usd}</span>
+                    <span>~ $ {swapQuote.transfer_approval_fees_usd}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Estimated Time:</span>
-                    <span>{swapQuote.quote.estimatedTime}</span>
+                    <span>{swapQuote.estimatedTime}</span>
                   </div>
                 </div>
               </div>

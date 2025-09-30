@@ -12,25 +12,8 @@ const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
   const { isWalletConnected } = useSwapSelectTokenLogic();
 
-  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
-  const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
-  const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
-
-  useEffect(() => {
-    if (tokenIn?.chain_type === 'EVM' && evmBalance) {
-      const mainToken = evmBalance.tokens.find(
-        (t) =>
-          t.contractAddress.toLocaleLowerCase() === tokenIn.contractAddress?.toLocaleLowerCase() &&
-          t.chainId === tokenIn.chainId,
-      );
-      setSelectedTokenBalance(mainToken?.balance || '0.00');
-    }
-
-    if (tokenIn?.chain_type === 'ICP' && icpBalance) {
-      const mainToken = icpBalance.tokens.find((t) => t.canisterId === tokenIn?.canisterId);
-      setSelectedTokenBalance(mainToken?.balance || '0.00');
-    }
-  }, [isEvmConnected, icpIdentity, tokenIn, evmBalance, icpBalance, setSelectedTokenBalance]);
+  const { tokenIn, usdPrice, amount, selectedTokenBalance } = useSwapStore();
+  const { setAmount, setUsdPrice } = useSwapActions();
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -122,11 +105,6 @@ const AmountInput = () => {
               </p>
             )}
           </div>
-          {!swapQuote.quote && swapQuote.message && (
-            <p className="absolute -bottom-5 animate-slide-in-from-top text-xs text-yellow-600">
-              {swapQuote.message}
-            </p>
-          )}
         </div>
       </div>
     </Card>

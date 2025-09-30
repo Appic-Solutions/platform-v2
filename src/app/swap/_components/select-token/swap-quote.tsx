@@ -6,9 +6,11 @@ import { ClockIcon, FireIcon } from '@/components/icons';
 import { RadialCountDown } from './radial-count-down';
 import SwapQuoteSkeleton from './swap-quote-skeleton';
 import { useSwapStore } from '../../_store';
+import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 
-const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
+export const SwapQuote = ({ isLoading }: { isLoading: boolean }) => {
   const { tokenOut, swapQuote } = useSwapStore();
+  const { nativeToken } = useSwapSelectTokenLogic();
 
   return (
     <div
@@ -22,13 +24,12 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
       <div className={cn('flex-shrink-1 h-fit w-full')}>
         {isLoading ? (
           <SwapQuoteSkeleton />
-        ) : tokenOut && swapQuote.quote ? (
+        ) : tokenOut && swapQuote ? (
           <Card
             className={cn(
-              'w-full flex-col items-start justify-between gap-3 overflow-hidden rounded-[20px] border !py-4 px-4',
+              'w-full flex-col items-start justify-between gap-3 overflow-hidden rounded-[20px] border !py-4',
               'md:rounded-[36px] md:px-6',
               'transition duration-300',
-              'cursor-pointer',
               'border-blue-600 bg-highlighted-card',
             )}
           >
@@ -51,7 +52,7 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
                   <div className={cn('relative h-7 w-7', 'lg:h-10 lg:w-10')}>
                     <Image
                       src={tokenOut.logo}
-                      alt="btc"
+                      alt={`${tokenOut.symbol} logo`}
                       className="rounded-full object-contain"
                       fill
                     />
@@ -61,19 +62,18 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
                   <p
                     className={cn(
                       'text-lg font-semibold md:text-xl',
-                      swapQuote.quote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
+                      swapQuote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
                     )}
                   >
-                    ~{' '}
-                    {formatToSignificantFigures(swapQuote.quote.amountOut) + ' ' + tokenOut.symbol}
+                    ~ {formatToSignificantFigures(swapQuote.amountOut) + ' ' + tokenOut.symbol}
                   </p>
                   <p
                     className={cn(
                       'text-xs leading-none text-muted md:text-sm',
-                      swapQuote.quote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
+                      swapQuote.amountOut.length > 7 && 'w-fit text-ellipsis md:w-56',
                     )}
                   >
-                    ~ ${swapQuote.quote.amountOutUSD}
+                    ~ ${swapQuote.amountOutUSD}
                   </p>
                 </div>
               </div>
@@ -88,12 +88,12 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
             <div className="flex w-full items-end justify-end gap-x-4">
               <span className="flex w-max items-center gap-x-1">
                 <p className="text-xs font-thin text-primary">
-                  ~ ${swapQuote.quote.transfer_approval_fees_usd}
+                  ~ ${swapQuote.transfer_approval_fees_usd}
                 </p>
                 <FireIcon width={15} height={15} className="text-primary" />
               </span>
               <span className="flex w-max items-center gap-x-1">
-                <p className="text-xs font-thin text-primary">{swapQuote.quote.estimatedTime}</p>
+                <p className="text-xs font-thin text-primary">{swapQuote.estimatedTime}</p>
                 <ClockIcon width={15} height={15} className="text-primary" />
               </span>
             </div>
@@ -110,34 +110,39 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Route:</span>
-                    <span>{swapQuote.quote.routeString}</span>
+                    <span>{swapQuote.routeString}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Minimum Received:</span>
                     <span>
-                      {swapQuote.quote.minAmountOut} {swapQuote.quote.tokenOut.symbol}
+                      {swapQuote.minAmountOut} {swapQuote.tokenOut.symbol}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Total Fees:</span>
-                    <span>~ ${swapQuote.quote.transfer_approval_fees_usd}</span>
-                  </div>
-                  {swapQuote.quote.tokenIn.chain_type === 'EVM' &&
-                    'gasFeesUSD' in swapQuote.quote && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted">Network Fee:</span>
-                        <span>~ ${swapQuote.quote.gasFeesUSD}</span>
-                      </div>
-                    )}
+                  {swapQuote.tokenIn.chain_type === 'EVM' && 'gasFeesUSD' in swapQuote ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted">Network Fee:</span>
+                      <span>
+                        ~{' '}
+                        {swapQuote.nativeTokenFees?.humanReadableTotalNativeFee +
+                          ' ' +
+                          nativeToken?.symbol}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted">Network Fee:</span>
+                      <span>~ ${swapQuote.transfer_approval_fees_usd}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Estimated Time:</span>
-                    <span>{swapQuote.quote.estimatedTime}</span>
+                    <span>{swapQuote.estimatedTime}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Execution Price:</span>
                     <span>
-                      1 {swapQuote.quote.tokenIn.symbol} ≈ {swapQuote.quote.tokenInPriceInTokenOut}{' '}
-                      {swapQuote.quote.tokenOut.symbol}
+                      1 {swapQuote.tokenIn.symbol} ≈ {swapQuote.tokenInPriceInTokenOut}{' '}
+                      {swapQuote.tokenOut.symbol}
                     </span>
                   </div>
                 </div>
@@ -149,5 +154,3 @@ const SwapQuotesList = ({ isLoading }: { isLoading: boolean }) => {
     </div>
   );
 };
-
-export default SwapQuotesList;

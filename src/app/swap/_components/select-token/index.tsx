@@ -7,7 +7,7 @@ import { TokenCard } from './token-card';
 import AmountInput from './amount-input';
 import WalletAddressInput from './wallet-address-input';
 import ActionButton from './action-button';
-import SwapOptionsList from './swap-quote-list';
+import { SwapQuote } from './swap-quote';
 import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { useSwapActions, useSwapStore } from '../../_store';
 import { useQuery } from '@tanstack/react-query';
@@ -20,12 +20,10 @@ import { fetchCrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { fetchSameChainQuote } from '@/blockchain_api/quoter/same-chain';
 
 export default function SwapSelectTokenPage() {
-  // swap store
   const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError, swapQuote } =
     useSwapStore();
   const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError, setSwapQuote } =
     useSwapActions();
-  // Logic
   const {
     changeStep,
     swapTokens,
@@ -33,27 +31,31 @@ export default function SwapSelectTokenPage() {
     setShowWalletAddress,
     actionButtonHandler,
     actionButtonStatus,
+    nativeToken,
   } = useSwapSelectTokenLogic();
   const { toast } = useToast();
 
   const getQuote = async () => {
     let response;
+
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
       response = await fetchICPQuote(tokenIn as IcpToken, tokenOut as IcpToken, amount);
       return response;
-    } else if (tokenIn?.chainId === tokenOut?.chainId) {
+    } else if (tokenIn?.chainId === tokenOut?.chainId && nativeToken) {
       response = await fetchSameChainQuote({
         amount,
         tokenIn: tokenIn as EvmToken,
         tokenOut: tokenOut as EvmToken,
+        nativeToken: nativeToken,
       });
-      return response;
+    } else {
+      response = await fetchCrossChainQuote({
+        amount,
+        tokenIn: tokenIn as IcpToken | EvmToken,
+        tokenOut: tokenOut as IcpToken | EvmToken,
+        nativeToken,
+      });
     }
-    response = await fetchCrossChainQuote({
-      amount,
-      tokenIn: tokenIn as IcpToken | EvmToken,
-      tokenOut: tokenOut as IcpToken | EvmToken,
-    });
     return response;
   };
 
@@ -81,20 +83,20 @@ export default function SwapSelectTokenPage() {
       swapQuoteData.success &&
       !BigNumber(swapQuoteData.result.amountOut).isNegative()
     ) {
-      setSwapQuote({ message: '', quote: swapQuoteData.result });
+      setSwapQuote(swapQuoteData.result);
     } else if (
       swapQuoteData &&
       swapQuoteData.result &&
       BigNumber(swapQuoteData.result.amountOut).isNegative()
     ) {
-      setSwapQuote({ message: '', quote: undefined });
+      setSwapQuote(undefined);
       toast({
         title: 'Amount too low',
         variant: 'destructive',
         duration: 3000,
       });
     } else {
-      setSwapQuote({ message: '', quote: undefined });
+      setSwapQuote(undefined);
       toast({
         title: 'No route found for selected tokens',
         variant: 'destructive',
@@ -126,7 +128,7 @@ export default function SwapSelectTokenPage() {
         'md:w-full md:max-w-[537px]',
         'overflow-x-hidden lg:overflow-x-hidden',
         'transition-[max-height] duration-300 ease-in-out',
-        Number(amount) > 0 && (swapQuote.quote || isLoading || isFetching)
+        Number(amount) > 0 && (swapQuote || isLoading || isFetching)
           ? 'lg:w-[1060px] lg:max-w-[1060px]'
           : '',
         showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
@@ -227,9 +229,8 @@ export default function SwapSelectTokenPage() {
           </div>
         </div>
 
-        {/* SWAP OPTIONS */}
-        {Number(amount) > 0 && (swapQuote.quote || isLoading || isFetching) ? (
-          <SwapOptionsList isLoading={isLoading || isFetching} />
+        {Number(amount) > 0 && (swapQuote || isLoading || isFetching) ? (
+          <SwapQuote isLoading={isLoading || isFetching} />
         ) : null}
       </div>
       {/* MOBILE ACTION BUTTONS */}

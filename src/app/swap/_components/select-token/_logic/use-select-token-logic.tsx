@@ -1,12 +1,16 @@
 import { TokenType, useSwapActions, useSwapStore } from '@/app/swap/_store';
+import { NATIVE_TOKEN_ADDRESS } from '@/blockchain_api/functions/icp/get_bridge_options';
+import { EvmToken } from '@/blockchain_api/types/tokens';
 import { useSharedStore } from '@/store/store';
 import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export const useSwapSelectTokenLogic = () => {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
+  const [userNativeToken, setUserNativeToken] = useState<EvmToken>();
+  const [nativeToken, setNativeToken] = useState<EvmToken>();
 
   const { connect: openIcpModal } = useAuth();
   const { open: openEvmModal } = useAppKit();
@@ -21,7 +25,8 @@ export const useSwapSelectTokenLogic = () => {
     selectedTokenBalance,
     swapQuote,
   } = useSwapStore();
-  const { setActiveStep, setTokenIn, setTokenOut, setUsdPrice } = useSwapActions();
+  const { setActiveStep, setTokenIn, setTokenOut, setUsdPrice, setSelectedTokenBalance } =
+    useSwapActions();
 
   const {
     isEvmBalanceLoading,
@@ -30,7 +35,36 @@ export const useSwapSelectTokenLogic = () => {
     evmBalance,
     icpBalance,
     icpIdentity,
+    bridgePairs,
   } = useSharedStore();
+
+  useEffect(() => {
+    if (tokenIn?.chain_type === 'EVM' && evmBalance) {
+      const mainToken = evmBalance.tokens.find(
+        (t) =>
+          t.contractAddress.toLocaleLowerCase() === tokenIn.contractAddress?.toLocaleLowerCase() &&
+          t.chainId === tokenIn.chainId,
+      );
+      setSelectedTokenBalance(mainToken?.balance || '0.00');
+    }
+
+    if (tokenIn?.chain_type === 'ICP' && icpBalance) {
+      const mainToken = icpBalance.tokens.find((t) => t.canisterId === tokenIn?.canisterId);
+      setSelectedTokenBalance(mainToken?.balance || '0.00');
+    }
+  }, [isEvmConnected, icpIdentity, tokenIn, evmBalance, icpBalance, setSelectedTokenBalance]);
+
+  useEffect(() => {
+    if (nativeToken) {
+      const userToken = evmBalance?.tokens.find(
+        (token) =>
+          token.canisterId === nativeToken.canisterId && token.chainId === nativeToken.chainId,
+      );
+      if (userToken) {
+        setUserNativeToken(userToken);
+      }
+    }
+  }, [tokenIn, nativeToken]);
 
   function changeStep(direction: 'next' | 'prev' | number) {
     const currentStep = typeof direction === 'number' ? direction : activeStep;
@@ -71,6 +105,13 @@ export const useSwapSelectTokenLogic = () => {
     return false;
   }
 
+  const areSameEvmTokens = (token1: EvmToken, token2: EvmToken) => {
+    if (token1.canisterId === token2.canisterId && token1.chainId === token2.chainId) {
+      return true;
+    }
+    return false;
+  };
+
   function getActionButtonStatus({ showWalletAddress }: { showWalletAddress: boolean }): {
     isDisable: boolean;
     text: string;
@@ -96,6 +137,13 @@ export const useSwapSelectTokenLogic = () => {
       };
     }
 
+    if (!swapQuote) {
+      return {
+        isDisable: true,
+        text: 'No route found',
+      };
+    }
+
     if (
       (isWalletConnected('to') && isWalletConnected('from')) ||
       (toWalletAddress && !toWalletValidationError && isWalletConnected('from'))
@@ -106,6 +154,35 @@ export const useSwapSelectTokenLogic = () => {
           text: 'INSUFFICIENT Funds',
         };
       }
+      if (
+        !userNativeToken ||
+        !userNativeToken.balance ||
+        ('nativeTokenFees' in swapQuote &&
+          swapQuote.nativeTokenFees?.humanReadableTotalNativeFee &&
+          new BigNumber(swapQuote.nativeTokenFees?.humanReadableTotalNativeFee).isGreaterThan(
+            userNativeToken.balance,
+          ))
+      ) {
+        return {
+          isDisable: true,
+          text: `INSUFFICIENT ${nativeToken?.symbol} Balance`,
+        };
+      }
+      if (
+        tokenIn.contractAddress &&
+        nativeToken &&
+        areSameEvmTokens(tokenIn, nativeToken) &&
+        'nativeTokenFees' in swapQuote &&
+        swapQuote.nativeTokenFees?.humanReadableTotalNativeFee &&
+        new BigNumber(swapQuote.nativeTokenFees?.humanReadableTotalNativeFee)
+          .plus(new BigNumber(amount))
+          .isGreaterThan(userNativeToken.balance)
+      ) {
+        return {
+          isDisable: true,
+          text: `INSUFFICIENT ${nativeToken.symbol} Balance`,
+        };
+      }
     }
 
     if (showWalletAddress) {
@@ -114,7 +191,7 @@ export const useSwapSelectTokenLogic = () => {
           isDisable: true,
           text: 'Enter Valid Address',
         };
-      } else if (!swapQuote.quote) {
+      } else if (!swapQuote) {
         return {
           isDisable: true,
           text: 'Set token amount to continue',
@@ -124,7 +201,7 @@ export const useSwapSelectTokenLogic = () => {
           isDisable: false,
           text: `Connect ${tokenIn.chain_type} Wallet`,
         };
-      } else if (swapQuote.quote && toWalletAddress && !toWalletValidationError) {
+      } else if (swapQuote && toWalletAddress && !toWalletValidationError) {
         return {
           isDisable: false,
           text: 'Review Swap',
@@ -132,7 +209,7 @@ export const useSwapSelectTokenLogic = () => {
       }
     }
 
-    if (swapQuote.quote && !swapQuote.quote) {
+    if (swapQuote && !swapQuote) {
       return {
         isDisable: true,
         text: 'Select Swap Option',
@@ -153,18 +230,13 @@ export const useSwapSelectTokenLogic = () => {
       };
     }
 
-    if (
-      toWalletAddress &&
-      !toWalletValidationError &&
-      isWalletConnected('from') &&
-      swapQuote.quote
-    ) {
+    if (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && swapQuote) {
       return {
         isDisable: false,
         text: 'Review Swap',
       };
     }
-    if (isWalletConnected('from') && isWalletConnected('to') && swapQuote.quote) {
+    if (isWalletConnected('from') && isWalletConnected('to') && swapQuote) {
       return {
         isDisable: false,
         text: 'Review Swap',
@@ -208,6 +280,17 @@ export const useSwapSelectTokenLogic = () => {
     showWalletAddress,
   });
 
+  const findNativeToken = useMemo(() => {
+    if (bridgePairs && tokenIn) {
+      const nativeToken = bridgePairs.find(
+        (t) => t.contractAddress === NATIVE_TOKEN_ADDRESS && t.chainId === tokenIn.chainId,
+      );
+      if (nativeToken) {
+        setNativeToken(nativeToken as EvmToken);
+      }
+    }
+  }, [tokenIn, bridgePairs]);
+
   return {
     changeStep,
     swapTokens,
@@ -217,5 +300,6 @@ export const useSwapSelectTokenLogic = () => {
     showWalletAddress,
     actionButtonStatus,
     isWalletConnected,
+    nativeToken,
   };
 };
