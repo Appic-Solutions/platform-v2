@@ -1,7 +1,7 @@
 import { Actor, Agent } from '@dfinity/agent';
 import { appic_dex } from '@/canister_ids.json';
 import {
-  Result_9 as WithdrawResult,
+  Result_11 as WithdrawResult,
   Balance,
 } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';

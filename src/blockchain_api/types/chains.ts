@@ -24,4 +24,5 @@ export interface Chain {
   twin_handle?: string;
   twin_token_support: boolean;
 	is_swap_active:boolean;
+	swap_contract_address?:string;
 }

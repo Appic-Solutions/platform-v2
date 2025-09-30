@@ -99,6 +99,7 @@ export interface CrossChainQuote {
 	// rpc data in case of evm to sth
 	viemChain: ViemChain | undefined,
 	rpcURl: string | undefined,
+	swapContractAddress: string | undefined;
 
 
 	amountOut: string;
@@ -118,6 +119,7 @@ export interface CrossChainQuote {
 	transfer_approval_fees_usd: string;
 	gasFeesUSD: string;
 	steps: QuoteStep[];
+	encodedData: string;
 }
 
 export async function fetchCrossChainQuote({
@@ -327,7 +329,9 @@ export async function fetchCrossChainQuote({
 				steps: data.steps,
 				nativeTokenFees,
 				viemChain,
-				rpcURl:chainAConfig?.rpc_url
+				rpcURl: chainAConfig?.rpc_url,
+				swapContractAddress: chainAConfig?.swap_contract_address,
+				encodedData: data.encodedData
 			};
 
 			return { result: quote, message: '', success: true };

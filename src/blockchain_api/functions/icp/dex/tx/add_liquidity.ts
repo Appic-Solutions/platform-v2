@@ -1,6 +1,6 @@
 import {
 	IncreaseLiquidityArgs,
-	Result_5 as IncreaseLiquidityResult,
+	Result_6 as IncreaseLiquidityResult,
 } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory as appicDexIdlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 

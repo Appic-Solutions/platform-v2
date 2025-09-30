@@ -19,7 +19,7 @@ import {
 } from '@/blockchain_api/did/ledger/icrc_types';
 import { appic_dex } from '@/canister_ids.json';
 import { Response } from '@/blockchain_api/types/response';
-import { Result_8 as SwapResult } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { Result_10 as SwapResult } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { BigNumber } from 'bignumber.js';
 

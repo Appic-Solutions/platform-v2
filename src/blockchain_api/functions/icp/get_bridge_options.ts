@@ -1,8 +1,4 @@
 import { EvmToken, IcpToken, Operator } from '@/blockchain_api/types/tokens';
-import { encodeFunctionData } from 'viem';
-import appic_minter_abi_v2 from '../../abi/appic_minter_v2.json';
-import dfinity_ck_minter_abi from '../../abi/dfinity_minter.json';
-import erc20_abi from '../../abi/erc20_tokens.json';
 import { Response } from '@/blockchain_api/types/response';
 import { Principal } from '@dfinity/principal';
 import { chains } from '@/blockchain_api/lists/chains';
@@ -101,6 +97,7 @@ export interface BridgeOption {
 // Constants
 export const DEFAULT_SUBACCOUNT =
 	'0x0000000000000000000000000000000000000000000000000000000000000000';
+
 export const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 // We also add a buffer of 1000000000000 wei or 0.000001 eth, in case that the tx is native to prevent gas + amount > balance
 const base_l1_fee = 10000000000000;
@@ -571,63 +568,6 @@ const get_deposit_helper_contract = (operator: string, chain_id: number): `0x${s
 		: (chain?.dfinity_ck_deposit_helper_contract as `0x${string}`);
 };
 
-/**
- * Encode function data for a transaction.
- */
-export const encode_burn_or_deposit_function_data = (
-	from_token_id: string, // token address
-	operator: Operator,
-	is_native: boolean,
-	principal_bytes: string, // icp recipient
-	amount: string,
-): `0x${string}` => {
-	if (operator === 'Appic') {
-		return encodeFunctionData({
-			abi: appic_minter_abi_v2,
-			functionName: 'burn',
-			args: [{
-				amount: BigInt(amount), // Convert string to BigInt for uint256
-				icpRecipient: principal_bytes as `0x${string}`, // bytes32
-				TokenAddress: from_token_id as `0x${string}`, // address
-				subaccount: DEFAULT_SUBACCOUNT as `0x${string}`, // bytes32
-			}],
-		});
-	}
-
-	return encodeFunctionData({
-		abi: dfinity_ck_minter_abi,
-		functionName: is_native ? 'depositEth' : 'depositErc20',
-		args: is_native
-			? [principal_bytes, DEFAULT_SUBACCOUNT]
-			: [from_token_id!, amount, principal_bytes, DEFAULT_SUBACCOUNT],
-	});
-};
-
-/**
- * Encode function data for a transaction.
- */
-export const encode_approval_function_data = (
-	deposit_helper_contract: `0x${string}`,
-	amount: string,
-): `0x${string}` => {
-
-	console.log("approval_amount:", amount);
-	return encodeFunctionData({
-		abi: erc20_abi,
-		functionName: 'approve',
-		args: [deposit_helper_contract, amount],
-	});
-};
-
-export const encode_deploy_erc20_function_data = (name: string, symbol: string, decimals: number,
-	base_token_bytes: string): `0x${string}` => {
-	return encodeFunctionData({
-		abi: appic_minter_abi_v2,
-		functionName: "deployERC20",
-		args: [name, symbol, BigInt(decimals), base_token_bytes]
-	})
-
-}
 
 /**
  * Calculate bridge options.

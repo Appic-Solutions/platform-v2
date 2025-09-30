@@ -21,11 +21,7 @@ import {
 } from '@/blockchain_api/did/ledger/icrc_types';
 import BigNumber from 'bignumber.js';
 import { Response } from '@/blockchain_api/types/response';
-import {
-	BridgeOption,
-	encode_approval_function_data,
-	encode_burn_or_deposit_function_data,
-} from './get_bridge_options';
+import { BridgeOption } from './get_bridge_options';
 import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
 	WithdrawalArg as AppicWithdrawalArg,
@@ -76,6 +72,7 @@ import { principal_to_bytes32 } from './utils/principal_to_hex';
 import { check_allowance } from '../evm/check_allowance';
 import { encode } from 'punycode';
 import { constructNow } from 'date-fns';
+import { encode_approval_function_data, encode_burn_or_deposit_function_data } from '@/blockchain_api/abi/abi_encoder';
 
 /**
  * Bridge Transactions: Overview
@@ -291,7 +288,7 @@ export const icrc2_approve = async (
 			}
 		}
 	} catch (error) {
-				console.log(error);
+		console.log(error);
 
 		return {
 			result: '',
@@ -351,7 +348,7 @@ export const request_withdraw = async (
 					};
 				}
 			} catch (error) {
-						console.log(error);
+				console.log(error);
 
 				return {
 					result: '',
@@ -478,7 +475,7 @@ export const request_withdraw = async (
 					};
 				}
 			} catch (error) {
-						console.log(error);
+				console.log(error);
 
 				return {
 					result: '',
@@ -515,7 +512,7 @@ export const request_withdraw = async (
 					};
 				}
 			} catch (error) {
-						console.log(error);
+				console.log(error);
 
 				return {
 					result: '',
@@ -591,7 +588,7 @@ export const notify_appic_helper_withdrawal = async (
 			};
 		}
 	} catch (error) {
-				console.log(error);
+		console.log(error);
 
 		return {
 			result: '',
@@ -664,7 +661,7 @@ export const check_withdraw_status = async (
 			};
 		}
 	} catch (error) {
-				console.log(error);
+		console.log(error);
 
 		return {
 			result: 'Call Failed',
@@ -735,7 +732,7 @@ export const create_wallet_client = async (
 
 		return walletClient;
 	} catch (error) {
-				console.log(error);
+		console.log(error);
 
 		throw error;
 	}
@@ -819,7 +816,7 @@ export const approve_erc20 = async (
 				};
 			}
 		} catch (error) {
-					console.log(error);
+			console.log(error);
 
 			return {
 				result: false,
@@ -902,7 +899,7 @@ export const request_deposit = async (
 			};
 		}
 	} catch (error) {
-				console.log(error);
+		console.log(error);
 
 		return {
 			result: '0x',
