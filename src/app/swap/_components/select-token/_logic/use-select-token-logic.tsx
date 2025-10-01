@@ -155,13 +155,14 @@ export const useSwapSelectTokenLogic = () => {
         };
       }
       if (
-        !userNativeToken ||
-        !userNativeToken.balance ||
-        ('nativeTokenFees' in swapQuote &&
-          swapQuote.nativeTokenFees?.humanReadableTotalNativeFee &&
-          new BigNumber(swapQuote.nativeTokenFees?.humanReadableTotalNativeFee).isGreaterThan(
-            userNativeToken.balance,
-          ))
+        tokenIn.contractAddress &&
+        (!userNativeToken ||
+          !userNativeToken.balance ||
+          ('nativeTokenFees' in swapQuote &&
+            swapQuote.nativeTokenFees?.totalNativeTokenfee &&
+            new BigNumber(swapQuote.nativeTokenFees?.totalNativeTokenfee).isGreaterThan(
+              userNativeToken.balance,
+            )))
       ) {
         return {
           isDisable: true,
@@ -171,10 +172,11 @@ export const useSwapSelectTokenLogic = () => {
       if (
         tokenIn.contractAddress &&
         nativeToken &&
+        userNativeToken?.balance &&
         areSameEvmTokens(tokenIn, nativeToken) &&
         'nativeTokenFees' in swapQuote &&
-        swapQuote.nativeTokenFees?.humanReadableTotalNativeFee &&
-        new BigNumber(swapQuote.nativeTokenFees?.humanReadableTotalNativeFee)
+        swapQuote.nativeTokenFees?.totalNativeTokenfee &&
+        new BigNumber(swapQuote.nativeTokenFees?.totalNativeTokenfee)
           .plus(new BigNumber(amount))
           .isGreaterThan(userNativeToken.balance)
       ) {

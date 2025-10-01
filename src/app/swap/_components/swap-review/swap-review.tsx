@@ -6,10 +6,12 @@ import Box from '@/components/ui/box';
 import BoxHeader from '@/components/ui/box-header';
 import { useSwapActions, useSwapStore } from '../../_store';
 import { DialogTrigger } from '@/components/ui/dialog';
+import { useSwapSelectTokenLogic } from '../select-token/_logic/use-select-token-logic';
 
 const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { swapQuote, tokenOut } = useSwapStore();
   const { setActiveStep } = useSwapActions();
+  const { nativeToken } = useSwapSelectTokenLogic();
 
   if (swapQuote && swapQuote && tokenOut) {
     return (
@@ -115,10 +117,22 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
                       <span>{swapQuote.tokenOut.symbol}</span>
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Network Fee:</span>
-                    <span>~ $ {swapQuote.transfer_approval_fees_usd}</span>
-                  </div>
+                  {swapQuote.tokenIn.chain_type === 'EVM' && 'gasFeesUSD' in swapQuote ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted">Network Fee:</span>
+                      <span>
+                        ~{' '}
+                        {swapQuote.nativeTokenFees?.humanReadableTotalNativeFee +
+                          ' ' +
+                          nativeToken?.symbol}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted">Network Fee:</span>
+                      <span>~ ${swapQuote.transfer_approval_fees_usd}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Estimated Time:</span>
                     <span>{swapQuote.estimatedTime}</span>

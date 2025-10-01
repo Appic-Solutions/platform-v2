@@ -6,16 +6,14 @@ import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
 import { depositStepsDetails } from '@/lib/constants/bridge';
 import { icpSwapStepsDetails } from '@/lib/constants/swap';
+import { useSwapReviewLogic } from './use-swap-review-logic';
 import { useSharedStore } from '@/store/store';
-import { approve_token_in, swap } from '@/blockchain_api/functions/icp/dex/tx/swap';
-import { useQueryClient } from '@tanstack/react-query';
-import { IcpQuote } from '@/blockchain_api/quoter/icp';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [steps, setSteps] = useState<TxStep[]>();
-  const { tokenIn, txStep, swapQuote, actions } = useSwapStore();
-  const { authenticatedAgent, unAuthenticatedAgent, icpIdentity } = useSharedStore();
+  const { tokenIn, tokenOut, txStep, toWalletAddress } = useSwapStore();
+  const { crosschainSwapExe, icpSwapExe, sameChainSWapExe } = useSwapReviewLogic();
   const {
     setAmount,
     setActiveStep,
@@ -24,7 +22,7 @@ export const StepperContainer = () => {
     setToWalletAddress,
     setWithdrawalId,
   } = useSwapActions();
-  const queryClient = useQueryClient();
+  const { evmAddress, icpIdentity } = useSharedStore();
 
   useEffect(() => {
     if (tokenIn?.chain_type === 'EVM') {
@@ -58,44 +56,12 @@ export const StepperContainer = () => {
   };
 
   const swapHandler = async () => {
-    if (swapQuote && unAuthenticatedAgent && icpIdentity) {
-      if (tokenIn?.chain_type === 'ICP' && authenticatedAgent && icpIdentity) {
-        // step1
-        const approveRes = await approve_token_in(
-          swapQuote as IcpQuote,
-          authenticatedAgent,
-          unAuthenticatedAgent,
-        );
-
-        if (!approveRes || !approveRes.result) {
-          actions.setTxStep({
-            count: 1,
-            status: 'failed',
-          });
-          return approveRes;
-        }
-
-        actions.setTxStep({
-          count: 2,
-          status: 'pending',
-        });
-
-        // Step 2
-        const removeLiquidityResponse = await swap(approveRes.result, authenticatedAgent);
-
-        if (!removeLiquidityResponse.success) {
-          actions.setTxStep({
-            count: 2,
-            status: 'failed',
-          });
-          return removeLiquidityResponse.message;
-        }
-        actions.setTxStep({
-          count: 2,
-          status: 'successful',
-        });
-      }
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+    if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
+      icpSwapExe();
+    } else if (tokenIn?.chainId === tokenOut?.chainId) {
+      sameChainSWapExe();
+    } else {
+      crosschainSwapExe();
     }
   };
 
