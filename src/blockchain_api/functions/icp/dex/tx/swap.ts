@@ -103,7 +103,6 @@ export async function swap(
   swap_args: SwapArgs,
   authenticated_agent: Agent,
 ): Promise<Response<string | undefined>> {
-  debugger;
   const dex_actor = Actor.createActor(idlFactory, {
     agent: authenticated_agent,
     canisterId: appic_dex,
