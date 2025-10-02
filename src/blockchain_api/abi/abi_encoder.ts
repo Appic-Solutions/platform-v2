@@ -77,6 +77,16 @@ export const encode_execute_swap_function_data = (
 	recipient: string, // bytes32
 	bridgeToMinter: boolean // bool
 ): string => {
+
+	console.log(commands, // uint8[]
+		data, // bytes[]
+		tokenIn, // address
+		amountIn, // uint256
+		minAmountOut, // uint256
+		deadline, // uint256
+		encodedData, // bytes
+		recipient, // bytes32
+		bridgeToMinter);
 	return encodeFunctionData({
 		abi: swap_contract_abi,
 		functionName: 'executeSwap',

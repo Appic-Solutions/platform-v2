@@ -53,7 +53,10 @@ export async function approve_token_in(
 					quote.rpcURl!,
 				);
 
+
 				if (new BigNumber(allowance).isGreaterThanOrEqualTo(quote.approvalAmount)) {
+					console.log(allowance, "allowance passed");
+
 					return {
 						result: "",
 						success: true,
@@ -198,6 +201,8 @@ export async function swap(
 	evm_address: string | undefined,
 	principal_id: Principal | undefined
 ): Promise<Response<string>> {
+
+	console.log(evm_address, principal_id);
 	let step1 = quote.steps[0].quote;
 
 	try {

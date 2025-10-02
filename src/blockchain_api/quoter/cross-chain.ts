@@ -244,8 +244,8 @@ export async function fetchCrossChainQuote({
 
 
 			if (chainA != "icp") {
-				let chainAConfig = chains.find(chain => chain.chainId == chainA)!;
-				let viemChain = chainAConfig.viem_config!;
+				chainAConfig = chains.find(chain => chain.chainId == chainA)!;
+				viemChain = chainAConfig.viem_config!;
 				let { max_fee_per_gas, max_priority_fee_per_gas } = await get_gas_price(viemChain, chainAConfig.rpc_url);
 				let gas_limit = BigNumber(data.steps[0].quote.gasLimit!).toFixed();
 				let { approval_gas, total_approval_fee } = estimate_approval_fee(max_fee_per_gas, tokenA.toLowerCase() == NATIVE_TOKEN_ADDRESS.toLowerCase());
@@ -269,10 +269,6 @@ export async function fetchCrossChainQuote({
 					maxFeePerGas: max_fee_per_gas,
 
 				} as NativeTokenFees;
-
-				viemChain = viemChain;
-				chainAConfig = chainAConfig;
-
 
 			} else {
 				nativeTokenFees = undefined;

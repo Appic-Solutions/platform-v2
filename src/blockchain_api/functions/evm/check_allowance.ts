@@ -8,6 +8,7 @@ export async function check_allowance(
 	viem_chain: ViemChain,
 	rpc_url: string,
 ): Promise<string> {
+	console.log(rpc_url);
 	const client = createPublicClient({
 		chain: viem_chain,
 		transport: http(rpc_url),
