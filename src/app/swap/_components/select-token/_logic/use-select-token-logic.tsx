@@ -69,6 +69,7 @@ export const useSwapSelectTokenLogic = () => {
   function changeStep(direction: 'next' | 'prev' | number) {
     const currentStep = typeof direction === 'number' ? direction : activeStep;
     if (direction === 'next') {
+      console.log('here');
       setActiveStep(currentStep + 1);
     } else if (direction === 'prev') {
       setActiveStep(currentStep - 1);
@@ -140,7 +141,7 @@ export const useSwapSelectTokenLogic = () => {
     if (!swapQuote) {
       return {
         isDisable: true,
-        text: 'No route found',
+        text: 'Confirm',
       };
     }
 

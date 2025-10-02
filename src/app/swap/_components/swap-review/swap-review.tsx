@@ -13,7 +13,7 @@ const SwapReview = ({ onOpenModal }: { onOpenModal: () => void }) => {
   const { setActiveStep } = useSwapActions();
   const { nativeToken } = useSwapSelectTokenLogic();
 
-  if (swapQuote && swapQuote && tokenOut) {
+  if (swapQuote && tokenOut) {
     return (
       <Box
         className={cn(

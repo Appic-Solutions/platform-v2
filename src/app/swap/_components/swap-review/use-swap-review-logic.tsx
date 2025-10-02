@@ -14,7 +14,7 @@ import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { Principal } from '@dfinity/principal';
 
 export const useSwapReviewLogic = () => {
-  const { tokenIn, tokenOut, swapQuote, actions, toWalletAddress } = useSwapStore();
+  const { tokenIn, swapQuote, actions, toWalletAddress } = useSwapStore();
   const { authenticatedAgent, icpIdentity, unAuthenticatedAgent, evmAddress } = useSharedStore();
 
   const queryClient = useQueryClient();
@@ -118,10 +118,9 @@ export const useSwapReviewLogic = () => {
         status: 'successful',
       });
     }
+    queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+    queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
   };
-
-  queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
-  queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
 
   const sameChainSWapExe = () => {};
 
