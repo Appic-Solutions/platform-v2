@@ -28,8 +28,8 @@ export default function TokenListPage() {
   const handleTokenClick = (token: TokenType) => {
     if (
       (token.chain_type === 'EVM' &&
-        (token.contractAddress === tokenIn?.contractAddress ||
-          token.contractAddress === tokenOut?.contractAddress)) ||
+        ((token.contractAddress === tokenIn?.contractAddress && token.chainId == tokenIn?.chainId) ||
+          token.contractAddress === tokenOut?.contractAddress && token.chainId == tokenOut?.chainId)) ||
       (token.chain_type === 'ICP' &&
         (token.canisterId === tokenIn?.canisterId || token.canisterId === tokenOut?.canisterId))
     ) {

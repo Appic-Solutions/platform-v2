@@ -507,10 +507,10 @@ export const estimate_approval_fee=  (
 		return { approval_gas: '0', total_approval_fee: '0' };
 	}
 	return {
-		total_approval_fee: new BigNumber("50000")
+		total_approval_fee: new BigNumber("60000")
 			.multipliedBy(max_fee_per_gas)
 			.toFixed(),
-		approval_gas: "50000",
+		approval_gas: "60000",
 	};
 }
 

@@ -21,11 +21,12 @@ import { encode_approval_function_data, encode_execute_swap_function_data } from
 import { padHex } from 'viem';
 import type { Address, Hex } from 'viem';
 import { principal_to_bytes32 } from '../icp/utils/principal_to_hex';
+import { tokens } from '@/blockchain_api/lists/sampleToken';
 
 
 // step 1
 // for swapping first we need to approve the token in spending
-export async function approve_token_in(
+export async function cross_chain_approve_token_in(
 	quote: CrossChainQuote,
 	authenticated_agent: Agent | undefined, // HttpAgent , Agent
 	unauthenticated_agent: HttpAgent,
@@ -195,27 +196,36 @@ export async function approve_token_in(
 
 // step 2 execute the swap
 // return tx hash or swapTxId
-export async function swap(
+export async function cross_chain_swap(
 	quote: CrossChainQuote,
 	authenticated_agent: Agent | undefined,
 	evm_address: string | undefined,
 	principal_id: Principal | undefined
 ): Promise<Response<string>> {
 
+	console.log(quote);
 	console.log(evm_address, principal_id);
 	let step1 = quote.steps[0].quote;
+
+	console.log(step1);
 
 	try {
 
 		if (quote.tokenIn.chain_type == "EVM") {
 			// starts from EVM
 
+
+			let wallet_client = await create_wallet_client(quote.tokenIn.chainId);
+
+			const [account] = await wallet_client.getAddresses();
+
+
 			let recipient = typeof (evm_address) == "undefined" ? principal_to_bytes32(principal_id?.toText()!) : convertAddressToBytes32(evm_address as Address);
 
 			let encoded_swap_function_data = encode_execute_swap_function_data(
-				step1.qswapData?.commands!,
+				step1.qswapData?.commands!.map(command => BigInt(command))!,
 				step1.qswapData?.commandData!,
-				step1.tokenIn as Address,
+				quote.tokenIn.contractAddress as Address,
 				BigInt(step1.amountIn),
 				BigInt(step1.minAmountOut),
 				BigInt(step1.qswapData?.deadline!),
@@ -224,22 +234,22 @@ export async function swap(
 				true
 			);
 
-			let wallet_client = await create_wallet_client(quote.tokenIn.chainId);
+			const public_client = createPublicClient({
+				transport: http(quote.rpcURl),
+				chain: quote.viemChain,
+			});
 
-			let value = step1.tokenIn == NATIVE_TOKEN_ADDRESS ? BigInt(step1.amountIn) : BigInt(0);
 
-
-
-			const [account] = await wallet_client.getAddresses();
+			let value = quote.tokenIn.contractAddress == NATIVE_TOKEN_ADDRESS ? BigInt(step1.amountIn) : BigInt(0);
 
 			const prepared_transaction = await wallet_client.prepareTransactionRequest({
 				chain: quote.viemChain,
 				account: account as `0x${string}`,
-				to: quote.tokenIn.contractAddress as `0x${string}`,
+				to: quote.swapContractAddress as `0x${string}`,
 				data: encoded_swap_function_data as `0x${string}`,
 				maxFeePerGas: BigInt(quote.nativeTokenFees?.maxFeePerGas!),
 				maxPriorityFeePerGas: BigInt(quote.nativeTokenFees?.maxPriorityFeePerGas!),
-				gas: BigInt(quote.nativeTokenFees?.approvalGasLimit!),
+				gas: BigInt(quote.nativeTokenFees?.swapGasLimit!),
 				type: 'eip1559',
 				value
 			});
@@ -249,10 +259,6 @@ export async function swap(
 				...prepared_transaction,
 			});
 
-			const public_client = createPublicClient({
-				transport: http(quote.rpcURl),
-				chain: quote.viemChain,
-			});
 
 			const tx_status = await public_client.waitForTransactionReceipt({
 				hash,

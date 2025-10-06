@@ -67,7 +67,7 @@ export const encode_deploy_erc20_function_data = (name: string, symbol: string, 
 // Assuming swap_contract_abi is defined as const swap_contract_abi: Abi = [/* the ABI object here */];
 
 export const encode_execute_swap_function_data = (
-	commands: number[], // uint8[]
+	commands: bigint[], // uint8[]
 	data: string[], // bytes[]
 	tokenIn: string, // address
 	amountIn: bigint, // uint256
@@ -78,7 +78,8 @@ export const encode_execute_swap_function_data = (
 	bridgeToMinter: boolean // bool
 ): string => {
 
-	console.log(commands, // uint8[]
+	console.log(
+		commands, // uint8[]
 		data, // bytes[]
 		tokenIn, // address
 		amountIn, // uint256

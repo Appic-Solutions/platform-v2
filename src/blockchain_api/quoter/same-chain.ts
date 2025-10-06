@@ -61,6 +61,7 @@ export interface SameChainQuote {
 	amountOut: string;
 	amountOutUSD: string;
 	routeString: string;
+	qswapData:QswapData;
 
 	// native token fees
 	nativeTokenFees: NativeTokenFees;
@@ -68,6 +69,8 @@ export interface SameChainQuote {
 	// rpc data in
 	viemChain: ViemChain | undefined,
 	rpcURl: string | undefined,
+	swapContractAddress: string | undefined;
+
 
 
 	route: Route[];
@@ -222,10 +225,13 @@ export async function fetchSameChainQuote({
 				amountOut: amountOutDec.toFixed(),
 				amountOutUSD: usdValueOut,
 				routeString,
+				qswapData:bestRoute.qswapData,
 
 				nativeTokenFees,
 				viemChain,
 				rpcURl,
+				swapContractAddress: chainConfig?.swap_contract_address,
+
 
 				route: bestRoute.route,
 				score: bestRoute.score,

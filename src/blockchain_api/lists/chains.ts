@@ -76,7 +76,7 @@ export const chains: Chain[] = [
 		twin_handle: 'base',
 		twin_token_support: true,
 		is_swap_active: true,
-		swap_contract_address: "0xa72ab997CCd4C55a7aDc049df8057D577f5322a8",
+		swap_contract_address: "0x6404e65369b008f52Eee1ba92aFd778F2C6dAF54",
 	},
 	{
 		chainId: 42161,
