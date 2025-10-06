@@ -55,7 +55,7 @@ export const chains: Chain[] = [
 		twin_handle: 'bsc',
 		twin_token_support: true,
 		is_swap_active: true,
-		swap_contract_address: "0x98fff5F36C0cF12AE16d3D80F67B5E8ab5E1FfB1",
+		swap_contract_address: "0x34b24251c1d0F7BcAD2CAe5619c2331D005d9CC8",
 	},
 	{
 		chainId: 8453,

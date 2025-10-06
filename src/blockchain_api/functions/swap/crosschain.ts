@@ -21,7 +21,15 @@ import { encode_approval_function_data, encode_execute_swap_function_data } from
 import { padHex } from 'viem';
 import type { Address, Hex } from 'viem';
 import { principal_to_bytes32 } from '../icp/utils/principal_to_hex';
-import { tokens } from '@/blockchain_api/lists/sampleToken';
+import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
+import {
+	Result as LogScrapingResult,
+} from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
+
+
+// in case the swap is usdc already and there is no swap needed
+const UNLIMITED_DEADLINE = 2388441600;
+
 
 
 // step 1
@@ -70,6 +78,22 @@ export async function cross_chain_approve_token_in(
 					quote.approvalAmount,
 				);
 
+				const public_client = createPublicClient({
+					transport: http(quote.rpcURl),
+					chain: quote.viemChain,
+				});
+
+				let estimated_gas = await public_client.estimateGas({
+					account: account as `0x${string}`,
+					to: quote.tokenIn.contractAddress as `0x${string}`,
+					data: encoded_function_data as `0x${string}`,
+					type: "eip1559"
+				});
+
+				console.log("estimated_gas:", estimated_gas);
+
+
+
 				const prepared_transaction = await wallet_client.prepareTransactionRequest({
 					chain: quote.viemChain,
 					account: account as `0x${string}`,
@@ -84,11 +108,6 @@ export async function cross_chain_approve_token_in(
 				const hash = await wallet_client.sendTransaction({
 					account: account,
 					...prepared_transaction,
-				});
-
-				const public_client = createPublicClient({
-					transport: http(quote.rpcURl),
-					chain: quote.viemChain,
 				});
 
 				const tx_status = await public_client.waitForTransactionReceipt({
@@ -199,6 +218,7 @@ export async function cross_chain_approve_token_in(
 export async function cross_chain_swap(
 	quote: CrossChainQuote,
 	authenticated_agent: Agent | undefined,
+	unauthenticated_agent: HttpAgent,
 	evm_address: string | undefined,
 	principal_id: Principal | undefined
 ): Promise<Response<string>> {
@@ -223,26 +243,37 @@ export async function cross_chain_swap(
 			let recipient = typeof (evm_address) == "undefined" ? principal_to_bytes32(principal_id?.toText()!) : convertAddressToBytes32(evm_address as Address);
 
 			let encoded_swap_function_data = encode_execute_swap_function_data(
-				step1.qswapData?.commands!.map(command => BigInt(command))!,
-				step1.qswapData?.commandData!,
+				step1.qswapData?.commands.map(command => BigInt(command)) || [],
+				step1.qswapData?.commandData || [],
 				quote.tokenIn.contractAddress as Address,
 				BigInt(step1.amountIn),
 				BigInt(step1.minAmountOut),
-				BigInt(step1.qswapData?.deadline!),
+				BigInt(step1.qswapData?.deadline || UNLIMITED_DEADLINE),
 				quote.encodedData,
 				recipient,
 				true
 			);
+
+			let value = quote.tokenIn.contractAddress == NATIVE_TOKEN_ADDRESS ? BigInt(step1.amountIn) : BigInt(0);
+
 
 			const public_client = createPublicClient({
 				transport: http(quote.rpcURl),
 				chain: quote.viemChain,
 			});
 
+			let estimated_gas = await public_client.estimateGas({
+				account: account as `0x${string}`,
+				to: quote.swapContractAddress as `0x${string}`,
+				data: encoded_swap_function_data as `0x${string}`,
+				value,
+				type: "eip1559"
+			});
 
-			let value = quote.tokenIn.contractAddress == NATIVE_TOKEN_ADDRESS ? BigInt(step1.amountIn) : BigInt(0);
+			console.log("estimated_gas:", estimated_gas);
 
-			const prepared_transaction = await wallet_client.prepareTransactionRequest({
+
+			let prepared_transaction = await wallet_client.prepareTransactionRequest({
 				chain: quote.viemChain,
 				account: account as `0x${string}`,
 				to: quote.swapContractAddress as `0x${string}`,
@@ -253,6 +284,17 @@ export async function cross_chain_swap(
 				type: 'eip1559',
 				value
 			});
+
+			setTimeout(() => { }, 1_000);
+
+			const nonce = await public_client.getTransactionCount({
+				address: account,
+				blockTag: "latest"
+			});
+
+			if (nonce != prepared_transaction.nonce) {
+				prepared_transaction.nonce = nonce;
+			}
 
 			const hash = await wallet_client.sendTransaction({
 				account: account,
@@ -266,6 +308,33 @@ export async function cross_chain_swap(
 			});
 
 			if (tx_status.status == 'success') {
+				// request log scrapping from the minter
+
+				// Create an actor for the Appic minter
+				const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+					canisterId: Principal.fromText(quote.minter_id!),
+					agent: unauthenticated_agent,
+				});
+
+				// cause block numbers update every 3 seconds
+				await new Promise(resolve => setTimeout(resolve, 3000));
+
+				const log_scraping_request_result =
+					(await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+				if ('Err' in log_scraping_request_result) {
+					if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
+						setTimeout(async () => {
+							await appic_minter_actor.request_scraping_logs();
+						}, 5000);
+					} else {
+						setTimeout(async () => {
+							await appic_minter_actor.request_scraping_logs();
+						}, 5000)
+					}
+				}
+
+				console.log(log_scraping_request_result);
+
 				return {
 					result: hash,
 					message: '',
@@ -287,7 +356,7 @@ export async function cross_chain_swap(
 				canisterId: appic_dex,
 			});
 
-			let swap_result = (await dex_actor.swap({ encoded_swap_data: quote.encodedData, recipient: evm_address } as CrosschainSwapArgs)) as CrossChainSwapResult;
+			let swap_result = (await dex_actor.cross_chain_swap({ encoded_swap_data: quote.encodedData, recipient: convertAddressToBytes32(evm_address as Address) } as CrosschainSwapArgs)) as CrossChainSwapResult;
 			if ('Err' in swap_result) {
 				console.log(swap_result.Err);
 				return {

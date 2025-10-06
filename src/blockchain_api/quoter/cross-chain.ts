@@ -7,6 +7,7 @@ import { chains } from '../lists/chains';
 import { Chain as ViemChain } from 'viem/chains';
 import { estimate_approval_fee, estimate_gas_fee, get_gas_price, NATIVE_TOKEN_ADDRESS } from '../functions/icp/get_bridge_options';
 import { Chain } from '../types/chains';
+import { Principal } from '@dfinity/principal';
 
 // Interfaces from your previous code
 interface QuoteStep {
@@ -100,7 +101,8 @@ export interface CrossChainQuote {
 	viemChain: ViemChain | undefined,
 	rpcURl: string | undefined,
 	swapContractAddress: string | undefined;
-
+	// in case the swap starts from evm the minter if of origin evm chain
+	minter_id:string | undefined;
 
 	amountOut: string;
 	amountOutUSD: string;
@@ -168,14 +170,15 @@ export async function fetchCrossChainQuote({
 		.minus(new BigNumber(feeIn))
 		.toFixed(0);
 
-	const amountInRawForApi = new BigNumber(amount).multipliedBy(bn10.pow(decimalsIn)).toFixed(0);
+	console.log(feeIn);
+	const amountInRawForApi = new BigNumber(amount).multipliedBy(bn10.pow(decimalsIn)).minus(BigNumber(feeIn).multipliedBy(2)).toFixed(0);
 	const chainA = tokenIn.chainId === 0 ? 'icp' : tokenIn.chainId;
 	const chainB = tokenOut.chainId === 0 ? 'icp' : tokenOut.chainId;
 
 
 	try {
 		const response = await axios.get<CrossChainQuoteResponse>(
-			'https://quoter.appicdao.com/api/quote/cross-chain',
+			'http://localhost:3000/api/quote/cross-chain',
 			{
 				params: {
 					tokenA,
@@ -326,6 +329,7 @@ export async function fetchCrossChainQuote({
 				nativeTokenFees,
 				viemChain,
 				rpcURl: chainAConfig?.rpc_url,
+				minter_id:chainAConfig?.appic_minter_address,
 				swapContractAddress: chainAConfig?.swap_contract_address,
 				encodedData: data.encodedData
 			};

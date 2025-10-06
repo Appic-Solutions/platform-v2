@@ -98,6 +98,7 @@ export const useSwapReviewLogic = () => {
 				swapRes = await crossChainSwap(
 					swapQuote as CrossChainQuote,
 					authenticatedAgent,
+					unAuthenticatedAgent,
 					undefined,
 					toWalletAddress ? Principal.fromText(toWalletAddress) : icpIdentity,
 				);
@@ -106,6 +107,7 @@ export const useSwapReviewLogic = () => {
 				swapRes = await crossChainSwap(
 					swapQuote as CrossChainQuote,
 					authenticatedAgent,
+					unAuthenticatedAgent,
 					toWalletAddress ? toWalletAddress : evmAddress,
 					undefined,
 				);
@@ -115,6 +117,7 @@ export const useSwapReviewLogic = () => {
 				swapRes = await crossChainSwap(
 					swapQuote as CrossChainQuote,
 					authenticatedAgent,
+					unAuthenticatedAgent,
 					toWalletAddress ? toWalletAddress : evmAddress,
 					undefined,
 				);

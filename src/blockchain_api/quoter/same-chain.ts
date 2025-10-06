@@ -5,7 +5,6 @@ import { QswapData, Route } from "./quote_types";
 import BigNumber from 'bignumber.js';
 import { NativeTokenFees } from './cross-chain';
 import { Chain as ViemChain } from 'viem/chains';
-import { Chain } from '../types/chains';
 import { chains } from '../lists/chains';
 import { estimate_approval_fee, estimate_gas_fee, get_gas_price, NATIVE_TOKEN_ADDRESS } from '../functions/icp/get_bridge_options';
 
