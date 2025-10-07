@@ -178,7 +178,7 @@ export async function fetchCrossChainQuote({
 
 	try {
 		const response = await axios.get<CrossChainQuoteResponse>(
-			'http://localhost:3000/api/quote/cross-chain',
+			'https://quoter.appicdao.com/api/quote/cross-chain',
 			{
 				params: {
 					tokenA,
