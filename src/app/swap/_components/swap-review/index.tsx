@@ -4,15 +4,17 @@ import { useEffect, useState } from 'react';
 import { useSwapActions, useSwapStore } from '../../_store';
 import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
-import { depositStepsDetails } from '@/lib/constants/bridge';
-import { icpSwapStepsDetails } from '@/lib/constants/swap';
+import {
+  icpSwapStepsDetails,
+  crosschainSwapStepsDetails,
+  sameChainSwapStepsDetails,
+} from '@/lib/constants/swap';
 import { useSwapReviewLogic } from './use-swap-review-logic';
-import { useSharedStore } from '@/store/store';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [steps, setSteps] = useState<TxStep[]>();
-  const { tokenIn, tokenOut, txStep, toWalletAddress } = useSwapStore();
+  const { tokenIn, tokenOut, txStep } = useSwapStore();
   const { crosschainSwapExe, icpSwapExe, sameChainSWapExe } = useSwapReviewLogic();
   const {
     setAmount,
@@ -22,14 +24,14 @@ export const StepperContainer = () => {
     setToWalletAddress,
     setWithdrawalId,
   } = useSwapActions();
-  const { evmAddress, icpIdentity } = useSharedStore();
 
   useEffect(() => {
-    if (tokenIn?.chain_type === 'EVM') {
-      setSteps(depositStepsDetails);
-    }
-    if (tokenIn?.chain_type === 'ICP') {
+    if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
       setSteps(icpSwapStepsDetails);
+    } else if (tokenIn?.chainId === tokenOut?.chainId) {
+      setSteps(sameChainSwapStepsDetails);
+    } else {
+      setSteps(crosschainSwapStepsDetails);
     }
   }, [tokenIn]);
 
@@ -57,13 +59,10 @@ export const StepperContainer = () => {
 
   const swapHandler = async () => {
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
-      console.log('icp swap started');
       icpSwapExe();
     } else if (tokenIn?.chainId === tokenOut?.chainId) {
-      console.log('same chain swap started');
       sameChainSWapExe();
     } else {
-      console.log('crosschain swap started');
       crosschainSwapExe();
     }
   };
