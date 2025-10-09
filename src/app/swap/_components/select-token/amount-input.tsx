@@ -7,13 +7,34 @@ import { useSwapActions, useSwapStore } from '@/app/swap/_store';
 import BigNumber from 'bignumber.js';
 import { useSwapSelectTokenLogic } from './_logic/use-select-token-logic';
 import { Avatar } from '@/components/common/ui/avatar';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
   const { isWalletConnected } = useSwapSelectTokenLogic();
 
-  const { tokenIn, usdPrice, amount, selectedTokenBalance } = useSwapStore();
-  const { setAmount, setUsdPrice } = useSwapActions();
+  const { tokenIn, usdPrice, amount, selectedTokenBalance, swapQuote } = useSwapStore();
+  const { setAmount, setUsdPrice, setSelectedTokenBalance } = useSwapActions();
+  const { isEvmConnected, icpIdentity } = useSharedStore();
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
+
+  useEffect(() => {
+    if (tokenIn?.chain_type === 'EVM' && evmBalance) {
+      const mainToken = evmBalance.tokens.find(
+        (t) =>
+          t.contractAddress.toLocaleLowerCase() === tokenIn.contractAddress?.toLocaleLowerCase() &&
+          t.chainId === tokenIn.chainId,
+      );
+      setSelectedTokenBalance(mainToken?.balance || '0.00');
+    }
+
+    if (tokenIn?.chain_type === 'ICP' && icpBalance) {
+      const mainToken = icpBalance.tokens.find((t) => t.canisterId === tokenIn?.canisterId);
+      setSelectedTokenBalance(mainToken?.balance || '0.00');
+    }
+  }, [isEvmConnected, icpIdentity, tokenIn, evmBalance, icpBalance, setSelectedTokenBalance]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

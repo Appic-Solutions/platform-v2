@@ -4,39 +4,21 @@ import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import { getPendingTransaction, PendingTransaction } from '@/lib/helpers/session';
 import { TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
-import { useSharedStore, useSharedStoreActions } from '@/store/store';
+import { useSharedStore } from '@/store/store';
 import { useBridgeActions } from '../bridge/_store';
 import { useQuery } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
 import { get_icp_tokens } from '@/blockchain_api/functions/icp/get_all_icp_tokens';
-import { getStorageItem, setStorageItem } from '@/lib/helpers/localstorage';
-import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { get_all_pools, Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
 import { get_dex_data } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { get_bridge_pairs } from '@/blockchain_api/functions/icp/get_bridge_token_pairs';
 import { useToast } from '@/lib/hooks/use-toast';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
-  const { setPools, setIcpTokens, setDexData, setBridgePairs } = useSharedStoreActions();
   const { setPendingTx } = useBridgeActions();
   const { toast } = useToast();
-
-  useEffect(() => {
-    const stored = getStorageItem('icpTokens');
-    if (stored) {
-      const parsedTokens = JSON.parse(stored) as IcpToken[];
-      setIcpTokens(parsedTokens);
-    }
-  }, [setIcpTokens]);
-
-  useEffect(() => {
-    const stored = getStorageItem('bridgePairs');
-    if (stored) {
-      const parsedBridgePairs = JSON.parse(stored) as (EvmToken | IcpToken)[];
-      setBridgePairs(parsedBridgePairs);
-    }
-  }, [setBridgePairs]);
 
   useEffect(() => {
     const pending = getPendingTransaction() as PendingTransaction;
@@ -48,16 +30,14 @@ export default function HeaderPage() {
   }, [evmAddress, icpIdentity, setPendingTx]);
 
   const { data: icpTokens } = useQuery({
-    queryKey: ['IcpTokens'],
+    queryKey: [queryKeys.icpTokens], // Better to use queryKeys (like your other queries)
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
 
       const res = await get_icp_tokens(unAuthenticatedAgent);
 
       if (res.result) {
-        setStorageItem('icpTokens', JSON.stringify(res.result));
-        setIcpTokens(res.result);
-        return res.result;
+        return res.result; // Without setStorageItem and setIcpTokens
       }
 
       return [];
@@ -71,15 +51,13 @@ export default function HeaderPage() {
   });
 
   useQuery({
-    queryKey: ['bridgePairs'],
+    queryKey: [queryKeys.bridgePairs],
     queryFn: async () => {
       if (!unAuthenticatedAgent) return [];
 
       const res = await get_bridge_pairs(unAuthenticatedAgent);
 
       if (res.result) {
-        setStorageItem('bridgePairs', JSON.stringify(res.result));
-        setBridgePairs(res.result);
         return res.result;
       }
 
@@ -94,7 +72,7 @@ export default function HeaderPage() {
   });
 
   const { data: allPools } = useQuery({
-    queryKey: ['icp-pools'],
+    queryKey: [queryKeys.icpPools],
     queryFn: async () => {
       const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
       if (!response.success) throw new Error('Failed to fetch all pools');
@@ -104,8 +82,8 @@ export default function HeaderPage() {
     retry: false,
   });
 
-  const { data: dexData } = useQuery({
-    queryKey: ['dex-data'],
+  useQuery({
+    queryKey: [queryKeys.dexData],
     queryFn: async () => {
       const response = await get_dex_data(
         unAuthenticatedAgent as HttpAgent,
@@ -118,14 +96,6 @@ export default function HeaderPage() {
     enabled: !!unAuthenticatedAgent && !!icpTokens?.length && !!allPools?.length,
     retry: false,
   });
-
-  useEffect(() => {
-    if (allPools) setPools(allPools);
-  }, [allPools, setPools]);
-
-  useEffect(() => {
-    if (dexData) setDexData(dexData);
-  }, [dexData, setDexData]);
 
   useEffect(() => {
     const handleOffline = () => {

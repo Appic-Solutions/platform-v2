@@ -6,7 +6,6 @@ import { cn, getChainLogo } from '@/lib/utils';
 import { CloseIcon } from '@/components/icons';
 import Link from 'next/link';
 import HistoryIcon from '@/components/icons/history';
-import { useWatch } from 'react-hook-form';
 
 export default function ProcessModal({
   isOpen,

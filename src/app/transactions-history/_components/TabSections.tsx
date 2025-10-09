@@ -26,7 +26,7 @@ const NeedConnectWallet = ({ title, description }: { title: string; description:
 
 export default function TabSection({ defaultValue }: { defaultValue: string }) {
   const router = useRouter();
-  const { icpBalance, evmBalance } = useSharedStore();
+  const { icpIdentity, evmAddress } = useSharedStore();
 
   return (
     <Tabs
@@ -53,7 +53,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
         ))}
       </TabsList>
       <TabsContent value="dex" asChild>
-        {evmBalance || icpBalance ? (
+        {evmAddress || icpIdentity ? (
           <div className="flex flex-col items-center justify-center gap-y-6 md:px-2">
             <DexContent />
           </div>
@@ -65,7 +65,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
         )}
       </TabsContent>
       <TabsContent value="bridge" asChild>
-        {evmBalance || icpBalance ? (
+        {evmAddress || icpIdentity ? (
           <div className="flex flex-col items-center justify-center gap-y-6 md:px-2">
             <BridgeContent />
           </div>
@@ -77,7 +77,7 @@ export default function TabSection({ defaultValue }: { defaultValue: string }) {
         )}
       </TabsContent>
       <TabsContent value="advanced" asChild>
-        {icpBalance ? (
+        {icpIdentity ? (
           <div className="flex flex-col items-center justify-center gap-y-6 px-2">
             <AdvancedContent />
           </div>

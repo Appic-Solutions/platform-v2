@@ -13,6 +13,8 @@ import Spinner from '@/components/ui/spinner';
 import { useQuery } from '@tanstack/react-query';
 import { getPositionsByOwner } from '@/blockchain_api/functions/icp/dex/get_positions';
 import { usePathname } from 'next/navigation';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const NeedConnectWallet = () => {
   const { connect } = useAuth();
@@ -32,16 +34,18 @@ const NeedConnectWallet = () => {
 };
 
 export default function PositionsPage() {
-  const { icpIdentity, icpTokens, pools, unAuthenticatedAgent } = useSharedStore();
+  const { icpIdentity, unAuthenticatedAgent } = useSharedStore();
   const { actions, userPositionsList } = usePositionDetailsStore();
   const pathname = usePathname();
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   const { isPending, data: positionsData } = useQuery({
-    queryKey: ['fetch-positions'],
+    queryKey: [queryKeys.positions],
     queryFn: () =>
       getPositionsByOwner({
         icpTokens: icpTokens!,
-        pools: pools!,
+        pools: icpPools!,
         owner: icpIdentity!,
         unAuthenticatedAgent: unAuthenticatedAgent!,
       }),
@@ -51,7 +55,7 @@ export default function PositionsPage() {
     enabled:
       !!icpIdentity &&
       !!unAuthenticatedAgent &&
-      !!pools &&
+      !!icpPools &&
       !!icpTokens &&
       (pathname === '/positions' || pathname === '/positions/details'),
   });

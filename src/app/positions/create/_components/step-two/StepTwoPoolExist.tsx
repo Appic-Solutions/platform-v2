@@ -9,6 +9,8 @@ import { useCreatePosition } from '../../_context/CreatePositionContext';
 import TokenSwitcher from './TokenSwitcher';
 import { useGetChartData } from '@/app/positions/_api';
 import ChartSkeleton from './ChartSkeleton';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const tabs: ChartType[] = [
   { label: 'Full range', value: 'fullRange' },
@@ -32,11 +34,11 @@ const StepTwoPoolExist = () => {
   } = useCreatePosition();
 
   const { unAuthenticatedAgent } = useSharedStore();
-  const { icpTokens } = useSharedStore();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   const [token0, token1] = useWatch({
     control: createPositionForm.control,
-    name: ['token0', 'token1', 'minPrice', 'maxPrice'],
+    name: ['token0', 'token1'],
   });
 
   const initialPrice = useMemo(() => {

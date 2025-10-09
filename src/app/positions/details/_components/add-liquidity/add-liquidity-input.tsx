@@ -4,6 +4,8 @@ import { FormattedPosition } from '@/app/positions/types';
 import { calculate_mint_amounts } from '@/blockchain_api/functions/icp/dex/calculate_mint_amounts';
 import { Avatar } from '@/components/common/ui/avatar';
 import { allowedInputCharacters } from '@/lib/constants/positions';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { cn, limitDecimalPlaces } from '@/lib/utils';
 import { useSharedStore } from '@/store/store';
 import React from 'react';
@@ -15,7 +17,8 @@ interface Props {
 }
 
 const AddLiquidityInput = ({ position, userTokenBalance, isAmountZero }: Props) => {
-  const { icpIdentity, icpBalance } = useSharedStore();
+  const { icpIdentity } = useSharedStore();
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
 
   const token = isAmountZero ? position.token0 : position.token1;
   const { actions, token0DepositAmount, token1DepositAmount } = usePositionDetailsStore();

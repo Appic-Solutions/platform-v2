@@ -22,12 +22,13 @@ const rethinkSans = Rethink_Sans({
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
-    <html lang="en" className={cn('dark relative bg-[#060607] md:h-full', rethinkSans.className)}>
+    <html lang="en" className="dark relative bg-[#060607] md:h-full">
       <Providers>
         <WalletWrapper>
           <UserWalletProvider />
           <body
             className={cn(
+              rethinkSans.className,
               '!pointer-events-auto relative isolate !select-auto',
               'flex flex-col items-center justify-center',
               'min-h-screen !px-6 !py-3.5 md:!py-8',

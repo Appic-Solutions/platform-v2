@@ -6,11 +6,12 @@ import TokenCard from './token-card';
 import BoxHeader from '@/components/ui/box-header';
 import { TokenType, useSwapActions, useSwapStore } from '../../_store';
 import { useChainListLogic } from './_logic';
-import { useSharedStore } from '@/store/store';
 import { useToast } from '@/lib/hooks/use-toast';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function TokenListPage() {
-  const { icpTokens } = useSharedStore();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
   const { selectedTokenType, tokenIn, tokenOut } = useSwapStore();
   const { setActiveStep } = useSwapActions();
   const {

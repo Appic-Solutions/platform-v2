@@ -1,15 +1,15 @@
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
-import { useSharedStore } from '@/store/store';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 import { useState, useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 export default function ExplorePageLogic() {
-  const { dexData } = useSharedStore();
-
   const [sortCriteria, setSortCriteria] = useState<
     { field: 'tvl' | 'apr'; direction: 'asc' | 'desc' }[]
   >([]);
   const [detailData, setDetailData] = useState<CandidPoolId | undefined>(undefined);
+  const dexData = useTypedQueryData(queryKeys.dexData);
 
   const methods = useForm({ defaultValues: { search: '' } });
   const search = useWatch({ control: methods.control, name: 'search' });

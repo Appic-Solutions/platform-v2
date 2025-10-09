@@ -16,9 +16,13 @@ import {
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { BridgeOption } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { HttpAgent } from '@dfinity/agent';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const BridgeHome = () => {
-  const { unAuthenticatedAgent, bridgePairs } = useSharedStore();
+  const { unAuthenticatedAgent } = useSharedStore();
+  const queryClient = useQueryClient();
+  const bridgePairs = useTypedQueryData(queryKeys.bridgePairs);
   const {
     amount,
     fromToken,
@@ -30,7 +34,6 @@ const BridgeHome = () => {
     withdrawalId,
   } = useBridgeStore();
   const { setBridgeOptions, setTxStep, setTxHash, setWithdrawalId } = useBridgeActions();
-  const queryClient = useQueryClient();
 
   const { mutateAsync: getBridgeOptions, isPending: isPendingBridgeOptions } =
     useGetBridgeOptions();

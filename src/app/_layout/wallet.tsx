@@ -8,39 +8,24 @@ import { useSharedStore, useSharedStoreActions } from '@/store/store';
 
 import { WalletPop } from './wallet/wallet-pop';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpAgent } from '@dfinity/agent';
-import { getStorageItem } from '@/lib/helpers/localstorage';
 import { get_icp_wallet_tokens_balances } from '@/blockchain_api/functions/icp/get_icp_balances';
 import { Principal } from '@dfinity/principal';
 import { get_evm_wallet_tokens_balances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { WalletConnectButtons } from './wallet-connect-buttons';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 const WalletPage = () => {
   const [isFirstIcpFetch, setIsFirstIcpFetch] = useState(true);
+  const queryClient = useQueryClient();
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
+  const bridgePairs = useTypedQueryData(queryKeys.bridgePairs);
 
-  const {
-    icpIdentity,
-    evmAddress,
-    isEvmConnected,
-    icpBalance,
-    evmBalance,
-    isEvmBalanceLoading,
-    isIcpBalanceLoading,
-    unAuthenticatedAgent,
-    bridgePairs,
-  } = useSharedStore();
+  const { icpIdentity, evmAddress, isEvmConnected, unAuthenticatedAgent } = useSharedStore();
 
-  const {
-    setIcpBalance,
-    setEvmBalance,
-    setIsEvmConnected,
-    setChainId,
-    setIcpIdentity,
-    setEvmAddress,
-    setIsEvmBalanceLoading,
-    setIsIcpBalanceLoading,
-  } = useSharedStoreActions();
+  const { setIsEvmConnected, setChainId, setIcpIdentity, setEvmAddress } = useSharedStoreActions();
 
   const fetchIcpBalances = async ({
     unAuthenticatedAgent,
@@ -51,51 +36,39 @@ const WalletPage = () => {
     principal: Principal | null;
     top_tokens: boolean;
   }) => {
-    setIsIcpBalanceLoading(true);
     try {
-      if (unAuthenticatedAgent && principal) {
-        const allIcpTokens = getStorageItem('icpTokens');
+      if (unAuthenticatedAgent && principal && icpTokens) {
         const icpBalanceRes = await get_icp_wallet_tokens_balances(
           principal.toString(),
-          JSON.parse(allIcpTokens || '[]'),
+          icpTokens,
           top_tokens,
           unAuthenticatedAgent,
         );
 
-        if (icpBalanceRes && icpBalanceRes.result) {
-          setIcpBalance(icpBalanceRes.result);
-        }
-
-        return icpBalanceRes;
+        return icpBalanceRes.result;
       }
     } catch (error) {
       console.log('Get ICP Balance Error => ', error);
     } finally {
-      setIsIcpBalanceLoading(false);
       if (isFirstIcpFetch) setIsFirstIcpFetch(false);
     }
   };
 
   const fetchEvmBalances = async ({ evmAddress }: { evmAddress: string | undefined }) => {
     try {
-      setIsEvmBalanceLoading(true);
       if (evmAddress && bridgePairs) {
         const evmBalanceData = await get_evm_wallet_tokens_balances(evmAddress, bridgePairs);
         if (evmBalanceData && evmBalanceData.result) {
-          setEvmBalance(evmBalanceData.result);
           return evmBalanceData.result;
         }
-        return evmBalanceData;
       }
     } catch (error) {
       console.log('Get EVM Balance Error => ', error);
-    } finally {
-      setIsEvmBalanceLoading(false);
     }
   };
 
-  useQuery({
-    queryKey: ['fetch-icp-balances'],
+  const { isFetching: isIcpFetching, data: icpBalance } = useQuery({
+    queryKey: [queryKeys.icpBalance],
     queryFn: () =>
       fetchIcpBalances({
         unAuthenticatedAgent: unAuthenticatedAgent!,
@@ -108,8 +81,8 @@ const WalletPage = () => {
     enabled: !!icpIdentity && !!unAuthenticatedAgent,
   });
 
-  useQuery({
-    queryKey: ['fetch-evm-balances'],
+  const { isFetching: isEvmFetching, data: evmBalance } = useQuery({
+    queryKey: [queryKeys.evmBalance],
     queryFn: () => fetchEvmBalances({ evmAddress }),
     refetchInterval: 1000 * 120,
     staleTime: 0,
@@ -124,13 +97,13 @@ const WalletPage = () => {
 
   const handleDisconnectIcp = () => {
     disconnectIcp();
-    setIcpBalance(undefined);
+    queryClient.removeQueries({ queryKey: [queryKeys.icpBalance], exact: true });
     setIcpIdentity(undefined);
   };
 
   const handleDisconnectEvm = () => {
     disconnectEvm();
-    setEvmBalance(undefined);
+    queryClient.removeQueries({ queryKey: [queryKeys.evmBalance], exact: true });
     setIsEvmConnected(false);
     setChainId(undefined);
     setEvmAddress(undefined);
@@ -159,9 +132,10 @@ const WalletPage = () => {
             title="Your ICP Wallet"
             balance={icpBalance}
             disconnect={handleDisconnectIcp}
-            isLoading={isIcpBalanceLoading}
+            isLoading={isIcpFetching}
             address={icpIdentity.toString()}
             hasMoreToken
+            queryKey={queryKeys.icpBalance}
           />
         )}
         {isEvmConnected && (
@@ -170,8 +144,9 @@ const WalletPage = () => {
             title="Your EVM Wallet"
             balance={evmBalance}
             disconnect={handleDisconnectEvm}
-            isLoading={isEvmBalanceLoading}
+            isLoading={isEvmFetching}
             address={evmAddress || ''}
+            queryKey={queryKeys.evmBalance}
           />
         )}
       </div>

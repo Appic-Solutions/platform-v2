@@ -15,6 +15,8 @@ import { CopyIcon } from 'lucide-react';
 import ChartSection from './chart-section';
 import SkeletonSection from './skeleton';
 import { CandidPoolId } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
 
 interface PositionDetailProps extends CandidPoolId {
   clearDataHandler: () => void;
@@ -26,8 +28,10 @@ export default function PositionDetail({
   fee,
   clearDataHandler,
 }: PositionDetailProps) {
-  const { unAuthenticatedAgent, icpTokens, pools } = useSharedStore();
+  const { unAuthenticatedAgent } = useSharedStore();
   const [isTokenSwap, setIsTokenSwap] = useState(false);
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpTokens = useTypedQueryData(queryKeys.icpTokens);
 
   useEffect(() => {
     if (!token0 || !token1 || !fee) {
@@ -48,13 +52,13 @@ export default function PositionDetail({
           fee,
         },
         icpTokens as IcpToken[],
-        pools as Pool[],
+        icpPools as Pool[],
       );
     },
     enabled:
       !!unAuthenticatedAgent &&
       !!icpTokens?.length &&
-      !!pools?.length &&
+      !!icpPools?.length &&
       !!token0 &&
       !!token1 &&
       !!fee,

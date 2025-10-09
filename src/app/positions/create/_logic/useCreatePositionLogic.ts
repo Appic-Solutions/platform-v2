@@ -21,9 +21,12 @@ import { limitDecimalPlaces } from '@/lib/utils';
 import BigNumber from 'bignumber.js';
 import { useAuth } from '@nfid/identitykit/react';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
+import { queryKeys } from '@/lib/constants/query-keys';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { useIsFetching } from '@tanstack/react-query';
 
 export default function useCreatePositionLogic() {
-  const { pools, icpBalance, icpIdentity, isIcpBalanceLoading } = useSharedStore();
+  const { icpIdentity } = useSharedStore();
   const [userTokenBalances, setUserTokenBalances] = useState<{
     token0Balance: string;
     token1Balance: string;
@@ -33,7 +36,9 @@ export default function useCreatePositionLogic() {
   const [existPool, setExistPool] = useState<Pool>();
   const [feeTiers, setFeeTiers] = useState<FeeTier[]>([]);
   const [isToken0Selected, setIsToken0Selected] = useState(true);
-  const feeManuallySelected = useRef(false);
+  const icpPools = useTypedQueryData(queryKeys.icpPools);
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const isIcpBalanceFetching = useIsFetching({ queryKey: [queryKeys.icpBalance] });
 
   const createPositionForm = useForm<CreatePositionFormDefaultValues>({
     defaultValues: {
@@ -328,7 +333,7 @@ export default function useCreatePositionLogic() {
     isButtonDisabled: boolean;
     buttonText: string;
   } => {
-    if (isIcpBalanceLoading) {
+    if (isIcpBalanceFetching) {
       return {
         isButtonDisabled: true,
         buttonText: 'Fetching wallet balance',
@@ -410,7 +415,7 @@ export default function useCreatePositionLogic() {
     }));
 
     const updatedFeeTiers = feeTiersList.map((feeTier) => {
-      const matchingPool = pools?.find(
+      const matchingPool = icpPools?.find(
         (pool) =>
           pool.pool_id.fee === feeTier.fee &&
           pool.pool_id.token0.toText() === feeTier.token0.toText() &&
@@ -447,7 +452,7 @@ export default function useCreatePositionLogic() {
     }
 
     getTickSpacingHandler(createPositionForm.getValues('fee'));
-  }, [Token0, Token1, pools]);
+  }, [Token0, Token1, icpPools]);
 
   const actionButtonStatus = getActionButtonStatus();
 

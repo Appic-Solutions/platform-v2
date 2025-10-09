@@ -7,6 +7,8 @@ import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
 import BigNumber from 'bignumber.js';
 import SelectTokenLogic from './_logic';
 import { Avatar } from '@/components/common/ui/avatar';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const AmountInput = () => {
   const [inputAmount, setInputAmount] = useState('');
@@ -16,7 +18,10 @@ const AmountInput = () => {
 
   const { fromToken, usdPrice, amount, selectedTokenBalance, bridgeOptions } = useBridgeStore();
   const { setAmount, setUsdPrice, setSelectedTokenBalance } = useBridgeActions();
-  const { isEvmConnected, icpIdentity, evmBalance, icpBalance } = useSharedStore();
+  const { isEvmConnected, icpIdentity } = useSharedStore();
+
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   useEffect(() => {
     if (fromToken?.chain_type === 'EVM' && evmBalance) {
