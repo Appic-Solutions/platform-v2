@@ -3,7 +3,20 @@ export interface NotificationProps {
   message: string;
 }
 
-export interface TransactionNotificationProps {
+export type TransactionNotificationProps = {
   title: string;
   caption: string;
-}
+  status: 'loading' | 'success' | 'failed';
+  fromChain: string;
+  fromToken: string;
+  toToken: string;
+} & (
+  | {
+      isSameChain: true;
+      toChain?: undefined;
+    }
+  | {
+      isSameChain: false;
+      toChain: string;
+    }
+);

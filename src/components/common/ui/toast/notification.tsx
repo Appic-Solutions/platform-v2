@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { CheckIcon, CloseIcon } from '@/components/icons';
 import { AlertTriangle } from 'lucide-react';
 import { NotificationProps, TransactionNotificationProps } from './types';
+import Spinner from '@/components/ui/spinner';
 
 const icons: Record<NotificationProps['type'], JSX.Element> = {
   success: <CheckIcon className="h-5 w-5 text-green-500" />,
@@ -26,6 +27,7 @@ export const notification = ({ type, message }: NotificationProps) => {
           'flex items-center gap-3',
           'w-full max-w-xs rounded-xl border p-3 shadow-md',
           colorVariants[type],
+          t.visible ? 'translate-x-0 opacity-100' : 'translate-x-2 opacity-0',
         )}
       >
         <div className="flex-shrink-0">{icons[type]}</div>
@@ -34,16 +36,94 @@ export const notification = ({ type, message }: NotificationProps) => {
     ),
     {
       position: 'bottom-right',
-      duration: 4000,
       toasterId: 'notification',
     },
   );
 };
 
-export const transactionNotification = ({ title, caption }: TransactionNotificationProps) => {
-  toast.custom((t) => <div>test</div>, {
-    position: 'top-right',
-    toasterId: 'transactionNotification',
-    duration: Infinity,
-  });
+export const transactionNotification = ({
+  title,
+  caption,
+  status,
+  fromChain,
+  fromToken,
+  toChain,
+  toToken,
+  isSameChain,
+}: TransactionNotificationProps) => {
+  toast.custom(
+    (t) => (
+      <div
+        className={cn(
+          'relative overflow-hidden p-3',
+          'flex items-center gap-3',
+          'w-full min-w-fit max-w-xs',
+          'rounded-xl border border-slate-200/50',
+          'bg-gradient-to-br from-white/80 to-slate-50/60 shadow-md backdrop-blur-md',
+          'before:absolute before:inset-0 before:-z-10',
+          'before:bg-gradient-to-br before:from-indigo-200/30 before:to-cyan-100/30 before:opacity-50 before:blur-xl',
+          'transform transition-all duration-300',
+          t.visible ? 'translate-x-0 opacity-100' : 'translate-x-2 opacity-0',
+        )}
+      >
+        <div className="relative flex items-center justify-center">
+          <div className="relative h-10 w-10 overflow-hidden rounded-full">
+            {[fromToken, toToken].map((item, idx) => (
+              <div
+                className="absolute inset-0"
+                style={{
+                  clipPath:
+                    idx === 0
+                      ? 'polygon(0 0, 50% 0, 50% 100%, 0 100%)'
+                      : 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)',
+                  backgroundImage: `url(${item})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: idx === 0 ? 'left center' : 'right center',
+                  backgroundRepeat: 'no-repeat',
+                }}
+              />
+            ))}
+            <div className="absolute left-1/2 top-0 h-full w-[1.5px] -translate-x-1/2 bg-white" />
+          </div>
+          <span
+            className={cn(
+              'absolute -bottom-1 h-4 w-4',
+              'flex items-center justify-center',
+              'rounded-full bg-white shadow-md',
+              isSameChain ? '-right-1' : '-left-1',
+            )}
+          >
+            <img src={fromChain} className="h-3.5 w-3.5" alt="from" />
+          </span>
+          {!isSameChain ? (
+            <span
+              className={cn(
+                'absolute -bottom-1 -right-1 h-4 w-4',
+                'flex items-center justify-center',
+                'rounded-full bg-white shadow-md',
+              )}
+            >
+              <img src={toChain} className="h-3.5 w-3.5" alt="to" />
+            </span>
+          ) : null}
+        </div>
+        <div className="flex flex-1 flex-col leading-snug">
+          <span className="text-sm font-medium text-slate-800">{title}</span>
+          <span className="text-xs text-slate-600">{caption}</span>
+        </div>
+        {status === 'loading' ? (
+          <div>
+            <Spinner />
+          </div>
+        ) : (
+          <CloseIcon onClick={() => toast.dismiss(t.id)} className="cursor-pointer text-red-500" />
+        )}
+      </div>
+    ),
+    {
+      position: 'top-right',
+      toasterId: 'transactionNotification',
+      duration: Infinity,
+    },
+  );
 };
