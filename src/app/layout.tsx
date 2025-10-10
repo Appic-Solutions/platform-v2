@@ -6,10 +6,10 @@ import '@nfid/identitykit/react/styles.css';
 import { WalletWrapper } from '@/lib/wrappers/wallet/wrapper';
 import Providers from './providers';
 import { UserWalletProvider } from '@/lib/wrappers/wallet/userWalletProvider';
-import ThemeSwitch from './_layout/theme-switch';
 import { cn } from '@/lib/utils';
 import NavbarPage from './_layout/navbar';
 import { Rethink_Sans } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 
 const rethinkSans = Rethink_Sans({
   subsets: ['latin'],
@@ -18,7 +18,7 @@ const rethinkSans = Rethink_Sans({
   variable: '--font-rethink-sans',
 });
 
-const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark relative bg-[#060607] md:h-full">
       <Providers>
@@ -36,12 +36,11 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
             <ShapesPage />
             <main className="mb-28 flex w-full flex-1 xl:mb-0">{children}</main>
             <NavbarPage />
-            <ThemeSwitch />
+            <Toaster toasterId="notification" />
+            <Toaster toasterId="transactionNotification" />
           </body>
         </WalletWrapper>
       </Providers>
     </html>
   );
-};
-
-export default RootLayout;
+}
