@@ -2,6 +2,7 @@ import { withdraw_funds_from_appic_dex } from '@/blockchain_api/functions/icp/de
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { Avatar } from '@/components/common/ui/avatar';
 import Spinner from '@/components/common/ui/spinner';
+import { queryKeys } from '@/lib/constants/query-keys';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useSharedStore } from '@/store/store';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,7 +28,7 @@ export const DexBalanceItem = ({
     const result = await mutateAsync({ amount: token.balance! });
     if (result.success) {
       toast({ title: 'Withdrawal successful', variant: 'default' });
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     } else {
       toast({ title: 'Something went wrong', variant: 'destructive' });
     }

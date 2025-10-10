@@ -18,6 +18,7 @@ import { PositionStepper } from '@/app/positions/details/_components/position-st
 import { DecreaseLiquidityArgs } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 interface Props {
   position: FormattedPosition;
@@ -104,7 +105,7 @@ export default function RemoveLiquidityStepTwo({
         status: 'successful',
         errorMessage: null,
       });
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     }
   };
 

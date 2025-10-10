@@ -14,6 +14,7 @@ import {
 import { PositionStepper } from '@/app/positions/details/_components/position-stepper';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function AddLiquidityStepTwo() {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +88,7 @@ export default function AddLiquidityStepTwo() {
           status: 'successful',
           errorMessage: null,
         });
-        queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+        queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
       }
     }
   };
