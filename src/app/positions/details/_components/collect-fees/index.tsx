@@ -12,6 +12,7 @@ import { collect_fees } from '@/blockchain_api/functions/icp/dex/tx/collect_fees
 import { useSharedStore } from '@/store/store';
 import { usePositionDetailsStore } from '@/app/positions/_store/usePositionDetailsStore';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 const CollectFees = () => {
   const [isFreshRequest, setIsFreshRequest] = useState(true);
@@ -43,7 +44,7 @@ const CollectFees = () => {
           errorMessage: null,
         });
       }
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     }
   };
 

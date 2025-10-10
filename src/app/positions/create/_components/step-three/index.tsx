@@ -19,6 +19,7 @@ import { createPositionStepsDetails } from '@/lib/constants/positions';
 import { useSharedStore } from '@/store/store';
 import { Principal } from '@dfinity/principal';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function CreatePositionStepThree() {
   const {
@@ -89,8 +90,8 @@ export default function CreatePositionStepThree() {
         token1,
         unAuthenticatedAgent,
       });
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
-      queryClient.invalidateQueries({ queryKey: ['fetch-positions'] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.positions] });
     }
   };
 

@@ -13,7 +13,7 @@ const queryClient = new QueryClient({
 });
 
 const persister = createAsyncStoragePersister({
-  storage: window.localStorage,
+  storage: typeof window !== 'undefined' ? window.localStorage : undefined,
   key: 'appic-cache',
   throttleTime: 1000,
 });

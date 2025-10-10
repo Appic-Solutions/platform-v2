@@ -104,8 +104,8 @@ const BridgeHome = () => {
         });
         setTxHash(undefined);
       }
-      queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] });
-      queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
       return res;
     },
     refetchInterval: 1000 * 5,
@@ -148,8 +148,8 @@ const BridgeHome = () => {
         setWithdrawalId(undefined);
       }
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['fetch-icp-balances'] }),
-        queryClient.invalidateQueries({ queryKey: ['fetch-evm-balances'] }),
+        queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] }),
+        queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] }),
       ]);
       return res;
     },

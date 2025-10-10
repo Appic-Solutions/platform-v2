@@ -9,6 +9,7 @@ export const queryKeys = {
   icpPools: 'icp-pools',
   dexData: 'dex-data',
   bridgePairs: 'bridge-pairs',
+  bridgeHistory: 'bridge-history',
   positions: 'fetch-positions',
   icpPoolsCreatePosition: 'icp-pools-create-position', // this query has an interval. so we should separate it from another queries.
   icpBalance: 'fetch-icp-balances',
