@@ -54,3 +54,35 @@
     linear-gradient(to bottom, #ffffff14 1px, transparent 1px);
   background-size: 32px 32px;
 }
+
+@layer utilities {
+  @keyframes toast-in {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes toast-out {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+    }
+  }
+
+  .animate-toast-in {
+    animation: toast-in 0.3s ease-out forwards;
+  }
+
+  .animate-toast-out {
+    animation: toast-out 0.3s ease-in forwards;
+  }
+}

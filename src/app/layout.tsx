@@ -6,11 +6,9 @@ import '@nfid/identitykit/react/styles.css';
 import { WalletWrapper } from '@/lib/wrappers/wallet/wrapper';
 import Providers from './providers';
 import { UserWalletProvider } from '@/lib/wrappers/wallet/userWalletProvider';
-import { Toaster } from '@/components/ui/toaster';
 import ThemeSwitch from './_layout/theme-switch';
 import { cn } from '@/lib/utils';
 import NavbarPage from './_layout/navbar';
-
 import { Rethink_Sans } from 'next/font/google';
 
 const rethinkSans = Rethink_Sans({
@@ -38,7 +36,6 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
             <ShapesPage />
             <main className="mb-28 flex w-full flex-1 xl:mb-0">{children}</main>
             <NavbarPage />
-            <Toaster />
             <ThemeSwitch />
           </body>
         </WalletWrapper>
