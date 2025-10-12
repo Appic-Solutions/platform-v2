@@ -25,9 +25,10 @@ import {
 } from './generate_new_twin_token_symbol';
 import { Chain } from '@/blockchain_api/types/chains';
 import { IcpToken } from '@/blockchain_api/types/tokens';
-import { encode_deploy_erc20_function_data, get_gas_price } from './get_bridge_options';
+import { get_gas_price } from './get_bridge_options';
 import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import { principal_to_bytes32 } from './utils/principal_to_hex';
+import { encode_deploy_erc20_function_data } from '@/blockchain_api/abi/abi_encoder';
 
 const erc20_deployment_gas_limit = 1_300_000;
 
@@ -79,9 +80,11 @@ export const get_evm_token_and_generate_twin_token = async (
 			if (twin_chain.type != 'ICP') throw 'EVM tokens can only be wrapped on ICP';
 
 			const lsm_info = (await lsm_actor.get_lsm_info()) as LedgerManagerInfo;
-			const creation_fee = new BigNumber(lsm_info.ls_creation_icp_fee.toString()).plus(
+
+			const creation_fee = lsm_info.ls_creation_icp_fee.toString() == "0" ? BigNumber("0") : new BigNumber(lsm_info.ls_creation_icp_fee.toString()).plus(
 				icp_transfer_fee * 2,
 			);
+
 			const human_readable_creation_fee = creation_fee.dividedBy(10 ** 8).toFixed();
 			const evm_token_result = await get_evm_token_info(
 				canister_id_or_token_address,
@@ -106,6 +109,8 @@ export const get_evm_token_and_generate_twin_token = async (
 			);
 
 			const transfer_fee = await generate_twin_token_transfer_fee(candid_evm_token);
+			// const transfer_fee = "10000";
+
 
 			const name = `${candid_evm_token.name} on ICP`;
 			const human_readable_transfer_fee = new BigNumber(transfer_fee)
@@ -201,6 +206,7 @@ export const approve_icp_or_native_token = async (
 				agent: authenticated_agent,
 				canisterId: icp_ledger,
 			});
+			if (new_twin_metadata.creation_fee == "0") return { result: "OK", success: true, message: '' };
 			console.log(authenticated_agent.getPrincipal());
 			const icp_approve_result = (await icp_actor.icrc2_approve({
 				amount: BigInt(new_twin_metadata.creation_fee),

@@ -136,6 +136,7 @@ export type CandidEventType = {
 	'CrosschainSwap': {
 		'swap_order': CandidCrosschainSwapOrder,
 		'is_refunded': boolean,
+		'icp_amount_out': [] | [bigint],
 	}
 };
 export interface CandidHistoryBucket {
@@ -229,6 +230,30 @@ export interface CollectFeesSuccess {
 	'token0_collected': bigint,
 	'token1_collected': bigint,
 }
+export interface ConsentInfo {
+	'metadata': ConsentMessageMetadata,
+	'consent_message': ConsentMessage,
+}
+export type ConsentMessage = {
+	'FieldsDisplayMessage': {
+		'fields': Array<[string, Value]>,
+		'intent': string,
+	}
+} |
+{ 'GenericDisplayMessage': string };
+export interface ConsentMessageMetadata {
+	'utc_offset_minutes': [] | [number],
+	'language': string,
+}
+export interface ConsentMessageRequest {
+	'arg': Uint8Array | number[],
+	'method': string,
+	'user_preferences': ConsentMessageSpec,
+}
+export interface ConsentMessageSpec {
+	'metadata': ConsentMessageMetadata,
+	'device_spec': [] | [DeviceSpec],
+}
 export interface CreatePoolArgs {
 	'fee': bigint,
 	'sqrt_price_x96': bigint,
@@ -250,7 +275,11 @@ export type CrosschainSwapError = { 'DepositError': DepositError } |
 { 'InvalidTokenIn': null } |
 { 'InvalidRecipient': null } |
 { 'LockedPrincipal': null } |
+{ 'InvalidTokenOut': null } |
 { 'InvalidIcpSwapStep': null };
+export type CrosschainSwapStatus = { 'Refunded': null } |
+{ 'Successful': bigint } |
+{ 'Pending': null };
 export interface DecreaseLiquidityArgs {
 	'amount1_min': bigint,
 	'pool': CandidPoolId,
@@ -284,6 +313,16 @@ export type DepositError = { 'TemporarilyUnavailable': string } |
 { 'LockedPrincipal': null } |
 { 'AmountOverflow': null } |
 { 'InsufficientFunds': { 'balance': bigint } };
+export type DeviceSpec = { 'GenericDisplay': null } |
+{ 'FieldsDisplay': null };
+export interface DurationSeconds { 'amount': bigint }
+export type Error = {
+	'GenericError': { 'description': string, 'error_code': bigint }
+} |
+{ 'InsufficientPayment': ErrorInfo } |
+{ 'UnsupportedCanisterCall': ErrorInfo } |
+{ 'ConsentMessageUnavailable': ErrorInfo };
+export interface ErrorInfo { 'description': string }
 export interface ExactInputParams {
 	'token_in': Principal,
 	'path': Array<CandidPathKey>,
@@ -401,9 +440,11 @@ export type Result = { 'Ok': null } |
 { 'Err': BurnPositionError };
 export type Result_1 = { 'Ok': CollectFeesSuccess } |
 { 'Err': CollectFeesError };
-export type Result_10 = { 'Ok': CandidSwapSuccess } |
+export type Result_10 = { 'Ok': bigint } |
+{ 'Err': QuoteError };
+export type Result_11 = { 'Ok': CandidSwapSuccess } |
 { 'Err': SwapError };
-export type Result_11 = { 'Ok': bigint } |
+export type Result_12 = { 'Ok': bigint } |
 { 'Err': WithdrawError };
 export type Result_2 = { 'Ok': CandidPoolId } |
 { 'Err': CreatePoolError };
@@ -413,14 +454,14 @@ export type Result_4 = { 'Ok': null } |
 { 'Err': DecreaseLiquidityError };
 export type Result_5 = { 'Ok': null } |
 { 'Err': DepositError };
-export type Result_6 = { 'Ok': bigint } |
-{ 'Err': IncreaseLiquidityError };
+export type Result_6 = { 'Ok': ConsentInfo } |
+{ 'Err': Error };
 export type Result_7 = { 'Ok': bigint } |
+{ 'Err': IncreaseLiquidityError };
+export type Result_8 = { 'Ok': bigint } |
 { 'Err': MintPositionError };
-export type Result_8 = { 'Ok': null } |
+export type Result_9 = { 'Ok': null } |
 { 'Err': SwapOrderCreationError };
-export type Result_9 = { 'Ok': bigint } |
-{ 'Err': QuoteError };
 export type RlpDecodeError = { 'InvalidAmount': null } |
 { 'InvalidTokenAddress': string } |
 { 'InvalidChainId': string } |
@@ -485,13 +526,25 @@ export type SwapOrderCreationError = { 'InvalidOriginChain': null } |
 { 'InvalidRecipient': string } |
 { 'FailedRlpDecoding': null } |
 { 'InvalidRlpData': RlpDecodeError } |
+{ 'InvalidTokenOut': null } |
 { 'InvalidIcpSwapStep': SwapError };
 export type SwapType = { 'ExactOutput': Array<CandidPoolId> } |
 { 'ExactInput': Array<CandidPoolId> } |
 { 'ExactOutputSingle': CandidPoolId } |
-{ 'ExactInputSingle': CandidPoolId };
+{ 'ExactInputSingle': CandidPoolId } |
+{ 'NoSwapNeeded': null };
+export interface TextValue { 'content': string }
+export interface TokenAmount {
+	'decimals': number,
+	'amount': bigint,
+	'symbol': string,
+}
 export interface UpgradeArgs { 'upgrade_minters': [] | [Array<CandidMinter>] }
 export interface UserBalanceArgs { 'token': Principal, 'user': Principal }
+export type Value = { 'Text': TextValue } |
+{ 'TokenAmount': TokenAmount } |
+{ 'TimestampSeconds': DurationSeconds } |
+{ 'DurationSeconds': DurationSeconds };
 export type WithdrawError = { 'FeeUnknown': null } |
 { 'TemporarilyUnavailable': string } |
 { 'InvalidDestination': string } |
@@ -508,7 +561,12 @@ export interface _SERVICE {
 	'decrease_liquidity': ActorMethod<[DecreaseLiquidityArgs], Result_4>,
 	'deposit': ActorMethod<[DepositArgs], Result_5>,
 	'get_active_ticks': ActorMethod<[CandidPoolId], Array<CandidTickInfo>>,
+	'get_crosschain_swap_status': ActorMethod<
+		[string],
+		[] | [CrosschainSwapStatus]
+	>,
 	'get_events': ActorMethod<[GetEventsArg], GetEventsResult>,
+	'get_minters': ActorMethod<[], Array<CandidMinter>>,
 	'get_pool': ActorMethod<[CandidPoolId], [] | [CandidPoolState]>,
 	'get_pool_history': ActorMethod<[CandidPoolId], [] | [CandidPoolHistory]>,
 	'get_pools': ActorMethod<[], Array<[CandidPoolId, CandidPoolState]>>,
@@ -517,16 +575,21 @@ export interface _SERVICE {
 		[Principal],
 		Array<[CandidPositionKey, CandidPositionInfo]>
 	>,
-	'increase_liquidity': ActorMethod<[IncreaseLiquidityArgs], Result_6>,
-	'mint_position': ActorMethod<[MintPositionArgs], Result_7>,
-	'minter_order': ActorMethod<[ReceivedSwapOrderEvent], Result_8>,
-	'multi_quote': ActorMethod<[Array<QuoteArgs>], Array<Result_9>>,
-	'quote': ActorMethod<[QuoteArgs], Result_9>,
-	'swap': ActorMethod<[SwapArgs], Result_10>,
+	'icrc21_canister_call_consent_message': ActorMethod<
+		[ConsentMessageRequest],
+		Result_6
+	>,
+	'increase_liquidity': ActorMethod<[IncreaseLiquidityArgs], Result_7>,
+	'mint_position': ActorMethod<[MintPositionArgs], Result_8>,
+	'minter_order': ActorMethod<[ReceivedSwapOrderEvent], Result_9>,
+	'multi_quote': ActorMethod<[Array<QuoteArgs>], Array<Result_10>>,
+	'quote': ActorMethod<[QuoteArgs], Result_10>,
+	'remove_minter': ActorMethod<[MinterKey], undefined>,
+	'swap': ActorMethod<[SwapArgs], Result_11>,
 	'update_minters': ActorMethod<[UpgradeArgs], undefined>,
 	'user_balance': ActorMethod<[UserBalanceArgs], bigint>,
 	'user_balances': ActorMethod<[Principal], Array<Balance>>,
-	'withdraw': ActorMethod<[Balance], Result_11>,
+	'withdraw': ActorMethod<[Balance], Result_12>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

@@ -149,7 +149,7 @@ export const get_bridge_options = async (
 
 			const { total_gas_fee, required_gas } = estimate_gas_fee(
 				max_fee_per_gas,
-				bridge_metadata.is_native ? "40000" : "80000",
+				bridge_metadata.is_native ? "80000" : "100000",
 			);
 
 			console.log('Deposit', required_gas, total_gas_fee);
@@ -431,7 +431,7 @@ export const get_gas_price = async (
 
 		const fee_history = await client.getFeeHistory({
 			blockCount: 5,
-			rewardPercentiles: [80],
+			rewardPercentiles: [50],
 			blockTag: 'latest',
 		});
 

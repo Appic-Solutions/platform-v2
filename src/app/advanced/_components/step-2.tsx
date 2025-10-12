@@ -8,6 +8,7 @@ import { Avatar } from '@/components/common/ui/avatar';
 import Spinner from '@/components/ui/spinner';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { BigNumber } from 'bignumber.js';
 
 export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2Props) {
   const { icpIdentity } = useSharedStore();
@@ -26,10 +27,13 @@ export default function Step2({ isLoading, newTwinMeta, prevStepHandler }: Step2
         t.chainId === newTwinMeta?.twin_chain?.chainId,
     );
 
-  const hasSufficientBalance = token
-    ? parseFloat(token.balance || '0') >=
-      parseFloat(newTwinMeta?.human_readable_creation_fee || '0')
+  const hasSufficientBalance = BigNumber(token?.balance || '0').gte(
+    BigNumber(newTwinMeta?.human_readable_creation_fee || '0'),
+  )
+    ? true
     : false;
+
+  console.log(token?.balance, newTwinMeta?.human_readable_creation_fee);
 
   const buttonText = !isWalletConnected ? (
     'Connect Wallet'

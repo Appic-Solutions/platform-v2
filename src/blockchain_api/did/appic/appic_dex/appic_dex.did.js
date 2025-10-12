@@ -105,6 +105,7 @@ export const idlFactory = ({ IDL }) => {
     'InvalidTokenIn' : IDL.Null,
     'InvalidRecipient' : IDL.Null,
     'LockedPrincipal' : IDL.Null,
+    'InvalidTokenOut' : IDL.Null,
     'InvalidIcpSwapStep' : IDL.Null,
   });
   const Result_3 = IDL.Variant({
@@ -151,6 +152,11 @@ export const idlFactory = ({ IDL }) => {
     'liquidity_net' : IDL.Int,
     'fee_growth_outside_0_x128' : IDL.Nat,
   });
+  const CrosschainSwapStatus = IDL.Variant({
+    'Refunded' : IDL.Null,
+    'Successful' : IDL.Nat,
+    'Pending' : IDL.Null,
+  });
   const GetEventsArg = IDL.Record({
     'start' : IDL.Nat64,
     'length' : IDL.Nat64,
@@ -160,6 +166,7 @@ export const idlFactory = ({ IDL }) => {
     'ExactInput' : IDL.Vec(CandidPoolId),
     'ExactOutputSingle' : CandidPoolId,
     'ExactInputSingle' : CandidPoolId,
+    'NoSwapNeeded' : IDL.Null,
   });
   const MinterKey = IDL.Record({
     'id' : IDL.Principal,
@@ -260,6 +267,7 @@ export const idlFactory = ({ IDL }) => {
     'CrosschainSwap' : IDL.Record({
       'swap_order' : CandidCrosschainSwapOrder,
       'is_refunded' : IDL.Bool,
+      'icp_amount_out' : IDL.Opt(IDL.Nat),
     }),
   });
   const CandidEvent = IDL.Record({
@@ -269,6 +277,12 @@ export const idlFactory = ({ IDL }) => {
   const GetEventsResult = IDL.Record({
     'total_event_count' : IDL.Nat64,
     'events' : IDL.Vec(CandidEvent),
+  });
+  const CandidMinter = IDL.Record({
+    'id' : IDL.Principal,
+    'usdc_address' : IDL.Text,
+    'chain_id' : IDL.Nat64,
+    'twin_usdc_principal' : IDL.Principal,
   });
   const CandidPoolState = IDL.Record({
     'sqrt_price_x96' : IDL.Nat,
@@ -318,6 +332,58 @@ export const idlFactory = ({ IDL }) => {
     'fees_token1_owed' : IDL.Nat,
     'fee_growth_inside_0_last_x128' : IDL.Nat,
   });
+  const ConsentMessageMetadata = IDL.Record({
+    'utc_offset_minutes' : IDL.Opt(IDL.Int16),
+    'language' : IDL.Text,
+  });
+  const DeviceSpec = IDL.Variant({
+    'GenericDisplay' : IDL.Null,
+    'FieldsDisplay' : IDL.Null,
+  });
+  const ConsentMessageSpec = IDL.Record({
+    'metadata' : ConsentMessageMetadata,
+    'device_spec' : IDL.Opt(DeviceSpec),
+  });
+  const ConsentMessageRequest = IDL.Record({
+    'arg' : IDL.Vec(IDL.Nat8),
+    'method' : IDL.Text,
+    'user_preferences' : ConsentMessageSpec,
+  });
+  const TextValue = IDL.Record({ 'content' : IDL.Text });
+  const TokenAmount = IDL.Record({
+    'decimals' : IDL.Nat8,
+    'amount' : IDL.Nat64,
+    'symbol' : IDL.Text,
+  });
+  const DurationSeconds = IDL.Record({ 'amount' : IDL.Nat64 });
+  const Value = IDL.Variant({
+    'Text' : TextValue,
+    'TokenAmount' : TokenAmount,
+    'TimestampSeconds' : DurationSeconds,
+    'DurationSeconds' : DurationSeconds,
+  });
+  const ConsentMessage = IDL.Variant({
+    'FieldsDisplayMessage' : IDL.Record({
+      'fields' : IDL.Vec(IDL.Tuple(IDL.Text, Value)),
+      'intent' : IDL.Text,
+    }),
+    'GenericDisplayMessage' : IDL.Text,
+  });
+  const ConsentInfo = IDL.Record({
+    'metadata' : ConsentMessageMetadata,
+    'consent_message' : ConsentMessage,
+  });
+  const ErrorInfo = IDL.Record({ 'description' : IDL.Text });
+  const Error = IDL.Variant({
+    'GenericError' : IDL.Record({
+      'description' : IDL.Text,
+      'error_code' : IDL.Nat,
+    }),
+    'InsufficientPayment' : ErrorInfo,
+    'UnsupportedCanisterCall' : ErrorInfo,
+    'ConsentMessageUnavailable' : ErrorInfo,
+  });
+  const Result_6 = IDL.Variant({ 'Ok' : ConsentInfo, 'Err' : Error });
   const IncreaseLiquidityArgs = IDL.Record({
     'amount1_max' : IDL.Nat,
     'pool' : CandidPoolId,
@@ -341,7 +407,7 @@ export const idlFactory = ({ IDL }) => {
     'LockedPrincipal' : IDL.Null,
     'AmountOverflow' : IDL.Null,
   });
-  const Result_6 = IDL.Variant({
+  const Result_7 = IDL.Variant({
     'Ok' : IDL.Nat,
     'Err' : IncreaseLiquidityError,
   });
@@ -368,7 +434,7 @@ export const idlFactory = ({ IDL }) => {
     'LockedPrincipal' : IDL.Null,
     'AmountOverflow' : IDL.Null,
   });
-  const Result_7 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : MintPositionError });
+  const Result_8 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : MintPositionError });
   const ReceivedSwapOrderEvent = IDL.Record({
     'encoded_swap_data' : IDL.Text,
     'tx_id' : IDL.Text,
@@ -437,9 +503,10 @@ export const idlFactory = ({ IDL }) => {
     'InvalidRecipient' : IDL.Text,
     'FailedRlpDecoding' : IDL.Null,
     'InvalidRlpData' : RlpDecodeError,
+    'InvalidTokenOut' : IDL.Null,
     'InvalidIcpSwapStep' : SwapError,
   });
-  const Result_8 = IDL.Variant({
+  const Result_9 = IDL.Variant({
     'Ok' : IDL.Null,
     'Err' : SwapOrderCreationError,
   });
@@ -474,7 +541,7 @@ export const idlFactory = ({ IDL }) => {
     'InvalidFeeForExactOutput' : IDL.Null,
     'CalculationOverflow' : IDL.Null,
   });
-  const Result_9 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : QuoteError });
+  const Result_10 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : QuoteError });
   const ExactOutputParams = IDL.Record({
     'amount_in_maximum' : IDL.Nat,
     'path' : IDL.Vec(CandidPathKey),
@@ -517,15 +584,9 @@ export const idlFactory = ({ IDL }) => {
     'amount_out' : IDL.Nat,
     'amount_in' : IDL.Nat,
   });
-  const Result_10 = IDL.Variant({
+  const Result_11 = IDL.Variant({
     'Ok' : CandidSwapSuccess,
     'Err' : SwapError,
-  });
-  const CandidMinter = IDL.Record({
-    'id' : IDL.Principal,
-    'usdc_address' : IDL.Text,
-    'chain_id' : IDL.Nat64,
-    'twin_usdc_principal' : IDL.Principal,
   });
   const UpgradeArgs = IDL.Record({
     'upgrade_minters' : IDL.Opt(IDL.Vec(CandidMinter)),
@@ -535,7 +596,7 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Principal,
   });
   const Balance = IDL.Record({ 'token' : IDL.Principal, 'amount' : IDL.Nat });
-  const Result_11 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : WithdrawError });
+  const Result_12 = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : WithdrawError });
   return IDL.Service({
     'burn' : IDL.Func([BurnPositionArgs], [Result], []),
     'collect_fees' : IDL.Func([CandidPositionKey], [Result_1], []),
@@ -548,7 +609,13 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(CandidTickInfo)],
         ['query'],
       ),
+    'get_crosschain_swap_status' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(CrosschainSwapStatus)],
+        ['query'],
+      ),
     'get_events' : IDL.Func([GetEventsArg], [GetEventsResult], ['query']),
+    'get_minters' : IDL.Func([], [IDL.Vec(CandidMinter)], ['query']),
     'get_pool' : IDL.Func(
         [CandidPoolId],
         [IDL.Opt(CandidPoolState)],
@@ -574,20 +641,26 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(CandidPositionKey, CandidPositionInfo))],
         ['query'],
       ),
-    'increase_liquidity' : IDL.Func([IncreaseLiquidityArgs], [Result_6], []),
-    'mint_position' : IDL.Func([MintPositionArgs], [Result_7], []),
-    'minter_order' : IDL.Func([ReceivedSwapOrderEvent], [Result_8], []),
+    'icrc21_canister_call_consent_message' : IDL.Func(
+        [ConsentMessageRequest],
+        [Result_6],
+        [],
+      ),
+    'increase_liquidity' : IDL.Func([IncreaseLiquidityArgs], [Result_7], []),
+    'mint_position' : IDL.Func([MintPositionArgs], [Result_8], []),
+    'minter_order' : IDL.Func([ReceivedSwapOrderEvent], [Result_9], []),
     'multi_quote' : IDL.Func(
         [IDL.Vec(QuoteArgs)],
-        [IDL.Vec(Result_9)],
+        [IDL.Vec(Result_10)],
         ['query'],
       ),
-    'quote' : IDL.Func([QuoteArgs], [Result_9], ['query']),
-    'swap' : IDL.Func([SwapArgs], [Result_10], []),
+    'quote' : IDL.Func([QuoteArgs], [Result_10], ['query']),
+    'remove_minter' : IDL.Func([MinterKey], [], []),
+    'swap' : IDL.Func([SwapArgs], [Result_11], []),
     'update_minters' : IDL.Func([UpgradeArgs], [], []),
     'user_balance' : IDL.Func([UserBalanceArgs], [IDL.Nat], ['query']),
     'user_balances' : IDL.Func([IDL.Principal], [IDL.Vec(Balance)], ['query']),
-    'withdraw' : IDL.Func([Balance], [Result_11], []),
+    'withdraw' : IDL.Func([Balance], [Result_12], []),
   });
 };
 export const init = ({ IDL }) => { return []; };
