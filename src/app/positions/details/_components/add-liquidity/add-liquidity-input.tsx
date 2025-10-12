@@ -124,7 +124,6 @@ const AddLiquidityInput = ({ position, userTokenBalance, isAmountZero }: Props) 
                   isAmountZero,
                 })
               }
-              token={token}
               userTokenBalance={userTokenBalance}
             />
           )}

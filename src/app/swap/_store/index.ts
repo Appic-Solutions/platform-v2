@@ -1,9 +1,9 @@
-import { TxHash } from '@/blockchain_api/functions/icp/bridge_transactions';
+import { SwapStatus } from '@/blockchain_api/functions/swap/crosschain';
 import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { IcpQuote } from '@/blockchain_api/quoter/icp';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { PendingTransaction } from '@/lib/helpers/session';
+import { TxStatusType } from '@/components/common/ui/toast/types';
 import { create } from 'zustand';
 
 export type TokenType = EvmToken | IcpToken;
@@ -13,6 +13,11 @@ export type Status = 'failed' | 'successful' | 'pending' | undefined;
 export interface TxStepType {
   count: number;
   status: 'pending' | 'successful' | 'failed' | undefined;
+}
+
+export interface PendingSwapTx {
+  id: string;
+  status: TxStatusType;
 }
 
 interface swapState {
@@ -30,7 +35,7 @@ interface swapState {
   txStep: TxStepType;
   txErrorMessage: string | undefined;
   prevTxStep: TxStepType;
-  withdrawalId: string | undefined;
+  pendingSwapTx: PendingSwapTx | undefined;
 }
 
 type Action = {
@@ -50,7 +55,7 @@ type Action = {
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
     setPrevTxStep: (prevStep: TxStepType) => void;
-    setWithdrawalId: (withdrawalId: string | undefined) => void;
+    setPendingSwapTx: (pendingSwapTx: PendingSwapTx | undefined) => void;
   };
 };
 
@@ -75,7 +80,8 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
   toWalletValidationError: '',
   selectedTokenBalance: '',
   txErrorMessage: undefined,
-  withdrawalId: undefined,
+  txId: undefined,
+  pendingSwapTx: undefined,
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
     setSelectedTokenType: (selectedTokenType) => set({ selectedTokenType }),
@@ -91,7 +97,7 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
     setTxStep: (txStep) => set({ txStep }),
     setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
     setPrevTxStep: (prevTxStep) => set({ prevTxStep }),
-    setWithdrawalId: (withdrawalId) => set({ withdrawalId }),
+    setPendingSwapTx: (pendingSwapTx) => set({ pendingSwapTx }),
   },
 }));
 

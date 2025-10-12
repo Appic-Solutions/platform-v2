@@ -14,6 +14,8 @@ export const queryKeys = {
   icpPoolsCreatePosition: 'icp-pools-create-position', // this query has an interval. so we should separate it from another queries.
   icpBalance: 'fetch-icp-balances',
   evmBalance: 'fetch-evm-balance',
+  swapStatus: 'swap-status',
+  checkSwapStatus: 'check-swap-status',
 } as const;
 
 export type QueryKeys = typeof queryKeys;

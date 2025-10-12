@@ -1,7 +1,14 @@
 import { IcpToken } from '@/blockchain_api/types/tokens';
+import { TxStatusType } from '@/components/common/ui/toast/types';
 
 export interface GetICPSwapQuoteRequest {
   tokenIn: IcpToken;
   tokenOut: IcpToken;
   amount: string;
+}
+
+export interface SwapStatusCachedQuery {
+  id: string;
+  status: TxStatusType;
+  timestamp: number;
 }

@@ -1,4 +1,4 @@
-import { useSwapStore } from '../../_store';
+import { TxStepType, useSwapStore } from '../../_store';
 import { useSharedStore } from '@/store/store';
 import { IcpQuote } from '@/blockchain_api/quoter/icp';
 import {
@@ -7,6 +7,7 @@ import {
 } from '@/blockchain_api/functions/icp/dex/tx/swap';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  check_swap_status,
   cross_chain_approve_token_in as crossChainApproveTokenIn,
   cross_chain_swap as crossChainSwap,
 } from '@/blockchain_api/functions/swap/crosschain';
@@ -18,9 +19,20 @@ import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { Principal } from '@dfinity/principal';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { queryKeys } from '@/lib/constants/query-keys';
+import { SwapStatusCachedQuery } from '../../_types';
+
+export const isCrossChainQuote = (quote: any): quote is CrossChainQuote => {
+  return (
+    quote &&
+    'steps' in quote &&
+    Array.isArray(quote.steps) &&
+    quote.steps.length > 0 &&
+    ('from_viemChain' in quote || 'from_minter_id' in quote)
+  );
+};
 
 export const useSwapReviewLogic = () => {
-  const { tokenIn, swapQuote, actions, toWalletAddress } = useSwapStore();
+  const { tokenIn, tokenOut, swapQuote, actions, toWalletAddress } = useSwapStore();
   const { authenticatedAgent, icpIdentity, unAuthenticatedAgent, evmAddress } = useSharedStore();
 
   const queryClient = useQueryClient();
@@ -70,8 +82,8 @@ export const useSwapReviewLogic = () => {
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
   };
 
-  const crosschainSwapExe = async () => {
-    if (unAuthenticatedAgent) {
+  const crosschainSwapExe = async (): Promise<TxStepType | undefined> => {
+    if (unAuthenticatedAgent && swapQuote && tokenIn && tokenOut) {
       // step1
       const approveRes = await crossChainApproveTokenIn(
         swapQuote as CrossChainQuote,
@@ -80,11 +92,12 @@ export const useSwapReviewLogic = () => {
       );
 
       if (!approveRes.success) {
-        actions.setTxStep({
+        const step: TxStepType = {
           count: 1,
           status: 'failed',
-        });
-        return approveRes;
+        };
+        actions.setTxStep(step);
+        return step;
       }
 
       actions.setTxStep({
@@ -127,16 +140,35 @@ export const useSwapReviewLogic = () => {
       }
 
       if (!swapRes.success) {
-        actions.setTxStep({
+        const step: TxStepType = {
           count: 2,
           status: 'failed',
-        });
-        return swapRes.message;
+        };
+        actions.setTxStep(step);
+        return step;
       }
+
+      // if step 2 was successful, 1. set successful step2 status, 2. close the modal 3.show the toast
+
       actions.setTxStep({
         count: 2,
         status: 'successful',
       });
+
+      const checkSwapStatusRes = await check_swap_status(
+        swapQuote as CrossChainQuote,
+        swapRes.result,
+        unAuthenticatedAgent,
+      );
+
+      if (!swapRes.success) {
+        const step: TxStepType = {
+          count: 2,
+          status: 'failed',
+        };
+        actions.setTxStep(step);
+        return step;
+      }
     }
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
@@ -179,6 +211,18 @@ export const useSwapReviewLogic = () => {
       count: 2,
       status: 'successful',
     });
+
+    const id = swapRes.result;
+    actions.setPendingSwapTx({ id, status: 'pending' });
+    actions.setTxStep({ count: 3, status: 'pending' });
+
+    const cacheData: SwapStatusCachedQuery = {
+      id,
+      status: 'pending',
+      timestamp: Date.now(),
+    };
+
+    queryClient.setQueryData([queryKeys.swapStatus, id], cacheData);
 
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });

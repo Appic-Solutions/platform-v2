@@ -1,7 +1,7 @@
 'use client';
 
 import toast from 'react-hot-toast';
-import { cn } from '@/lib/utils';
+import { cn, getChainLogo } from '@/lib/utils';
 import { CheckIcon, CloseIcon } from '@/components/icons';
 import { AlertTriangle } from 'lucide-react';
 import { NotificationProps, TransactionNotificationProps } from './types';
@@ -45,10 +45,8 @@ export const transactionNotification = ({
   title,
   caption,
   status,
-  fromChain,
-  fromToken,
-  toChain,
-  toToken,
+  tokenIn,
+  tokenOut,
   isSameChain,
 }: TransactionNotificationProps) => {
   toast.custom(
@@ -68,7 +66,7 @@ export const transactionNotification = ({
       >
         <div className="relative flex items-center justify-center">
           <div className="relative h-10 w-10 overflow-hidden rounded-full">
-            {[fromToken, toToken].map((item, idx) => (
+            {[tokenIn.logo, tokenOut.logo].map((item, idx) => (
               <div
                 className="absolute inset-0"
                 style={{
@@ -93,7 +91,7 @@ export const transactionNotification = ({
               isSameChain ? '-right-1' : '-left-1',
             )}
           >
-            <img src={fromChain} className="h-3.5 w-3.5" alt="from" />
+            <img src={getChainLogo(tokenIn.chainId)} className="h-3.5 w-3.5" alt="from" />
           </span>
           {!isSameChain ? (
             <span
@@ -103,7 +101,7 @@ export const transactionNotification = ({
                 'rounded-full bg-white shadow-md',
               )}
             >
-              <img src={toChain} className="h-3.5 w-3.5" alt="to" />
+              <img src={getChainLogo(tokenOut.chainId)} className="h-3.5 w-3.5" alt="to" />
             </span>
           ) : null}
         </div>
@@ -111,7 +109,7 @@ export const transactionNotification = ({
           <span className="text-sm font-medium text-slate-800">{title}</span>
           <span className="text-xs text-slate-600">{caption}</span>
         </div>
-        {status === 'loading' ? (
+        {status === 'pending' ? (
           <div>
             <Spinner />
           </div>

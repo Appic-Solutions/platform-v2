@@ -16,13 +16,14 @@ export const StepperContainer = () => {
   const [steps, setSteps] = useState<TxStep[]>();
   const { tokenIn, tokenOut, txStep } = useSwapStore();
   const { crosschainSwapExe, icpSwapExe, sameChainSWapExe } = useSwapReviewLogic();
+
   const {
     setAmount,
     setActiveStep,
     setTxStep,
     setTxErrorMessage,
     setToWalletAddress,
-    setWithdrawalId,
+    setPendingSwapTx,
   } = useSwapActions();
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export const StepperContainer = () => {
       setActiveStep(1);
       setAmount('');
       setToWalletAddress('');
-      setWithdrawalId(undefined);
+      setPendingSwapTx(undefined);
       resetTxState();
     } else if (txStep.status === 'failed') {
       resetTxState();

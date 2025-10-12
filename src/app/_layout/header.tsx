@@ -22,12 +22,19 @@ import {
   check_deposit_status,
   check_withdraw_status,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
+import { useSwapStore } from '../swap/_store';
+import { check_swap_status } from '@/blockchain_api/functions/swap/crosschain';
+import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
+import { isCrossChainQuote } from '../swap/_components/swap-review/use-swap-review-logic';
+import { SwapStatusCachedQuery } from '../swap/_types';
+import { transactionNotification } from '@/components/common/ui/toast/notification';
 
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
   const queryClient = useQueryClient();
   const { setPendingTx } = useBridgeActions();
   const { pendingTx } = useBridgeStore();
+  const { pendingSwapTx, swapQuote, tokenIn, tokenOut, actions: swapStoreActions } = useSwapStore();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -37,7 +44,21 @@ export default function HeaderPage() {
     } else if (pending?.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
       setPendingTx(pending);
     }
-  }, [evmAddress, icpIdentity, setPendingTx]);
+
+    const cachedSwaps = queryClient.getQueriesData({ queryKey: [queryKeys.swapStatus] });
+    if (cachedSwaps.length > 0) {
+      const latestSwap = cachedSwaps[cachedSwaps.length - 1][1] as SwapStatusCachedQuery;
+      if (latestSwap?.status === 'pending') {
+        swapStoreActions.setPendingSwapTx({ id: latestSwap.id, status: 'pending' });
+      }
+    }
+  }, [evmAddress, icpIdentity, setPendingTx, swapStoreActions.setPendingSwapTx]);
+
+  useEffect(() => {
+    if (pendingSwapTx?.status === 'pending') {
+      toast({ title: 'Swap Pending', description: 'Checking status...', variant: 'default' });
+    }
+  }, [pendingSwapTx, toast]);
 
   // check pending deposit tx status
   useQuery({
@@ -109,6 +130,44 @@ export default function HeaderPage() {
       !!unAuthenticatedAgent &&
       pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
       !!icpIdentity,
+  });
+
+  // check pending swap status
+  useQuery({
+    queryKey: [queryKeys.checkSwapStatus],
+    queryFn: async () => {
+      const res = await check_swap_status(
+        swapQuote as CrossChainQuote,
+        pendingSwapTx?.id as string,
+        unAuthenticatedAgent as HttpAgent,
+      );
+
+      if (res.success) {
+        if (res.result.status === 'successful' || res.result.status === 'failed') {
+          swapStoreActions.setPendingSwapTx(undefined);
+          queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
+        } else {
+          swapStoreActions.setPendingSwapTx(pendingSwapTx);
+        }
+      } else {
+        swapStoreActions.setPendingSwapTx(undefined);
+        queryClient.removeQueries({ queryKey: ['swap-status', pendingSwapTx?.id] });
+      }
+      transactionNotification({
+        title: res.result.title,
+        caption: res.result.caption,
+        status: res.result.status,
+        isSameChain: false,
+        tokenIn: tokenIn!,
+        tokenOut: tokenOut!,
+      });
+
+      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance, queryKeys.icpBalance] });
+      return res;
+    },
+    refetchInterval: 1000 * 5,
+    enabled:
+      !!swapQuote && isCrossChainQuote(swapQuote) && !!unAuthenticatedAgent && !!pendingTx?.id,
   });
 
   const { data: icpTokens } = useQuery({
