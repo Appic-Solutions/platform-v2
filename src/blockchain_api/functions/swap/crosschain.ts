@@ -10,11 +10,11 @@ import {
 } from '@/blockchain_api/did/ledger/icrc_types';
 import { appic_dex } from '@/canister_ids.json';
 import { Response } from '@/blockchain_api/types/response';
-import { Result_3 as CrossChainSwapResult, CrosschainSwapArgs } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { Result_3 as CrossChainSwapResult, CrosschainSwapArgs, CrosschainSwapStatus } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { BigNumber } from 'bignumber.js';
 import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
-import { createPublicClient, createWalletClient, custom, http, WalletClient } from 'viem';
+import { createPublicClient, createWalletClient, custom, http, parseEventLogs, WalletClient } from 'viem';
 import { NATIVE_TOKEN_ADDRESS } from '../icp/get_bridge_options';
 import { check_allowance } from '../evm/check_allowance';
 import { encode_approval_function_data, encode_execute_swap_function_data } from '@/blockchain_api/abi/abi_encoder';
@@ -25,7 +25,7 @@ import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/
 import {
 	Result as LogScrapingResult,
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
-
+import swap_contract_abi from "../../abi/swap_contract.json"
 
 // in case the swap is usdc already and there is no swap needed
 const UNLIMITED_DEADLINE = 2388441600;
@@ -397,18 +397,307 @@ export interface SwapStatus {
 }
 
 /// step 3 check swap status should be called every 5 seconds
-export async function check_swap_status(quote: CrossChainQuote, hash_or_tx_id: string): Promise<Response<string>> {
+export async function check_swap_status(
+	quote: CrossChainQuote,
+	hash_or_tx_id: string,
+	unauthenticated_agent: HttpAgent,
+): Promise<Response<SwapStatus>> {
+	try {
+		const fromIsEvm = quote.tokenIn.chain_type === 'EVM';
+		const toIsEvm = quote.tokenOut.chain_type === 'EVM';
+		const tokenInSymbol = quote.tokenIn.symbol || 'TOKEN_IN';
+		const tokenOutSymbol = quote.tokenOut.symbol || 'TOKEN_OUT';
 
+		let swapTxId: string | undefined;
+		let currentStatus: any;
+		let minterRpcUrl: string | undefined;
+		let minterViemChain: any;
+		let minterChainId: number = fromIsEvm ? Number(quote.tokenIn.chainId) : Number(quote.tokenOut.chainId);
+		let publicClient: any;
 
-	return {
-		success: true,
-		message: "",
-		result: ""
+		if (fromIsEvm) {
+			minterRpcUrl = quote.from_rpcURl;
+			minterViemChain = quote.from_viemChain;
+			const fromMinterActor = Actor.createActor(AppicMinterIdlFactory, {
+				agent: unauthenticated_agent,
+				canisterId: Principal.fromText(quote.from_minter_id!),
+			});
+
+			const statusOpt = await fromMinterActor.retrieve_swap_status_by_hash(hash_or_tx_id) as [] | [SwapStatus];
+			if (!statusOpt || statusOpt.length === 0) {
+				return { success: true, message: '', result: pendingResponse(quote) };
+			}
+			currentStatus = statusOpt[0];
+		} else {
+			minterRpcUrl = quote.to_rpcURl;
+			minterViemChain = quote.to_viemChain;
+			swapTxId = hash_or_tx_id;
+		}
+
+		// Handle minter status if fromIsEvm (for EVM start)
+		if (fromIsEvm && currentStatus) {
+			publicClient = createPublicClient({ transport: http(minterRpcUrl), chain: minterViemChain });
+			const usdcDecimals = minterChainId === 56 ? 18 : 6;
+
+			if (
+				'PendingSwap' in currentStatus ||
+				'AcceptedSwap' in currentStatus ||
+				'SwapTxCreated' in currentStatus ||
+				'PendingRefundSwap' in currentStatus ||
+				'RefundSwapTxCreated' in currentStatus ||
+				'PendingFailedSwap' in currentStatus ||
+				'QuarantinedSwap' in currentStatus
+			) {
+				return { success: true, message: '', result: pendingResponse(quote) };
+			} else if ('SwapTxSent' in currentStatus) {
+				const hash = currentStatus.SwapTxSent.transaction_hash;
+				const rawAmountOut = await getEventAmountOut(publicClient, hash, true);
+				if (rawAmountOut === null) return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: successResponse(quote, rawAmountOut, quote.tokenOut.decimals) };
+			} else if ('RefundSwapTxSent' in currentStatus) {
+				const hash = currentStatus.RefundSwapTxSent.transaction_hash;
+				const rawAmountOut = await getEventAmountOut(publicClient, hash, true);
+				if (rawAmountOut === null) return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: refundResponse(quote, rawAmountOut, 'USDC', usdcDecimals) };
+			} else if ('SwapTxFinalized' in currentStatus) {
+				const finalized = currentStatus.SwapTxFinalized;
+				if ('PendingReimbursement' in finalized) return { success: true, message: '', result: pendingResponse(quote) };
+				const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed).transaction_hash;
+				const rawAmountOut = await getEventAmountOut(publicClient, hash, false);
+				if (rawAmountOut === null) return { success: true, message: '', result: pendingResponse(quote) };
+				if ('Success' in finalized) {
+					return { success: true, message: '', result: successResponse(quote, rawAmountOut, quote.tokenOut.decimals) };
+				} else {
+					const rawRefund = rawAmountOut || finalized.Reimbursed.reimbursed_amount.toString();
+					return { success: true, message: '', result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals) };
+				}
+			} else if ('RefundSwapTxFinalized' in currentStatus) {
+				const finalized = currentStatus.RefundSwapTxFinalized;
+				if ('PendingReimbursement' in finalized) return { success: true, message: '', result: pendingResponse(quote) };
+				const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed).transaction_hash;
+				const rawAmountOut = await getEventAmountOut(publicClient, hash, false);
+				const rawRefund = rawAmountOut || ('Reimbursed' in finalized ? finalized.Reimbursed.reimbursed_amount.toString() : '0');
+				return { success: true, message: '', result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals) };
+			} else if ('MintedToAppicDex' in currentStatus) {
+				swapTxId = currentStatus.MintedToAppicDex;
+			} else if ('NotifiedAppicDex' in currentStatus) {
+				swapTxId = currentStatus.NotifiedAppicDex;
+			} else {
+				return { success: true, message: '', result: pendingResponse(quote) };
+			}
+		}
+
+		// Handle dex status
+		if (swapTxId) {
+			const dexActor = Actor.createActor(idlFactory, {
+				agent: unauthenticated_agent,
+				canisterId: Principal.fromText(appic_dex),
+			});
+			const dexStatusOpt = await dexActor.get_crosschain_swap_status(swapTxId) as [] | [CrosschainSwapStatus];
+			if (!dexStatusOpt || dexStatusOpt.length === 0) {
+				return { success: true, message: '', result: pendingResponse(quote) };
+			}
+			const dexStatus = dexStatusOpt[0];
+
+			if ('Pending' in dexStatus) {
+				return { success: true, message: '', result: pendingResponse(quote) };
+			} else if ('Refunded' in dexStatus) {
+				if (!fromIsEvm) {
+					// ICP origin, refund on ICP
+					const refundAmount = quote.amountIn;
+					const refundToken = tokenInSymbol;
+					return { success: true, message: '', result: refundResponseFormatted(quote, refundAmount, refundToken) };
+				} else {
+					// EVM origin, refund to minter, treat as pending
+					return { success: true, message: '', result: pendingResponse(quote) };
+				}
+			} else if ('Successful' in dexStatus) {
+				const rawAmountOut = dexStatus.Successful.toString();
+				if (!toIsEvm) {
+					return { success: true, message: '', result: successResponse(quote, rawAmountOut, quote.tokenOut.decimals) };
+				} else {
+					// Proceed to to minter
+					minterRpcUrl = quote.to_rpcURl;
+					minterViemChain = quote.to_viemChain;
+					minterChainId = Number(quote.tokenOut.chainId);
+					publicClient = createPublicClient({ transport: http(minterRpcUrl), chain: minterViemChain });
+					const usdcDecimals = minterChainId === 56 ? 18 : 6;
+
+					const toMinterActor = Actor.createActor(AppicMinterIdlFactory, {
+						agent: unauthenticated_agent,
+						canisterId: Principal.fromText(quote.to_minter_id!),
+					});
+					const toStatusOpt = await toMinterActor.retrieve_swap_status_by_swap_tx_id(swapTxId) as [] | [SwapStatus];
+					if (!toStatusOpt || toStatusOpt.length === 0) {
+						return { success: true, message: '', result: pendingResponse(quote) };
+					}
+					currentStatus = toStatusOpt[0];
+
+					if (
+						'PendingSwap' in currentStatus ||
+						'AcceptedSwap' in currentStatus ||
+						'SwapTxCreated' in currentStatus ||
+						'PendingRefundSwap' in currentStatus ||
+						'RefundSwapTxCreated' in currentStatus ||
+						'PendingFailedSwap' in currentStatus ||
+						'QuarantinedSwap' in currentStatus
+					) {
+						return { success: true, message: '', result: pendingResponse(quote) };
+					} else if ('SwapTxSent' in currentStatus) {
+						const hash = currentStatus.SwapTxSent.transaction_hash;
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, true);
+						if (rawAmountOutTo === null) return { success: true, message: '', result: pendingResponse(quote) };
+						return { success: true, message: '', result: successResponse(quote, rawAmountOutTo, quote.tokenOut.decimals) };
+					} else if ('RefundSwapTxSent' in currentStatus) {
+						const hash = currentStatus.RefundSwapTxSent.transaction_hash;
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, true);
+						if (rawAmountOutTo === null) return { success: true, message: '', result: pendingResponse(quote) };
+						return { success: true, message: '', result: refundResponse(quote, rawAmountOutTo, 'USDC', usdcDecimals) };
+					} else if ('SwapTxFinalized' in currentStatus) {
+						const finalized = currentStatus.SwapTxFinalized;
+						if ('PendingReimbursement' in finalized) return { success: true, message: '', result: pendingResponse(quote) };
+						const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed).transaction_hash;
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, false);
+						if (rawAmountOutTo === null) return { success: true, message: '', result: pendingResponse(quote) };
+						if ('Success' in finalized) {
+							return { success: true, message: '', result: successResponse(quote, rawAmountOutTo, quote.tokenOut.decimals) };
+						} else {
+							const rawRefund = rawAmountOutTo || finalized.Reimbursed.reimbursed_amount.toString();
+							return { success: true, message: '', result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals) };
+						}
+					} else if ('RefundSwapTxFinalized' in currentStatus) {
+						const finalized = currentStatus.RefundSwapTxFinalized;
+						if ('PendingReimbursement' in finalized) return { success: true, message: '', result: pendingResponse(quote) };
+						const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed).transaction_hash;
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, false);
+						const rawRefund = rawAmountOutTo || ('Reimbursed' in finalized ? finalized.Reimbursed.reimbursed_amount.toString() : '0');
+						return { success: true, message: '', result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals) };
+					} else if ('MintedToAppicDex' in currentStatus || 'NotifiedAppicDex' in currentStatus) {
+						// Unlikely, but if here, perhaps success
+						return { success: true, message: '', result: successResponse(quote, quote.amountOutRaw || '0', quote.tokenOut.decimals) };
+					} else {
+						return { success: true, message: '', result: pendingResponse(quote) };
+					}
+				}
+			}
+		}
+
+		return { success: true, message: '', result: pendingResponse(quote) };
+	} catch (error) {
+		console.error(error);
+		return {
+			success: false,
+			message: `Failed to check swap status: ${error}`,
+			result: failedResponse(quote, 'Error checking status'),
+		};
 	}
 }
 
 
+// Format amount with decimals using BigNumber
+function formatAmount(raw: string, decimals: number): string {
+	if (!raw) return '0';
+	return new BigNumber(raw).div(new BigNumber(10).pow(decimals)).toFixed();
+}
 
+
+
+
+// Helper functions for status classification
+function isPendingLike(status: any): boolean {
+	return (
+		'PendingSwap' in status ||
+		'AcceptedSwap' in status ||
+		'SwapTxCreated' in status ||
+		'SwapTxSent' in status ||
+		'PendingRefundSwap' in status ||
+		'RefundSwapTxSent' in status ||
+		'PendingFailedSwap' in status
+	);
+}
+
+// Helper responses
+function pendingResponse(quote: CrossChainQuote): SwapStatus {
+	return {
+		status: 'Pending',
+		amount_in: quote.amountIn,
+		amount_out: quote.amountOut,
+		text: 'Swap is processing...',
+	};
+}
+
+function successResponse(quote: CrossChainQuote, rawAmountOut: string, tokenOutDecimals: number): SwapStatus {
+	const formattedAmountOut = formatAmount(rawAmountOut, tokenOutDecimals);
+	const tokenInSymbol = quote.tokenIn.symbol || 'TOKEN_IN';
+	const tokenOutSymbol = quote.tokenOut.symbol || 'TOKEN_OUT';
+	return {
+		status: 'Successful',
+		amount_in: quote.amountIn,
+		amount_out: formattedAmountOut,
+		text: `Swapped ${quote.amountIn} ${tokenInSymbol} to ${formattedAmountOut} ${tokenOutSymbol}`,
+	};
+}
+
+function refundResponse(quote: CrossChainQuote, rawRefundAmount: string, refundToken: string, refundDecimals: number): SwapStatus {
+	const formattedRefund = formatAmount(rawRefundAmount, refundDecimals);
+	return {
+		status: 'Failed',
+		amount_in: quote.amountIn,
+		amount_out: '0',
+		text: `Refunded with ${formattedRefund} ${refundToken}`,
+	};
+}
+
+function refundResponseFormatted(quote: CrossChainQuote, formattedRefundAmount: string, refundToken: string): SwapStatus {
+	return {
+		status: 'Failed',
+		amount_in: quote.amountIn,
+		amount_out: '0',
+		text: `Refunded with ${formattedRefundAmount} ${refundToken}`,
+	};
+}
+
+function failedResponse(quote: CrossChainQuote, reason: string): SwapStatus {
+	return {
+		status: 'Failed',
+		amount_in: quote.amountIn,
+		amount_out: '0',
+		text: `Swap failed: ${reason}`,
+	};
+}
+
+// ABI for SwapExecuted event
+// ABI for SwapExecuted event
+const swapExecutedAbi = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{ "indexed": false, "name": "user", "type": "address" },
+			{ "indexed": true, "name": "recipient", "type": "bytes32" },
+			{ "indexed": true, "name": "tokenIn", "type": "address" },
+			{ "indexed": true, "name": "tokenOut", "type": "address" },
+			{ "indexed": false, "name": "amountIn", "type": "uint256" },
+			{ "indexed": false, "name": "amountOut", "type": "uint256" },
+			{ "indexed": false, "name": "bridgeToMinter", "type": "bool" },
+			{ "indexed": false, "name": "encodedData", "type": "bytes" }
+		],
+		"name": "SwapExecuted",
+		"type": "event"
+	}
+] as const;
+
+// Helper to get amountOut from event
+async function getEventAmountOut(publicClient: any, hash: string, isSent: boolean = true): Promise<string | null> {
+	let txHash = hash.startsWith('0x') ? hash as `0x${string}` : `0x${hash}` as `0x${string}`;
+	const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+	if (!receipt) return null;
+	const currentBlock = await publicClient.getBlockNumber();
+	if (isSent && (currentBlock - receipt.blockNumber < BigInt(1))) return null;
+	const logs = parseEventLogs({ abi: swapExecutedAbi, logs: receipt.logs });
+	const filtered = logs.filter((log: any) => log.eventName === 'SwapExecuted');
+	if (filtered.length === 0) return null;
+	return filtered[0].args.amountOut.toString();
+}
 
 export const convertAddressToBytes32 = (address: Address): Hex => {
 	return padHex(address, { size: 32 });
