@@ -7,7 +7,6 @@ import { chains } from '../lists/chains';
 import { Chain as ViemChain } from 'viem/chains';
 import { estimate_approval_fee, estimate_gas_fee, get_gas_price, NATIVE_TOKEN_ADDRESS } from '../functions/icp/get_bridge_options';
 import { Chain } from '../types/chains';
-import { Principal } from '@dfinity/principal';
 
 // Interfaces from your previous code
 interface QuoteStep {
@@ -98,11 +97,19 @@ export interface CrossChainQuote {
 	nativeTokenFees: NativeTokenFees | undefined;
 
 	// rpc data in case of evm to sth
-	viemChain: ViemChain | undefined,
-	rpcURl: string | undefined,
-	swapContractAddress: string | undefined;
+	from_viemChain: ViemChain | undefined,
+	to_viemChain: ViemChain | undefined,
+
+	from_swapContractAddress: string | undefined;
+	to_swapContractAddress: string | undefined;
+
 	// in case the swap starts from evm the minter if of origin evm chain
-	minter_id:string | undefined;
+	from_minter_id: string | undefined;
+	to_minter_id: string | undefined;
+
+	from_rpcURl: string | undefined,
+	to_rpcURl: string | undefined,
+
 
 	amountOut: string;
 	amountOutUSD: string;
@@ -280,6 +287,7 @@ export async function fetchCrossChainQuote({
 
 			}
 
+			let chainBConfig = chainB != "icp" ? chains.find(chain => chain.chainId == chainB)! : undefined;
 
 			// Calculate total gas fees in USD from steps
 			let totalGasUSD = new BigNumber(nativeTokenFees?.totalNativeFeeUSD || "0");
@@ -293,6 +301,7 @@ export async function fetchCrossChainQuote({
 					totalGasUSD = totalGasUSD.plus(step.quote.canisterFee);
 				}
 			});
+
 
 
 			const gasFeesUSD = totalGasUSD.toFixed(2);
@@ -327,10 +336,21 @@ export async function fetchCrossChainQuote({
 				gasFeesUSD,
 				steps: data.steps,
 				nativeTokenFees,
-				viemChain,
-				rpcURl: chainAConfig?.rpc_url,
-				minter_id:chainAConfig?.appic_minter_address,
-				swapContractAddress: chainAConfig?.swap_contract_address,
+
+				from_viemChain: chainAConfig?.viem_config,
+				to_viemChain: chainBConfig?.viem_config,
+
+
+
+				from_rpcURl: chainAConfig?.rpc_url,
+				to_rpcURl: chainBConfig?.rpc_url,
+
+				from_minter_id: chainAConfig?.appic_minter_address,
+				to_minter_id: chainBConfig?.appic_minter_address,
+
+				from_swapContractAddress: chainAConfig?.swap_contract_address,
+				to_swapContractAddress: chainBConfig?.swap_contract_address,
+
 				encodedData: data.encodedData
 			};
 

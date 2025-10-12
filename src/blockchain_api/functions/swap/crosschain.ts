@@ -57,9 +57,9 @@ export async function cross_chain_approve_token_in(
 				const allowance = await check_allowance(
 					quote.tokenIn.contractAddress as `0x${string}`,
 					account as `0x${string}`,
-					quote.swapContractAddress as `0x${string}`,
-					quote.viemChain!,
-					quote.rpcURl!,
+					quote.from_swapContractAddress as `0x${string}`,
+					quote.from_viemChain!,
+					quote.from_rpcURl!,
 				);
 
 
@@ -74,13 +74,13 @@ export async function cross_chain_approve_token_in(
 				}
 
 				const encoded_function_data = encode_approval_function_data(
-					quote.swapContractAddress as `0x${string}`,
+					quote.from_swapContractAddress as `0x${string}`,
 					quote.approvalAmount,
 				);
 
 				const public_client = createPublicClient({
-					transport: http(quote.rpcURl),
-					chain: quote.viemChain,
+					transport: http(quote.from_rpcURl),
+					chain: quote.from_viemChain,
 				});
 
 				let estimated_gas = await public_client.estimateGas({
@@ -95,7 +95,7 @@ export async function cross_chain_approve_token_in(
 
 
 				const prepared_transaction = await wallet_client.prepareTransactionRequest({
-					chain: quote.viemChain,
+					chain: quote.from_viemChain,
 					account: account as `0x${string}`,
 					to: quote.tokenIn.contractAddress as `0x${string}`,
 					data: encoded_function_data as `0x${string}`,
@@ -258,13 +258,13 @@ export async function cross_chain_swap(
 
 
 			const public_client = createPublicClient({
-				transport: http(quote.rpcURl),
-				chain: quote.viemChain,
+				transport: http(quote.from_rpcURl),
+				chain: quote.from_viemChain,
 			});
 
 			let estimated_gas = await public_client.estimateGas({
 				account: account as `0x${string}`,
-				to: quote.swapContractAddress as `0x${string}`,
+				to: quote.from_swapContractAddress as `0x${string}`,
 				data: encoded_swap_function_data as `0x${string}`,
 				value,
 				type: "eip1559"
@@ -274,9 +274,9 @@ export async function cross_chain_swap(
 
 
 			let prepared_transaction = await wallet_client.prepareTransactionRequest({
-				chain: quote.viemChain,
+				chain: quote.from_viemChain,
 				account: account as `0x${string}`,
-				to: quote.swapContractAddress as `0x${string}`,
+				to: quote.from_swapContractAddress as `0x${string}`,
 				data: encoded_swap_function_data as `0x${string}`,
 				maxFeePerGas: BigInt(quote.nativeTokenFees?.maxFeePerGas!),
 				maxPriorityFeePerGas: BigInt(quote.nativeTokenFees?.maxPriorityFeePerGas!),
@@ -312,7 +312,7 @@ export async function cross_chain_swap(
 
 				// Create an actor for the Appic minter
 				const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
-					canisterId: Principal.fromText(quote.minter_id!),
+					canisterId: Principal.fromText(quote.from_minter_id!),
 					agent: unauthenticated_agent,
 				});
 
@@ -374,7 +374,6 @@ export async function cross_chain_swap(
 
 		}
 
-
 	} catch (error) {
 		console.log(error);
 		return {
@@ -390,9 +389,17 @@ export async function cross_chain_swap(
 
 
 
+export interface SwapStatus {
+	status: "Pending" | "Successful" | "Failed",
+	amount_in: string,
+	amount_out: string,
+	text: string,
+}
 
 /// step 3 check swap status should be called every 5 seconds
-export async function check_swap_status(tx_id: string): Promise<Response<string>> {
+export async function check_swap_status(quote: CrossChainQuote, hash_or_tx_id: string): Promise<Response<string>> {
+
+
 	return {
 		success: true,
 		message: "",
