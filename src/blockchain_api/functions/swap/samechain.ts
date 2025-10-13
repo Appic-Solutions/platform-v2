@@ -8,7 +8,7 @@ import { check_allowance } from '../evm/check_allowance';
 import { encode_approval_function_data, encode_execute_swap_function_data } from '@/blockchain_api/abi/abi_encoder';
 import type { Address } from 'viem';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
-import { convertAddressToBytes32, create_wallet_client } from './crosschain';
+import { convertAddressToBytes32, create_wallet_client, formatAmount, getEventAmountOut, SwapStatus } from './crosschain';
 
 
 // step 1
@@ -90,7 +90,7 @@ export async function same_chain_approve_token_in(
 			} else {
 				return {
 					result: hash,
-					message: '',
+					message: 'Failed to send approval transaction please try again later',
 					success: false,
 				};
 			}
@@ -113,13 +113,9 @@ export async function same_chain_approve_token_in(
 export async function same_chain_swap(
 	quote: SameChainQuote,
 	evm_address: string,
-): Promise<Response<string>> {
-
-
+): Promise<Response<SwapStatus>> {
 
 	try {
-
-
 
 		let wallet_client = await create_wallet_client(quote.tokenIn.chainId);
 
@@ -168,20 +164,21 @@ export async function same_chain_swap(
 		});
 
 
-		const tx_status = await public_client.waitForTransactionReceipt({
-			hash,
-			confirmations: 1,
-		});
 
-		if (tx_status.status == 'success') {
+		let amount_out = await getEventAmountOut(public_client, hash, true);
+
+		if (amount_out != null) {
+
 			return {
-				result: hash,
+				result: {
+					amount_out: formatAmount(amount_out, quote.tokenOut.decimals), amount_in: quote.amountIn, status: "successful", title: "Swapped", caption: `Swapped ${quote.amountIn} ${quote.tokenIn.symbol} to ${formatAmount(amount_out, quote.tokenOut.decimals)} ${quote.tokenOut.symbol}`,
+				},
 				message: '',
 				success: true,
 			};
 		} else {
 			return {
-				result: "Failed to send tx to the network",
+				result: { amount_out: "0", amount_in: "0", status: "failed", title: "Swap failed", caption: "Please try again later" } as SwapStatus,
 				message: '',
 				success: false,
 			};
@@ -191,7 +188,7 @@ export async function same_chain_swap(
 		console.log(error);
 		return {
 			message: `Failed to send swap transaction: ${error}`,
-			result: "",
+			result: { amount_out: "0", amount_in: "0", status: "failed", title: "Swap failed", caption: "Please try again later" },
 			success: false,
 		};
 	}

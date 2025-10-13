@@ -141,6 +141,14 @@ export const useSwapReviewLogic = () => {
 
       actions.setTxStep(step);
 
+      const cacheData: SwapStatusCachedQuery = {
+        id: swapRes.result,
+        status: 'pending',
+        timestamp: Date.now(),
+      };
+
+      queryClient.setQueryData([queryKeys.swapStatus, swapRes.result], cacheData);
+
       return step;
     }
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
@@ -173,29 +181,20 @@ export const useSwapReviewLogic = () => {
       toWalletAddress ? toWalletAddress : evmAddress!,
     );
 
-    if (!swapRes.success) {
+    console.log(swapRes);
+
+    if (swapRes.result.status === 'failed') {
       actions.setTxStep({
         count: 2,
         status: 'failed',
       });
       return swapRes.message;
     }
+
     actions.setTxStep({
       count: 2,
       status: 'successful',
     });
-
-    const id = swapRes.result;
-    actions.setPendingSwapTx({ id, status: 'pending' });
-    actions.setTxStep({ count: 3, status: 'pending' });
-
-    const cacheData: SwapStatusCachedQuery = {
-      id,
-      status: 'pending',
-      timestamp: Date.now(),
-    };
-
-    queryClient.setQueryData([queryKeys.swapStatus, id], cacheData);
 
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
