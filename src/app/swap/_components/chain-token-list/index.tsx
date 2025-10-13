@@ -25,12 +25,24 @@ export default function TokenListPage() {
     setQuery,
   } = useChainListLogic();
   const { toast } = useToast();
+  const otherSelectedToken = selectedTokenType === 'in' ? tokenOut : tokenIn;
+
+  const filteredTokensExpectSelected = filteredTokens?.filter((token) => {
+    if (otherSelectedToken) {
+      return token.chain_type === 'EVM'
+        ? token.contractAddress !== otherSelectedToken?.contractAddress
+        : token.canisterId !== otherSelectedToken?.canisterId;
+    }
+    return filteredTokens;
+  });
 
   const handleTokenClick = (token: TokenType) => {
     if (
       (token.chain_type === 'EVM' &&
-        ((token.contractAddress === tokenIn?.contractAddress && token.chainId == tokenIn?.chainId) ||
-          token.contractAddress === tokenOut?.contractAddress && token.chainId == tokenOut?.chainId)) ||
+        ((token.contractAddress === tokenIn?.contractAddress &&
+          token.chainId == tokenIn?.chainId) ||
+          (token.contractAddress === tokenOut?.contractAddress &&
+            token.chainId == tokenOut?.chainId))) ||
       (token.chain_type === 'ICP' &&
         (token.canisterId === tokenIn?.canisterId || token.canisterId === tokenOut?.canisterId))
     ) {
@@ -62,8 +74,8 @@ export default function TokenListPage() {
         )}
       />
       <div className="flex h-full w-full flex-col gap-y-6 overflow-y-scroll">
-        {icpTokens && filteredTokens && filteredTokens.length > 0 ? (
-          sortTokens(filteredTokens)?.map((token, idx) => (
+        {icpTokens && filteredTokensExpectSelected && filteredTokensExpectSelected.length > 0 ? (
+          sortTokens(filteredTokensExpectSelected)?.map((token, idx) => (
             <TokenCard
               key={idx}
               token={token}
