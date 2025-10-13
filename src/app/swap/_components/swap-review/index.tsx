@@ -10,6 +10,7 @@ import {
   sameChainSwapStepsDetails,
 } from '@/lib/constants/swap';
 import { useSwapReviewLogic } from './use-swap-review-logic';
+import { transactionNotification } from '@/components/common/ui/toast/notification';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,8 @@ export const StepperContainer = () => {
   }, [tokenIn]);
 
   const resetTxState = () => {
+    setIsOpen(false);
+    setActiveStep(1);
     setTxStep({
       count: 1,
       status: 'pending',
@@ -51,9 +54,17 @@ export const StepperContainer = () => {
       setAmount('');
       setToWalletAddress('');
       setPendingSwapTx(undefined);
-      resetTxState();
+      setTxStep({
+        count: 1,
+        status: 'pending',
+      });
+      setTxErrorMessage(undefined);
     } else if (txStep.status === 'failed') {
-      resetTxState();
+      setTxStep({
+        count: 1,
+        status: 'pending',
+      });
+      setTxErrorMessage(undefined);
       setIsOpen(false);
     }
   };
@@ -61,12 +72,19 @@ export const StepperContainer = () => {
   const swapHandler = async () => {
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
       const res = await icpSwapExe();
+      if (res?.status === 'successful') {
+        resetTxState();
+      }
     } else if (tokenIn?.chainId === tokenOut?.chainId) {
       const res = await sameChainSWapExe();
+      if (res?.status === 'successful') {
+        if (res?.status === 'successful') {
+          resetTxState();
+        }
+      }
     } else {
       const res = await crosschainSwapExe();
       if (res?.status === 'successful') {
-        setIsOpen(false);
         resetTxState();
       }
     }

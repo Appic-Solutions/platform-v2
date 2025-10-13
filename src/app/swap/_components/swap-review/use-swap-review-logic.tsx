@@ -20,6 +20,8 @@ import { Principal } from '@dfinity/principal';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { SwapStatusCachedQuery } from '../../_types';
+import { step } from 'viem/chains';
+import { transactionNotification } from '@/components/common/ui/toast/notification';
 
 export const isCrossChainQuote = (quote: any): quote is CrossChainQuote => {
   return (
@@ -37,7 +39,8 @@ export const useSwapReviewLogic = () => {
 
   const queryClient = useQueryClient();
 
-  const icpSwapExe = async () => {
+  const icpSwapExe = async (): Promise<TxStepType | undefined> => {
+    let step: TxStepType;
     if (
       tokenIn?.chain_type === 'ICP' &&
       authenticatedAgent &&
@@ -52,11 +55,12 @@ export const useSwapReviewLogic = () => {
       );
 
       if (!approveRes || !approveRes.result) {
-        actions.setTxStep({
+        step = {
           count: 1,
           status: 'failed',
-        });
-        return approveRes;
+        };
+        actions.setTxStep(step);
+        return step;
       }
 
       actions.setTxStep({
@@ -67,22 +71,37 @@ export const useSwapReviewLogic = () => {
       // Step 2
       const swapRes = await icpSwap(swapQuote as IcpQuote, approveRes.result, authenticatedAgent);
 
-      if (!swapRes.success) {
-        actions.setTxStep({
+      if (!swapRes.success || !swapRes.result) {
+        step = {
           count: 2,
           status: 'failed',
-        });
-        return swapRes.message;
+        };
+        actions.setTxStep(step);
+        return step;
       }
-      actions.setTxStep({
+
+      step = {
         count: 2,
         status: 'successful',
+      };
+
+      actions.setTxStep(step);
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+
+      transactionNotification({
+        caption: swapRes.result.caption,
+        isSameChain: true,
+        status: swapRes.result.status,
+        title: swapRes.result.title,
+        tokenIn: tokenIn!,
+        tokenOut: tokenOut!,
       });
+      return step;
     }
-    queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
   };
 
   const crosschainSwapExe = async (): Promise<TxStepType | undefined> => {
+    let step: TxStepType;
     if (unAuthenticatedAgent && swapQuote && tokenIn && tokenOut) {
       // step1
       const approveRes = await crossChainApproveTokenIn(
@@ -92,7 +111,7 @@ export const useSwapReviewLogic = () => {
       );
 
       if (!approveRes.success) {
-        const step: TxStepType = {
+        step = {
           count: 1,
           status: 'failed',
         };
@@ -119,7 +138,7 @@ export const useSwapReviewLogic = () => {
       );
 
       if (!swapRes.success) {
-        const step: TxStepType = {
+        step = {
           count: 2,
           status: 'failed',
         };
@@ -134,7 +153,7 @@ export const useSwapReviewLogic = () => {
         });
       }
 
-      const step: TxStepType = {
+      step = {
         count: 2,
         status: swapRes.success ? 'successful' : 'failed',
       };
@@ -155,16 +174,17 @@ export const useSwapReviewLogic = () => {
     queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
   };
 
-  const sameChainSWapExe = async () => {
+  const sameChainSWapExe = async (): Promise<TxStepType | undefined> => {
+    let step: TxStepType;
     // step1
     const approveRes = await sameChainApproveTokenIn(swapQuote as SameChainQuote);
-
     if (!approveRes.success) {
-      actions.setTxStep({
+      step = {
         count: 1,
         status: 'failed',
-      });
-      return approveRes;
+      };
+      actions.setTxStep(step);
+      return step;
     }
 
     actions.setTxStep({
@@ -181,23 +201,35 @@ export const useSwapReviewLogic = () => {
       toWalletAddress ? toWalletAddress : evmAddress!,
     );
 
-    console.log(swapRes);
-
     if (swapRes.result.status === 'failed') {
-      actions.setTxStep({
+      step = {
         count: 2,
         status: 'failed',
-      });
-      return swapRes.message;
+      };
+      actions.setTxStep(step);
+      return step;
     }
 
-    actions.setTxStep({
+    step = {
       count: 2,
-      status: 'successful',
-    });
+      status: !swapRes.success ? 'failed' : 'successful',
+    };
+
+    actions.setTxStep(step);
 
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
+
+    transactionNotification({
+      caption: swapRes.result.caption,
+      isSameChain: true,
+      status: swapRes.result.status,
+      title: swapRes.result.title,
+      tokenIn: tokenIn!,
+      tokenOut: tokenOut!,
+    });
+
+    return step;
   };
 
   return {
