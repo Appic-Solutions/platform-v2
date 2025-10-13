@@ -19,9 +19,10 @@ import {
 } from '@/blockchain_api/did/ledger/icrc_types';
 import { appic_dex } from '@/canister_ids.json';
 import { Response } from '@/blockchain_api/types/response';
-import { Result_10 as SwapResult } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
+import { Result_11 as SwapResult } from '@/blockchain_api/did/appic/appic_dex/appic_dex_types';
 import { idlFactory } from '@/blockchain_api/did/appic/appic_dex/appic_dex.did';
 import { BigNumber } from 'bignumber.js';
+import { formatAmount, SwapStatus } from '@/blockchain_api/functions/swap/crosschain';
 
 // step 1
 // for swapping first we need to generate the swap args and then approve the token in spending
@@ -100,9 +101,10 @@ export async function approve_token_in(
 
 // step 2
 export async function swap(
+	quote: IcpQuote,
 	swap_args: SwapArgs,
 	authenticated_agent: Agent,
-): Promise<Response<string | undefined>> {
+): Promise<Response<SwapStatus | undefined>> {
 	const dex_actor = Actor.createActor(idlFactory, {
 		agent: authenticated_agent,
 		canisterId: appic_dex,
@@ -114,15 +116,18 @@ export async function swap(
 			console.log(swap_result.Err);
 			return {
 				message: `${swap_result.Err}`,
-				result: undefined,
+				result: { amount_out: "0", amount_in: "0", title: "Swap failed", caption: "" } as SwapStatus,
 				success: false,
 			};
+		} else {
+			let amount_out = formatAmount(swap_result.Ok.amount_out.toString(), quote.tokenOut.decimals);
+			return {
+				message: '',
+				result: { amount_out, amount_in: quote.amountIn, caption: `Swapped ${quote.amountIn} ${quote.tokenIn.symbol} to ${formatAmount(amount_out, quote.tokenOut.decimals)} ${quote.tokenOut.symbol}`, title: "Swapped" } as SwapStatus,
+				success: true,
+			};
+
 		}
-		return {
-			message: '',
-			result: `${swap_result.Ok}`,
-			success: true,
-		};
 	} catch (error) {
 		console.log(error);
 		return {

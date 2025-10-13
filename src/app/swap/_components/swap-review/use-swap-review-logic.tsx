@@ -65,7 +65,7 @@ export const useSwapReviewLogic = () => {
       });
 
       // Step 2
-      const swapRes = await icpSwap(approveRes.result, authenticatedAgent);
+      const swapRes = await icpSwap(swapQuote as IcpQuote, approveRes.result, authenticatedAgent);
 
       if (!swapRes.success) {
         actions.setTxStep({
