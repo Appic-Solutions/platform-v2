@@ -93,7 +93,7 @@ export const transactionNotification = ({
               isSameChain ? '-right-1' : '-left-1',
             )}
           >
-            <img src={tokenIn.logo} className="h-3.5 w-3.5" alt="from" />
+            <img src={getChainLogo(tokenIn.chainId)} className="h-3.5 w-3.5" alt="from" />
           </span>
           {!isSameChain ? (
             <span

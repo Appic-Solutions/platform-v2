@@ -44,21 +44,14 @@ export const StepperContainer = () => {
       count: 1,
       status: 'pending',
     });
+    setAmount('');
+    setToWalletAddress('');
     setTxErrorMessage(undefined);
   };
 
   const onCloseModal = () => {
     if (txStep.status === 'successful') {
-      setIsOpen(false);
-      setActiveStep(1);
-      setAmount('');
-      setToWalletAddress('');
-      setPendingSwapTx(undefined);
-      setTxStep({
-        count: 1,
-        status: 'pending',
-      });
-      setTxErrorMessage(undefined);
+      resetTxState();
     } else if (txStep.status === 'failed') {
       setTxStep({
         count: 1,
@@ -78,9 +71,7 @@ export const StepperContainer = () => {
     } else if (tokenIn?.chainId === tokenOut?.chainId) {
       const res = await sameChainSWapExe();
       if (res?.status === 'successful') {
-        if (res?.status === 'successful') {
-          resetTxState();
-        }
+        resetTxState();
       }
     } else {
       const res = await crosschainSwapExe();

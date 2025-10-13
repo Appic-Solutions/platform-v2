@@ -23,7 +23,7 @@ export const useChainListLogic = () => {
   const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   const { data: topEvmTokensData } = useQuery({
-    queryKey: ['top-evm-tokens'],
+    queryKey: [queryKeys.topEvmTokens],
     queryFn: () => get_top_evm_tokens(unAuthenticatedAgent!),
     enabled: !!unAuthenticatedAgent,
   });
@@ -134,7 +134,16 @@ export const useChainListLogic = () => {
           token.canisterId?.toLowerCase().includes(searchQuery),
       );
     return filtered;
-  }, [query, selectedChainId, updatedSwapTokensList, tokenIn, selectedTokenType, tokenOut]);
+  }, [
+    query,
+    selectedChainId,
+    updatedSwapTokensList,
+    tokenIn,
+    selectedTokenType,
+    tokenOut,
+    icpBalance,
+    evmBalance,
+  ]);
 
   // sort items based on balance
   const sortTokens = (tokens: TokenType[]) => {

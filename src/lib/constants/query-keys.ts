@@ -16,6 +16,7 @@ export const queryKeys = {
   evmBalance: 'fetch-evm-balance',
   swapStatus: 'swap-status',
   checkSwapStatus: 'check-swap-status',
+  topEvmTokens: 'top-evm-tokens',
 } as const;
 
 export type QueryKeys = typeof queryKeys;
