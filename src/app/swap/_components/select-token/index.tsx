@@ -14,7 +14,6 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchICPQuote } from '@/blockchain_api/quoter/icp';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { useEffect } from 'react';
-import { useToast } from '@/lib/hooks/use-toast';
 import BigNumber from 'bignumber.js';
 import { fetchCrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { fetchSameChainQuote } from '@/blockchain_api/quoter/same-chain';

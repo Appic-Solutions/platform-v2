@@ -116,7 +116,10 @@ export const transactionNotification = ({
             <Spinner />
           </div>
         ) : (
-          <CloseIcon onClick={() => toast.dismiss(t.id)} className="cursor-pointer text-red-500" />
+          <CloseIcon
+            onClick={() => toast.dismiss(t.id)}
+            className="cursor-pointer text-slate-800"
+          />
         )}
       </div>
     ),
