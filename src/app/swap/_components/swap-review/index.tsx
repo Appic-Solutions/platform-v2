@@ -60,11 +60,15 @@ export const StepperContainer = () => {
 
   const swapHandler = async () => {
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
-      icpSwapExe();
+      const res = await icpSwapExe();
     } else if (tokenIn?.chainId === tokenOut?.chainId) {
-      sameChainSWapExe();
+      const res = await sameChainSWapExe();
     } else {
-      crosschainSwapExe();
+      const res = await crosschainSwapExe();
+      if (res?.status === 'successful') {
+        setIsOpen(false);
+        resetTxState();
+      }
     }
   };
 

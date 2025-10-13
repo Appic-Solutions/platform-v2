@@ -48,12 +48,13 @@ export const transactionNotification = ({
   tokenIn,
   tokenOut,
   isSameChain,
-}: TransactionNotificationProps) => {
+  toastId,
+}: TransactionNotificationProps & { toastId?: string }) => {
   toast.custom(
     (t) => (
       <div
         className={cn(
-          'relative overflow-hidden p-3',
+          'relative top-12 overflow-hidden p-3 md:top-24',
           'flex items-center gap-3',
           'w-full min-w-fit max-w-xs',
           'rounded-xl border border-slate-200/50',
@@ -68,6 +69,7 @@ export const transactionNotification = ({
           <div className="relative h-10 w-10 overflow-hidden rounded-full">
             {[tokenIn.logo, tokenOut.logo].map((item, idx) => (
               <div
+                key={idx}
                 className="absolute inset-0"
                 style={{
                   clipPath:
@@ -91,7 +93,7 @@ export const transactionNotification = ({
               isSameChain ? '-right-1' : '-left-1',
             )}
           >
-            <img src={getChainLogo(tokenIn.chainId)} className="h-3.5 w-3.5" alt="from" />
+            <img src={tokenIn.logo} className="h-3.5 w-3.5" alt="from" />
           </span>
           {!isSameChain ? (
             <span
@@ -121,7 +123,8 @@ export const transactionNotification = ({
     {
       position: 'top-right',
       toasterId: 'transactionNotification',
-      duration: Infinity,
+      duration: status === 'pending' ? Infinity : 20_000,
+      id: toastId,
     },
   );
 };
