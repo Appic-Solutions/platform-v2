@@ -126,19 +126,10 @@ export default function HeaderPage() {
       !!icpIdentity,
   });
 
-  // Temp:
-  useEffect(() => {
-    console.log('==============================>');
-    console.log(pendingSwapTx);
-    console.log(swapStoreActions);
-    console.log(unAuthenticatedAgent);
-  }, [pendingSwapTx]);
-
   // check pending swap status
   useQuery({
     queryKey: [queryKeys.checkSwapStatus, pendingSwapTx?.id],
     queryFn: async () => {
-      console.log('checkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
       const res = await check_swap_status(
         swapQuote as CrossChainQuote,
         pendingSwapTx?.id as string,
