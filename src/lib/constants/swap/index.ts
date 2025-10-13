@@ -110,23 +110,6 @@ export const crosschainSwapStepsDetails: TxStep[] = [
       },
     },
   },
-  {
-    title: 'Step 3',
-    statuses: {
-      pending: {
-        statusTitle: 'Pending',
-        description: 'Transaction submitted, waiting for minter verification',
-      },
-      successful: {
-        statusTitle: 'Successful',
-        description: 'Minted successfully',
-      },
-      failed: {
-        statusTitle: 'Failed',
-        description: 'Failed to mint',
-      },
-    },
-  },
 ];
 
 export const tabs: { value: BalanceType; label: string }[] = [

@@ -105,60 +105,17 @@ export const useSwapReviewLogic = () => {
         status: 'pending',
       });
 
-      // Step 2
-      let swapRes;
-      if (swapQuote?.tokenIn.chain_type === 'EVM' && swapQuote?.tokenOut.chain_type == 'ICP') {
-        // evm to icp
-        swapRes = await crossChainSwap(
-          swapQuote as CrossChainQuote,
-          authenticatedAgent,
-          unAuthenticatedAgent,
-          undefined,
-          toWalletAddress ? Principal.fromText(toWalletAddress) : icpIdentity,
-        );
-      } else if (
-        swapQuote?.tokenIn.chain_type === 'EVM' &&
-        swapQuote?.tokenOut.chain_type == 'EVM'
-      ) {
-        //  evm to evm
-        swapRes = await crossChainSwap(
-          swapQuote as CrossChainQuote,
-          authenticatedAgent,
-          unAuthenticatedAgent,
-          toWalletAddress ? toWalletAddress : evmAddress,
-          undefined,
-        );
-      } else {
-        // icp to evm
-        swapRes = await crossChainSwap(
-          swapQuote as CrossChainQuote,
-          authenticatedAgent,
-          unAuthenticatedAgent,
-          toWalletAddress ? toWalletAddress : evmAddress,
-          undefined,
-        );
-      }
+      const isEvmToIcp =
+        swapQuote.tokenIn.chain_type === 'EVM' && swapQuote.tokenOut.chain_type === 'ICP';
+      const recipientEvm = toWalletAddress || evmAddress;
+      const recipientIcp = toWalletAddress ? Principal.fromText(toWalletAddress) : icpIdentity;
 
-      if (!swapRes.success) {
-        const step: TxStepType = {
-          count: 2,
-          status: 'failed',
-        };
-        actions.setTxStep(step);
-        return step;
-      }
-
-      // if step 2 was successful, 1. set successful step2 status, 2. close the modal 3.show the toast
-
-      actions.setTxStep({
-        count: 2,
-        status: 'successful',
-      });
-
-      const checkSwapStatusRes = await check_swap_status(
+      const swapRes = await crossChainSwap(
         swapQuote as CrossChainQuote,
-        swapRes.result,
+        authenticatedAgent,
         unAuthenticatedAgent,
+        isEvmToIcp ? undefined : recipientEvm,
+        isEvmToIcp ? recipientIcp : undefined,
       );
 
       if (!swapRes.success) {
@@ -169,6 +126,22 @@ export const useSwapReviewLogic = () => {
         actions.setTxStep(step);
         return step;
       }
+
+      if (swapRes.success) {
+        actions.setPendingSwapTx({
+          id: swapRes.result,
+          status: 'pending',
+        });
+      }
+
+      const step: TxStepType = {
+        count: 2,
+        status: swapRes.success ? 'successful' : 'failed',
+      };
+
+      actions.setTxStep(step);
+
+      return step;
     }
     queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
     queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });

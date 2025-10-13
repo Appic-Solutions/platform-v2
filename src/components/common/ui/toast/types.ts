@@ -14,4 +14,5 @@ export type TransactionNotificationProps = {
   status: TxStatusType;
   tokenIn: EvmToken | IcpToken;
   tokenOut: EvmToken | IcpToken;
+  toastId?: string;
 };

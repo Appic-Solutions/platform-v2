@@ -18,6 +18,7 @@ import { useToast } from '@/lib/hooks/use-toast';
 import BigNumber from 'bignumber.js';
 import { fetchCrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { fetchSameChainQuote } from '@/blockchain_api/quoter/same-chain';
+import { notification } from '@/components/common/ui/toast/notification';
 
 export default function SwapSelectTokenPage() {
   const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError, swapQuote } =
@@ -33,7 +34,6 @@ export default function SwapSelectTokenPage() {
     actionButtonStatus,
     nativeToken,
   } = useSwapSelectTokenLogic();
-  const { toast } = useToast();
 
   const getQuote = async () => {
     let response;
@@ -90,30 +90,27 @@ export default function SwapSelectTokenPage() {
       BigNumber(swapQuoteData.result.amountOut).isNegative()
     ) {
       setSwapQuote(undefined);
-      toast({
-        title: 'Amount too low',
-        variant: 'destructive',
-        duration: 3000,
+      notification({
+        message: 'Amount too low',
+        type: 'error',
       });
     } else {
       setSwapQuote(undefined);
-      toast({
-        title: 'No route found for selected tokens',
-        variant: 'destructive',
-        duration: 3000,
+      notification({
+        message: 'No route found for selected tokens',
+        type: 'error',
       });
     }
-  }, [isFetched, isSuccess, swapQuoteData, toast, setSwapQuote]);
+  }, [isFetched, isSuccess, swapQuoteData, setSwapQuote]);
 
   useEffect(() => {
     if (isError) {
-      toast({
-        title: 'Failed to fetch quote',
-        variant: 'destructive',
-        duration: 3000,
+      notification({
+        message: 'Failed to fetch quote',
+        type: 'error',
       });
     }
-  }, [isError, toast]);
+  }, [isError]);
 
   useEffect(() => {
     if (amount) {
