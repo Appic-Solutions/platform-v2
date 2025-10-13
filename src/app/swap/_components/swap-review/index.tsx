@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 import SwapTransactionStepper from './transaction-stepper';
 import { useEffect, useState } from 'react';
-import { useSwapActions, useSwapStore } from '../../_store';
+import { TxStepType, useSwapActions, useSwapStore } from '../../_store';
 import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
 import {
@@ -63,21 +63,17 @@ export const StepperContainer = () => {
   };
 
   const swapHandler = async () => {
+    let res: TxStepType | undefined;
+
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
-      const res = await icpSwapExe();
-      if (res?.status === 'successful') {
-        resetTxState();
-      }
+      res = await icpSwapExe();
     } else if (tokenIn?.chainId === tokenOut?.chainId) {
-      const res = await sameChainSWapExe();
-      if (res?.status === 'successful') {
-        resetTxState();
-      }
+      res = await sameChainSWapExe();
     } else {
-      const res = await crosschainSwapExe();
-      if (res?.status === 'successful') {
-        resetTxState();
-      }
+      res = await crosschainSwapExe();
+    }
+    if (res?.status === 'successful') {
+      resetTxState();
     }
   };
 

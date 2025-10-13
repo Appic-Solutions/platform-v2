@@ -39,6 +39,10 @@ export const useSwapReviewLogic = () => {
 
   const queryClient = useQueryClient();
 
+  // we just call the transaction notification in samechain and icp swap here.
+  // because there is no need to have a query call every 5s
+  // and for crosschain that we should call a query every 5s, we call the transaction notification
+  // in the header.tsx component inside the query for handling update state of the notification
   const icpSwapExe = async (): Promise<TxStepType | undefined> => {
     let step: TxStepType;
     if (
