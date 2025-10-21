@@ -262,7 +262,7 @@ export async function fetchCrossChainQuote({
 				let { total_gas_fee } = estimate_gas_fee(max_fee_per_gas, gas_limit);
 
 				let total_native_token_fee = BigNumber(total_approval_fee).plus(total_gas_fee).toFixed();
-				let human_readable_native_token_fee = BigNumber(total_native_token_fee).div(BigNumber(10).pow(18)).toFixed();
+				let human_readable_native_token_fee = BigNumber(total_native_token_fee).div(BigNumber(10).pow(18)).toFixed(6);
 
 				nativeTokenFees = {
 					approvalFeeInNativeToken: total_approval_fee,
@@ -273,7 +273,7 @@ export async function fetchCrossChainQuote({
 
 					totalNativeTokenfee: total_native_token_fee,
 					humanReadableTotalNativeFee: human_readable_native_token_fee,
-					totalNativeFeeUSD: BigNumber(nativeToken?.usdPrice!).multipliedBy(human_readable_native_token_fee).toFixed(),
+					totalNativeFeeUSD: BigNumber(nativeToken?.usdPrice!).multipliedBy(human_readable_native_token_fee).toFixed(2),
 
 					maxPriorityFeePerGas: max_priority_fee_per_gas,
 					maxFeePerGas: max_fee_per_gas,

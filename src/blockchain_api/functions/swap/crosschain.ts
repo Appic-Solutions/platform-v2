@@ -287,7 +287,8 @@ export async function cross_chain_swap(
 				value,
 			});
 
-			setTimeout(() => { }, 1_000);
+			// waiting for the nonce to be upgraded
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			const nonce = await public_client.getTransactionCount({
 				address: account,
@@ -451,7 +452,7 @@ export async function check_swap_status(
 				return { success: true, message: '', result: pendingResponse(quote) };
 			} else if ('SwapTxSent' in currentStatus) {
 				const hash = currentStatus.SwapTxSent.transaction_hash;
-				const rawAmountOut = await getEventAmountOut(publicClient, hash, true);
+				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				if (rawAmountOut === null)
 					return { success: true, message: '', result: pendingResponse(quote) };
 				return {
@@ -461,7 +462,7 @@ export async function check_swap_status(
 				};
 			} else if ('RefundSwapTxSent' in currentStatus) {
 				const hash = currentStatus.RefundSwapTxSent.transaction_hash;
-				const rawAmountOut = await getEventAmountOut(publicClient, hash, true);
+				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				if (rawAmountOut === null)
 					return { success: true, message: '', result: pendingResponse(quote) };
 				return {
@@ -475,7 +476,7 @@ export async function check_swap_status(
 					return { success: true, message: '', result: pendingResponse(quote) };
 				const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 					.transaction_hash;
-				const rawAmountOut = await getEventAmountOut(publicClient, hash, false);
+				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				if (rawAmountOut === null)
 					return { success: true, message: '', result: pendingResponse(quote) };
 				if ('Success' in finalized) {
@@ -498,7 +499,7 @@ export async function check_swap_status(
 					return { success: true, message: '', result: pendingResponse(quote) };
 				const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 					.transaction_hash;
-				const rawAmountOut = await getEventAmountOut(publicClient, hash, false);
+				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				const rawRefund =
 					rawAmountOut ||
 					('Reimbursed' in finalized ? finalized.Reimbursed.reimbursed_amount.toString() : '0');
@@ -589,7 +590,7 @@ export async function check_swap_status(
 						return { success: true, message: '', result: pendingResponse(quote) };
 					} else if ('SwapTxSent' in currentStatus) {
 						const hash = currentStatus.SwapTxSent.transaction_hash;
-						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, true);
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						if (rawAmountOutTo === null)
 							return { success: true, message: '', result: pendingResponse(quote) };
 						return {
@@ -599,7 +600,7 @@ export async function check_swap_status(
 						};
 					} else if ('RefundSwapTxSent' in currentStatus) {
 						const hash = currentStatus.RefundSwapTxSent.transaction_hash;
-						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, true);
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						if (rawAmountOutTo === null)
 							return { success: true, message: '', result: pendingResponse(quote) };
 						return {
@@ -613,7 +614,7 @@ export async function check_swap_status(
 							return { success: true, message: '', result: pendingResponse(quote) };
 						const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 							.transaction_hash;
-						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, false);
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						if (rawAmountOutTo === null)
 							return { success: true, message: '', result: pendingResponse(quote) };
 						if ('Success' in finalized) {
@@ -636,7 +637,7 @@ export async function check_swap_status(
 							return { success: true, message: '', result: pendingResponse(quote) };
 						const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 							.transaction_hash;
-						const rawAmountOutTo = await getEventAmountOut(publicClient, hash, false);
+						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						const rawRefund =
 							rawAmountOutTo ||
 							('Reimbursed' in finalized ? finalized.Reimbursed.reimbursed_amount.toString() : '0');
@@ -673,7 +674,7 @@ export async function check_swap_status(
 // Format amount with decimals using BigNumber
 export function formatAmount(raw: string, decimals: number): string {
 	if (!raw) return '0';
-	return new BigNumber(raw).div(new BigNumber(10).pow(decimals)).toFixed();
+	return new BigNumber(raw).div(new BigNumber(10).pow(decimals)).toFixed(6);
 }
 
 
@@ -769,7 +770,6 @@ const swapExecutedAbi = [
 export async function getEventAmountOut(
 	publicClient: any,
 	hash: string,
-	isSent: boolean = true,
 ): Promise<string | null> {
 	let txHash = hash.startsWith('0x') ? (hash as `0x${string}`) : (`0x${hash}` as `0x${string}`);
 	const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, confirmations: 1 });
