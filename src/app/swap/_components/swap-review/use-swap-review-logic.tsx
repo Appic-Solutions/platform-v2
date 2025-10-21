@@ -7,7 +7,6 @@ import {
 } from '@/blockchain_api/functions/icp/dex/tx/swap';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  check_swap_status,
   cross_chain_approve_token_in as crossChainApproveTokenIn,
   cross_chain_swap as crossChainSwap,
 } from '@/blockchain_api/functions/swap/crosschain';
@@ -20,7 +19,6 @@ import { Principal } from '@dfinity/principal';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { SwapStatusCachedQuery } from '../../_types';
-import { step } from 'viem/chains';
 import { transactionNotification } from '@/components/common/ui/toast/notification';
 
 export const isCrossChainQuote = (quote: any): quote is CrossChainQuote => {
@@ -90,7 +88,6 @@ export const useSwapReviewLogic = () => {
       };
 
       actions.setTxStep(step);
-      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
 
       transactionNotification({
         caption: swapRes.result.caption,
@@ -174,8 +171,6 @@ export const useSwapReviewLogic = () => {
 
       return step;
     }
-    queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
-    queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
   };
 
   const sameChainSWapExe = async (): Promise<TxStepType | undefined> => {
@@ -220,9 +215,6 @@ export const useSwapReviewLogic = () => {
     };
 
     actions.setTxStep(step);
-
-    queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
-    queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
 
     transactionNotification({
       caption: swapRes.result.caption,

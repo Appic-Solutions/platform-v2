@@ -153,6 +153,7 @@ export default function HeaderPage() {
           swapStoreActions.setPendingSwapTx(undefined);
           queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
           reactHotToast.dismiss(pendingSwapTx?.id);
+
           transactionNotification({
             title: res.result.title,
             caption: res.result.caption,
@@ -171,7 +172,8 @@ export default function HeaderPage() {
         reactHotToast.dismiss(pendingSwapTx?.id);
       }
 
-      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance, queryKeys.icpBalance] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
       return res;
     },
     refetchInterval: 1000 * 5,

@@ -54,6 +54,7 @@ const AmountInput = () => {
     const usdPrice = new BigNumber(value == '' ? '0' : value)
       .multipliedBy(tokenIn?.usdPrice || 0)
       .toFixed(2);
+    console.log({ usdPrice, tokenIn });
     setUsdPrice(usdPrice);
     setAmount(value);
   };

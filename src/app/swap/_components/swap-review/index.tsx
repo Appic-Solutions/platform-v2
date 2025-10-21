@@ -10,22 +10,17 @@ import {
   sameChainSwapStepsDetails,
 } from '@/lib/constants/swap';
 import { useSwapReviewLogic } from './use-swap-review-logic';
-import { transactionNotification } from '@/components/common/ui/toast/notification';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [steps, setSteps] = useState<TxStep[]>();
   const { tokenIn, tokenOut, txStep } = useSwapStore();
   const { crosschainSwapExe, icpSwapExe, sameChainSWapExe } = useSwapReviewLogic();
-
-  const {
-    setAmount,
-    setActiveStep,
-    setTxStep,
-    setTxErrorMessage,
-    setToWalletAddress,
-    setPendingSwapTx,
-  } = useSwapActions();
+  const { setAmount, setActiveStep, setTxStep, setTxErrorMessage, setToWalletAddress } =
+    useSwapActions();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
@@ -75,6 +70,8 @@ export const StepperContainer = () => {
     if (res?.status === 'successful') {
       resetTxState();
     }
+    queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+    queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
   };
 
   const onOpenModal = () => {

@@ -8,7 +8,7 @@ import { useAuth } from '@nfid/identitykit/react';
 import { useAppKit } from '@reown/appkit/react';
 import { useIsFetching } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export const useSwapSelectTokenLogic = () => {
   const [showWalletAddress, setShowWalletAddress] = useState(false);
@@ -64,6 +64,8 @@ export const useSwapSelectTokenLogic = () => {
       );
       if (userToken) {
         setUserNativeToken(userToken);
+      } else {
+        setUserNativeToken(undefined);
       }
     }
   }, [tokenIn, nativeToken]);
@@ -114,144 +116,157 @@ export const useSwapSelectTokenLogic = () => {
     return false;
   };
 
-  function getActionButtonStatus({ showWalletAddress }: { showWalletAddress: boolean }): {
-    isDisable: boolean;
-    text: string;
-  } {
-    if (!tokenIn || !tokenOut) {
-      return {
-        isDisable: true,
-        text: 'Select token to swap',
-      };
-    }
-
-    if (!Number(amount) || Number(amount) === 0) {
-      return {
-        isDisable: true,
-        text: 'Set token amount to continue',
-      };
-    }
-
-    if (isEvmBalanceFetching || isIcpBalanceFetching) {
-      return {
-        isDisable: true,
-        text: 'Fetching wallet balance',
-      };
-    }
-
-    if (!swapQuote) {
-      return {
-        isDisable: true,
-        text: 'Confirm',
-      };
-    }
-
-    if (
-      (isWalletConnected('to') && isWalletConnected('from')) ||
-      (toWalletAddress && !toWalletValidationError && isWalletConnected('from'))
-    ) {
-      if (new BigNumber(amount).isGreaterThan(new BigNumber(selectedTokenBalance))) {
+  const getActionButtonStatus = useCallback(
+    ({
+      showWalletAddress,
+    }: {
+      showWalletAddress: boolean;
+    }): { isDisable: boolean; text: string } => {
+      if (!tokenIn || !tokenOut) {
         return {
           isDisable: true,
-          text: 'INSUFFICIENT Funds',
+          text: 'Select token to swap',
         };
       }
-      if (
-        tokenIn.contractAddress &&
-        (!userNativeToken ||
-          !userNativeToken.balance ||
-          ('nativeTokenFees' in swapQuote &&
-            swapQuote.nativeTokenFees?.totalNativeTokenfee &&
-            new BigNumber(swapQuote.nativeTokenFees?.totalNativeTokenfee).isGreaterThan(
-              userNativeToken.balanceRawInteger || '0',
-            )))
-      ) {
-        return {
-          isDisable: true,
-          text: `INSUFFICIENT ${nativeToken?.symbol} Balance`,
-        };
-      }
-      if (
-        tokenIn.contractAddress &&
-        nativeToken &&
-        userNativeToken?.balance &&
-        areSameEvmTokens(tokenIn, nativeToken) &&
-        'nativeTokenFees' in swapQuote &&
-        swapQuote.nativeTokenFees?.totalNativeTokenfee &&
-        new BigNumber(swapQuote.nativeTokenFees?.totalNativeTokenfee)
-          .plus(new BigNumber(amount))
-          .isGreaterThan(userNativeToken.balanceRawInteger || '0')
-      ) {
-        return {
-          isDisable: true,
-          text: `INSUFFICIENT ${nativeToken.symbol} Balance`,
-        };
-      }
-    }
 
-    if (showWalletAddress) {
-      if (!toWalletAddress || toWalletValidationError) {
-        return {
-          isDisable: true,
-          text: 'Enter Valid Address',
-        };
-      } else if (!swapQuote) {
+      if (!Number(amount) || Number(amount) === 0) {
         return {
           isDisable: true,
           text: 'Set token amount to continue',
         };
-      } else if (!isWalletConnected('from')) {
+      }
+
+      if (isEvmBalanceFetching || isIcpBalanceFetching) {
+        return {
+          isDisable: true,
+          text: 'Fetching wallet balance',
+        };
+      }
+
+      if (!swapQuote) {
+        return {
+          isDisable: true,
+          text: 'Confirm',
+        };
+      }
+
+      if (
+        (isWalletConnected('to') && isWalletConnected('from')) ||
+        (toWalletAddress && !toWalletValidationError && isWalletConnected('from'))
+      ) {
+        if (new BigNumber(amount).isGreaterThan(new BigNumber(selectedTokenBalance))) {
+          return {
+            isDisable: true,
+            text: 'INSUFFICIENT Funds',
+          };
+        }
+
+        if (
+          tokenIn.contractAddress &&
+          (!userNativeToken ||
+            !userNativeToken.balance ||
+            ('nativeTokenFees' in swapQuote &&
+              swapQuote.nativeTokenFees?.totalNativeTokenfee &&
+              new BigNumber(swapQuote.nativeTokenFees?.totalNativeTokenfee).isGreaterThan(
+                userNativeToken.balanceRawInteger || '0',
+              )))
+        ) {
+          return {
+            isDisable: true,
+            text: `INSUFFICIENT ${nativeToken?.symbol} Balance`,
+          };
+        }
+
+        if (
+          tokenIn.contractAddress &&
+          nativeToken &&
+          userNativeToken?.balance &&
+          areSameEvmTokens(tokenIn, nativeToken) &&
+          'nativeTokenFees' in swapQuote &&
+          swapQuote.nativeTokenFees?.totalNativeTokenfee &&
+          new BigNumber(swapQuote.nativeTokenFees?.totalNativeTokenfee)
+            .plus(new BigNumber(amount))
+            .isGreaterThan(userNativeToken.balanceRawInteger || '0')
+        ) {
+          return {
+            isDisable: true,
+            text: `INSUFFICIENT ${nativeToken.symbol} Balance`,
+          };
+        }
+      }
+
+      if (showWalletAddress) {
+        if (!toWalletAddress || toWalletValidationError) {
+          return {
+            isDisable: true,
+            text: 'Enter Valid Address',
+          };
+        } else if (!swapQuote) {
+          return {
+            isDisable: true,
+            text: 'Set token amount to continue',
+          };
+        } else if (!isWalletConnected('from')) {
+          return {
+            isDisable: false,
+            text: `Connect ${tokenIn.chain_type} Wallet`,
+          };
+        } else if (swapQuote && toWalletAddress && !toWalletValidationError) {
+          return {
+            isDisable: false,
+            text: 'Review Swap',
+          };
+        }
+      }
+
+      if (!isWalletConnected('from')) {
         return {
           isDisable: false,
           text: `Connect ${tokenIn.chain_type} Wallet`,
         };
-      } else if (swapQuote && toWalletAddress && !toWalletValidationError) {
+      }
+
+      if (!showWalletAddress && !isWalletConnected('to')) {
+        return {
+          isDisable: false,
+          text: `Connect ${tokenOut.chain_type} Wallet`,
+        };
+      }
+
+      if (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && swapQuote) {
         return {
           isDisable: false,
           text: 'Review Swap',
         };
       }
-    }
 
-    if (swapQuote && !swapQuote) {
+      if (isWalletConnected('from') && isWalletConnected('to') && swapQuote) {
+        return {
+          isDisable: false,
+          text: 'Review Swap',
+        };
+      }
+
       return {
         isDisable: true,
-        text: 'Select Swap Option',
+        text: 'Confirm',
       };
-    }
-
-    if (!isWalletConnected('from')) {
-      return {
-        isDisable: false,
-        text: `Connect ${tokenIn.chain_type} Wallet`,
-      };
-    }
-
-    if (!showWalletAddress && !isWalletConnected('to')) {
-      return {
-        isDisable: false,
-        text: `Connect ${tokenOut.chain_type} Wallet`,
-      };
-    }
-
-    if (toWalletAddress && !toWalletValidationError && isWalletConnected('from') && swapQuote) {
-      return {
-        isDisable: false,
-        text: 'Review Swap',
-      };
-    }
-    if (isWalletConnected('from') && isWalletConnected('to') && swapQuote) {
-      return {
-        isDisable: false,
-        text: 'Review Swap',
-      };
-    }
-
-    return {
-      isDisable: true,
-      text: 'Confirm',
-    };
-  }
+    },
+    [
+      tokenIn,
+      tokenOut,
+      amount,
+      isEvmBalanceFetching,
+      isIcpBalanceFetching,
+      swapQuote,
+      selectedTokenBalance,
+      userNativeToken,
+      nativeToken,
+      toWalletAddress,
+      toWalletValidationError,
+      isWalletConnected,
+    ],
+  );
 
   const openConnectWalletModalHandler = (token: TokenType) => {
     if (token?.chain_type === 'ICP') {
