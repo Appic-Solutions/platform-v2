@@ -688,7 +688,7 @@ function pendingResponse(quote: CrossChainQuote): SwapStatus {
 		status: 'pending',
 		amount_in: quote.amountIn,
 		amount_out: quote.amountOut,
-		caption: 'Swap is processing...',
+		caption: 'Swap in progress...',
 		title: 'Swapping',
 	};
 }
