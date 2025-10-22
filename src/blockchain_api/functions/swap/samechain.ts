@@ -165,7 +165,7 @@ export async function same_chain_swap(
 
 
 
-		let amount_out = await getEventAmountOut(public_client, hash, true);
+		let amount_out = await getEventAmountOut(public_client, hash);
 
 		if (amount_out != null) {
 

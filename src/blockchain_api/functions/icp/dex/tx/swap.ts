@@ -120,7 +120,7 @@ export async function swap(
 				success: false,
 			};
 		} else {
-			let amount_out = formatAmount(swap_result.Ok.amount_out.toString(), quote.tokenOut.decimals);
+			let amount_out = swap_result.Ok.amount_out.toString();
 			return {
 				message: '',
 				result: { amount_out, amount_in: quote.amountIn, caption: `Swapped ${quote.amountIn} ${quote.tokenIn.symbol} to ${formatAmount(amount_out, quote.tokenOut.decimals)} ${quote.tokenOut.symbol}`, title: "Swapped" } as SwapStatus,

@@ -26,13 +26,13 @@ import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/
 import {
 	WithdrawalArg as AppicWithdrawalArg,
 	WithdrawErc20Arg as AppicWithdrawErc20Arg,
-	Result_2 as AppicWithdrawalNativeResult,
-	Result_1 as AppicWithdrawalErc20Result,
+	Result_3 as AppicWithdrawalNativeResult,
+	Result_2 as AppicWithdrawalErc20Result,
 	Result as LogScrapingResult,
 	DepositStatus,
 	RetrieveWithdrawalStatus,
 	WrapIcrcArg,
-	Result_3 as WrapIcrcrResult
+	Result_4 as WrapIcrcrResult
 
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 

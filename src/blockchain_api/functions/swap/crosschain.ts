@@ -304,7 +304,9 @@ export async function cross_chain_swap(
 				...prepared_transaction,
 			});
 
-			let confirmations = quote.from_viemChain?.id == 137 ? 2 : 1;
+			let fromChain = quote.from_viemChain?.id;
+
+			let confirmations = fromChain == 137 || fromChain == 1 ? 2 : 1;
 
 			const tx_status = await public_client.waitForTransactionReceipt({
 				hash,
