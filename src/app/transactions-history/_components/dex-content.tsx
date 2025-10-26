@@ -1,9 +1,6 @@
 'use client';
-import { cn, getChainLogo, getChainName } from '@/lib/utils';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { useState } from 'react';
-import useLogic from '../_logic';
-import Spinner from '@/components/ui/spinner';
 import {
   Select,
   SelectContent,
@@ -11,11 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn, getChainLogo, getChainName, getChainSymbol } from '@/lib/utils';
+import Spinner from '@/components/ui/spinner';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { Avatar } from '@/components/common/ui/avatar';
 import { BlockchainIcon } from '@/components/icons';
+import useLogic from '../_logic';
 
-type dexDataTypes =
+type DexDataType =
   | 'All'
   | 'Swap'
   | 'CreatedPool'
@@ -25,7 +25,7 @@ type dexDataTypes =
   | 'DecreasedLiquidity'
   | 'MintedPosition';
 
-const types = [
+const SELECT_OPTIONS: { label: string; value: DexDataType }[] = [
   { label: 'All', value: 'All' },
   { label: 'Swap', value: 'Swap' },
   { label: 'Collected Fees', value: 'CollectedFees' },
@@ -36,215 +36,235 @@ const types = [
   { label: 'Minted Positions', value: 'MintedPosition' },
 ];
 
+// ---------- Helpers ----------
+const isSwapType = (type: string) => ['Swap', 'CrosschainSwap', 'SameChainEvmSwap'].includes(type);
+
+const formatNumber = (value?: string | number) => (value ? Number(value).toFixed(5) : '');
+
+function getReadableAmountIn(item: any): string {
+  switch (item.type) {
+    case 'Swap':
+      return formatNumber(item.human_readable_final_amount_in);
+    case 'CrosschainSwap':
+    case 'SameChainEvmSwap':
+      return formatNumber(item.human_readable_amount_in);
+    default:
+      return (
+        formatNumber(item.human_readable_amount0_paid) ||
+        formatNumber(item.human_readable_amount0_received) ||
+        formatNumber(item.human_readable_amount0_collected)
+      );
+  }
+}
+
+function getReadableAmountOut(item: any): string {
+  switch (item.type) {
+    case 'Swap':
+      return formatNumber(item.human_readable_final_amount_out);
+    case 'CrosschainSwap':
+      return formatNumber(item.human_readable_real_amount_out);
+    case 'SameChainEvmSwap':
+      return formatNumber(item.human_readable_amount_out);
+    default:
+      return (
+        formatNumber(item.human_readable_amount1_paid) ||
+        formatNumber(item.human_readable_amount1_received) ||
+        formatNumber(item.human_readable_amount1_collected)
+      );
+  }
+}
+
+// ---------- Main Component ----------
 export default function DexContent() {
-  const [activeType, setActiveType] = useState<dexDataTypes>('All');
+  const [activeType, setActiveType] = useState<DexDataType>('All');
   const { dexData, isLoading, isError } = useLogic();
 
-  const filteredData = dexData?.filter((item) =>
-    activeType === 'All' ? true : item.type === activeType,
-  );
+  const filteredData = useMemo(() => {
+    if (!dexData) return [];
+    if (activeType === 'All') return dexData;
 
-  if (isError) {
+    return dexData.filter((item) =>
+      activeType === 'Swap' ? isSwapType(item.type) : item.type === activeType,
+    );
+  }, [dexData, activeType]);
+
+  // ---------- Error / Loading States ----------
+  if (isError)
     return (
-      <div
-        className={cn(
-          'flex h-full items-center justify-center text-xl',
-          'mx-auto max-w-[490px] px-6 text-center text-white',
-        )}
-      >
+      <div className="mx-auto flex h-full max-w-[490px] items-center justify-center px-6 text-center text-xl text-white">
         Failed To Get Dex History
       </div>
     );
-  }
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className="my-auto flex items-center justify-center md:absolute md:inset-0">
         <Spinner />
       </div>
     );
-  }
 
+  // ---------- Empty ----------
+  if (!filteredData.length)
+    return (
+      <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
+        <Image src="/images/empty.png" alt="Empty" width={100} height={100} />
+        Empty Dex History
+      </div>
+    );
+
+  // ---------- UI ----------
   return (
     <>
-      <Select value={activeType} onValueChange={(value: dexDataTypes) => setActiveType(value)}>
+      {/* Type Filter */}
+      <Select value={activeType} onValueChange={(v: DexDataType) => setActiveType(v)}>
         <SelectTrigger className="absolute right-0 top-0 z-50 h-9 max-w-28 border-2 border-box-border text-xs text-white md:right-8 md:top-8 md:max-w-[150px]">
           <SelectValue placeholder="Select type" />
         </SelectTrigger>
-        <SelectContent
-          className={cn(
-            'bg-input-fields bg-cover bg-center bg-no-repeat shadow-md backdrop-blur-[30px]',
-            'border-2 border-box-border text-xs text-white',
-          )}
-        >
-          {types.map((type, idx) => (
-            <SelectItem key={idx} value={type.value} className="cursor-pointer">
-              {type.label}
+        <SelectContent className="border-2 border-box-border bg-input-fields bg-cover bg-center bg-no-repeat text-xs text-white shadow-md backdrop-blur-[30px]">
+          {SELECT_OPTIONS.map(({ label, value }) => (
+            <SelectItem key={value} value={value} className="cursor-pointer">
+              {label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {filteredData && filteredData.length > 0 ? (
-        filteredData.map((item, idx) => {
-          const { date, time, status, type, label } = item;
+      {/* History List */}
+      {filteredData.map((item, idx) => {
+        const { date, time, status, type } = item;
+        const isSwapped = isSwapType(type);
 
-          return (
-            <div
-              key={idx}
-              className={cn(
-                'overflow-hidden',
-                'flex w-full flex-col gap-y-4 bg-input-fields bg-cover bg-center bg-no-repeat shadow-md',
-                'rounded-2xl p-5 backdrop-blur-[30px] duration-200 hover:bg-black/75',
-                'md:rounded-[36px] md:p-6',
-              )}
-            >
-              {/* Date & Time */}
-              <div
-                className={cn(
-                  'flex items-center justify-between gap-x-4',
-                  'text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
-                )}
-              >
-                <p>{date}</p>
-                <p>{time}</p>
-              </div>
-
-              {/* Type-specific rendering */}
-              {type === 'Swap' ? (
-                <div className="flex w-full items-center justify-between *:relative">
-                  {/* Token In */}
-                  <div>
-                    <Avatar src={item.token_in.logo} className="h-12 w-12" />
-                    <Avatar
-                      src={getChainLogo(item.token_in.chainId)}
-                      className="absolute -bottom-1 -right-1 h-5 w-5 shadow"
-                    />
-                  </div>
-
-                  {/* Arrow */}
-                  <div className="flex w-full items-center justify-center">
-                    <div
-                      className={cn(
-                        'flex-1 border-t-[3px]',
-                        status === 'Failed' ? 'border-red-500' : 'border-green-500',
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        'relative z-10 rounded-full p-2.5',
-                        status === 'Failed'
-                          ? 'border-2 border-red-500'
-                          : 'before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500',
-                      )}
-                    >
-                      <BlockchainIcon className="h-5 w-5 text-white md:h-6 md:w-6" />
-                    </div>
-                    <div
-                      className={cn(
-                        'flex-1 border-t-[3px]',
-                        status === 'Failed' ? 'border-red-500' : 'border-green-500',
-                      )}
-                    />
-                  </div>
-
-                  {/* Token Out */}
-                  <div>
-                    <Avatar src={item.token_out.logo} className="h-12 w-12" />
-                    <Avatar
-                      src={getChainLogo(item.token_out.chainId)}
-                      className="absolute -bottom-1 -right-1 h-5 w-5 shadow"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-x-2.5">
-                    <div className="flex items-center">
-                      <Avatar src={item.token0.logo} className="h-12 w-12" />
-                      <Avatar src={item.token1.logo} className="-ml-4 h-12 w-12" />
-                    </div>
-                    <p className="text-lg font-medium text-white md:text-xl">
-                      {item.token0.symbol}/{item.token1.symbol}
-                    </p>
-                  </div>
-                  {'pool_fee' in item && item.pool_fee ? (
-                    <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-                      <span className="text-xs leading-5 text-white/60">
-                        {Number(item.pool_fee) / 10000}%
-                      </span>
-                    </SolidCard>
-                  ) : 'position' in item && item.position ? (
-                    <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
-                      <span className="text-xs leading-5 text-white/60">
-                        {Number(item.position.pool_id.fee) / 10000}%
-                      </span>
-                    </SolidCard>
-                  ) : null}
-                </div>
-              )}
-
-              {/* Footer */}
-              {type === 'CreatedPool' ? null : (
-                <div
-                  className={cn(
-                    'flex items-center justify-between gap-x-4 text-xs font-bold',
-                    'max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]',
-                    '*:flex *:flex-1 *:flex-col *:justify-center',
-                  )}
-                >
-                  <div>
-                    <p>
-                      {type === 'Swap'
-                        ? `${item.token_in.symbol} on ${getChainName(item.token_in.chainId)}`
-                        : `${item.token0.symbol} Amount`}
-                    </p>
-                    <p className="text-xl leading-7 max-md:text-white">
-                      {type === 'Swap'
-                        ? Number(item.human_readable_final_amount_in).toFixed(5)
-                        : 'human_readable_amount0_paid' in item
-                          ? Number(item.human_readable_amount0_paid).toFixed(5)
-                          : 'human_readable_amount0_received' in item
-                            ? Number(item.human_readable_amount0_received).toFixed(5)
-                            : 'human_readable_amount0_collected' in item
-                              ? Number(item.human_readable_amount0_collected).toFixed(5)
-                              : ''}
-                    </p>
-                  </div>
-
-                  <div className="items-center text-center max-md:hidden">
-                    {status === 'Successful' ? `Successful ${type}` : `${type} Failed`}
-                  </div>
-
-                  <div className="items-end">
-                    <p>
-                      {type === 'Swap'
-                        ? `${item.token_out.symbol} on ${getChainName(item.token_out.chainId)}`
-                        : `${item.token1.symbol} Amount`}
-                    </p>
-                    <p className="text-xl leading-7 max-md:text-white">
-                      {type === 'Swap'
-                        ? Number(item.human_readable_final_amount_out).toFixed(5)
-                        : 'human_readable_amount1_paid' in item
-                          ? Number(item.human_readable_amount1_paid).toFixed(5)
-                          : 'human_readable_amount1_received' in item
-                            ? Number(item.human_readable_amount1_received).toFixed(5)
-                            : 'human_readable_amount1_collected' in item
-                              ? Number(item.human_readable_amount1_collected).toFixed(5)
-                              : ''}
-                    </p>
-                  </div>
-                </div>
-              )}
+        return (
+          <div
+            key={idx}
+            className={cn(
+              'flex w-full flex-col gap-y-4 overflow-hidden rounded-2xl bg-input-fields bg-cover bg-center p-5 shadow-md backdrop-blur-[30px] duration-200 hover:bg-black/75 md:rounded-[36px] md:p-6',
+            )}
+          >
+            {/* Date & Time */}
+            <div className="flex items-center justify-between gap-x-4 text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]">
+              <p>{date}</p>
+              <p>{time}</p>
             </div>
-          );
-        })
-      ) : (
-        <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
-          <Image src="/images/empty.png" alt="Empty" width={100} height={100} />
-          Empty Dex History
-        </div>
-      )}
+
+            {/* Content */}
+            {isSwapped ? <SwapItem item={item} status={status} /> : <PoolItem item={item} />}
+
+            {/* Footer */}
+            {type !== 'CreatedPool' && <Footer item={item} isSwapped={isSwapped} status={status} />}
+          </div>
+        );
+      })}
     </>
+  );
+}
+
+// ---------- Subcomponents ----------
+function SwapItem({ item, status }: { item: any; status: string }) {
+  return (
+    <div className="flex w-full items-center justify-between *:relative">
+      <TokenAvatar token={item.token_in} />
+      <SwapArrow status={status} />
+      <TokenAvatar token={item.token_out} />
+    </div>
+  );
+}
+
+function PoolItem({ item }: { item: any }) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-x-2.5">
+        <div className="flex items-center">
+          <Avatar src={item.token0.logo} className="h-12 w-12" />
+          <Avatar src={item.token1.logo} className="-ml-4 h-12 w-12" />
+        </div>
+        <p className="text-lg font-medium text-white md:text-xl">
+          {item.token0.symbol}/{item.token1.symbol}
+        </p>
+      </div>
+
+      {'pool_fee' in item && item.pool_fee ? (
+        <FeeCard fee={item.pool_fee} />
+      ) : 'position' in item && item.position ? (
+        <FeeCard fee={item.position.poolId.fee} />
+      ) : null}
+    </div>
+  );
+}
+
+function Footer({ item, isSwapped, status }: { item: any; isSwapped: boolean; status: string }) {
+  const { type } = item;
+  return (
+    <div className="flex items-center justify-between gap-x-4 text-xs font-bold *:flex *:flex-1 *:flex-col *:justify-center max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]">
+      <div>
+        <p>
+          {isSwapped
+            ? `${item.token_in.symbol} on ${getChainName(item.token_in.chainId)}`
+            : `${item.token0.symbol} Amount`}
+        </p>
+        <p className="text-xl leading-7 max-md:text-white">{getReadableAmountIn(item)}</p>
+      </div>
+
+      <div className="items-center text-center max-md:hidden">
+        {status === 'Successful'
+          ? `Successful ${type}`
+          : status === 'Pending'
+            ? `Pending Swap`
+            : `Refunded with ${Number(item.human_readable_refund_amount).toFixed(4)} USDC on ${getChainSymbol(item.refund_chain)}`}
+      </div>
+
+      <div className="items-end">
+        <p>
+          {isSwapped
+            ? `${item.token_out.symbol} on ${getChainName(item.token_out.chainId)}`
+            : `${item.token1.symbol} Amount`}
+        </p>
+        <p className="text-xl leading-7 max-md:text-white">{getReadableAmountOut(item)}</p>
+      </div>
+    </div>
+  );
+}
+
+function TokenAvatar({ token }: { token: any }) {
+  return (
+    <div>
+      <Avatar src={token.logo} className="h-12 w-12" />
+      <Avatar
+        src={getChainLogo(token.chainId)}
+        className="absolute -bottom-1 -right-1 h-5 w-5 shadow"
+      />
+    </div>
+  );
+}
+
+function SwapArrow({ status }: { status: string }) {
+  const color = status === 'Refunded' ? 'border-red-500' : 'border-green-500';
+  return (
+    <div className="flex w-full items-center justify-center">
+      <div className={cn('flex-1 border-t-[3px]', color)} />
+      <div
+        className={cn(
+          'relative z-10 rounded-full p-2.5',
+          status === 'Refunded'
+            ? 'border-2 border-red-500'
+            : 'before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500',
+        )}
+      >
+        {status === 'Pending' ? (
+          <Spinner />
+        ) : (
+          <BlockchainIcon className="h-5 w-5 text-white md:h-6 md:w-6" />
+        )}
+      </div>
+      <div className={cn('flex-1 border-t-[3px]', color)} />
+    </div>
+  );
+}
+
+function FeeCard({ fee }: { fee: string | number }) {
+  return (
+    <SolidCard size="sm" className="w-max bg-[#FFFFFF1A]">
+      <span className="text-xs leading-5 text-white/60">{Number(fee) / 10000}%</span>
+    </SolidCard>
   );
 }

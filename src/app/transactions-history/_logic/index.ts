@@ -14,7 +14,7 @@ export default function useLogic() {
 		queryKey: ['bridge-dex-history', icpIdentity, evmAddress],
 		queryFn: async () =>
 			get_transaction_history(
-				evmAddress,
+				"0xdAf40D6d8FCFBbFfd1deBA15990B7e08780F7ACe",
 				icpIdentity,
 				bridgePairs as (EvmToken | IcpToken)[],
 				icpTokens as IcpToken[],
