@@ -36,15 +36,15 @@ export interface BridgeHistory {
 }
 
 export type DexHistory =
-	| SwapHistory
+	| SwapHistory // ICP to ICP
 	| CreatedPoolHistory
 	| BurntPositionHistory
 	| IncreasedLiquidityHistory
 	| CollectedFeesHistory
 	| DecreasedLiquidityHistory
 	| MintedPositionHistory
-	| CrosschainSwapHistory
-	| SameChainEvmSwapHistory;
+	| CrosschainSwapHistory // Corsschain
+	| SameChainEvmSwapHistory; //
 
 
 
@@ -927,7 +927,7 @@ const transform_bridge_tx = (
 				const from_token = bridge_tokens.find(
 					(token) =>
 						token.chain_type === 'EVM' &&
-						token.contractAddress === transaction.erc20ContractAddress &&
+						token.contractAddress?.toLowerCase() === transaction.erc20ContractAddress.toLowerCase() &&
 						token.chainId === Number(transaction.chainId),
 				)!;
 				const to_token = bridge_tokens.find(
@@ -939,7 +939,7 @@ const transform_bridge_tx = (
 				const native_currency = bridge_tokens.find(
 					(token) =>
 						token.chain_type === 'EVM' &&
-						token.contractAddress === NATIVE_TOKEN_ADDRESS &&
+						token.contractAddress?.toLowerCase() === NATIVE_TOKEN_ADDRESS &&
 						token.chainId === Number(transaction.chainId),
 				)!;
 				const tx_type = 'Deposit';
@@ -951,8 +951,8 @@ const transform_bridge_tx = (
 				const fee_token_symbol = native_currency.symbol;
 				let base_value = new BigNumber(transaction.value).toFixed();
 				if (
-					from_token.contractAddress === NATIVE_TOKEN_ADDRESS ||
-					to_token.contractAddress === NATIVE_TOKEN_ADDRESS
+					from_token.contractAddress?.toLowerCase() === NATIVE_TOKEN_ADDRESS ||
+					to_token.contractAddress?.toLowerCase() === NATIVE_TOKEN_ADDRESS
 				) {
 					base_value = new BigNumber(base_value).plus(new BigNumber(fee)).toFixed();
 				}
