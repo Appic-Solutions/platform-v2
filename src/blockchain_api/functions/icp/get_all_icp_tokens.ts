@@ -64,7 +64,7 @@ export const transform_icp_tokens = (icp_tokens: ApiIcpToken[]): IcpToken[] => {
 				chain_type: "ICP" as ChainType, // Chain type is ICP
 				canisterId: token.ledgerId,
 				fee: new BigNumber(token.fee).toString(),
-				tokenType: parse_token_type(token.tokenType),
+				tokenType: 'ICRC2',
 				balance: undefined, // Optional, can be added later
 				balanceRawInteger: undefined,
 				usdBalance: undefined, // Optional, can be added later
