@@ -7,6 +7,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import { ChainType } from '@/blockchain_api/types/chains';
+import { HttpAgent } from '@dfinity/agent';
 
 // Define the API response token interface
 export interface ApiIcpToken {
@@ -27,7 +28,7 @@ export interface ApiIcpToken {
 // 2: The response is transformed into icp token interface
 // Step 1
 // Get valid appic tokens
-export const get_icp_tokens = async (): Promise<Response<IcpToken[]>> => {
+export const get_icp_tokens = async (unAuthenticatedAgent:HttpAgent): Promise<Response<IcpToken[]>> => {
 	try {
 		const response = await axios.get<{ data: ApiIcpToken[] }>('https://api.appicdao.com/tokens/icp');
 		const validated_icp_tokens = response.data.data;
@@ -76,17 +77,4 @@ export const transform_icp_tokens = (icp_tokens: ApiIcpToken[]): IcpToken[] => {
 	console.log("Mapped tokens", mapped_tokens);
 	return mapped_tokens;
 };
-// Helper converts token_type into supported token_type
-export const parse_token_type = (type: IcpTokenType): string => {
-	if ('ICRC1' in type) {
-		return 'ICRC1';
-	} else if ('ICRC2' in type) {
-		return 'ICRC2';
-	} else if ('ICRC3' in type) {
-		return 'ICRC2';
-	} else if ('DIP20' in type) {
-		return 'DIP20';
-	} else {
-		return 'Not Supported';
-	}
-};
+

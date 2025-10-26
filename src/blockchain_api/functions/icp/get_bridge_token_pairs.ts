@@ -1,40 +1,64 @@
-import { Actor, HttpAgent } from '@dfinity/agent';
-import { idlFactory as appicHelperIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
-import {
-	TokenPair,
-	Operator as BackendOperator,
-} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import axios from 'axios';
 import { Response } from '@/blockchain_api/types/response';
 import BigNumber from 'bignumber.js';
 import { EvmToken, IcpToken, Operator } from '../../types/tokens';
-
-import { appic_helper_canister_id } from '@/canister_ids.json';
-import { Principal } from '@dfinity/principal';
 import { get_evm_token_price } from '../evm/get_tokens_price';
+import {
+	IcpTokenType,
+} from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
+import { HttpAgent } from '@dfinity/agent';
 
-export const get_bridge_pairs = async (
-	agent: HttpAgent,
-): Promise<Response<Array<EvmToken | IcpToken>>> => {
-	const appic_actor = Actor.createActor(appicHelperIdlFactory, {
-		agent,
-		canisterId: Principal.fromText(appic_helper_canister_id),
-	});
+// Define the API response types
+export interface ApiTokenPair {
+	evmToken: ApiEvmToken;
+	icpToken: ApiIcpToken;
+	operator: ApiOperator;
+}
+export interface ApiEvmToken {
+	chainId: string;
+	erc20ContractAddress: string;
+	name: string;
+	decimals: number;
+	symbol: string;
+	logo: string;
+	isWrappedIcrc: boolean;
+	cmcId?: number;
+	usdPrice?: string;
+	volumeUsd24h?: string;
+}
+export interface ApiIcpToken {
+	ledgerId: string;
+	name: string;
+	decimals: number;
+	symbol: string;
+	usdPrice: string;
+	logo: string;
+	fee: string;
+	tokenType: IcpTokenType;
+	rank?: number;
+	listedOnAppicDex?: boolean;
+}
+export enum ApiOperator {
+	DfinityCkEthMinter = 'DfinityCkEthMinter',
+	AppicMinter = 'AppicMinter',
+}
 
+export const get_bridge_pairs = async (unAuthenticatedAgent: HttpAgent): Promise<Response<Array<EvmToken | IcpToken>>> => {
 	try {
-		const bridge_pairs = (await appic_actor.get_bridge_pairs()) as TokenPair[];
+		const response = await axios.get<{ data: ApiTokenPair[] }>('https://api.appicdao.com/bridge-pairs');
+		const bridge_pairs = response.data.data;
 		const transformed_bridge_pairs = await parseBridgePairs(bridge_pairs);
 		return {
 			result: transformed_bridge_pairs,
 			message: '',
 			success: true,
 		};
-
-		// Error handling
+		// error handling
 	} catch (error) {
 		return {
 			result: [],
 			success: false,
-			message: `Error fetching bridge pairs ${error}`,
+			message: `error fetching bridge pairs ${error}`,
 		};
 	}
 };
@@ -51,14 +75,11 @@ export const get_bridge_pairs_for_token = (
 			token.chainId == base_chain_id &&
 			(token.canisterId === token_id || token.contractAddress === token_id),
 	);
-
 	if (!base_token?.bridgePairs) {
 		return []; // Early exit if no base token or bridge pairs exist
 	}
-
 	// Filter bridge pairs for the specified chain_id
 	const pairs = base_token.bridgePairs.filter((pair) => pair.chain_id === selected_chain_id);
-
 	// Map over pairs and gather matching tokens efficiently
 	const filtered_token_pairs = pairs.flatMap((pair) =>
 		bridge_tokens.filter(
@@ -68,122 +89,122 @@ export const get_bridge_pairs_for_token = (
 					token.contractAddress === pair.contract_or_canister_id),
 		),
 	);
-
-	console.log(filtered_token_pairs);
-
 	return filtered_token_pairs;
 };
 
-export function parseOperator(operator: BackendOperator): Operator {
-	if ('AppicMinter' in operator) {
+export function parseOperator(operator: ApiOperator): Operator {
+	if (operator === ApiOperator.AppicMinter) {
 		return 'Appic';
-	} else if ('DfinityCkEthMinter' in operator) {
+	} else if (operator === ApiOperator.DfinityCkEthMinter) {
 		return 'Dfinity';
 	}
 	throw new Error('Unknown operator');
 }
 
+async function parseBridgePairs(response: ApiTokenPair[]): Promise<Array<EvmToken | IcpToken>> {
+	try {
 
-async function parseBridgePairs(response: TokenPair[]): Promise<Array<EvmToken | IcpToken>> {
-	const tokensMap = new Map<string, EvmToken | IcpToken>();
-	// Collect all price fetch promises
-	const pricePromises = response.map(async (pair) => {
-		const { evm_token, icp_token } = pair;
-		const parsed_chain_id: number = new BigNumber(evm_token.chain_id.toString()).toNumber();
-		if (evm_token.is_wrapped_icrc) {
-			return {
-				pair,
-				usdPrice: { result: icp_token.usd_price, success: true, message: "" }
+		const tokensMap = new Map<string, EvmToken | IcpToken>();
+		// Collect all price fetch promises
+		const pricePromises = response.map(async (pair) => {
+			const { evmToken, icpToken } = pair;
+			const parsed_chain_id: number = Number(evmToken.chainId);
+			if (evmToken.isWrappedIcrc) {
+				return {
+					pair,
+					usdPrice: { result: icpToken.usdPrice, success: true, message: "" }
+				}
+			} else {
+				let usdPriceResponse = evmToken.usdPrice ?
+					{ result: evmToken.usdPrice, message: "", success: true } :
+					await get_evm_token_price(evmToken.erc20ContractAddress, parsed_chain_id);
+				return {
+					pair,
+					usdPrice: usdPriceResponse
+				}
 			}
-		} else {
-			let usdPrice = evm_token.usd_price.length == 1 ?
-				{ result: evm_token.usd_price[0], message: "", success: true } :
-				await get_evm_token_price(evm_token.erc20_contract_address, parsed_chain_id);
-
-			return {
-				pair,
-				usdPrice
+		});
+		// Execute all price fetches in parallel
+		const priceResults = await Promise.all(pricePromises);
+		// Process pairs with their fetched prices
+		for (const { pair, usdPrice } of priceResults) {
+			const { operator, evmToken, icpToken } = pair;
+			console.log(evmToken, icpToken);
+			const parsedOperator = parseOperator(operator);
+			const evmKey = `${evmToken.erc20ContractAddress}-${evmToken.chainId}`;
+			console.log(evmKey);
+			const icpKey = icpToken.ledgerId;
+			const parsed_chain_id: number = Number(evmToken.chainId);
+			try {
+				const final_usd_price = usdPrice.result === "0" ? icpToken.usdPrice : usdPrice.result;
+				// Parse EVM token
+				if (!tokensMap.has(evmKey)) {
+					tokensMap.set(evmKey, {
+						name: evmToken.name,
+						symbol: evmToken.symbol,
+						logo: evmToken.logo,
+						decimals: evmToken.decimals,
+						chainId: parsed_chain_id,
+						contractAddress: evmToken.erc20ContractAddress,
+						chain_type: 'EVM',
+						operator: parsedOperator,
+						bridgePairs: [],
+						is_wrapped_icrc: evmToken.isWrappedIcrc,
+						usdPrice: final_usd_price,
+					});
+				}
+				// Parse ICP token
+				if (!tokensMap.has(icpKey)) {
+					tokensMap.set(icpKey, {
+						name: icpToken.name,
+						symbol: icpToken.symbol,
+						logo: icpToken.logo,
+						decimals: icpToken.decimals,
+						chainId: 0,
+						canisterId: icpToken.ledgerId,
+						fee: new BigNumber(icpToken.fee).toString(),
+						tokenType: "ICRC2",
+						chain_type: 'ICP',
+						operator: parsedOperator,
+						bridgePairs: [],
+						usdPrice: final_usd_price,
+						rank: 1,
+						listed_on_appic_dex: icpToken.listedOnAppicDex ?? false
+					});
+				}
+				// Add bridge pair information
+				const evmTokenObj = tokensMap.get(evmKey) as EvmToken;
+				const icpTokenObj = tokensMap.get(icpKey) as IcpToken;
+				evmTokenObj.bridgePairs!.push({
+					contract_or_canister_id: icpTokenObj.canisterId!,
+					chain_id: icpTokenObj.chainId,
+				});
+				icpTokenObj.bridgePairs!.push({
+					contract_or_canister_id: evmTokenObj.contractAddress,
+					chain_id: evmTokenObj.chainId,
+				});
+			} catch (error) {
+				console.log(error);
+				throw error;
 			}
 		}
-	});
-
-	// Execute all price fetches in parallel
-	const priceResults = await Promise.all(pricePromises);
-
-	// Process pairs with their fetched prices
-	for (const { pair, usdPrice } of priceResults) {
-		const { operator, evm_token, icp_token } = pair;
-		const parsedOperator = parseOperator(operator);
-		const evmKey = `${evm_token.erc20_contract_address}-${evm_token.chain_id}`;
-		const icpKey = icp_token.ledger_id.toString();
-		const parsed_chain_id: number = new BigNumber(evm_token.chain_id.toString()).toNumber();
-
-		try {
-			const final_usd_price = usdPrice.result === "0" ? icp_token.usd_price : usdPrice.result;
-
-			// Parse EVM token
-			if (!tokensMap.has(evmKey)) {
-				tokensMap.set(evmKey, {
-					name: evm_token.name,
-					symbol: evm_token.symbol,
-					logo: evm_token.logo,
-					decimals: evm_token.decimals,
-					chainId: parsed_chain_id,
-					contractAddress: evm_token.erc20_contract_address,
-					chain_type: 'EVM',
-					operator: parsedOperator,
-					bridgePairs: [],
-					is_wrapped_icrc: evm_token.is_wrapped_icrc,
-					usdPrice: final_usd_price,
-				});
+		// Return unique tokens as an array
+		return Array.from(tokensMap.values()).sort((a, b) => {
+			if (a.operator === 'Appic' && b.operator !== 'Appic') {
+				return -1;
 			}
-
-			// Parse ICP token
-			if (!tokensMap.has(icpKey)) {
-				tokensMap.set(icpKey, {
-					name: icp_token.name,
-					symbol: icp_token.symbol,
-					logo: icp_token.logo,
-					decimals: icp_token.decimals,
-					chainId: 0,
-					canisterId: icp_token.ledger_id.toString(),
-					fee: icp_token.fee.toString(),
-					tokenType: '',
-					chain_type: 'ICP',
-					operator: parsedOperator,
-					bridgePairs: [],
-					usdPrice: final_usd_price,
-					rank: 1,
-					listed_on_appic_dex: icp_token.listed_on_appic_dex[0] || false
-				});
+			if (a.operator !== 'Appic' && b.operator === 'Appic') {
+				return 1;
 			}
+			return 0;
+		});
 
-			// Add bridge pair information
-			const evmToken = tokensMap.get(evmKey) as EvmToken;
-			const icpToken = tokensMap.get(icpKey) as IcpToken;
 
-			evmToken.bridgePairs!.push({
-				contract_or_canister_id: icpToken.canisterId!,
-				chain_id: icpToken.chainId,
-			});
-
-			icpToken.bridgePairs!.push({
-				contract_or_canister_id: evmToken.contractAddress,
-				chain_id: evmToken.chainId,
-			});
-		} catch (error) {
-			return [];
-		}
+	} catch (error) {
+		console.log("Failed to transform bridge pairs:", error);
+		throw "";
 	}
 
-	// Return unique tokens as an array
-	return Array.from(tokensMap.values()).sort((a, b) => {
-		if (a.operator === 'Appic' && b.operator !== 'Appic') {
-			return -1;
-		}
-		if (a.operator !== 'Appic' && b.operator === 'Appic') {
-			return 1;
-		}
-		return 0;
-	});
 }
+
+
