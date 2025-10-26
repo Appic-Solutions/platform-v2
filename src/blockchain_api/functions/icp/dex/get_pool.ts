@@ -15,6 +15,8 @@ export interface Pool {
 	sqrt_price_x96: string,
 	pool_reserves0: string,
 	pool_reserves1: string,
+	human_readable_reserves0?: string;
+	human_readable_reserves1?: string;
 	fee_protocol: string,
 	token0_transfer_fee: string,
 	swap_volume1_all_time: string,
@@ -126,6 +128,10 @@ function transformPool(poolId: CandidPoolId, poolState: CandidPoolState, getToke
 
 	const reserves0 = new BigNumber(pool.pool_reserves0).dividedBy(new BigNumber(10).pow(decimals0));
 	const reserves1 = new BigNumber(pool.pool_reserves1).dividedBy(new BigNumber(10).pow(decimals1));
+
+	pool.human_readable_reserves0 = reserves0.toFixed(6);
+	pool.human_readable_reserves1 = reserves1.toFixed(6);
+
 	const token0UsdPriceBN = new BigNumber(token0_usd_price);
 	const token1UsdPriceBN = new BigNumber(token1_usd_price);
 
@@ -246,8 +252,8 @@ export async function get_pools_by_tokens(
 
 		for (const fee of FEE_TIERS) {
 			const poolId: CandidPoolId = {
-				token0:Principal.fromText(token0.canisterId),
-				token1:Principal.fromText(token1.canisterId),
+				token0: Principal.fromText(token0.canisterId),
+				token1: Principal.fromText(token1.canisterId),
 				fee: BigInt(fee),
 			};
 

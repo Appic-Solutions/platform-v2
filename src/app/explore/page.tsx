@@ -241,7 +241,7 @@ export default function ExplorePage() {
                           <td>${Number(item.pool.tvl_usd).toFixed(2)}</td>
                           <td>{item.apr ? `${Number(item.apr).toFixed(2)}%` : '0%'}</td>
                           <td>${Number(item.total_24h_volume_usd || 0).toFixed(2)}</td>
-                          <td>${Number(item.total_24h_volume_usd || 0).toFixed(2)}</td>
+                          <td>${Number(item.total_30d_volume_usd || 0).toFixed(2)}</td>
                         </tr>
                       ))
                     )}

@@ -1,40 +1,43 @@
-import { Actor, HttpAgent } from '@dfinity/agent';
-import { Principal } from '@dfinity/principal';
+import axios from 'axios';
 import { Response } from '@/blockchain_api/types/response';
 // Appic helper types and did
-import { idlFactory as AppicIdlFactory } from '@/blockchain_api/did/appic/appic_helper/appic_helper.did';
 import {
-	CandidIcpToken,
 	IcpTokenType,
 } from '@/blockchain_api/did/appic/appic_helper/appic_helper_types';
-
 import BigNumber from 'bignumber.js';
-
 import { IcpToken } from '@/blockchain_api/types/tokens';
+import { ChainType } from '@/blockchain_api/types/chains';
 
-import { appic_helper_canister_id } from '@/canister_ids.json';
+// Define the API response token interface
+export interface ApiIcpToken {
+	ledgerId: string;
+	name: string;
+	decimals: number;
+	symbol: string;
+	usdPrice: string;
+	logo: string;
+	fee: string; // Assuming Erc20TokenAmount is a string representation
+	tokenType: IcpTokenType;
+	rank?: number | null;
+	listedOnAppicDex?: boolean | null;
+}
 
 // The flow is as follow
-// 1: The validated tokens are fetched from appic helper canister(Appic helper makes sure that the token canister exists and validates their wasm module)
+// 1: The validated tokens are fetched from the REST API (Appic helper makes sure that the token canister exists and validates their wasm module)
 // 2: The response is transformed into icp token interface
-
 // Step 1
 // Get valid appic tokens
-export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToken[]>> => {
-	const appic_actor = Actor.createActor(AppicIdlFactory, {
-		agent,
-		canisterId: Principal.fromText(appic_helper_canister_id),
-	});
-
+export const get_icp_tokens = async (): Promise<Response<IcpToken[]>> => {
 	try {
-		const validated_icp_tokens = (await appic_actor.get_icp_tokens()) as CandidIcpToken[];
-
+		const response = await axios.get<{ data: ApiIcpToken[] }>('https://api.appicdao.com/tokens/icp');
+		const validated_icp_tokens = response.data.data;
+		console.log("fetched tokens:", validated_icp_tokens);
+		console.log(transform_icp_tokens(validated_icp_tokens));
 		return {
 			result: transform_icp_tokens(validated_icp_tokens),
 			success: true,
 			message: '',
 		};
-
 		// Error handling
 	} catch (error) {
 		return {
@@ -44,33 +47,35 @@ export const get_icp_tokens = async (agent: HttpAgent): Promise<Response<IcpToke
 		};
 	}
 };
-
 // Step 2.1 Helper function
 // transform response into icp response
-export const transform_icp_tokens = (icp_tokens: CandidIcpToken[]): IcpToken[] => {
-	return icp_tokens
-		// .filter((token) => token.rank.length == 1 && token.rank[0] <= 30) // Match by canisterId/address
+export const transform_icp_tokens = (icp_tokens: ApiIcpToken[]): IcpToken[] => {
+	console.log("activated transform function");
+	let mapped_tokens = icp_tokens
+		// .filter((token) => token.rank !== undefined && token.rank <= 30) // Match by canisterId/address
 		.map((token) => {
 			return {
 				name: token.name,
 				symbol: token.symbol,
 				logo: token.logo,
-				usdPrice: token.usd_price,
+				usdPrice: token.usdPrice,
 				decimals: token.decimals,
 				chainId: 0, // Chain ID for ICP
-				chain_type: 'ICP', // Chain type is ICP
-				canisterId: token.ledger_id.toString(),
-				fee: new BigNumber(token.fee.toString()).toString(),
-				tokenType: parse_token_type(token.token_type),
+				chain_type: "ICP" as ChainType, // Chain type is ICP
+				canisterId: token.ledgerId,
+				fee: new BigNumber(token.fee).toString(),
+				tokenType: parse_token_type(token.tokenType),
 				balance: undefined, // Optional, can be added later
 				balanceRawInteger: undefined,
 				usdBalance: undefined, // Optional, can be added later
-				rank: token.rank[0] || undefined,
-				listed_on_appic_dex: token.listed_on_appic_dex[0] || false
+				rank: token.rank ? token.rank : undefined,
+				listed_on_appic_dex: token.listedOnAppicDex ?? false
 			};
 		});
-};
 
+	console.log("Mapped tokens", mapped_tokens);
+	return mapped_tokens;
+};
 // Helper converts token_type into supported token_type
 export const parse_token_type = (type: IcpTokenType): string => {
 	if ('ICRC1' in type) {

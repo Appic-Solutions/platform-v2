@@ -3,9 +3,9 @@ import Wallet from './wallet';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import {
-  getPendingTransaction,
-  PendingTransaction,
-  removePendingTransaction,
+	getPendingTransaction,
+	PendingTransaction,
+	removePendingTransaction,
 } from '@/lib/helpers/session';
 import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { useSharedStore } from '@/store/store';
@@ -19,8 +19,8 @@ import { get_bridge_pairs } from '@/blockchain_api/functions/icp/get_bridge_toke
 import { useToast } from '@/lib/hooks/use-toast';
 import { queryKeys } from '@/lib/constants/query-keys';
 import {
-  check_deposit_status,
-  check_withdraw_status,
+	check_deposit_status,
+	check_withdraw_status,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
 import { useSwapStore } from '../swap/_store';
 import { check_swap_status } from '@/blockchain_api/functions/swap/crosschain';
@@ -30,245 +30,243 @@ import { transactionNotification } from '@/components/common/ui/toast/notificati
 import reactHotToast from 'react-hot-toast';
 
 export default function HeaderPage() {
-  const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
-  const queryClient = useQueryClient();
-  const { setPendingTx } = useBridgeActions();
-  const { pendingTx } = useBridgeStore();
-  const { toast } = useToast();
-  const { pendingSwapTx, swapQuote, tokenIn, tokenOut, actions: swapStoreActions } = useSwapStore();
+	const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
+	const queryClient = useQueryClient();
+	const { setPendingTx } = useBridgeActions();
+	const { pendingTx } = useBridgeStore();
+	const { toast } = useToast();
+	const { pendingSwapTx, swapQuote, tokenIn, tokenOut, actions: swapStoreActions } = useSwapStore();
 
-  useEffect(() => {
-    const pending = getPendingTransaction() as PendingTransaction;
-    if (pending?.bridge_option.bridge_tx_type === TxType.Deposit && evmAddress) {
-      setPendingTx(pending);
-    } else if (pending?.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
-      setPendingTx(pending);
-    }
+	useEffect(() => {
+		const pending = getPendingTransaction() as PendingTransaction;
+		if (pending?.bridge_option.bridge_tx_type === TxType.Deposit && evmAddress) {
+			setPendingTx(pending);
+		} else if (pending?.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
+			setPendingTx(pending);
+		}
 
-    const cachedSwaps = queryClient.getQueriesData({ queryKey: [queryKeys.swapStatus] });
-    if (cachedSwaps.length > 0) {
-      const latestSwap = cachedSwaps[cachedSwaps.length - 1][1] as SwapStatusCachedQuery;
-      if (latestSwap?.status === 'pending') {
-        swapStoreActions.setPendingSwapTx({ id: latestSwap.id, status: 'pending' });
-      }
-    }
-  }, [evmAddress, icpIdentity, setPendingTx, swapStoreActions.setPendingSwapTx]);
+		const cachedSwaps = queryClient.getQueriesData({ queryKey: [queryKeys.swapStatus] });
+		if (cachedSwaps.length > 0) {
+			const latestSwap = cachedSwaps[cachedSwaps.length - 1][1] as SwapStatusCachedQuery;
+			if (latestSwap?.status === 'pending') {
+				swapStoreActions.setPendingSwapTx({ id: latestSwap.id, status: 'pending' });
+			}
+		}
+	}, [evmAddress, icpIdentity, setPendingTx, swapStoreActions.setPendingSwapTx]);
 
-  // check pending deposit tx status
-  useQuery({
-    queryKey: ['check-pending-deposit-status'],
-    queryFn: async () => {
-      const res = await check_deposit_status(
-        pendingTx?.id as `0x${string}`,
-        pendingTx?.bridge_option as BridgeOption,
-        unAuthenticatedAgent as HttpAgent,
-      );
-      if (res.success) {
-        if (res.result === 'Minted') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else if (res.result === 'Invalid' || res.result === 'Quarantined') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else {
-          setPendingTx(pendingTx);
-        }
-      } else if (!res.success) {
-        setPendingTx(undefined);
-        removePendingTransaction();
-      }
-      queryClient.invalidateQueries({ queryKey: [queryKeys.bridgeHistory] });
-      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
-      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
-      return res;
-    },
-    refetchInterval: 1000 * 5,
-    enabled:
-      !!pendingTx &&
-      !!unAuthenticatedAgent &&
-      pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
-      !!evmAddress,
-  });
-  // check pending withdrawal tx status
-  useQuery({
-    queryKey: ['check-pending-withdrawal-status'],
-    queryFn: async () => {
-      const res = await check_withdraw_status(
-        pendingTx?.id as string,
-        pendingTx?.bridge_option as BridgeOption,
-        unAuthenticatedAgent as HttpAgent,
-      );
+	// check pending deposit tx status
+	useQuery({
+		queryKey: ['check-pending-deposit-status'],
+		queryFn: async () => {
+			const res = await check_deposit_status(
+				pendingTx?.id as `0x${string}`,
+				pendingTx?.bridge_option as BridgeOption,
+				unAuthenticatedAgent as HttpAgent,
+			);
+			if (res.success) {
+				if (res.result === 'Minted') {
+					setPendingTx(undefined);
+					removePendingTransaction();
+				} else if (res.result === 'Invalid' || res.result === 'Quarantined') {
+					setPendingTx(undefined);
+					removePendingTransaction();
+				} else {
+					setPendingTx(pendingTx);
+				}
+			} else if (!res.success) {
+				setPendingTx(undefined);
+				removePendingTransaction();
+			}
+			queryClient.invalidateQueries({ queryKey: [queryKeys.bridgeHistory] });
+			queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+			queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
+			return res;
+		},
+		refetchInterval: 1000 * 5,
+		enabled:
+			!!pendingTx &&
+			!!unAuthenticatedAgent &&
+			pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
+			!!evmAddress,
+	});
+	// check pending withdrawal tx status
+	useQuery({
+		queryKey: ['check-pending-withdrawal-status'],
+		queryFn: async () => {
+			const res = await check_withdraw_status(
+				pendingTx?.id as string,
+				pendingTx?.bridge_option as BridgeOption,
+				unAuthenticatedAgent as HttpAgent,
+			);
 
-      if (res.success) {
-        if (res.result === 'Successful') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
-          setPendingTx(undefined);
-          removePendingTransaction();
-        } else {
-          setPendingTx(pendingTx);
-        }
-      } else if (!res.success) {
-        setPendingTx(undefined);
-        removePendingTransaction();
-      }
-      queryClient.invalidateQueries({ queryKey: [queryKeys.bridgeHistory] });
-      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
-      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
-      return res;
-    },
-    refetchInterval: 1000 * 5,
-    enabled:
-      !!pendingTx &&
-      !!unAuthenticatedAgent &&
-      pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
-      !!icpIdentity,
-  });
+			if (res.success) {
+				if (res.result === 'Successful') {
+					setPendingTx(undefined);
+					removePendingTransaction();
+				} else if (res.result === 'QuarantinedReimbursement' || res.result === 'Reimbursed') {
+					setPendingTx(undefined);
+					removePendingTransaction();
+				} else {
+					setPendingTx(pendingTx);
+				}
+			} else if (!res.success) {
+				setPendingTx(undefined);
+				removePendingTransaction();
+			}
+			queryClient.invalidateQueries({ queryKey: [queryKeys.bridgeHistory] });
+			queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+			queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
+			return res;
+		},
+		refetchInterval: 1000 * 5,
+		enabled:
+			!!pendingTx &&
+			!!unAuthenticatedAgent &&
+			pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
+			!!icpIdentity,
+	});
 
-  // check pending swap status
-  useQuery({
-    queryKey: [queryKeys.checkSwapStatus, pendingSwapTx?.id],
-    queryFn: async () => {
-      const res = await check_swap_status(
-        swapQuote as CrossChainQuote,
-        pendingSwapTx?.id as string,
-        unAuthenticatedAgent as HttpAgent,
-      );
+	// check pending swap status
+	useQuery({
+		queryKey: [queryKeys.checkSwapStatus, pendingSwapTx?.id],
+		queryFn: async () => {
+			const res = await check_swap_status(
+				swapQuote as CrossChainQuote,
+				pendingSwapTx?.id as string,
+				unAuthenticatedAgent as HttpAgent,
+			);
 
-      console.log('check status response ====================>', res);
+			console.log('check status response ====================>', res);
 
-      if (res.result) {
-        transactionNotification({
-          title: res.result.title,
-          caption: res.result.caption,
-          status: res.result.status,
-          isSameChain: false,
-          tokenIn: tokenIn!,
-          tokenOut: tokenOut!,
-          toastId: pendingSwapTx?.id,
-        });
+			if (res.result) {
+				transactionNotification({
+					title: res.result.title,
+					caption: res.result.caption,
+					status: res.result.status,
+					isSameChain: false,
+					tokenIn: tokenIn!,
+					tokenOut: tokenOut!,
+					toastId: pendingSwapTx?.id,
+				});
 
-        if (res.result.status === 'successful' || res.result.status === 'failed') {
-          swapStoreActions.setPendingSwapTx(undefined);
-          queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
-          reactHotToast.dismiss(pendingSwapTx?.id);
+				if (res.result.status === 'successful' || res.result.status === 'failed') {
+					swapStoreActions.setPendingSwapTx(undefined);
+					queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
+					reactHotToast.dismiss(pendingSwapTx?.id);
 
-          transactionNotification({
-            title: res.result.title,
-            caption: res.result.caption,
-            status: res.result.status,
-            isSameChain: false,
-            tokenIn: tokenIn!,
-            tokenOut: tokenOut!,
-            toastId: pendingSwapTx?.id,
-          });
-        } else {
-          swapStoreActions.setPendingSwapTx(pendingSwapTx);
-        }
-      } else {
-        swapStoreActions.setPendingSwapTx(undefined);
-        queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
-        reactHotToast.dismiss(pendingSwapTx?.id);
-      }
+					transactionNotification({
+						title: res.result.title,
+						caption: res.result.caption,
+						status: res.result.status,
+						isSameChain: false,
+						tokenIn: tokenIn!,
+						tokenOut: tokenOut!,
+						toastId: pendingSwapTx?.id,
+					});
+				} else {
+					swapStoreActions.setPendingSwapTx(pendingSwapTx);
+				}
+			} else {
+				swapStoreActions.setPendingSwapTx(undefined);
+				queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
+				reactHotToast.dismiss(pendingSwapTx?.id);
+			}
 
-      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
-      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
-      return res;
-    },
-    refetchInterval: 1000 * 5,
-    enabled: !!swapQuote && !!unAuthenticatedAgent && !!pendingSwapTx?.id,
-  });
+			queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
+			queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
+			return res;
+		},
+		refetchInterval: 1000 * 5,
+		enabled: !!swapQuote && !!unAuthenticatedAgent && !!pendingSwapTx?.id,
+	});
 
-  const { data: icpTokens } = useQuery({
-    queryKey: [queryKeys.icpTokens],
-    queryFn: async () => {
-      if (!unAuthenticatedAgent) return [];
+	const { data: icpTokens } = useQuery({
+		queryKey: [queryKeys.icpTokens],
+		queryFn: async () => {
 
-      const res = await get_icp_tokens(unAuthenticatedAgent);
+			const res = await get_icp_tokens();
 
-      if (res.result) {
-        return res.result;
-      }
+			if (res.result) {
+				return res.result;
+			}
 
-      return [];
-    },
-    enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 60,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 10,
-  });
+			return [];
+		},
+		refetchInterval: 1000 * 60,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60,
+		gcTime: 1000 * 60 * 10,
+	});
 
-  useQuery({
-    queryKey: [queryKeys.bridgePairs],
-    queryFn: async () => {
-      if (!unAuthenticatedAgent) return [];
+	useQuery({
+		queryKey: [queryKeys.bridgePairs],
+		queryFn: async () => {
+			if (!unAuthenticatedAgent) return [];
 
-      const res = await get_bridge_pairs(unAuthenticatedAgent);
+			const res = await get_bridge_pairs(unAuthenticatedAgent);
 
-      if (res.result) {
-        return res.result;
-      }
+			if (res.result) {
+				return res.result;
+			}
 
-      return [];
-    },
-    enabled: !!unAuthenticatedAgent,
-    refetchInterval: 1000 * 60,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60,
-    gcTime: 1000 * 60 * 10,
-  });
+			return [];
+		},
+		enabled: !!unAuthenticatedAgent,
+		refetchInterval: 1000 * 60,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
+		staleTime: 1000 * 60,
+		gcTime: 1000 * 60 * 10,
+	});
 
-  const { data: allPools } = useQuery({
-    queryKey: [queryKeys.icpPools],
-    queryFn: async () => {
-      const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
-      if (!response.success) throw new Error('Failed to fetch all pools');
-      return response.result;
-    },
-    enabled: !!unAuthenticatedAgent && !!icpTokens?.length,
-    retry: false,
-  });
+	const { data: allPools } = useQuery({
+		queryKey: [queryKeys.icpPools],
+		queryFn: async () => {
+			const response = await get_all_pools(unAuthenticatedAgent as HttpAgent, icpTokens || []);
+			if (!response.success) throw new Error('Failed to fetch all pools');
+			return response.result;
+		},
+		enabled: !!unAuthenticatedAgent && !!icpTokens?.length,
+		retry: false,
+	});
 
-  useQuery({
-    queryKey: [queryKeys.dexData],
-    queryFn: async () => {
-      const response = await get_dex_data(
-        unAuthenticatedAgent as HttpAgent,
-        icpTokens || [],
-        allPools as Pool[],
-      );
-      if (!response.success) throw new Error('Failed to fetch dex data');
-      return response.result;
-    },
-    enabled: !!unAuthenticatedAgent && !!icpTokens?.length && !!allPools?.length,
-    retry: false,
-  });
+	useQuery({
+		queryKey: [queryKeys.dexData],
+		queryFn: async () => {
+			const response = await get_dex_data(
+				unAuthenticatedAgent as HttpAgent,
+				icpTokens || [],
+				allPools as Pool[],
+			);
+			if (!response.success) throw new Error('Failed to fetch dex data');
+			return response.result;
+		},
+		enabled: !!unAuthenticatedAgent && !!icpTokens?.length && !!allPools?.length,
+		retry: false,
+	});
 
-  useEffect(() => {
-    const handleOffline = () => {
-      toast({ title: 'Internet connection lost', variant: 'destructive' });
-    };
-    const handleOnline = () => {
-      toast({ title: 'Internet connection restored', variant: 'success' });
-    };
+	useEffect(() => {
+		const handleOffline = () => {
+			toast({ title: 'Internet connection lost', variant: 'destructive' });
+		};
+		const handleOnline = () => {
+			toast({ title: 'Internet connection restored', variant: 'success' });
+		};
 
-    window.addEventListener('offline', handleOffline);
-    window.addEventListener('online', handleOnline);
+		window.addEventListener('offline', handleOffline);
+		window.addEventListener('online', handleOnline);
 
-    return () => {
-      window.removeEventListener('offline', handleOffline);
-      window.removeEventListener('online', handleOnline);
-    };
-  }, [toast]);
+		return () => {
+			window.removeEventListener('offline', handleOffline);
+			window.removeEventListener('online', handleOnline);
+		};
+	}, [toast]);
 
-  return (
-    <header className={cn('flex w-full items-center justify-between', 'mb-5 xl:mt-4')}>
-      <Image src={'/images/logo/white-logo.png'} alt="logo" width={52} height={43} />
-      <Wallet />
-    </header>
-  );
+	return (
+		<header className={cn('flex w-full items-center justify-between', 'mb-5 xl:mt-4')}>
+			<Image src={'/images/logo/white-logo.png'} alt="logo" width={52} height={43} />
+			<Wallet />
+		</header>
+	);
 }
