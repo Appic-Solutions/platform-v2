@@ -24,7 +24,7 @@ export const useChainListLogic = () => {
 
 	const { data: topEvmTokensData } = useQuery({
 		queryKey: [queryKeys.topEvmTokens],
-		queryFn: () => get_top_evm_tokens(unAuthenticatedAgent!),
+		queryFn: () => get_top_evm_tokens(),
 		enabled: !!unAuthenticatedAgent,
 	});
 
