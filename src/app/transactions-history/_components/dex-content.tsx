@@ -12,7 +12,7 @@ import { cn, getChainLogo, getChainName, getChainSymbol } from '@/lib/utils';
 import Spinner from '@/components/ui/spinner';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { Avatar } from '@/components/common/ui/avatar';
-import { BlockchainIcon } from '@/components/icons';
+import { BlockchainIcon, CloseIcon } from '@/components/icons';
 import useLogic from '../_logic';
 
 type DexDataType =
@@ -103,15 +103,6 @@ export default function DexContent() {
       </div>
     );
 
-  // ---------- Empty ----------
-  if (!filteredData.length)
-    return (
-      <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
-        <Image src="/images/empty.png" alt="Empty" width={100} height={100} />
-        Empty Dex History
-      </div>
-    );
-
   // ---------- UI ----------
   return (
     <>
@@ -129,32 +120,42 @@ export default function DexContent() {
         </SelectContent>
       </Select>
 
-      {/* History List */}
-      {filteredData.map((item, idx) => {
-        const { date, time, status, type } = item;
-        const isSwapped = isSwapType(type);
+      {/* ---------- Empty ---------- */}
+      {!filteredData.length ? (
+        <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
+          <Image src="/images/empty.png" alt="Empty" width={100} height={100} />
+          Empty Dex History
+        </div>
+      ) : (
+        // History List
+        filteredData.map((item, idx) => {
+          const { date, time, status, type } = item;
+          const isSwapped = isSwapType(type);
 
-        return (
-          <div
-            key={idx}
-            className={cn(
-              'flex w-full flex-col gap-y-4 overflow-hidden rounded-2xl bg-input-fields bg-cover bg-center p-5 shadow-md backdrop-blur-[30px] duration-200 hover:bg-black/75 md:rounded-[36px] md:p-6',
-            )}
-          >
-            {/* Date & Time */}
-            <div className="flex items-center justify-between gap-x-4 text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]">
-              <p>{date}</p>
-              <p>{time}</p>
+          return (
+            <div
+              key={idx}
+              className={cn(
+                'flex w-full flex-col gap-y-4 overflow-hidden rounded-2xl bg-input-fields bg-cover bg-center p-5 shadow-md backdrop-blur-[30px] duration-200 hover:bg-black/75 md:rounded-[36px] md:p-6',
+              )}
+            >
+              {/* Date & Time */}
+              <div className="flex items-center justify-between gap-x-4 text-sm font-bold max-md:text-[#898989] md:text-[#333333] md:dark:text-[#898989]">
+                <p>{date}</p>
+                <p>{time}</p>
+              </div>
+
+              {/* Content */}
+              {isSwapped ? <SwapItem item={item} status={status} /> : <PoolItem item={item} />}
+
+              {/* Footer */}
+              {type !== 'CreatedPool' && (
+                <Footer item={item} isSwapped={isSwapped} status={status} />
+              )}
             </div>
-
-            {/* Content */}
-            {isSwapped ? <SwapItem item={item} status={status} /> : <PoolItem item={item} />}
-
-            {/* Footer */}
-            {type !== 'CreatedPool' && <Footer item={item} isSwapped={isSwapped} status={status} />}
-          </div>
-        );
-      })}
+          );
+        })
+      )}
     </>
   );
 }
@@ -238,25 +239,37 @@ function TokenAvatar({ token }: { token: any }) {
 }
 
 function SwapArrow({ status }: { status: string }) {
-  const color = status === 'Refunded' ? 'border-red-500' : 'border-green-500';
   return (
     <div className="flex w-full items-center justify-center">
-      <div className={cn('flex-1 border-t-[3px]', color)} />
       <div
         className={cn(
+          'flex-1 border-t-[3px]',
+          status === 'Refunded' ? 'border-red-500' : 'border-green-500',
+        )}
+      />
+      <div
+        className={cn(
+          'flex h-12 w-12 items-center justify-center',
           'relative z-10 rounded-full p-2.5',
           status === 'Refunded'
             ? 'border-2 border-red-500'
-            : 'before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500',
+            : status === 'Pending'
+              ? 'animate-spin border-2 border-green-500 border-t-transparent'
+              : 'before:absolute before:inset-0 before:rounded-full before:border-2 before:border-green-500',
         )}
       >
-        {status === 'Pending' ? (
-          <Spinner />
-        ) : (
-          <BlockchainIcon className="h-5 w-5 text-white md:h-6 md:w-6" />
-        )}
+        <BlockchainIcon className="h-5 w-5 text-white md:h-6 md:w-6" />
       </div>
-      <div className={cn('flex-1 border-t-[3px]', color)} />
+      <div
+        className={cn(
+          'flex-1 border-t-[3px]',
+          status === 'Refunded'
+            ? 'border-red-500'
+            : status === 'Pending'
+              ? 'border-dashed border-black'
+              : 'border-green-500',
+        )}
+      />
     </div>
   );
 }
