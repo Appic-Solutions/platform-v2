@@ -48,6 +48,7 @@ export const get_bridge_pairs = async (unAuthenticatedAgent: HttpAgent): Promise
 		const response = await axios.get<{ data: ApiTokenPair[] }>('https://api.appicdao.com/bridge-pairs');
 		const bridge_pairs = response.data.data;
 		const transformed_bridge_pairs = await parseBridgePairs(bridge_pairs);
+		console.log("Transformed bridge pairs:", transformed_bridge_pairs);
 		return {
 			result: transformed_bridge_pairs,
 			message: '',

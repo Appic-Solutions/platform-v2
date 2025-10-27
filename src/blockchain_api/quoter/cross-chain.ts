@@ -155,6 +155,8 @@ export async function fetchCrossChainQuote({
 		};
 	}
 
+	console.log(nativeToken);
+
 	// let chainA=tokenIn.chainId;
 
 	const bn10 = new BigNumber(10);
@@ -324,7 +326,7 @@ export async function fetchCrossChainQuote({
 				route: overallRoute,
 				score: averageScore,
 				minAmountOutRaw: adjustedTotalMinAmountOut.toString(),
-				minAmountOut: minAmountOutDec.toFixed(),
+				minAmountOut: minAmountOutDec.toFixed(6),
 				minAmountOutUSD: usdValueMinOut,
 				slippage: data.totalSlippage,
 				estimatedTime: '30s to 2m',

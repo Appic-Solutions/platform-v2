@@ -235,7 +235,7 @@ export async function fetchSameChainQuote({
 				route: bestRoute.route,
 				score: bestRoute.score,
 				minAmountOutRaw: adjustedMinAmountOut.toString(),
-				minAmountOut: minAmountOutDec.toFixed(),
+				minAmountOut: minAmountOutDec.toFixed(6),
 				minAmountOutUSD: usdValueMinOut,
 				slippage: bestRoute.slippage,
 				estimatedTime: `${Number(bestRoute.estimatedTime) / 1000}s`,

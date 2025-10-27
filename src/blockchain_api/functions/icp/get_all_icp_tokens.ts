@@ -32,8 +32,6 @@ export const get_icp_tokens = async (unAuthenticatedAgent:HttpAgent): Promise<Re
 	try {
 		const response = await axios.get<{ data: ApiIcpToken[] }>('https://api.appicdao.com/tokens/icp');
 		const validated_icp_tokens = response.data.data;
-		console.log("fetched tokens:", validated_icp_tokens);
-		console.log(transform_icp_tokens(validated_icp_tokens));
 		return {
 			result: transform_icp_tokens(validated_icp_tokens),
 			success: true,
