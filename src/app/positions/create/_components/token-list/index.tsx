@@ -6,7 +6,6 @@ import RHFInput from '@/components/form/rhf-input';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { IcpToken } from '@/blockchain_api/types/tokens';
 import TokenCard from '@/app/auto-invest/_components/chain-token-list/token-card';
-import { useSharedStore } from '@/store/store';
 import { CreatePositionFormDefaultValues } from '../../schema';
 import { TokenListPageProps } from '@/app/positions/types';
 import { useState } from 'react';
