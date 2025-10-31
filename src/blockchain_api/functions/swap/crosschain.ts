@@ -306,40 +306,39 @@ export async function cross_chain_swap(
 
 			let fromChain = quote.from_viemChain?.id;
 
-			let confirmations = fromChain == 137 || fromChain == 1 ? 2 : 1;
 
 			const tx_status = await public_client.waitForTransactionReceipt({
 				hash,
-				confirmations,
+				confirmations: 1,
 			});
 
 			if (tx_status.status == 'success') {
 				// request log scrapping from the minter
 
 				// Create an actor for the Appic minter
-				const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
-					canisterId: Principal.fromText(quote.from_minter_id!),
-					agent: unauthenticated_agent,
-				});
+				// const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+				// 	canisterId: Principal.fromText(quote.from_minter_id!),
+				// 	agent: unauthenticated_agent,
+				// });
 
 				// cause block numbers update every 3 seconds
-				await new Promise((resolve) => setTimeout(resolve, 3000));
+				// await new Promise((resolve) => setTimeout(resolve, 3000));
 
-				const log_scraping_request_result =
-					(await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
-				if ('Err' in log_scraping_request_result) {
-					if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
-						setTimeout(async () => {
-							await appic_minter_actor.request_scraping_logs();
-						}, 5000);
-					} else {
-						setTimeout(async () => {
-							await appic_minter_actor.request_scraping_logs();
-						}, 5000);
-					}
-				}
-
-				console.log(log_scraping_request_result);
+				// const log_scraping_request_result =
+				// 	(await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+				// if ('Err' in log_scraping_request_result) {
+				// 	if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
+				// 		setTimeout(async () => {
+				// 			await appic_minter_actor.request_scraping_logs();
+				// 		}, 5000);
+				// 	} else {
+				// 		setTimeout(async () => {
+				// 			await appic_minter_actor.request_scraping_logs();
+				// 		}, 5000);
+				// 	}
+				// }
+				//
+				// console.log(log_scraping_request_result);
 
 				return {
 					result: hash,

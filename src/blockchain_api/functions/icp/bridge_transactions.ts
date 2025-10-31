@@ -878,11 +878,11 @@ export const request_deposit = async (
 		});
 
 		// TODO: to be changed later
-		const confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 3;
+		// const confirmations_required = bridge_option.operator == 'Dfinity' ? 1 : 3;
 
 		const tx_status = await public_client.waitForTransactionReceipt({
 			hash,
-			confirmations: confirmations_required,
+			confirmations: 1,
 		});
 
 		if (tx_status.status == 'success') {
@@ -927,65 +927,70 @@ export const notify_appic_helper_deposit = async (
 		bridge_option.operator == 'Appic' ? { AppicMinter: null } : { DfinityCkEthMinter: null }
 	) as AppicHelperOperator;
 	try {
-		const notify_deposit_result = (await appic_helper_actor.new_evm_to_icp_tx({
-			chain_id: BigInt(bridge_option.chain_id),
-			from_address: user_wallet_address,
-			principal: Principal.fromText(recipient_principal),
-			subaccount: [],
-			total_gas_spent: BigInt(bridge_option.fees.max_network_fee),
-			transaction_hash: tx_hash,
-			value: BigInt(bridge_option.amount),
-			erc20_contract_address: bridge_option.from_token_id,
-			icrc_ledger_id: Principal.fromText(bridge_option.to_token_id),
-			operator: parsed_operator,
-		} as AddEvmToIcpTx)) as NewEvmToIcpResult;
-
-		console.log(notify_deposit_result);
+		// const notify_deposit_result = (await appic_helper_actor.new_evm_to_icp_tx({
+		// 	chain_id: BigInt(bridge_option.chain_id),
+		// 	from_address: user_wallet_address,
+		// 	principal: Principal.fromText(recipient_principal),
+		// 	subaccount: [],
+		// 	total_gas_spent: BigInt(bridge_option.fees.max_network_fee),
+		// 	transaction_hash: tx_hash,
+		// 	value: BigInt(bridge_option.amount),
+		// 	erc20_contract_address: bridge_option.from_token_id,
+		// 	icrc_ledger_id: Principal.fromText(bridge_option.to_token_id),
+		// 	operator: parsed_operator,
+		// } as AddEvmToIcpTx)) as NewEvmToIcpResult;
+		//
+		// console.log(notify_deposit_result);
 
 		// If the minter is of type of appic minter
 		// Request minter to start log scraping
-		if (bridge_option.operator === 'Appic') {
-			// Create an actor for the Appic minter
-			const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
-				canisterId: bridge_option.minter_id,
-				agent: unauthenticated_agent,
-			});
+		// if (bridge_option.operator === 'Appic') {
+		// 	// Create an actor for the Appic minter
+		// 	const appic_minter_actor = Actor.createActor(AppicMinterIdlFactory, {
+		// 		canisterId: bridge_option.minter_id,
+		// 		agent: unauthenticated_agent,
+		// 	});
+		//
+		// 	const log_scraping_request_result =
+		// 		(await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
+		// 	if ('Err' in log_scraping_request_result) {
+		// 		if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
+		// 			setTimeout(async () => {
+		// 				await appic_minter_actor.request_scraping_logs();
+		// 			}, 5000);
+		// 		} else {
+		// 			setTimeout(async () => {
+		// 				await appic_minter_actor.request_scraping_logs();
+		// 			}, 5000)
+		// 		}
+		// 	}
+		// }
 
-			const log_scraping_request_result =
-				(await appic_minter_actor.request_scraping_logs()) as LogScrapingResult;
-			if ('Err' in log_scraping_request_result) {
-				if ('CalledTooManyTimes' in log_scraping_request_result.Err) {
-					setTimeout(async () => {
-						await appic_minter_actor.request_scraping_logs();
-					}, 5000);
-				} else {
-					setTimeout(async () => {
-						await appic_minter_actor.request_scraping_logs();
-					}, 5000)
-				}
-			}
-		}
-
-		if ('Ok' in notify_deposit_result) {
-			return {
-				result: '',
-				success: true,
-				message: '',
-			};
-		} else {
-			if ('TxAlreadyExists' in (notify_deposit_result.Err as AddEvmToIcpTxError)) {
-				return {
-					result: '',
-					success: true,
-					message: '',
-				};
-			}
-			console.error(notify_deposit_result.Err);
-			return {
-				result: '',
-				success: false,
-				message: `Failed to notify appic helper ${notify_deposit_result.Err}`,
-			};
+		// if ('Ok' in notify_deposit_result) {
+		// 	return {
+		// 		result: '',
+		// 		success: true,
+		// 		message: '',
+		// 	};
+		// } else {
+		// 	if ('TxAlreadyExists' in (notify_deposit_result.Err as AddEvmToIcpTxError)) {
+		// 		return {
+		// 			result: '',
+		// 			success: true,
+		// 			message: '',
+		// 		};
+		// 	}
+		// 	console.error(notify_deposit_result.Err);
+		// 	return {
+		// 		result: '',
+		// 		success: false,
+		// 		message: `Failed to notify appic helper ${notify_deposit_result.Err}`,
+		// 	};
+		// }
+		return {
+			result: '',
+			success: true,
+			message: ''
 		}
 	} catch (error) {
 		console.error(error);

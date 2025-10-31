@@ -159,7 +159,6 @@ export const chains: Chain[] = [
 		disabled: true,
 		is_advance_supported: false,
 		logo: '/images/logo/chains-logos/fantom.svg',
-		ankr_handle: 'fantom',
 		viem_config: fantom,
 		twin_token_support: false,
 		is_swap_active: false,

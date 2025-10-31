@@ -181,6 +181,7 @@ export async function fetchCrossChainQuote({
 
 	console.log(feeIn);
 	const amountInRawForApi = new BigNumber(amount).multipliedBy(bn10.pow(decimalsIn)).minus(BigNumber(feeIn).multipliedBy(2)).toFixed(0);
+	console.log(amountInRawForApi);
 	const chainA = tokenIn.chainId === 0 ? 'icp' : tokenIn.chainId;
 	const chainB = tokenOut.chainId === 0 ? 'icp' : tokenOut.chainId;
 

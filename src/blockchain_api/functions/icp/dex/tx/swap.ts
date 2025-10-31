@@ -55,12 +55,13 @@ export async function approve_token_in(
 			},
 			spender: { owner: Principal.fromText(appic_dex), subaccount: [] },
 		} as AllowanceArgs)) as Allowance;
+		console.log("allowance:", token_in_allowance.allowance.toString(), "approval amount:", quote.approvalAmount, sender_principal.toString());
 
 		// Check if  appic dex alread has enough allowance
 		//
 		// token0
 		if (
-			BigNumber(token_in_allowance.allowance.toString()).isLessThan(BigNumber(quote.approvalAmount))
+			BigNumber(token_in_allowance.allowance.toString()).isLessThanOrEqualTo(BigNumber(quote.approvalAmount))
 		) {
 			// In case of Native withdrawal
 			const token_in_approval_result = (await token_in_actor.icrc2_approve({
