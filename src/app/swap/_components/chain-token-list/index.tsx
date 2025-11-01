@@ -32,7 +32,7 @@ export default function TokenListPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (query && filteredTokens?.length === 0 && selectedChainId !== 0) {
+    if (query && selectedChainId !== 0) {
       findNewTokens();
     }
   }, [selectedChainId, query, filteredTokens?.length, selectedChainId]);

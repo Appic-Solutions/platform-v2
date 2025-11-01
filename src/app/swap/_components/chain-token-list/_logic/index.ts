@@ -1,7 +1,6 @@
 import { useGetNewEvmTokensData } from '@/app/swap/_api';
 import { TokenType, useSwapActions, useSwapStore } from '@/app/swap/_store';
 import { get_top_evm_tokens } from '@/blockchain_api/functions/evm/get_top_evm_tokens';
-import { ApiEvmToken } from '@/blockchain_api/functions/swap/get_token_data';
 import { chains } from '@/blockchain_api/lists/chains';
 import { Chain } from '@/blockchain_api/types/chains';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
@@ -181,8 +180,32 @@ export const useChainListLogic = () => {
     return filteredTokens;
   });
 
-  const mergedTokens = useMemo(() => {
-    return [...(filteredTokensExpectSelected || []), ...(newTokens || [])];
+  const getTokenKey = (token: TokenType): string => {
+    if ('contractAddress' in token && token.contractAddress) {
+      return `evm:${token.chainId}:${token.contractAddress.toLowerCase()}`;
+    }
+    if ('canisterId' in token && token.canisterId) {
+      return `icp:${token.canisterId.toLowerCase()}`;
+    }
+    return `${token.symbol}:${token.chainId}`;
+  };
+
+  const mergedTokens: TokenType[] = useMemo(() => {
+    const seen = new Set<string>();
+    const result: TokenType[] = [];
+
+    // Prioritize newTokens (they come first)
+    const allTokens = [...(newTokens || []), ...(filteredTokensExpectSelected || [])];
+
+    for (const token of allTokens) {
+      const key = getTokenKey(token);
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(token);
+      }
+    }
+
+    return result;
   }, [filteredTokensExpectSelected, newTokens]);
 
   // sort items based on balance
