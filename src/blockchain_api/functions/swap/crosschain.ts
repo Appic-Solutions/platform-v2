@@ -222,7 +222,6 @@ export async function cross_chain_approve_token_in(
 export async function cross_chain_swap(
 	quote: CrossChainQuote,
 	authenticated_agent: Agent | undefined,
-	unauthenticated_agent: HttpAgent,
 	evm_address: string | undefined,
 	principal_id: Principal | undefined,
 ): Promise<Response<string>> {

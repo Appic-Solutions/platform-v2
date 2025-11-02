@@ -54,6 +54,7 @@ export const useSwapReviewLogic = () => {
         swapQuote as IcpQuote,
         authenticatedAgent,
         unAuthenticatedAgent,
+        Principal.fromText(toWalletAddress) || undefined,
       );
 
       if (!approveRes || !approveRes.result) {
@@ -125,17 +126,18 @@ export const useSwapReviewLogic = () => {
         status: 'pending',
       });
 
-      const isEvmToIcp =
-        swapQuote.tokenIn.chain_type === 'EVM' && swapQuote.tokenOut.chain_type === 'ICP';
-      const recipientEvm = toWalletAddress || evmAddress;
-      const recipientIcp = toWalletAddress ? Principal.fromText(toWalletAddress) : icpIdentity;
+      const recipientEvm =
+        swapQuote.tokenOut.chain_type === 'ICP' ? undefined : toWalletAddress || evmAddress;
+      const recipientIcp =
+        swapQuote.tokenOut.chain_type === 'ICP'
+          ? Principal.fromText(toWalletAddress) || icpIdentity
+          : undefined;
 
       const swapRes = await crossChainSwap(
         swapQuote as CrossChainQuote,
         authenticatedAgent,
-        unAuthenticatedAgent,
-        isEvmToIcp ? undefined : recipientEvm,
-        isEvmToIcp ? recipientIcp : undefined,
+        recipientEvm,
+        recipientIcp,
       );
 
       if (!swapRes.success) {
