@@ -48,7 +48,6 @@ export const get_bridge_pairs = async (unAuthenticatedAgent: HttpAgent): Promise
 		const response = await axios.get<{ data: ApiTokenPair[] }>('https://api.appicdao.com/bridge-pairs');
 		const bridge_pairs = response.data.data;
 		const transformed_bridge_pairs = await parseBridgePairs(bridge_pairs);
-		console.log("Transformed bridge pairs:", transformed_bridge_pairs);
 		return {
 			result: transformed_bridge_pairs,
 			message: '',
@@ -130,10 +129,8 @@ async function parseBridgePairs(response: ApiTokenPair[]): Promise<Array<EvmToke
 		// Process pairs with their fetched prices
 		for (const { pair, usdPrice } of priceResults) {
 			const { operator, evmToken, icpToken } = pair;
-			console.log(evmToken, icpToken);
 			const parsedOperator = parseOperator(operator);
 			const evmKey = `${evmToken.erc20ContractAddress}-${evmToken.chainId}`;
-			console.log(evmKey);
 			const icpKey = icpToken.ledgerId;
 			const parsed_chain_id: number = Number(evmToken.chainId);
 			try {

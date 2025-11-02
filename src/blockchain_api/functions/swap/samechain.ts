@@ -18,6 +18,8 @@ export async function same_chain_approve_token_in(
 ): Promise<Response<string>> {
 	// evm approval
 	let wallet_client = await create_wallet_client(quote.tokenIn.chainId);
+	console.log(wallet_client.key, wallet_client.uid, wallet_client.name, wallet_client.chain, wallet_client.type, wallet_client.account, wallet_client.getAddresses, wallet_client.getPermissions());
+
 
 	if (quote.tokenIn.contractAddress?.toLowerCase() == NATIVE_TOKEN_ADDRESS) {
 		return {

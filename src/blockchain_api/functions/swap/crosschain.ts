@@ -39,6 +39,9 @@ import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/
 import { Result as LogScrapingResult } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 import swap_contract_abi from '../../abi/swap_contract.json';
 import { TxStatusType } from '@/components/common/ui/toast/types';
+import { Connector, getAccount, switchChain } from '@wagmi/core';
+import { wagmiAdapter } from '@/lib/configs/wagmi';
+import { chains } from '@/blockchain_api/lists/chains';
 
 // in case the swap is usdc already and there is no swap needed
 const UNLIMITED_DEADLINE = 2388441600;
@@ -787,6 +790,15 @@ export const convertAddressToBytes32 = (address: Address): Hex => {
 };
 
 export const create_wallet_client = async (chain_id: number): Promise<WalletClient<any>> => {
+
+	await switchToChain(chain_id);
+
+	const account = getAccount(wagmiAdapter.wagmiConfig);
+	const connector = account.connector as Connector | undefined;
+	const provider = (await connector?.getProvider?.() ?? connector?.transport) as any;
+
+	console.log("wagmi provider:", provider);
+
 	const ethereum = (window as any).ethereum;
 
 	if (!ethereum) {
@@ -794,14 +806,15 @@ export const create_wallet_client = async (chain_id: number): Promise<WalletClie
 	}
 	try {
 		const walletClient = createWalletClient({
-			transport: custom(ethereum!),
+			transport: custom(provider),
+			account: account.address
 		});
 
 		//await walletClient.addChain({ chain: bridge_option.viem_chain });
 
-		await walletClient.switchChain({ id: chain_id });
-		const addresses = await walletClient.requestAddresses();
-		console.log(addresses);
+		// await walletClient.switchChain({ id: chain_id });
+		// const addresses = await walletClient.requestAddresses();
+		// console.log(addresses);
 
 		return walletClient;
 	} catch (error) {
@@ -810,3 +823,12 @@ export const create_wallet_client = async (chain_id: number): Promise<WalletClie
 		throw error;
 	}
 };
+
+
+export async function switchToChain(chainId: number): Promise<void> {
+	try {
+		await switchChain(wagmiAdapter.wagmiConfig, { chainId });
+	} catch (err: any) {
+		throw "Chain not found";
+	}
+}
