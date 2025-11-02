@@ -49,7 +49,6 @@ export const get_icp_tokens = async (unAuthenticatedAgent:HttpAgent): Promise<Re
 // Step 2.1 Helper function
 // transform response into icp response
 export const transform_icp_tokens = (icp_tokens: ApiIcpToken[]): IcpToken[] => {
-	console.log("activated transform function");
 	let mapped_tokens = icp_tokens
 		// .filter((token) => token.rank !== undefined && token.rank <= 30) // Match by canisterId/address
 		.map((token) => {
@@ -72,7 +71,6 @@ export const transform_icp_tokens = (icp_tokens: ApiIcpToken[]): IcpToken[] => {
 			};
 		});
 
-	console.log("Mapped tokens", mapped_tokens);
 	return mapped_tokens;
 };
 
