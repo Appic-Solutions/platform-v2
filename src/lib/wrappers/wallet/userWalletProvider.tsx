@@ -31,7 +31,6 @@ export const UserWalletProvider = () => {
 
 	// Agents
 	const authenticatedAgent = useAuthenticatedAgent();
-	console.log("auth principal", authenticatedAgent?.getPrincipal().then(value => console.log("auth principal value:", value.toText())));
 	const unAuthenticatedAgent = useUnAuthenticatedAgent();
 
 
