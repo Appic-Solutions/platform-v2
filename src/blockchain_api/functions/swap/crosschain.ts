@@ -33,7 +33,7 @@ import {
 	encode_execute_swap_function_data,
 } from '@/blockchain_api/abi/abi_encoder';
 import { padHex } from 'viem';
-import type { Address, Hex } from 'viem';
+import type { Address, Hex, PublicClient } from 'viem';
 import { principal_to_bytes32 } from '../icp/utils/principal_to_hex';
 import { idlFactory as AppicMinterIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import { Result as LogScrapingResult } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
@@ -522,6 +522,8 @@ export async function check_swap_status(
 			}
 		}
 
+		console.log(currentStatus, swapTxId);
+
 		// Handle dex status
 		if (swapTxId) {
 			const dexActor = Actor.createActor(idlFactory, {
@@ -531,6 +533,7 @@ export async function check_swap_status(
 			const dexStatusOpt = (await dexActor.get_crosschain_swap_status(swapTxId)) as
 				| []
 				| [CrosschainSwapStatus];
+			console.log("dexStatusOpt", dexStatusOpt);
 			if (!dexStatusOpt || dexStatusOpt.length === 0) {
 				return { success: true, message: '', result: pendingResponse(quote) };
 			}
@@ -575,13 +578,20 @@ export async function check_swap_status(
 						agent: unauthenticated_agent,
 						canisterId: Principal.fromText(quote.to_minter_id!),
 					});
+					console.log(quote.to_minter_id!);
 					const toStatusOpt = (await toMinterActor.retrieve_swap_status_by_swap_tx_id(swapTxId)) as
 						| []
 						| [SwapStatus];
+
+					console.log(toStatusOpt);
 					if (!toStatusOpt || toStatusOpt.length === 0) {
 						return { success: true, message: '', result: pendingResponse(quote) };
 					}
+
+
 					currentStatus = toStatusOpt[0];
+
+					console.log(toStatusOpt[0]);
 
 					if (
 						'PendingSwap' in currentStatus ||
@@ -596,6 +606,8 @@ export async function check_swap_status(
 					} else if ('SwapTxSent' in currentStatus) {
 						const hash = currentStatus.SwapTxSent.transaction_hash;
 						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
+						console.log("HASH", hash, "rawAmountOutTo:", rawAmountOutTo);
+
 						if (rawAmountOutTo === null)
 							return { success: true, message: '', result: pendingResponse(quote) };
 						return {
@@ -773,17 +785,42 @@ const swapExecutedAbi = [
 
 // Helper to get amountOut from event
 export async function getEventAmountOut(
-	publicClient: any,
+	publicClient: PublicClient,
 	hash: string,
 ): Promise<string | null> {
-	let txHash = hash.startsWith('0x') ? (hash as `0x${string}`) : (`0x${hash}` as `0x${string}`);
-	const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, confirmations: 1 });
-	console.log(receipt);
-	const logs = parseEventLogs({ abi: swapExecutedAbi, logs: receipt.logs });
-	const filtered = logs.filter((log: any) => log.eventName === 'SwapExecuted');
-	if (filtered.length === 0) return null;
-	return filtered[0].args.amountOut.toString();
+	try {
+		let txHash = hash.startsWith('0x') ? (hash as `0x${string}`) : (`0x${hash}` as `0x${string}`);
+		const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+		console.log(receipt);
+		const logs = parseEventLogs({ abi: swapExecutedAbi, logs: receipt.logs });
+		const filtered = logs.filter((log: any) => log.eventName === 'SwapExecuted');
+		if (filtered.length === 0) return null;
+		return filtered[0].args.amountOut.toString();
+	} catch (error) {
+		console.log(error);
+		return null;
+	}
 }
+
+// Helper to get amountOut from event
+export async function getEventAmountOutWaitForTransaction(
+	publicClient: PublicClient,
+	hash: string,
+): Promise<string | null> {
+	try {
+		let txHash = hash.startsWith('0x') ? (hash as `0x${string}`) : (`0x${hash}` as `0x${string}`);
+		const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, confirmations:1 });
+		console.log(receipt);
+		const logs = parseEventLogs({ abi: swapExecutedAbi, logs: receipt.logs });
+		const filtered = logs.filter((log: any) => log.eventName === 'SwapExecuted');
+		if (filtered.length === 0) return null;
+		return filtered[0].args.amountOut.toString();
+	} catch (error) {
+		console.log(error);
+		return null;
+	}
+}
+
 
 export const convertAddressToBytes32 = (address: Address): Hex => {
 	return padHex(address, { size: 32 });

@@ -176,7 +176,7 @@ export default function HeaderPage() {
       queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
       return res;
     },
-    refetchInterval: 1000 * 5,
+    refetchInterval: 1000 * 3,
     enabled: !!swapQuote && !!unAuthenticatedAgent && !!pendingSwapTx?.id,
   });
 

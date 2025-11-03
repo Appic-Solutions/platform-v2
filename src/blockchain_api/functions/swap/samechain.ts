@@ -8,7 +8,7 @@ import { check_allowance } from '../evm/check_allowance';
 import { encode_approval_function_data, encode_execute_swap_function_data } from '@/blockchain_api/abi/abi_encoder';
 import type { Address } from 'viem';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
-import { convertAddressToBytes32, create_wallet_client, formatAmount, getEventAmountOut, SwapStatus } from './crosschain';
+import { convertAddressToBytes32, create_wallet_client, formatAmount, getEventAmountOut, getEventAmountOutWaitForTransaction, SwapStatus } from './crosschain';
 
 
 // step 1
@@ -167,7 +167,7 @@ export async function same_chain_swap(
 
 
 
-		let amount_out = await getEventAmountOut(public_client, hash);
+		let amount_out = await getEventAmountOutWaitForTransaction(public_client, hash);
 
 		if (amount_out != null) {
 
