@@ -129,9 +129,10 @@ export const useSwapReviewLogic = () => {
 
 			const recipientEvm =
 				swapQuote.tokenOut.chain_type === 'ICP' ? undefined : toWalletAddress || evmAddress;
+
 			const recipientIcp =
 				swapQuote.tokenOut.chain_type === 'ICP'
-					? Principal.fromText(toWalletAddress) || icpIdentity
+					? toWalletAddress == "" ? icpIdentity : Principal.fromText(toWalletAddress)
 					: undefined;
 
 			const swapRes = await crossChainSwap(
