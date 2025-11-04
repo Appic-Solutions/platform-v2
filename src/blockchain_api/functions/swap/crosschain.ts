@@ -42,6 +42,7 @@ import { TxStatusType } from '@/components/common/ui/toast/types';
 import { Connector, getAccount, switchChain } from '@wagmi/core';
 import { wagmiAdapter } from '@/lib/configs/wagmi';
 import { chains } from '@/blockchain_api/lists/chains';
+import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 
 // in case the swap is usdc already and there is no swap needed
 const UNLIMITED_DEADLINE = 2388441600;
@@ -400,43 +401,48 @@ export interface SwapStatus {
 
 /// step 3 check swap status should be called every 5 seconds
 export async function check_swap_status(
-	quote: CrossChainQuote,
+	// quote: CrossChainQuote,
+	tokenIn: EvmToken | IcpToken,
+	tokenOut: EvmToken | IcpToken,
+	amountIn: string,
 	hash_or_tx_id: string,
 	unauthenticated_agent: HttpAgent,
 ): Promise<Response<SwapStatus>> {
 	try {
-		const fromIsEvm = quote.tokenIn.chain_type === 'EVM';
-		const toIsEvm = quote.tokenOut.chain_type === 'EVM';
-		const tokenInSymbol = quote.tokenIn.symbol || 'TOKEN_IN';
-		const tokenOutSymbol = quote.tokenOut.symbol || 'TOKEN_OUT';
+		const fromIsEvm = tokenIn.chain_type === 'EVM';
+		const toIsEvm = tokenOut.chain_type === 'EVM';
+		const tokenInSymbol = tokenIn.symbol || 'TOKEN_IN';
+		const tokenOutSymbol = tokenOut.symbol || 'TOKEN_OUT';
 
 		let swapTxId: string | undefined;
 		let currentStatus: any;
 		let minterRpcUrl: string | undefined;
 		let minterViemChain: any;
 		let minterChainId: number = fromIsEvm
-			? Number(quote.tokenIn.chainId)
-			: Number(quote.tokenOut.chainId);
+			? Number(tokenIn.chainId)
+			: Number(tokenOut.chainId);
 		let publicClient: any;
 
 		if (fromIsEvm) {
-			minterRpcUrl = quote.from_rpcURl;
-			minterViemChain = quote.from_viemChain;
+			let from_chain = chains.find(chain => chain.chainId == tokenIn.chainId);
+			minterRpcUrl = from_chain?.rpc_url;
+			minterViemChain = from_chain?.viem_config;
 			const fromMinterActor = Actor.createActor(AppicMinterIdlFactory, {
 				agent: unauthenticated_agent,
-				canisterId: Principal.fromText(quote.from_minter_id!),
+				canisterId: Principal.fromText(from_chain?.appic_minter_address!),
 			});
 
 			const statusOpt = (await fromMinterActor.retrieve_swap_status_by_hash(hash_or_tx_id)) as
 				| []
 				| [SwapStatus];
 			if (!statusOpt || statusOpt.length === 0) {
-				return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: pendingResponse(amountIn) };
 			}
 			currentStatus = statusOpt[0];
 		} else {
-			minterRpcUrl = quote.to_rpcURl;
-			minterViemChain = quote.to_viemChain;
+			let to_chain = chains.find(chain => chain.chainId == tokenOut.chainId);
+			minterRpcUrl = to_chain?.rpc_url;
+			minterViemChain = to_chain?.viem_config;
 			swapTxId = hash_or_tx_id;
 		}
 
@@ -454,54 +460,54 @@ export async function check_swap_status(
 				'PendingFailedSwap' in currentStatus ||
 				'QuarantinedSwap' in currentStatus
 			) {
-				return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: pendingResponse(amountIn) };
 			} else if ('SwapTxSent' in currentStatus) {
 				const hash = currentStatus.SwapTxSent.transaction_hash;
 				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				if (rawAmountOut === null)
-					return { success: true, message: '', result: pendingResponse(quote) };
+					return { success: true, message: '', result: pendingResponse(amountIn) };
 				return {
 					success: true,
 					message: '',
-					result: successResponse(quote, rawAmountOut, quote.tokenOut.decimals),
+					result: successResponse(tokenIn, tokenOut, amountIn, rawAmountOut),
 				};
 			} else if ('RefundSwapTxSent' in currentStatus) {
 				const hash = currentStatus.RefundSwapTxSent.transaction_hash;
 				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				if (rawAmountOut === null)
-					return { success: true, message: '', result: pendingResponse(quote) };
+					return { success: true, message: '', result: pendingResponse(amountIn) };
 				return {
 					success: true,
 					message: '',
-					result: refundResponse(quote, rawAmountOut, 'USDC', usdcDecimals),
+					result: refundResponse(amountIn, rawAmountOut, 'USDC', usdcDecimals),
 				};
 			} else if ('SwapTxFinalized' in currentStatus) {
 				const finalized = currentStatus.SwapTxFinalized;
 				if ('PendingReimbursement' in finalized)
-					return { success: true, message: '', result: pendingResponse(quote) };
+					return { success: true, message: '', result: pendingResponse(amountIn) };
 				const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 					.transaction_hash;
 				const rawAmountOut = await getEventAmountOut(publicClient, hash);
 				if (rawAmountOut === null)
-					return { success: true, message: '', result: pendingResponse(quote) };
+					return { success: true, message: '', result: pendingResponse(amountIn) };
 				if ('Success' in finalized) {
 					return {
 						success: true,
 						message: '',
-						result: successResponse(quote, rawAmountOut, quote.tokenOut.decimals),
+						result: successResponse(tokenIn, tokenOut, amountIn, rawAmountOut),
 					};
 				} else {
 					const rawRefund = rawAmountOut || finalized.Reimbursed.reimbursed_amount.toString();
 					return {
 						success: true,
 						message: '',
-						result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals),
+						result: refundResponse(amountIn, rawRefund, 'USDC', usdcDecimals),
 					};
 				}
 			} else if ('RefundSwapTxFinalized' in currentStatus) {
 				const finalized = currentStatus.RefundSwapTxFinalized;
 				if ('PendingReimbursement' in finalized)
-					return { success: true, message: '', result: pendingResponse(quote) };
+					return { success: true, message: '', result: pendingResponse(amountIn) };
 				const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 					.transaction_hash;
 				const rawAmountOut = await getEventAmountOut(publicClient, hash);
@@ -511,14 +517,14 @@ export async function check_swap_status(
 				return {
 					success: true,
 					message: '',
-					result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals),
+					result: refundResponse(amountIn, rawRefund, 'USDC', usdcDecimals),
 				};
 			} else if ('MintedToAppicDex' in currentStatus) {
 				swapTxId = currentStatus.MintedToAppicDex;
 			} else if ('NotifiedAppicDex' in currentStatus) {
 				swapTxId = currentStatus.NotifiedAppicDex;
 			} else {
-				return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: pendingResponse(amountIn) };
 			}
 		}
 
@@ -535,25 +541,25 @@ export async function check_swap_status(
 				| [CrosschainSwapStatus];
 			console.log("dexStatusOpt", dexStatusOpt);
 			if (!dexStatusOpt || dexStatusOpt.length === 0) {
-				return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: pendingResponse(amountIn) };
 			}
 			const dexStatus = dexStatusOpt[0];
 
 			if ('Pending' in dexStatus) {
-				return { success: true, message: '', result: pendingResponse(quote) };
+				return { success: true, message: '', result: pendingResponse(amountIn) };
 			} else if ('Refunded' in dexStatus) {
 				if (!fromIsEvm) {
 					// ICP origin, refund on ICP
-					const refundAmount = quote.amountIn;
+					const refundAmount = amountIn;
 					const refundToken = tokenInSymbol;
 					return {
 						success: true,
 						message: '',
-						result: refundResponseFormatted(quote, refundAmount, refundToken),
+						result: refundResponseFormatted(amountIn, refundAmount, refundToken),
 					};
 				} else {
 					// EVM origin, refund to minter, treat as pending
-					return { success: true, message: '', result: pendingResponse(quote) };
+					return { success: true, message: '', result: pendingResponse(amountIn) };
 				}
 			} else if ('Successful' in dexStatus) {
 				const rawAmountOut = dexStatus.Successful.toString();
@@ -561,13 +567,14 @@ export async function check_swap_status(
 					return {
 						success: true,
 						message: '',
-						result: successResponse(quote, rawAmountOut, quote.tokenOut.decimals),
+						result: successResponse(tokenIn, tokenOut, amountIn, rawAmountOut),
 					};
 				} else {
+					let to_chain = chains.find(chain => chain.chainId == tokenOut.chainId);
 					// Proceed to to minter
-					minterRpcUrl = quote.to_rpcURl;
-					minterViemChain = quote.to_viemChain;
-					minterChainId = Number(quote.tokenOut.chainId);
+					minterRpcUrl = to_chain?.rpc_url;
+					minterViemChain = to_chain?.viem_config;
+					minterChainId = Number(to_chain?.chainId);
 					publicClient = createPublicClient({
 						transport: http(minterRpcUrl),
 						chain: minterViemChain,
@@ -576,16 +583,15 @@ export async function check_swap_status(
 
 					const toMinterActor = Actor.createActor(AppicMinterIdlFactory, {
 						agent: unauthenticated_agent,
-						canisterId: Principal.fromText(quote.to_minter_id!),
+						canisterId: Principal.fromText(to_chain?.appic_minter_address!),
 					});
-					console.log(quote.to_minter_id!);
 					const toStatusOpt = (await toMinterActor.retrieve_swap_status_by_swap_tx_id(swapTxId)) as
 						| []
 						| [SwapStatus];
 
 					console.log(toStatusOpt);
 					if (!toStatusOpt || toStatusOpt.length === 0) {
-						return { success: true, message: '', result: pendingResponse(quote) };
+						return { success: true, message: '', result: pendingResponse(amountIn) };
 					}
 
 
@@ -602,56 +608,56 @@ export async function check_swap_status(
 						'PendingFailedSwap' in currentStatus ||
 						'QuarantinedSwap' in currentStatus
 					) {
-						return { success: true, message: '', result: pendingResponse(quote) };
+						return { success: true, message: '', result: pendingResponse(amountIn) };
 					} else if ('SwapTxSent' in currentStatus) {
 						const hash = currentStatus.SwapTxSent.transaction_hash;
 						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						console.log("HASH", hash, "rawAmountOutTo:", rawAmountOutTo);
 
 						if (rawAmountOutTo === null)
-							return { success: true, message: '', result: pendingResponse(quote) };
+							return { success: true, message: '', result: pendingResponse(amountIn) };
 						return {
 							success: true,
 							message: '',
-							result: successResponse(quote, rawAmountOutTo, quote.tokenOut.decimals),
+							result: successResponse(tokenIn, tokenOut, amountIn, rawAmountOutTo),
 						};
 					} else if ('RefundSwapTxSent' in currentStatus) {
 						const hash = currentStatus.RefundSwapTxSent.transaction_hash;
 						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						if (rawAmountOutTo === null)
-							return { success: true, message: '', result: pendingResponse(quote) };
+							return { success: true, message: '', result: pendingResponse(amountIn) };
 						return {
 							success: true,
 							message: '',
-							result: refundResponse(quote, rawAmountOutTo, 'USDC', usdcDecimals),
+							result: refundResponse(amountIn, rawAmountOutTo, 'USDC', usdcDecimals),
 						};
 					} else if ('SwapTxFinalized' in currentStatus) {
 						const finalized = currentStatus.SwapTxFinalized;
 						if ('PendingReimbursement' in finalized)
-							return { success: true, message: '', result: pendingResponse(quote) };
+							return { success: true, message: '', result: pendingResponse(amountIn) };
 						const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 							.transaction_hash;
 						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
 						if (rawAmountOutTo === null)
-							return { success: true, message: '', result: pendingResponse(quote) };
+							return { success: true, message: '', result: pendingResponse(amountIn) };
 						if ('Success' in finalized) {
 							return {
 								success: true,
 								message: '',
-								result: successResponse(quote, rawAmountOutTo, quote.tokenOut.decimals),
+								result: successResponse(tokenIn, tokenOut, amountIn, rawAmountOutTo),
 							};
 						} else {
 							const rawRefund = rawAmountOutTo || finalized.Reimbursed.reimbursed_amount.toString();
 							return {
 								success: true,
 								message: '',
-								result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals),
+								result: refundResponse(amountIn, rawRefund, 'USDC', usdcDecimals),
 							};
 						}
 					} else if ('RefundSwapTxFinalized' in currentStatus) {
 						const finalized = currentStatus.RefundSwapTxFinalized;
 						if ('PendingReimbursement' in finalized)
-							return { success: true, message: '', result: pendingResponse(quote) };
+							return { success: true, message: '', result: pendingResponse(amountIn) };
 						const hash = ('Success' in finalized ? finalized.Success : finalized.Reimbursed)
 							.transaction_hash;
 						const rawAmountOutTo = await getEventAmountOut(publicClient, hash);
@@ -661,29 +667,22 @@ export async function check_swap_status(
 						return {
 							success: true,
 							message: '',
-							result: refundResponse(quote, rawRefund, 'USDC', usdcDecimals),
+							result: refundResponse(amountIn, rawRefund, 'USDC', usdcDecimals),
 						};
-					} else if ('MintedToAppicDex' in currentStatus || 'NotifiedAppicDex' in currentStatus) {
-						// Unlikely, but if here, perhaps success
-						return {
-							success: true,
-							message: '',
-							result: successResponse(quote, quote.amountOutRaw || '0', quote.tokenOut.decimals),
-						};
-					} else {
-						return { success: true, message: '', result: pendingResponse(quote) };
+					}  else {
+						return { success: true, message: '', result: pendingResponse(amountIn) };
 					}
 				}
 			}
 		}
 
-		return { success: true, message: '', result: pendingResponse(quote) };
+		return { success: true, message: '', result: pendingResponse(amountIn) };
 	} catch (error) {
 		console.error(error);
 		return {
 			success: false,
 			message: `Failed to check swap status: ${error}`,
-			result: failedResponse(quote, 'Error checking status'),
+			result: failedResponse(amountIn, 'Error checking status'),
 		};
 	}
 }
@@ -696,35 +695,36 @@ export function formatAmount(raw: string, decimals: number): string {
 
 
 // Helper responses
-function pendingResponse(quote: CrossChainQuote): SwapStatus {
+function pendingResponse(amountIn: string): SwapStatus {
 	return {
 		status: 'pending',
-		amount_in: quote.amountIn,
-		amount_out: quote.amountOut,
+		amount_in: amountIn,
+		amount_out: "",
 		caption: 'Swap in progress...',
 		title: 'Swapping',
 	};
 }
 
 function successResponse(
-	quote: CrossChainQuote,
+	tokenIn: IcpToken | EvmToken,
+	tokenOut: IcpToken | EvmToken,
+	amountIn: string,
 	rawAmountOut: string,
-	tokenOutDecimals: number,
 ): SwapStatus {
-	const formattedAmountOut = formatAmount(rawAmountOut, tokenOutDecimals);
-	const tokenInSymbol = quote.tokenIn.symbol || 'TOKEN_IN';
-	const tokenOutSymbol = quote.tokenOut.symbol || 'TOKEN_OUT';
+	const formattedAmountOut = formatAmount(rawAmountOut, tokenOut.decimals);
+	const tokenInSymbol = tokenIn.symbol || 'TOKEN_IN';
+	const tokenOutSymbol = tokenOut.symbol || 'TOKEN_OUT';
 	return {
 		status: 'successful',
-		amount_in: quote.amountIn,
+		amount_in: amountIn,
 		amount_out: formattedAmountOut,
-		caption: `Swapped ${quote.amountIn} ${tokenInSymbol} to ${formattedAmountOut} ${tokenOutSymbol}`,
+		caption: `Swapped ${amountIn} ${tokenInSymbol} to ${formattedAmountOut} ${tokenOutSymbol}`,
 		title: 'Swapped',
 	};
 }
 
 function refundResponse(
-	quote: CrossChainQuote,
+	amountIn: string,
 	rawRefundAmount: string,
 	refundToken: string,
 	refundDecimals: number,
@@ -732,7 +732,7 @@ function refundResponse(
 	const formattedRefund = formatAmount(rawRefundAmount, refundDecimals);
 	return {
 		status: 'failed',
-		amount_in: quote.amountIn,
+		amount_in: amountIn,
 		amount_out: '0',
 		caption: `Refunded with ${formattedRefund} ${refundToken}`,
 		title: 'Swap failed',
@@ -740,23 +740,23 @@ function refundResponse(
 }
 
 function refundResponseFormatted(
-	quote: CrossChainQuote,
+	amountIn: string,
 	formattedRefundAmount: string,
 	refundToken: string,
 ): SwapStatus {
 	return {
 		status: 'failed',
-		amount_in: quote.amountIn,
+		amount_in: amountIn,
 		amount_out: '0',
 		caption: `Refunded with ${formattedRefundAmount} ${refundToken}`,
 		title: 'Swapping',
 	};
 }
 
-function failedResponse(quote: CrossChainQuote, reason: string): SwapStatus {
+function failedResponse(amountIn:string, reason: string): SwapStatus {
 	return {
 		status: 'failed',
-		amount_in: quote.amountIn,
+		amount_in: amountIn,
 		amount_out: '0',
 		caption: `Swap failed: ${reason}`,
 		title: 'Swapped',
@@ -809,7 +809,7 @@ export async function getEventAmountOutWaitForTransaction(
 ): Promise<string | null> {
 	try {
 		let txHash = hash.startsWith('0x') ? (hash as `0x${string}`) : (`0x${hash}` as `0x${string}`);
-		const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, confirmations:1 });
+		const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, confirmations: 1 });
 		console.log(receipt);
 		const logs = parseEventLogs({ abi: swapExecutedAbi, logs: receipt.logs });
 		const filtered = logs.filter((log: any) => log.eventName === 'SwapExecuted');
