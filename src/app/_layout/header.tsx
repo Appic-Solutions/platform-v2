@@ -49,7 +49,7 @@ export default function HeaderPage() {
     if (cachedSwaps.length > 0) {
       const latestSwap = cachedSwaps[cachedSwaps.length - 1][1] as SwapStatusCachedQuery;
       if (latestSwap?.status === 'pending') {
-        swapStoreActions.setPendingSwapTx({ id: latestSwap.id, status: 'pending' });
+        swapStoreActions.setPendingSwapTx({ ...latestSwap, status: 'pending' });
       }
     }
   }, [evmAddress, icpIdentity, setPendingTx, swapStoreActions.setPendingSwapTx]);
@@ -131,8 +131,10 @@ export default function HeaderPage() {
     queryKey: [queryKeys.checkSwapStatus, pendingSwapTx?.id],
     queryFn: async () => {
       const res = await check_swap_status(
-        swapQuote as CrossChainQuote,
-        pendingSwapTx?.id as string,
+        pendingSwapTx?.tokenIn!,
+        pendingSwapTx?.tokenOut!,
+        pendingSwapTx?.amountIn!,
+        pendingSwapTx?.id!,
         unAuthenticatedAgent as HttpAgent,
       );
 
@@ -144,8 +146,8 @@ export default function HeaderPage() {
           caption: res.result.caption,
           status: res.result.status,
           isSameChain: false,
-          tokenIn: tokenIn!,
-          tokenOut: tokenOut!,
+          tokenIn: pendingSwapTx?.tokenIn!,
+          tokenOut: pendingSwapTx?.tokenOut!,
           toastId: pendingSwapTx?.id,
         });
 
@@ -177,7 +179,12 @@ export default function HeaderPage() {
       return res;
     },
     refetchInterval: 1000 * 3,
-    enabled: !!swapQuote && !!unAuthenticatedAgent && !!pendingSwapTx?.id,
+    enabled:
+      !!unAuthenticatedAgent &&
+      !!pendingSwapTx?.id &&
+      !!pendingSwapTx.amountIn &&
+      !!pendingSwapTx.tokenIn &&
+      !!pendingSwapTx.tokenOut,
   });
 
   const { data: icpTokens } = useQuery({

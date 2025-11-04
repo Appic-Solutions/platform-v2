@@ -5,6 +5,7 @@ import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
 import { TxStatusType } from '@/components/common/ui/toast/types';
 import { create } from 'zustand';
+import { SwapStatusCachedQuery } from '../_types';
 
 export type TokenType = EvmToken | IcpToken;
 type SelectionType = 'in' | 'out';
@@ -15,10 +16,7 @@ export interface TxStepType {
   status: 'pending' | 'successful' | 'failed' | undefined;
 }
 
-export interface PendingSwapTx {
-  id: string;
-  status: TxStatusType;
-}
+export type SwapQuote = IcpQuote | CrossChainQuote | SameChainQuote;
 
 interface swapState {
   activeStep: number;
@@ -27,7 +25,7 @@ interface swapState {
   tokenIn: TokenType | undefined;
   tokenOut: TokenType | undefined;
   amount: string;
-  swapQuote: IcpQuote | CrossChainQuote | SameChainQuote | undefined;
+  swapQuote: SwapQuote | undefined;
   selectedTokenBalance: string;
   toWalletAddress: string;
   toWalletValidationError: string;
@@ -35,7 +33,7 @@ interface swapState {
   txStep: TxStepType;
   txErrorMessage: string | undefined;
   prevTxStep: TxStepType;
-  pendingSwapTx: PendingSwapTx | undefined;
+  pendingSwapTx: SwapStatusCachedQuery | undefined;
 }
 
 type Action = {
@@ -55,7 +53,7 @@ type Action = {
     setTxStep: (step: TxStepType) => void;
     setTxErrorMessage: (err: string | undefined) => void;
     setPrevTxStep: (prevStep: TxStepType) => void;
-    setPendingSwapTx: (pendingSwapTx: PendingSwapTx | undefined) => void;
+    setPendingSwapTx: (pendingSwapTx: SwapStatusCachedQuery | undefined) => void;
   };
 };
 
