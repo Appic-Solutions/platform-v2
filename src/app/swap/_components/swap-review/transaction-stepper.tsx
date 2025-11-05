@@ -12,11 +12,11 @@ interface Props {
 }
 
 export default function SwapTransactionStepper({ steps, onCloseModal }: Props) {
-  const { txStep, prevTxStep, actions } = useSwapStore();
+  const { swapStep, prevSwapStep, actions } = useSwapStore();
 
   const stepperClickHandler = (activeId: number) => {
-    if (prevTxStep.count === activeId) return;
-    actions.setPrevTxStep({ count: activeId, status: 'successful' });
+    if (prevSwapStep.count === activeId) return;
+    actions.setPrevSwapStep({ count: activeId, status: 'successful' });
   };
 
   return (
@@ -31,7 +31,9 @@ export default function SwapTransactionStepper({ steps, onCloseModal }: Props) {
             onCloseModal={onCloseModal}
             key={index}
             currentStep={
-              prevTxStep.count === 0 || prevTxStep.count === txStep.count ? txStep : prevTxStep
+              prevSwapStep.count === 0 || prevSwapStep.count === swapStep.count
+                ? swapStep
+                : prevSwapStep
             }
             index={index}
             step={step}
@@ -40,8 +42,8 @@ export default function SwapTransactionStepper({ steps, onCloseModal }: Props) {
       </div>
       <Stepper
         totalSteps={steps.length}
-        currentStep={txStep.count}
-        selectedStep={prevTxStep.count}
+        currentStep={swapStep.count}
+        selectedStep={prevSwapStep.count}
         clickHandler={stepperClickHandler}
       />
     </div>

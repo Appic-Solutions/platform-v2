@@ -9,7 +9,7 @@ import {
 } from '@/app/bridge/_api';
 import { FullDepositRequest, FullWithdrawalRequest } from '@/app/bridge/_api/types/request';
 import { useBridgeActions, useBridgeStore } from '@/app/bridge/_store';
-import { setPendingTransactionToSession } from '@/lib/helpers/session';
+import { setPendingTransactionToSession } from '@/lib/helpers/session-storage/bridge';
 import { useSharedStore } from '@/store/store';
 import { Principal } from '@dfinity/principal';
 

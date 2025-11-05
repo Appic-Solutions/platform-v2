@@ -6,7 +6,7 @@ import {
   getPendingTransaction,
   PendingTransaction,
   removePendingTransaction,
-} from '@/lib/helpers/session';
+} from '@/lib/helpers/session-storage/bridge';
 import { BridgeOption, TxType } from '@/blockchain_api/functions/icp/get_bridge_options';
 import { useSharedStore } from '@/store/store';
 import { useBridgeActions, useBridgeStore } from '../bridge/_store';
@@ -22,12 +22,9 @@ import {
   check_deposit_status,
   check_withdraw_status,
 } from '@/blockchain_api/functions/icp/bridge_transactions';
-import { useSwapStore } from '../swap/_store';
-import { check_swap_status } from '@/blockchain_api/functions/swap/crosschain';
-import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
-import { SwapStatusCachedQuery } from '../swap/_types';
-import { transactionNotification } from '@/components/common/ui/toast/notification';
-import reactHotToast from 'react-hot-toast';
+import { useSwapActions } from '../swap/_store';
+import { useTypedQueryData } from '@/lib/hooks/use-typed-query-data';
+import { usePendingSwapsStatus } from '@/lib/hooks/use-pending-swap-status';
 
 export default function HeaderPage() {
   const { evmAddress, icpIdentity, unAuthenticatedAgent } = useSharedStore();
@@ -35,7 +32,10 @@ export default function HeaderPage() {
   const { setPendingTx } = useBridgeActions();
   const { pendingTx } = useBridgeStore();
   const { toast } = useToast();
-  const { pendingSwapTx, swapQuote, tokenIn, tokenOut, actions: swapStoreActions } = useSwapStore();
+  const { addPendingSwap } = useSwapActions();
+
+  const icpBalance = useTypedQueryData(queryKeys.icpBalance);
+  const evmBalance = useTypedQueryData(queryKeys.evmBalance);
 
   useEffect(() => {
     const pending = getPendingTransaction() as PendingTransaction;
@@ -44,15 +44,16 @@ export default function HeaderPage() {
     } else if (pending?.bridge_option.bridge_tx_type === TxType.Withdrawal && icpIdentity) {
       setPendingTx(pending);
     }
+  }, [evmBalance, icpBalance, evmAddress, icpIdentity, setPendingTx, addPendingSwap]);
 
-    const cachedSwaps = queryClient.getQueriesData({ queryKey: [queryKeys.swapStatus] });
-    if (cachedSwaps.length > 0) {
-      const latestSwap = cachedSwaps[cachedSwaps.length - 1][1] as SwapStatusCachedQuery;
-      if (latestSwap?.status === 'pending') {
-        swapStoreActions.setPendingSwapTx({ ...latestSwap, status: 'pending' });
-      }
+  const { queries, pendingSwaps, hasPendingSwaps } = usePendingSwapsStatus();
+  // Log for debugging
+  useEffect(() => {
+    if (hasPendingSwaps) {
+      console.log(`🔄 Monitoring ${pendingSwaps.length} pending swaps:`, pendingSwaps);
+      console.log(`queries:`, queries);
     }
-  }, [evmAddress, icpIdentity, setPendingTx, swapStoreActions.setPendingSwapTx]);
+  }, [hasPendingSwaps, pendingSwaps.length]);
 
   // check pending deposit tx status
   useQuery({
@@ -89,6 +90,7 @@ export default function HeaderPage() {
       pendingTx.bridge_option.bridge_tx_type === TxType.Deposit &&
       !!evmAddress,
   });
+
   // check pending withdrawal tx status
   useQuery({
     queryKey: ['check-pending-withdrawal-status'],
@@ -124,67 +126,6 @@ export default function HeaderPage() {
       !!unAuthenticatedAgent &&
       pendingTx.bridge_option.bridge_tx_type === TxType.Withdrawal &&
       !!icpIdentity,
-  });
-
-  // check pending swap status
-  useQuery({
-    queryKey: [queryKeys.checkSwapStatus, pendingSwapTx?.id],
-    queryFn: async () => {
-      const res = await check_swap_status(
-        pendingSwapTx?.tokenIn!,
-        pendingSwapTx?.tokenOut!,
-        pendingSwapTx?.amountIn!,
-        pendingSwapTx?.id!,
-        unAuthenticatedAgent as HttpAgent,
-      );
-
-      console.log('check status response ====================>', res);
-
-      if (res.result) {
-        transactionNotification({
-          title: res.result.title,
-          caption: res.result.caption,
-          status: res.result.status,
-          isSameChain: false,
-          tokenIn: pendingSwapTx?.tokenIn!,
-          tokenOut: pendingSwapTx?.tokenOut!,
-          toastId: pendingSwapTx?.id,
-        });
-
-        if (res.result.status === 'successful' || res.result.status === 'failed') {
-          swapStoreActions.setPendingSwapTx(undefined);
-          queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
-          reactHotToast.dismiss(pendingSwapTx?.id);
-
-          transactionNotification({
-            title: res.result.title,
-            caption: res.result.caption,
-            status: res.result.status,
-            isSameChain: false,
-            tokenIn: tokenIn!,
-            tokenOut: tokenOut!,
-            toastId: pendingSwapTx?.id,
-          });
-        } else {
-          swapStoreActions.setPendingSwapTx(pendingSwapTx);
-        }
-      } else {
-        swapStoreActions.setPendingSwapTx(undefined);
-        queryClient.removeQueries({ queryKey: [queryKeys.swapStatus, pendingSwapTx?.id] });
-        reactHotToast.dismiss(pendingSwapTx?.id);
-      }
-
-      queryClient.invalidateQueries({ queryKey: [queryKeys.icpBalance] });
-      queryClient.invalidateQueries({ queryKey: [queryKeys.evmBalance] });
-      return res;
-    },
-    refetchInterval: 1000 * 3,
-    enabled:
-      !!unAuthenticatedAgent &&
-      !!pendingSwapTx?.id &&
-      !!pendingSwapTx.amountIn &&
-      !!pendingSwapTx.tokenIn &&
-      !!pendingSwapTx.tokenOut,
   });
 
   const { data: icpTokens } = useQuery({

@@ -1,11 +1,10 @@
-import { TxStepType, useSwapStore } from '../../_store';
+import { SwapStepType, useSwapStore } from '../../_store';
 import { useSharedStore } from '@/store/store';
 import { IcpQuote } from '@/blockchain_api/quoter/icp';
 import {
   approve_token_in as icpApproveTokenIn,
   swap as icpSwap,
 } from '@/blockchain_api/functions/icp/dex/tx/swap';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   cross_chain_approve_token_in as crossChainApproveTokenIn,
   cross_chain_swap as crossChainSwap,
@@ -17,9 +16,8 @@ import {
 import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { Principal } from '@dfinity/principal';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
-import { queryKeys } from '@/lib/constants/query-keys';
-import { SwapStatusCachedQuery } from '../../_types';
 import { transactionNotification } from '@/components/common/ui/toast/notification';
+import { addPendingSwapToSession, PendingSwap } from '@/lib/helpers/session-storage/swap';
 
 export const isCrossChainQuote = (quote: any): quote is CrossChainQuote => {
   return (
@@ -35,14 +33,12 @@ export const useSwapReviewLogic = () => {
   const { tokenIn, tokenOut, swapQuote, actions, toWalletAddress } = useSwapStore();
   const { authenticatedAgent, icpIdentity, unAuthenticatedAgent, evmAddress } = useSharedStore();
 
-  const queryClient = useQueryClient();
-
   // we just call the transaction notification in samechain and icp swap here.
   // because there is no need to have a query call every 5s
   // and for crosschain that we should call a query every 5s, we call the transaction notification
   // in the header.tsx component inside the query for handling update state of the notification
-  const icpSwapExe = async (): Promise<TxStepType | undefined> => {
-    let step: TxStepType;
+  const icpSwapExe = async (): Promise<SwapStepType | undefined> => {
+    let step: SwapStepType;
     if (
       tokenIn?.chain_type === 'ICP' &&
       authenticatedAgent &&
@@ -63,11 +59,11 @@ export const useSwapReviewLogic = () => {
           count: 1,
           status: 'failed',
         };
-        actions.setTxStep(step);
+        actions.setSwapStep(step);
         return step;
       }
 
-      actions.setTxStep({
+      actions.setSwapStep({
         count: 2,
         status: 'pending',
       });
@@ -80,7 +76,7 @@ export const useSwapReviewLogic = () => {
           count: 2,
           status: 'failed',
         };
-        actions.setTxStep(step);
+        actions.setSwapStep(step);
         return step;
       }
 
@@ -89,7 +85,7 @@ export const useSwapReviewLogic = () => {
         status: 'successful',
       };
 
-      actions.setTxStep(step);
+      actions.setSwapStep(step);
 
       transactionNotification({
         caption: swapRes.result.caption,
@@ -103,8 +99,8 @@ export const useSwapReviewLogic = () => {
     }
   };
 
-  const crosschainSwapExe = async (): Promise<TxStepType | undefined> => {
-    let step: TxStepType;
+  const crosschainSwapExe = async (): Promise<SwapStepType | undefined> => {
+    let step: SwapStepType;
     if (unAuthenticatedAgent && swapQuote && tokenIn && tokenOut) {
       // step1
       const approveRes = await crossChainApproveTokenIn(
@@ -118,11 +114,11 @@ export const useSwapReviewLogic = () => {
           count: 1,
           status: 'failed',
         };
-        actions.setTxStep(step);
+        actions.setSwapStep(step);
         return step;
       }
 
-      actions.setTxStep({
+      actions.setSwapStep({
         count: 2,
         status: 'pending',
       });
@@ -149,7 +145,7 @@ export const useSwapReviewLogic = () => {
           count: 2,
           status: 'failed',
         };
-        actions.setTxStep(step);
+        actions.setSwapStep(step);
         return step;
       }
 
@@ -158,9 +154,9 @@ export const useSwapReviewLogic = () => {
         status: swapRes.success ? 'successful' : 'failed',
       };
 
-      actions.setTxStep(step);
+      actions.setSwapStep(step);
 
-      const cacheData: SwapStatusCachedQuery = {
+      const pendingSwap: PendingSwap = {
         id: swapRes.result,
         amountIn: swapQuote.amountIn,
         tokenIn: swapQuote.tokenIn,
@@ -170,16 +166,16 @@ export const useSwapReviewLogic = () => {
       };
 
       if (swapRes.success) {
-        actions.setPendingSwapTx(cacheData);
+        actions.addPendingSwap(pendingSwap);
+        addPendingSwapToSession(pendingSwap);
       }
-      queryClient.setQueryData([queryKeys.swapStatus, swapRes.result], cacheData);
 
       return step;
     }
   };
 
-  const sameChainSWapExe = async (): Promise<TxStepType | undefined> => {
-    let step: TxStepType;
+  const sameChainSWapExe = async (): Promise<SwapStepType | undefined> => {
+    let step: SwapStepType;
     // step1
     const approveRes = await sameChainApproveTokenIn(swapQuote as SameChainQuote);
     if (!approveRes.success) {
@@ -187,11 +183,11 @@ export const useSwapReviewLogic = () => {
         count: 1,
         status: 'failed',
       };
-      actions.setTxStep(step);
+      actions.setSwapStep(step);
       return step;
     }
 
-    actions.setTxStep({
+    actions.setSwapStep({
       count: 2,
       status: 'pending',
     });
@@ -210,7 +206,7 @@ export const useSwapReviewLogic = () => {
         count: 2,
         status: 'failed',
       };
-      actions.setTxStep(step);
+      actions.setSwapStep(step);
       return step;
     }
 
@@ -219,7 +215,7 @@ export const useSwapReviewLogic = () => {
       status: !swapRes.success ? 'failed' : 'successful',
     };
 
-    actions.setTxStep(step);
+    actions.setSwapStep(step);
 
     transactionNotification({
       caption: swapRes.result.caption,

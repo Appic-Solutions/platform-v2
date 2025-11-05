@@ -1,3 +1,4 @@
+import { SwapQuote } from '@/app/swap/_store';
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { DexData } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
@@ -17,6 +18,7 @@ export const queryKeys = {
   swapStatus: 'swap-status',
   checkSwapStatus: 'check-swap-status',
   topEvmTokens: 'top-evm-tokens',
+  swapQuote: 'swap-quote',
 } as const;
 
 export type QueryKeys = typeof queryKeys;
@@ -28,6 +30,7 @@ export type QueryReturnTypes = {
   [queryKeys.icpPools]: Pool[];
   [queryKeys.dexData]: DexData;
   [queryKeys.bridgePairs]: (EvmToken | IcpToken)[];
+  [queryKeys.swapQuote]: SwapQuote;
 };
 
 export type QueryKey = keyof QueryReturnTypes;

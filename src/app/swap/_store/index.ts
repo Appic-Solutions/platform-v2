@@ -1,17 +1,15 @@
-import { SwapStatus } from '@/blockchain_api/functions/swap/crosschain';
 import { CrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { IcpQuote } from '@/blockchain_api/quoter/icp';
 import { SameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { EvmToken, IcpToken } from '@/blockchain_api/types/tokens';
-import { TxStatusType } from '@/components/common/ui/toast/types';
+import { PendingSwap } from '@/lib/helpers/session-storage/swap';
 import { create } from 'zustand';
-import { SwapStatusCachedQuery } from '../_types';
 
 export type TokenType = EvmToken | IcpToken;
 type SelectionType = 'in' | 'out';
 export type Status = 'failed' | 'successful' | 'pending' | undefined;
 
-export interface TxStepType {
+export interface SwapStepType {
   count: number;
   status: 'pending' | 'successful' | 'failed' | undefined;
 }
@@ -29,11 +27,11 @@ interface swapState {
   selectedTokenBalance: string;
   toWalletAddress: string;
   toWalletValidationError: string;
-  // tx states
-  txStep: TxStepType;
-  txErrorMessage: string | undefined;
-  prevTxStep: TxStepType;
-  pendingSwapTx: SwapStatusCachedQuery | undefined;
+  // swap states
+  swapStep: SwapStepType;
+  swapErrorMessage: string | undefined;
+  prevSwapStep: SwapStepType;
+  pendingSwaps: PendingSwap[];
 }
 
 type Action = {
@@ -50,20 +48,23 @@ type Action = {
     setTokenIn: (token: TokenType | undefined) => void;
     setTokenOut: (token: TokenType | undefined) => void;
     // tx actions
-    setTxStep: (step: TxStepType) => void;
-    setTxErrorMessage: (err: string | undefined) => void;
-    setPrevTxStep: (prevStep: TxStepType) => void;
-    setPendingSwapTx: (pendingSwapTx: SwapStatusCachedQuery | undefined) => void;
+    setSwapStep: (step: SwapStepType) => void;
+    setSwapErrorMessage: (err: string | undefined) => void;
+    setPrevSwapStep: (prevStep: SwapStepType) => void;
+    addPendingSwap: (pendingSwap: PendingSwap) => void;
+    removePendingSwap: (id: string) => void;
+    updateSwapStatus: (id: string, status: PendingSwap['status']) => void;
+    clearPendingSwaps: () => void;
   };
 };
 
 export const useSwapStore = create<swapState & Action>()((set) => ({
   activeStep: 1,
-  txStep: {
+  swapStep: {
     count: 1,
     status: 'pending' as Status,
   },
-  prevTxStep: {
+  prevSwapStep: {
     count: 0,
     status: 'successful' as Status,
   },
@@ -77,9 +78,9 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
   toWalletAddress: '',
   toWalletValidationError: '',
   selectedTokenBalance: '',
-  txErrorMessage: undefined,
+  swapErrorMessage: undefined,
   txId: undefined,
-  pendingSwapTx: undefined,
+  pendingSwaps: [],
   actions: {
     setActiveStep: (activeStep) => set({ activeStep }),
     setSelectedTokenType: (selectedTokenType) => set({ selectedTokenType }),
@@ -91,11 +92,28 @@ export const useSwapStore = create<swapState & Action>()((set) => ({
     setToWalletAddress: (toWalletAddress) => set({ toWalletAddress }),
     setToWalletValidationError: (toWalletValidationError) => set({ toWalletValidationError }),
     setSelectedTokenBalance: (selectedTokenBalance) => set({ selectedTokenBalance }),
-    // tx actions
-    setTxStep: (txStep) => set({ txStep }),
-    setTxErrorMessage: (txErrorMessage) => set({ txErrorMessage }),
-    setPrevTxStep: (prevTxStep) => set({ prevTxStep }),
-    setPendingSwapTx: (pendingSwapTx) => set({ pendingSwapTx }),
+    // swap actions
+    setSwapStep: (swapStep) => set({ swapStep }),
+    setSwapErrorMessage: (swapErrorMessage) => set({ swapErrorMessage }),
+    setPrevSwapStep: (prevSwapStep) => set({ prevSwapStep }),
+    // pending swap
+    addPendingSwap: (pendingSwap) =>
+      set((state) => ({
+        pendingSwaps: [...(state.pendingSwaps || []), pendingSwap],
+      })),
+    removePendingSwap: (id) =>
+      set((state) => ({
+        pendingSwaps: state.pendingSwaps.filter((swap) => swap.id !== id),
+      })),
+
+    updateSwapStatus: (id, status) =>
+      set((state) => ({
+        pendingSwaps: state.pendingSwaps.map((swap) =>
+          swap.id === id ? { ...swap, status } : swap,
+        ),
+      })),
+
+    clearPendingSwaps: () => set({ pendingSwaps: [] }),
   },
 }));
 

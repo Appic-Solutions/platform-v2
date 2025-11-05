@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 import SwapTransactionStepper from './transaction-stepper';
 import { useEffect, useState } from 'react';
-import { TxStepType, useSwapActions, useSwapStore } from '../../_store';
+import { SwapStepType, useSwapActions, useSwapStore } from '../../_store';
 import SwapReview from './swap-review';
 import { TxStep } from '../../_api/types';
 import {
@@ -16,9 +16,9 @@ import { queryKeys } from '@/lib/constants/query-keys';
 export const StepperContainer = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [steps, setSteps] = useState<TxStep[]>();
-  const { tokenIn, tokenOut, txStep } = useSwapStore();
+  const { tokenIn, tokenOut, swapStep } = useSwapStore();
   const { crosschainSwapExe, icpSwapExe, sameChainSWapExe } = useSwapReviewLogic();
-  const { setAmount, setActiveStep, setTxStep, setTxErrorMessage, setToWalletAddress } =
+  const { setAmount, setActiveStep, setSwapStep, setSwapErrorMessage, setToWalletAddress } =
     useSwapActions();
   const queryClient = useQueryClient();
 
@@ -35,30 +35,30 @@ export const StepperContainer = () => {
   const resetTxState = () => {
     setIsOpen(false);
     setActiveStep(1);
-    setTxStep({
+    setSwapStep({
       count: 1,
       status: 'pending',
     });
     setAmount('');
     setToWalletAddress('');
-    setTxErrorMessage(undefined);
+    setSwapErrorMessage(undefined);
   };
 
   const onCloseModal = () => {
-    if (txStep.status === 'successful') {
+    if (swapStep.status === 'successful') {
       resetTxState();
-    } else if (txStep.status === 'failed') {
-      setTxStep({
+    } else if (swapStep.status === 'failed') {
+      setSwapStep({
         count: 1,
         status: 'pending',
       });
-      setTxErrorMessage(undefined);
+      setSwapErrorMessage(undefined);
       setIsOpen(false);
     }
   };
 
   const swapHandler = async () => {
-    let res: TxStepType | undefined;
+    let res: SwapStepType | undefined;
 
     if (tokenIn?.chain_type === 'ICP' && tokenOut?.chain_type === 'ICP') {
       res = await icpSwapExe();

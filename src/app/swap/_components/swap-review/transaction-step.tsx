@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 import Image from 'next/image';
 import { TxStep } from '../../_api/types';
-import { TxStepType, useSwapStore } from '../../_store';
+import { SwapStepType, useSwapStore } from '../../_store';
 import { getChainLogo } from '@/lib/utils';
 import HistoryIcon from '@/components/icons/history';
 import { useRouter } from 'next/navigation';
@@ -16,11 +16,11 @@ export const TransactionStep = ({
   onCloseModal,
 }: {
   step: TxStep;
-  currentStep: TxStepType;
+  currentStep: SwapStepType;
   index: number;
   onCloseModal: () => void;
 }) => {
-  const { txErrorMessage, tokenIn, tokenOut, actions, txStep } = useSwapStore();
+  const { swapErrorMessage, tokenIn, tokenOut, actions, swapStep } = useSwapStore();
   const router = useRouter();
   const getLogoHandler = () => {
     // withdrawal tx
@@ -39,8 +39,8 @@ export const TransactionStep = ({
   const onNavigateToHistory = () => {
     onCloseModal();
     router.push('/transactions-history/dex');
-    actions.setTxStep({ count: 1, status: 'pending' });
-    actions.setPrevTxStep({
+    actions.setSwapStep({ count: 1, status: 'pending' });
+    actions.setPrevSwapStep({
       count: 0,
       status: 'pending',
     });
@@ -95,11 +95,11 @@ export const TransactionStep = ({
             {step.statuses[currentStep.status].description}
           </p>
           <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
-            {txErrorMessage}
+            {swapErrorMessage}
           </p>
         </div>
       )}
-      {txStep.count === 2 && txStep.status === 'successful' && (
+      {swapStep.count === 2 && swapStep.status === 'successful' && (
         <>
           <p className="pb-2 text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
             You can safely close this window

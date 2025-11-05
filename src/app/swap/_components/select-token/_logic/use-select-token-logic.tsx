@@ -39,6 +39,8 @@ export const useSwapSelectTokenLogic = () => {
   const isEvmBalanceFetching = useIsFetching({ queryKey: [queryKeys.evmBalance] });
   const bridgePairs = useTypedQueryData(queryKeys.bridgePairs);
 
+  const isSwapQuoteFetching = useIsFetching({ queryKey: [queryKeys.swapQuote] });
+
   useEffect(() => {
     if (tokenIn?.chain_type === 'EVM' && evmBalance) {
       const mainToken = evmBalance.tokens.find(
@@ -143,7 +145,7 @@ export const useSwapSelectTokenLogic = () => {
         };
       }
 
-      if (!swapQuote) {
+      if (!swapQuote || isSwapQuoteFetching) {
         return {
           isDisable: true,
           text: 'Confirm',

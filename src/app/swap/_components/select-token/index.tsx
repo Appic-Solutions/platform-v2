@@ -18,6 +18,7 @@ import BigNumber from 'bignumber.js';
 import { fetchCrossChainQuote } from '@/blockchain_api/quoter/cross-chain';
 import { fetchSameChainQuote } from '@/blockchain_api/quoter/same-chain';
 import { notification } from '@/components/common/ui/toast/notification';
+import { queryKeys } from '@/lib/constants/query-keys';
 
 export default function SwapSelectTokenPage() {
   const { tokenIn, tokenOut, amount, toWalletAddress, toWalletValidationError, swapQuote } =
@@ -67,8 +68,8 @@ export default function SwapSelectTokenPage() {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['swap-quot', tokenIn, tokenOut, amount],
-    queryFn: () => getQuote(),
+    queryKey: [queryKeys.swapQuote, tokenIn, tokenOut, amount],
+    queryFn: async () => await getQuote(),
     enabled: !!tokenIn && !!tokenOut && !!amount && !isNaN(Number(amount)) && Number(amount) > 0,
     refetchInterval: 20000,
   });
