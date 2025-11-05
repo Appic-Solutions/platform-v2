@@ -1,4 +1,4 @@
-import { SwapQuote } from '@/app/swap/_store';
+import { SwapQuote } from '@/app/(panel)/swap/_store';
 import { EvmTokensBalances } from '@/blockchain_api/functions/evm/get_evm_balances';
 import { DexData } from '@/blockchain_api/functions/icp/dex/explore/get_pool_history';
 import { Pool } from '@/blockchain_api/functions/icp/dex/get_pool';
