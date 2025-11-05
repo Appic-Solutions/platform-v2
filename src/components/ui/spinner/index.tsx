@@ -8,7 +8,7 @@ export default function Spinner({ className, ...props }: SpinnerProps) {
     <div className="grid w-full place-items-center overflow-hidden rounded-lg lg:overflow-visible">
       <svg
         aria-hidden="true"
-        className={cn('animate-spin fill-blue-600 text-gray-200 dark:text-gray-300', className)}
+        className={cn('animate-spin fill-blue-600 text-gray-300', className)}
         width={24}
         height={24}
         viewBox="0 0 100 101"

@@ -14,7 +14,11 @@ const Q96 = BigNumber(2).pow(96);
  * @param amount0 The token0 amount
  * @returns liquidity for amount0, imprecise
  */
-export function maxLiquidityForAmount0Imprecise(sqrtRatioAX96: BigNumber, sqrtRatioBX96: BigNumber, amount0: BigNumber): BigNumber {
+export function maxLiquidityForAmount0Imprecise(
+  sqrtRatioAX96: BigNumber,
+  sqrtRatioBX96: BigNumber,
+  amount0: BigNumber,
+): BigNumber {
   if (sqrtRatioAX96.gt(sqrtRatioBX96)) {
     [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
   }
@@ -30,7 +34,11 @@ export function maxLiquidityForAmount0Imprecise(sqrtRatioAX96: BigNumber, sqrtRa
  * @param amount0 The token0 amount
  * @returns liquidity for amount0, precise
  */
-export function maxLiquidityForAmount0Precise(sqrtRatioAX96: BigNumber, sqrtRatioBX96: BigNumber, amount0: BigNumber): BigNumber {
+export function maxLiquidityForAmount0Precise(
+  sqrtRatioAX96: BigNumber,
+  sqrtRatioBX96: BigNumber,
+  amount0: BigNumber,
+): BigNumber {
   if (sqrtRatioAX96.gt(sqrtRatioBX96)) {
     [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
   }
@@ -46,7 +54,11 @@ export function maxLiquidityForAmount0Precise(sqrtRatioAX96: BigNumber, sqrtRati
  * @param amount1 The token1 amount
  * @returns liquidity for amount1
  */
-export function maxLiquidityForAmount1(sqrtRatioAX96: BigNumber, sqrtRatioBX96: BigNumber, amount1: BigNumber): BigNumber {
+export function maxLiquidityForAmount1(
+  sqrtRatioAX96: BigNumber,
+  sqrtRatioBX96: BigNumber,
+  amount1: BigNumber,
+): BigNumber {
   if (sqrtRatioAX96.gt(sqrtRatioBX96)) {
     [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
   }
@@ -74,7 +86,6 @@ export function maxLiquidityForAmounts(
   if (sqrtRatioAX96.gt(sqrtRatioBX96)) {
     [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
   }
-
 
   if (sqrtRatioCurrentX96.lte(sqrtRatioAX96)) {
     return maxLiquidityForAmount0Precise(sqrtRatioAX96, sqrtRatioBX96, amount0);

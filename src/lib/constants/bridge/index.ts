@@ -1,4 +1,4 @@
-import { TxStep } from '@/app/bridge/_api/types';
+import { TxStep } from '@/app/(panel)/bridge/_api/types';
 
 export const withdrawalStepsDetails: TxStep[] = [
   {

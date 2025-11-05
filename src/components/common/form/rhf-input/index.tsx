@@ -13,7 +13,7 @@ export default function RHFInput({ name, label, className, ...props }: InputProp
       render={({ field, fieldState: { error } }) => (
         <div className={cn('flex flex-col gap-1', className)}>
           {label && (
-            <label htmlFor={name} className="capitalize text-white dark:text-white md:text-black">
+            <label htmlFor={name} className="capitalize text-white">
               {label}
             </label>
           )}
@@ -25,9 +25,7 @@ export default function RHFInput({ name, label, className, ...props }: InputProp
             className={cn(
               'border-none outline-none ring-0',
               'flex h-[42px] w-full items-center',
-              'rounded-lg bg-white/50 dark:bg-white/60',
-              'text-[#0A0A0B] dark:text-[#333333]',
-              'placeholder:text-[#0A0A0B] dark:placeholder:text-[#333333]',
+              'rounded-lg bg-white/60 text-[#333333] placeholder:text-[#333333]',
               'px-3.5 py-2.5',
               error ? 'border-red-500' : 'border-gray-300',
             )}

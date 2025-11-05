@@ -38,7 +38,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ),
         day: cn(
           buttonVariants({ variant: 'ghost' }),
-          'h-8 w-8 p-0 font-normal aria-selected:opacity-100 aria-selected:text-white aria-selected:dark:text-black ',
+          'h-8 w-8 p-0 font-normal aria-selected:opacity-100 aria-selected:text-black',
         ),
         day_range_start: 'day-range-start',
         day_range_end: 'day-range-end',

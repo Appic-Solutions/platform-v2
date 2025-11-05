@@ -12,46 +12,45 @@ import BigNumber from 'bignumber.js';
 // } from './utils/token_parser';
 import { Response } from '@/blockchain_api/types/response';
 export interface NewTwinRequest {
-	status: twinLsRequest;
-	erc20_contract: string;
-	creator: Principal;
-	evm_token: EvmToken | undefined;
-	date: string;
-	time: string;
-	date_object: Date;
-	fee_charged: string;
-	fee_token_symbol: string;
-	human_readable_fee_charged: string;
-	chain_id: number;
-	icp_token: IcpToken | undefined;
-	token_id: string | undefined;
+  status: twinLsRequest;
+  erc20_contract: string;
+  creator: Principal;
+  evm_token: EvmToken | undefined;
+  date: string;
+  time: string;
+  date_object: Date;
+  fee_charged: string;
+  fee_token_symbol: string;
+  human_readable_fee_charged: string;
+  chain_id: number;
+  icp_token: IcpToken | undefined;
+  token_id: string | undefined;
 }
 
 export const get_advanced_history = async (
-	principal_id: Principal,
-	unauthenticated_agent: HttpAgent,
+  principal_id: Principal,
+  unauthenticated_agent: HttpAgent,
 ): Promise<Response<NewTwinRequest[]>> => {
-	const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
-		canisterId: Principal.fromText(appic_helper_canister_id),
-		agent: unauthenticated_agent,
-	});
-	try {
-		const requests = (await appic_helper_actor.get_erc20_twin_ls_requests_by_creator(
-			principal_id,
-		)) as CandidLedgerSuiteRequest[];
+  const appic_helper_actor = Actor.createActor(AppicHelperIdlFactory, {
+    canisterId: Principal.fromText(appic_helper_canister_id),
+    agent: unauthenticated_agent,
+  });
+  try {
+    const requests = (await appic_helper_actor.get_erc20_twin_ls_requests_by_creator(
+      principal_id,
+    )) as CandidLedgerSuiteRequest[];
 
-		// return { result: transform_ls_request_response(requests), message: '', success: true };
-		return { result: [], message: '', success: true };
-
-	} catch (error) {
-		console.log(error);
-		console.error(error);
-		return {
-			result: [],
-			message: `Failed to get user twin token creation history ${error}`,
-			success: false,
-		};
-	}
+    // return { result: transform_ls_request_response(requests), message: '', success: true };
+    return { result: [], message: '', success: true };
+  } catch (error) {
+    console.log(error);
+    console.error(error);
+    return {
+      result: [],
+      message: `Failed to get user twin token creation history ${error}`,
+      success: false,
+    };
+  }
 };
 
 // const transform_ls_request_response = (requests: CandidLedgerSuiteRequest[]): NewTwinRequest[] => {

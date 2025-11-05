@@ -63,10 +63,7 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn('flex items-center justify-center px-6', 'text-black dark:text-white', className)}
-    {...props}
-  >
+  <div className={cn('flex items-center justify-center px-6 text-white', className)} {...props}>
     {children}
     <DialogPrimitive.Close
       className={cn('absolute right-4 rounded-md', 'disabled:pointer-events-none')}

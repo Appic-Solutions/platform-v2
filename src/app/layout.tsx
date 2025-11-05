@@ -1,46 +1,17 @@
-'use client';
-import '../style/globals.css';
-import HeaderPage from '@/app/_layout/header';
-import ShapesPage from '@/app/_layout/shapes';
-import '@nfid/identitykit/react/styles.css';
-import { WalletWrapper } from '@/lib/wrappers/wallet/wrapper';
-import Providers from './providers';
-import { UserWalletProvider } from '@/lib/wrappers/wallet/userWalletProvider';
-import { cn } from '@/lib/utils';
-import NavbarPage from './_layout/navbar';
-import { Rethink_Sans } from 'next/font/google';
-import { Toaster } from 'react-hot-toast';
+import type { Metadata } from 'next';
+import { ReactNode } from 'react';
+import '@/style/globals.css';
 
-const rethinkSans = Rethink_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-rethink-sans',
-});
+export const metadata: Metadata = {
+  title: 'Appic Dao',
+  description: 'Appic cross-chain swap built on ICP',
+  icons: '/favicon.ico',
+};
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" className="dark relative bg-[#060607] md:h-full">
-      <Providers>
-        <WalletWrapper>
-          <UserWalletProvider />
-          <body
-            className={cn(
-              rethinkSans.className,
-              '!pointer-events-auto relative isolate !select-auto',
-              'flex flex-col items-center justify-center',
-              'min-h-screen !px-6 !py-3.5 md:!py-8',
-            )}
-          >
-            <HeaderPage />
-            <ShapesPage />
-            <main className="mb-28 flex w-full flex-1 xl:mb-0">{children}</main>
-            <NavbarPage />
-            <Toaster toasterId="notification" />
-            <Toaster toasterId="transactionNotification" />
-          </body>
-        </WalletWrapper>
-      </Providers>
+    <html lang="en" className="font-rethink-sans relative bg-[#060607] md:h-full">
+      {children}
     </html>
   );
 }

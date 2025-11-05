@@ -20,7 +20,7 @@ export default function RHFInput({
       render={({ field, fieldState: { error } }) => (
         <div className={cn('flex w-full flex-col gap-1', wrapperClassName)}>
           {label && (
-            <label htmlFor={name} className="capitalize text-white dark:text-white md:text-black">
+            <label htmlFor={name} className="capitalize text-white">
               {label}
             </label>
           )}
@@ -32,9 +32,7 @@ export default function RHFInput({
             className={cn(
               'border-none outline-none ring-0',
               'flex h-[42px] w-full items-center',
-              'rounded-lg bg-white/50 dark:bg-white/30',
-              'text-black dark:text-white',
-              'placeholder:text-black/50 dark:placeholder:text-white/50',
+              'rounded-lg bg-white/30 text-white placeholder:text-white/50',
               'px-3.5 py-2.5',
               error ? 'border-red-500' : 'border-gray-300',
               className,

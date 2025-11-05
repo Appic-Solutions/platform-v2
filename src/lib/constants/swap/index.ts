@@ -1,5 +1,5 @@
-import { BalanceType } from '@/app/_layout/wallet/_types';
-import { TxStep } from '@/app/swap/_api/types';
+import { BalanceType } from '@/app/(panel)/_layout/wallet/_types';
+import { TxStep } from '@/app/(panel)/swap/_api/types';
 
 export const icpSwapStepsDetails: TxStep[] = [
   {

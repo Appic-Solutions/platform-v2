@@ -30,9 +30,7 @@ export default function TransactionStepper({
 
   return (
     <Box className="w-full max-w-[691px] justify-start gap-y-9">
-      <div className="text-center text-lg font-bold text-[#333333] dark:text-white">
-        Bridge Transaction
-      </div>
+      <div className="text-center text-lg font-bold text-white">Bridge Transaction</div>
       <div className="flex items-center justify-center gap-x-16">
         {steps.slice(currentStep - 1, currentStep + 1).map((step, index, array) => (
           <div
@@ -49,7 +47,7 @@ export default function TransactionStepper({
               currentStep === index + 1 ? 'opacity-100' : 'select-none opacity-60',
             )}
           >
-            <div className="text-lg font-bold text-[#333333] dark:text-white">Step {index + 1}</div>
+            <div className="text-lg font-bold text-white">Step {index + 1}</div>
             <div
               className={cn(
                 'relative flex h-[90px] w-[90px] items-center justify-center rounded-full',
@@ -67,10 +65,8 @@ export default function TransactionStepper({
               />
             </div>
             <div className="flex flex-col gap-y-4">
-              <p className="text-lg font-bold text-[#333333] dark:text-white">{step.title}</p>
-              <p className="text-sm font-semibold text-[#636363] dark:text-[#9F9F9F]">
-                {step.description}
-              </p>
+              <p className="text-lg font-bold text-white">{step.title}</p>
+              <p className="text-sm font-semibold text-[#9F9F9F]">{step.description}</p>
             </div>
           </div>
         ))}

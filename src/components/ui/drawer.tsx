@@ -55,14 +55,7 @@ const DrawerContent = React.forwardRef<
 DrawerContent.displayName = 'DrawerContent';
 
 const DrawerHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      'flex items-center justify-between px-6',
-      'text-black dark:text-white',
-      className,
-    )}
-    {...props}
-  >
+  <div className={cn('flex items-center justify-between px-6 text-white', className)} {...props}>
     <DrawerPrimitive.Close
       className={cn('absolute right-4 rounded-md', 'disabled:pointer-events-none')}
     >

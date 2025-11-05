@@ -9,13 +9,7 @@ interface BoxHeaderProps {
 
 export default function BoxHeader({ title, onBack, className }: BoxHeaderProps) {
   return (
-    <div
-      className={cn(
-        'flex items-center justify-center',
-        'text-white md:text-black md:dark:text-white',
-        className,
-      )}
-    >
+    <div className={cn('flex items-center justify-center text-white', className)}>
       {onBack && (
         <button
           onClick={onBack}

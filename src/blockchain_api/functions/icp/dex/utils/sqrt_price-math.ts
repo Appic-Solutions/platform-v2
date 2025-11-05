@@ -37,7 +37,12 @@ function invariant(condition: boolean, message: string): asserts condition {
 export abstract class SqrtPriceMath {
   private constructor() {}
 
-  public static getAmount0Delta(sqrtRatioAX96: BigNumber, sqrtRatioBX96: BigNumber, liquidity: BigNumber, roundUp: boolean): BigNumber {
+  public static getAmount0Delta(
+    sqrtRatioAX96: BigNumber,
+    sqrtRatioBX96: BigNumber,
+    liquidity: BigNumber,
+    roundUp: boolean,
+  ): BigNumber {
     if (sqrtRatioAX96.gt(sqrtRatioBX96)) {
       [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
     }
@@ -49,11 +54,19 @@ export abstract class SqrtPriceMath {
       const inner = mulDivRoundingUp(numerator1, numerator2, sqrtRatioBX96);
       return mulDivRoundingUp(inner, ONE, sqrtRatioAX96);
     } else {
-      return numerator1.multipliedBy(numerator2).dividedToIntegerBy(sqrtRatioBX96).dividedToIntegerBy(sqrtRatioAX96);
+      return numerator1
+        .multipliedBy(numerator2)
+        .dividedToIntegerBy(sqrtRatioBX96)
+        .dividedToIntegerBy(sqrtRatioAX96);
     }
   }
 
-  public static getAmount1Delta(sqrtRatioAX96: BigNumber, sqrtRatioBX96: BigNumber, liquidity: BigNumber, roundUp: boolean): BigNumber {
+  public static getAmount1Delta(
+    sqrtRatioAX96: BigNumber,
+    sqrtRatioBX96: BigNumber,
+    liquidity: BigNumber,
+    roundUp: boolean,
+  ): BigNumber {
     if (sqrtRatioAX96.gt(sqrtRatioBX96)) {
       [sqrtRatioAX96, sqrtRatioBX96] = [sqrtRatioBX96, sqrtRatioAX96];
     }
@@ -66,7 +79,12 @@ export abstract class SqrtPriceMath {
     }
   }
 
-  public static getNextSqrtPriceFromInput(sqrtPX96: BigNumber, liquidity: BigNumber, amountIn: BigNumber, zeroForOne: boolean): BigNumber {
+  public static getNextSqrtPriceFromInput(
+    sqrtPX96: BigNumber,
+    liquidity: BigNumber,
+    amountIn: BigNumber,
+    zeroForOne: boolean,
+  ): BigNumber {
     if (!sqrtPX96.gt(ZERO)) {
       throw new Error('sqrtPX96 must be greater than zero');
     }
@@ -79,7 +97,12 @@ export abstract class SqrtPriceMath {
       : this.getNextSqrtPriceFromAmount1RoundingDown(sqrtPX96, liquidity, amountIn, true);
   }
 
-  public static getNextSqrtPriceFromOutput(sqrtPX96: BigNumber, liquidity: BigNumber, amountOut: BigNumber, zeroForOne: boolean): BigNumber {
+  public static getNextSqrtPriceFromOutput(
+    sqrtPX96: BigNumber,
+    liquidity: BigNumber,
+    amountOut: BigNumber,
+    zeroForOne: boolean,
+  ): BigNumber {
     if (!sqrtPX96.gt(ZERO)) {
       throw new Error('sqrtPX96 must be greater than zero');
     }
@@ -92,7 +115,12 @@ export abstract class SqrtPriceMath {
       : this.getNextSqrtPriceFromAmount0RoundingUp(sqrtPX96, liquidity, amountOut, false);
   }
 
-  private static getNextSqrtPriceFromAmount0RoundingUp(sqrtPX96: BigNumber, liquidity: BigNumber, amount: BigNumber, add: boolean): BigNumber {
+  private static getNextSqrtPriceFromAmount0RoundingUp(
+    sqrtPX96: BigNumber,
+    liquidity: BigNumber,
+    amount: BigNumber,
+    add: boolean,
+  ): BigNumber {
     if (amount.isZero()) return sqrtPX96;
     const numerator1 = liquidity.multipliedBy(Q96);
 
@@ -117,7 +145,12 @@ export abstract class SqrtPriceMath {
     }
   }
 
-  private static getNextSqrtPriceFromAmount1RoundingDown(sqrtPX96: BigNumber, liquidity: BigNumber, amount: BigNumber, add: boolean): BigNumber {
+  private static getNextSqrtPriceFromAmount1RoundingDown(
+    sqrtPX96: BigNumber,
+    liquidity: BigNumber,
+    amount: BigNumber,
+    add: boolean,
+  ): BigNumber {
     if (add) {
       let quotient: BigNumber;
       if (amount.lte(MaxUint160)) {

@@ -29,8 +29,7 @@ const TabsTrigger = React.forwardRef<
     className={cn(
       'relative z-10 flex h-12 w-12 items-center justify-center rounded-full',
       'disabled:pointer-events-none disabled:opacity-50',
-      'data-[state=active]:bg-[linear-gradient(81.4deg,_#000000_-15.41%,_#1D1D1D_113.98%)]',
-      'data-[state=active]:dark:bg-[linear-gradient(81.4deg,_#EFEFEF_-15.41%,_#A5A5A5_113.98%)]',
+      'data-[state=active]:bg-[linear-gradient(81.4deg,_#EFEFEF_-15.41%,_#A5A5A5_113.98%)]',
       className,
     )}
     {...props}

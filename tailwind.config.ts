@@ -3,7 +3,6 @@ import scrollbar from 'tailwind-scrollbar';
 
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
-  darkMode: 'class',
   plugins: [scrollbar({ nocompatible: true })],
   theme: {
     container: {
@@ -53,6 +52,7 @@ const config: Config = {
 
       /* Keyframes */
       keyframes: {
+        // Panel
         'slideInFromRight': {
           '0%': { transform: 'translateX(100%)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
@@ -95,10 +95,56 @@ const config: Config = {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+
+        // Landing
+        'scroll-button-effect': {
+          '0%': { opacity: '0' },
+          '50%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'border-rotate': {
+          '0%': { transform: 'rotate(0)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        'border-move-rotate': {
+          '0%': { 'offset-distance': '0%' },
+          '100%': { 'offset-distance': '100%' },
+        },
+        'text-stroke': {
+          '0%': {
+            fill: 'rgba(72, 138, 20, 0)',
+            stroke: 'rgba(54, 95, 160, 1)',
+            strokeDashoffset: '25%',
+            strokeDasharray: '0 50%',
+            strokeWidth: '2',
+          },
+          '70%': {
+            fill: 'rgba(72, 138, 20, 0)',
+            stroke: 'rgba(54, 95, 160, 1)',
+          },
+          '80%': {
+            fill: 'rgba(72, 138, 20, 0)',
+            stroke: 'rgba(54, 95, 160, 1)',
+            strokeWidth: '3',
+          },
+          '100%': {
+            fill: '#1C68F8',
+            stroke: 'rgba(54, 95, 160, 0)',
+            strokeDashoffset: '-25%',
+            strokeDasharray: '50% 0',
+            strokeWidth: '3',
+          },
+        },
+        'scroll': {
+          '100%': {
+            transform: 'translate(calc(-50% - 2rem))',
+          },
+        },
       },
 
       /* Animation */
       animation: {
+        // Panel
         'slide-in-from-right': 'slideInFromRight 0.5s ease-in-out',
         'slide-in-from-left': 'slideInFromLeft 0.5s ease-in-out',
         'slide-in': 'slide-in 0.3s ease-out 0.1s forwards',
@@ -106,6 +152,13 @@ const config: Config = {
         'slide-in-with-height': 'slideInFromTopWithHeight 0.3s ease-out forwards',
         'border-spin': 'border-spin 2s linear infinite',
         'fade': 'fadeIn .5s ease-in-out',
+
+        // Landing
+        'border-rotate': 'border-rotate 5s linear forwards infinite',
+        'infinite-scroll': 'scroll 20s linear infinite',
+        'text-stroke': 'text-stroke 5s both alternate',
+        'border-move-rotate': 'border-move-rotate 12s linear infinite',
+        'scroll-button-effect-animate': 'scroll-button-effect 2.5s infinite',
       },
     },
   },

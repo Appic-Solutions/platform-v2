@@ -48,7 +48,7 @@ export default function RHFUploadFile({
       control={control}
       render={({ field: { onChange }, fieldState: { error: fieldError } }) => (
         <div className="flex w-full min-w-fit flex-col gap-y-1">
-          {label && <label className="text-white dark:text-white md:text-black">{label}</label>}
+          {label && <label className="text-white">{label}</label>}
 
           <div className="flex flex-col gap-x-5 gap-y-6 md:flex-row md:items-center md:gap-y-0">
             <label
@@ -56,8 +56,8 @@ export default function RHFUploadFile({
               className={cn(
                 'flex flex-col items-center justify-center gap-y-2',
                 'h-[155px] min-h-fit w-full min-w-fit max-w-[238px]',
-                'rounded-lg bg-white/50 dark:bg-white/60',
-                'cursor-pointer text-[#0A0A0B] dark:text-[#333333]',
+                'rounded-lg bg-white/60 text-[#333333]',
+                'cursor-pointer',
                 'relative overflow-hidden',
               )}
             >
@@ -77,14 +77,14 @@ export default function RHFUploadFile({
                 className={cn(
                   'items-center justify-center',
                   'h-[38px] min-h-fit w-full min-w-fit max-w-[102px]',
-                  'rounded-lg bg-white/50 dark:bg-white/60',
-                  'cursor-pointer text-[#0A0A0B] dark:text-[#333333]',
+                  'rounded-lg bg-white/60 text-[#333333]',
+                  'cursor-pointer',
                   'hidden md:flex',
                 )}
               >
                 upload
               </label>
-              <span className="text-xs text-white dark:text-white md:max-w-[155px] md:text-[#0A0A0B]">
+              <span className="text-xs text-white md:max-w-[155px]">
                 Upload a {maxWidth}x{maxHeight} pixel PNG or JPG (max {maxSize}MB)
               </span>
             </div>

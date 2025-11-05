@@ -1,0 +1,165 @@
+import { ArrowsUpDownIcon, WalletIcon } from '@/components/icons';
+import Box from '@/components/ui/box';
+import { cn, getChainLogo } from '@/lib/utils';
+import HistoryIcon from '@/components/icons/history';
+import Link from 'next/link';
+import { TokenCard } from './TokenCard';
+import AmountInput from './AmountInput';
+import WalletAddressInput from './WalletAddressInput';
+import ActionButton from './ActionButton';
+import BridgeOptionsList from './BridgeOptionsList';
+import SelectTokenLogic from './_logic';
+import { useBridgeActions, useBridgeStore } from '../../_store';
+
+interface SelectTokenProps {
+  isPendingBridgeOptions: boolean;
+}
+
+export default function BridgeSelectTokenPage({ isPendingBridgeOptions }: SelectTokenProps) {
+  // bridge store
+  const { fromToken, toToken, amount, toWalletAddress, bridgeOptions, toWalletValidationError } =
+    useBridgeStore();
+  const { setSelectedTokenType, setToWalletAddress, setToWalletValidationError } =
+    useBridgeActions();
+  // Logic
+  const {
+    changeStep,
+    swapTokens,
+    showWalletAddress,
+    setShowWalletAddress,
+    actionButtonHandler,
+    actionButtonStatus,
+  } = SelectTokenLogic();
+
+  return (
+    <Box
+      className={cn(
+        'flex h-full flex-col gap-6 md:h-fit',
+        'md:w-full md:max-w-[537px]',
+        'overflow-x-hidden lg:overflow-x-hidden',
+        'transition-[max-height] duration-300 ease-in-out',
+        Number(amount) > 0 &&
+          bridgeOptions.options &&
+          bridgeOptions.options.length > 0 &&
+          'lg:w-[1060px] lg:max-w-[1060px]',
+        showWalletAddress ? 'lg:max-h-[780px]' : 'lg:max-h-[600px]',
+      )}
+    >
+      <div className="flex w-full items-center justify-between text-white">
+        <h1 className="text-2xl font-bold md:text-3xl">Bridge</h1>
+        <Link href="/transactions-history/bridge" className="flex items-center gap-x-2 text-sm">
+          <HistoryIcon width={20} height={20} />
+          History
+        </Link>
+      </div>
+
+      <div className="flex w-full flex-1 flex-col justify-between gap-x-4 gap-y-6 lg:flex-row lg:overflow-hidden">
+        {/* TOKENS AND AMOUNT INPUT */}
+        <div className="flex h-full w-full flex-col items-center justify-between gap-y-4 md:overflow-hidden lg:max-w-[482px]">
+          <div className="flex h-full w-full flex-col justify-between">
+            {/* TOKENS */}
+            <div
+              className={cn(
+                'relative flex w-full',
+                fromToken && toToken
+                  ? 'flex-col gap-y-4 sm:flex-row sm:gap-x-4'
+                  : 'flex-col gap-y-4',
+              )}
+            >
+              <TokenCard
+                token={fromToken}
+                customOnClick={() => {
+                  setSelectedTokenType('from');
+                  changeStep('next');
+                }}
+                label="From"
+                className={cn(
+                  fromToken && 'py-5 md:rounded-3xl md:py-5',
+                  fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
+                )}
+              />
+              <div
+                className={cn(
+                  'group absolute inset-0 z-20 m-auto h-10 w-10 cursor-pointer rounded-full',
+                  'flex items-center justify-center',
+                  'bg-[#0B0B0B] text-white',
+                  'border-2 border-white/30',
+                  'transition-transform duration-300',
+                  fromToken && toToken
+                    ? 'hover:rotate-180 sm:rotate-90 sm:hover:-rotate-90'
+                    : 'hover:rotate-180',
+                )}
+                onClick={swapTokens}
+              >
+                <ArrowsUpDownIcon width={20} height={20} />
+              </div>
+              <TokenCard
+                token={toToken}
+                customOnClick={() => {
+                  setSelectedTokenType('to');
+                  changeStep('next');
+                }}
+                label="To"
+                className={cn(
+                  toToken && 'py-5 md:rounded-3xl md:py-5',
+                  fromToken && toToken && 'max-h-min md:max-h-min md:px-6',
+                )}
+              />
+            </div>
+            {/* AMOUNT INPUT */}
+            {fromToken && toToken && <AmountInput />}
+            {/* WALLET ADDRESS INPUT */}
+            <WalletAddressInput
+              token={toToken}
+              address={toWalletAddress}
+              setAddress={setToWalletAddress}
+              validationError={toWalletValidationError}
+              onValidationError={setToWalletValidationError}
+              show={showWalletAddress}
+              avatar={getChainLogo(toToken?.chainId)}
+            />
+          </div>
+          {/* DESKTOP ACTION BUTTONS */}
+          <div className={cn('flex w-full items-center gap-x-2', 'max-lg:hidden')}>
+            <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
+              {actionButtonStatus.text}
+            </ActionButton>
+            <div
+              onClick={() => setShowWalletAddress(!showWalletAddress)}
+              className={cn(
+                'flex min-h-12 min-w-12 items-center justify-center rounded-full px-4',
+                'cursor-pointer transition-colors duration-300',
+                'bg-primary-buttons hover:opacity-85',
+                'transition-all ease-in-out',
+              )}
+            >
+              <WalletIcon className="text-white" />
+            </div>
+          </div>
+        </div>
+
+        {/* BRIDGE OPTIONS */}
+        {Number(amount) > 0 && bridgeOptions.options && bridgeOptions.options?.length > 0 && (
+          <BridgeOptionsList isPending={isPendingBridgeOptions} />
+        )}
+      </div>
+      {/* MOBILE ACTION BUTTONS */}
+      <div className="flex w-full items-center gap-x-2 lg:hidden">
+        <ActionButton onClick={actionButtonHandler} isDisabled={actionButtonStatus.isDisable}>
+          {actionButtonStatus.text}
+        </ActionButton>
+        <div
+          onClick={() => setShowWalletAddress(!showWalletAddress)}
+          className={cn(
+            'flex min-h-12 min-w-12 items-center justify-center rounded-full px-4',
+            'cursor-pointer transition-colors duration-300',
+            'bg-primary-buttons hover:opacity-90',
+            'transition-all ease-out',
+          )}
+        >
+          <WalletIcon className="text-white" />
+        </div>
+      </div>
+    </Box>
+  );
+}

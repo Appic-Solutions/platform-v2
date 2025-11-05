@@ -8,17 +8,17 @@ import { Actor, HttpAgent } from '@dfinity/agent';
 // Appic minter IDL and types
 import { idlFactory as AppicIdlFactory } from '@/blockchain_api/did/appic/appic_minter/appic_minter.did';
 import {
-	MinterInfo,
-	// Eip1559TransactionPrice as AppicEip1559TransactionPrice,
-	// Eip1559TransactionPriceArg as AppicEip1559TransactionPriceArg,
+  MinterInfo,
+  // Eip1559TransactionPrice as AppicEip1559TransactionPrice,
+  // Eip1559TransactionPriceArg as AppicEip1559TransactionPriceArg,
 } from '@/blockchain_api/did/appic/appic_minter/appic_minter_types';
 
 // Dfinity minter IDL and types
 import { idlFactory as DfinityIdlFactory } from '@/blockchain_api/did/dfinity_minter/dfinity_minter.did';
 import {
-	MinterInfo as DfinityMinterInfo,
-	// Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
-	// Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
+  MinterInfo as DfinityMinterInfo,
+  // Eip1559TransactionPrice as DfinityEip1559TransactionPrice,
+  // Eip1559TransactionPriceArg as DfinityEip1559TransactionPriceArg,
 } from '@/blockchain_api/did/dfinity_minter/dfinity_minter_types';
 
 import { is_native_token } from '../evm/utils/erc20_helpers';
@@ -28,75 +28,75 @@ import { createPublicClient, http, Chain as ViemChain } from 'viem';
 
 // Enums and Types
 export enum Badge {
-	BEST = 'Best Return',
-	FASTEST = 'Fastest',
-	CHEAPEST = 'Cheapest',
+  BEST = 'Best Return',
+  FASTEST = 'Fastest',
+  CHEAPEST = 'Cheapest',
 }
 
 export enum TxType {
-	Deposit,
-	Withdrawal,
+  Deposit,
+  Withdrawal,
 }
 
 export interface BridgeMetadata {
-	tx_type: TxType;
-	minter_address: Principal;
-	operator: Operator;
-	chain_id: number;
-	is_native: boolean;
-	deposit_helper_contract: `0x${string}`;
-	viem_chain: ViemChain;
-	rpc_url: string;
-	is_wrapped_icrc: boolean
+  tx_type: TxType;
+  minter_address: Principal;
+  operator: Operator;
+  chain_id: number;
+  is_native: boolean;
+  deposit_helper_contract: `0x${string}`;
+  viem_chain: ViemChain;
+  rpc_url: string;
+  is_wrapped_icrc: boolean;
 }
 
 export interface BridgeFees {
-	minter_fee: string; // Fee that appic minter takes for deposit and withdrawal
-	human_readable_minter_fee: string;
-	max_network_fee: string; // Fee required to pay transaction gas fees, Can be paid either by native tokens or twin pairs of native tokens
-	human_readable_max_network_fee: string;
-	approval_fee_in_native_token: string; // Fee required for transaction approval, can be 0 as well in case of native deposit transactions
-	total_native_fee: string; // max_network_fee + minter_fee + approval_fee_in_native_token
-	human_readable_total_native_fee: string; // total native fee in human readable format
-	total_fee_usd_price: string; // Total fee converted to usd
-	native_fee_token_symbol: string;
-	max_fee_per_gas: string;
-	max_priority_fee_per_gas: string;
-	// Only used for withdrawal, in other cases will be set to 0
-	approval_fee_in_erc20_tokens: string; // Fee required for approval of erc20 tokens in erc20 tokens not native tokens, can be 0 if transaction is_native
+  minter_fee: string; // Fee that appic minter takes for deposit and withdrawal
+  human_readable_minter_fee: string;
+  max_network_fee: string; // Fee required to pay transaction gas fees, Can be paid either by native tokens or twin pairs of native tokens
+  human_readable_max_network_fee: string;
+  approval_fee_in_native_token: string; // Fee required for transaction approval, can be 0 as well in case of native deposit transactions
+  total_native_fee: string; // max_network_fee + minter_fee + approval_fee_in_native_token
+  human_readable_total_native_fee: string; // total native fee in human readable format
+  total_fee_usd_price: string; // Total fee converted to usd
+  native_fee_token_symbol: string;
+  max_fee_per_gas: string;
+  max_priority_fee_per_gas: string;
+  // Only used for withdrawal, in other cases will be set to 0
+  approval_fee_in_erc20_tokens: string; // Fee required for approval of erc20 tokens in erc20 tokens not native tokens, can be 0 if transaction is_native
 
-	// Only used for deposit, in other cases will be set to 0
-	approve_erc20_gas: string;
-	deposit_gas: string;
+  // Only used for deposit, in other cases will be set to 0
+  approve_erc20_gas: string;
+  deposit_gas: string;
 }
 
 export interface BridgeOption {
-	is_native: boolean;
-	from_token_id: string; //canister id or contract address
-	to_token_id: string; //canister id or contract address
-	native_fee_token_id: string; //canister id or contract address
-	bridge_tx_type: TxType; // Deposit or withdrawal
-	minter_id: Principal; // Minter id related to transaction, Dfinity-ckEth or appic minter
-	deposit_helper_contract: string; // Helper contract address for depositing and withdrawing
-	chain_id: number; // the chain id that tokens are gonna be deposited from or withdrawn to
-	viem_chain: ViemChain;
-	operator: Operator; // whether dfinity or appic
-	fees: BridgeFees;
-	amount: string;
-	estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
-	human_readable_estimated_return: string; // estimated return in human_readable format
-	usd_estimated_return: string;
-	via: string;
-	duration: string;
-	is_best: boolean;
-	badge: Badge;
-	rpc_url: string;
-	is_wrapped_icrc: boolean;
+  is_native: boolean;
+  from_token_id: string; //canister id or contract address
+  to_token_id: string; //canister id or contract address
+  native_fee_token_id: string; //canister id or contract address
+  bridge_tx_type: TxType; // Deposit or withdrawal
+  minter_id: Principal; // Minter id related to transaction, Dfinity-ckEth or appic minter
+  deposit_helper_contract: string; // Helper contract address for depositing and withdrawing
+  chain_id: number; // the chain id that tokens are gonna be deposited from or withdrawn to
+  viem_chain: ViemChain;
+  operator: Operator; // whether dfinity or appic
+  fees: BridgeFees;
+  amount: string;
+  estimated_return: string; // if native = amount - total_fee, if erc20= amount - approval_erc20_fee
+  human_readable_estimated_return: string; // estimated return in human_readable format
+  usd_estimated_return: string;
+  via: string;
+  duration: string;
+  is_best: boolean;
+  badge: Badge;
+  rpc_url: string;
+  is_wrapped_icrc: boolean;
 }
 
 // Constants
 export const DEFAULT_SUBACCOUNT =
-	'0x0000000000000000000000000000000000000000000000000000000000000000';
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 export const NATIVE_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 // We also add a buffer of 1000000000000 wei or 0.000001 eth, in case that the tx is native to prevent gas + amount > balance
@@ -106,178 +106,175 @@ const base_l1_fee = 10000000000000;
  * Get bridge options for a transaction.
  */
 export const get_bridge_options = async (
-	from_token: EvmToken | IcpToken,
-	to_token: EvmToken | IcpToken,
-	amount: string,
-	agent: HttpAgent,
-	bridge_pairs: (EvmToken | IcpToken)[],
+  from_token: EvmToken | IcpToken,
+  to_token: EvmToken | IcpToken,
+  amount: string,
+  agent: HttpAgent,
+  bridge_pairs: (EvmToken | IcpToken)[],
 ): Promise<Response<BridgeOption[]>> => {
-	const bridge_metadata = get_bridge_metadata(from_token, to_token);
+  const bridge_metadata = get_bridge_metadata(from_token, to_token);
 
-	const native_currency = get_native_currency(
-		bridge_metadata.operator,
-		bridge_metadata.chain_id,
-		bridge_metadata.tx_type,
-		bridge_pairs,
-	);
+  const native_currency = get_native_currency(
+    bridge_metadata.operator,
+    bridge_metadata.chain_id,
+    bridge_metadata.tx_type,
+    bridge_pairs,
+  );
 
-	amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(from_token.decimals)).toFixed();
+  amount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(from_token.decimals)).toFixed();
 
-	console.log(bridge_metadata, amount, from_token);
+  console.log(bridge_metadata, amount, from_token);
 
+  try {
+    // const value = bridge_metadata.is_native ? amount : '0';
+    const { max_fee_per_gas, max_priority_fee_per_gas } = await get_gas_price(
+      bridge_metadata.viem_chain,
+      bridge_metadata.rpc_url,
+    );
 
-	try {
-		// const value = bridge_metadata.is_native ? amount : '0';
-		const { max_fee_per_gas, max_priority_fee_per_gas } = await get_gas_price(
-			bridge_metadata.viem_chain,
-			bridge_metadata.rpc_url,
-		);
+    if (bridge_metadata.tx_type == TxType.Deposit) {
+      // In case of native deposit we need to keep some native tokens in users wallet, otherwise the transaction will be rejected by wallet
+      if (bridge_metadata.is_native && bridge_metadata.chain_id == 8453) {
+        amount = new BigNumber(amount).minus(base_l1_fee).toFixed();
+      }
 
-		if (bridge_metadata.tx_type == TxType.Deposit) {
+      const { approval_gas, total_approval_fee } = estimate_approval_fee(
+        max_fee_per_gas,
+        bridge_metadata.is_native,
+      );
 
-			// In case of native deposit we need to keep some native tokens in users wallet, otherwise the transaction will be rejected by wallet
-			if (bridge_metadata.is_native && bridge_metadata.chain_id == 8453) {
-				amount = new BigNumber(amount).minus(base_l1_fee).toFixed();
-			}
+      console.log('Approval', approval_gas, total_approval_fee);
 
-			const { approval_gas, total_approval_fee } = estimate_approval_fee(
-				max_fee_per_gas,
-				bridge_metadata.is_native,
-			);
+      const { total_gas_fee, required_gas } = estimate_gas_fee(
+        max_fee_per_gas,
+        bridge_metadata.is_native ? '80000' : '100000',
+      );
 
-			console.log('Approval', approval_gas, total_approval_fee);
+      console.log('Deposit', required_gas, total_gas_fee);
 
-			const { total_gas_fee, required_gas } = estimate_gas_fee(
-				max_fee_per_gas,
-				bridge_metadata.is_native ? "80000" : "100000",
-			);
+      if (bridge_metadata.is_native) {
+        if (new BigNumber(total_gas_fee).plus(total_approval_fee).isGreaterThan(amount)) {
+          return {
+            message: `Minimum amount: ${new BigNumber(total_gas_fee)
+              .plus(total_approval_fee)
+              .dividedBy(10 ** 18)
+              .toFixed()}`,
+            result: [],
+            success: false,
+          };
+        }
+      }
 
-			console.log('Deposit', required_gas, total_gas_fee);
+      let estimated_approval_erc20_fee = '0';
+      // in case its a wrapped icrc, we need to pay one transfe fee(release fee)
+      if (bridge_metadata.is_wrapped_icrc) {
+        estimated_approval_erc20_fee = BigNumber(to_token.fee!).toString();
+      }
 
-			if (bridge_metadata.is_native) {
-				if (new BigNumber(total_gas_fee).plus(total_approval_fee).isGreaterThan(amount)) {
-					return {
-						message: `Minimum amount: ${new BigNumber(total_gas_fee)
-							.plus(total_approval_fee)
-							.dividedBy(10 ** 18)
-							.toFixed()}`,
-						result: [],
-						success: false,
-					};
-				}
-			}
+      const bridge_options = await calculate_bridge_options(
+        from_token.contractAddress!,
+        to_token.canisterId!,
+        from_token.usdPrice,
+        to_token.decimals.toFixed(),
+        agent,
+        bridge_metadata,
+        total_gas_fee,
+        total_approval_fee,
+        estimated_approval_erc20_fee,
+        amount,
+        native_currency,
+        max_fee_per_gas,
+        max_priority_fee_per_gas,
+        approval_gas,
+        required_gas,
+      );
+      return { result: bridge_options, message: '', success: true };
+    } else if (bridge_metadata.tx_type == TxType.Withdrawal) {
+      const minimum_native_withdrawal_amount = await fetch_minimum_native_withdrawal_amount(
+        agent,
+        bridge_metadata.operator,
+        bridge_metadata.minter_address,
+      );
 
-			let estimated_approval_erc20_fee = '0';
-			// in case its a wrapped icrc, we need to pay one transfe fee(release fee)
-			if (bridge_metadata.is_wrapped_icrc) {
-				estimated_approval_erc20_fee = BigNumber(to_token.fee!).toString();
-			}
+      // Native token
+      const estimated_approval_fee = native_currency.fee!;
+      let estimated_approval_erc20_fee = bridge_metadata.is_native ? '0' : from_token.fee!;
+      // in case its a wrapped icrc, we need to pay one approval fee and one transfe fee
+      if (bridge_metadata.is_wrapped_icrc) {
+        estimated_approval_erc20_fee = BigNumber(from_token.fee!).multipliedBy(2).toString();
+      }
+      let { max_transaction_fee } = await estimate_withdrawal_gas(
+        agent,
+        bridge_metadata.operator,
+        bridge_metadata.minter_address,
+        bridge_metadata.is_native,
+        from_token.canisterId!,
+        max_fee_per_gas,
+        bridge_metadata.is_wrapped_icrc,
+      );
 
+      // apply l1_fee if transaction is for base
+      if (bridge_metadata.chain_id == 8453) {
+        max_transaction_fee = BigNumber(max_transaction_fee).plus(base_l1_fee).toFixed();
+      }
 
-			const bridge_options = await calculate_bridge_options(
-				from_token.contractAddress!,
-				to_token.canisterId!,
-				from_token.usdPrice,
-				to_token.decimals.toFixed(),
-				agent,
-				bridge_metadata,
-				total_gas_fee,
-				total_approval_fee,
-				estimated_approval_erc20_fee,
-				amount,
-				native_currency,
-				max_fee_per_gas,
-				max_priority_fee_per_gas,
-				approval_gas,
-				required_gas,
-			);
-			return { result: bridge_options, message: '', success: true };
-		} else if (bridge_metadata.tx_type == TxType.Withdrawal) {
-			const minimum_native_withdrawal_amount = await fetch_minimum_native_withdrawal_amount(
-				agent,
-				bridge_metadata.operator,
-				bridge_metadata.minter_address,
-			);
+      if (bridge_metadata.is_native) {
+        // if the amount of native token to be withdrawn is greater than minimum
+        if (
+          new BigNumber(minimum_native_withdrawal_amount)
+            .plus(estimated_approval_fee)
+            .isGreaterThan(new BigNumber(amount))
+        ) {
+          return {
+            message: `Minimum amount: ${new BigNumber(minimum_native_withdrawal_amount)
+              .plus(estimated_approval_fee)
+              .dividedBy(10 ** 18)
+              .toFixed()}`,
+            result: [],
+            success: false,
+          };
+        }
+      }
 
-			// Native token
-			const estimated_approval_fee = native_currency.fee!;
-			let estimated_approval_erc20_fee = bridge_metadata.is_native ? '0' : from_token.fee!;
-			// in case its a wrapped icrc, we need to pay one approval fee and one transfe fee
-			if (bridge_metadata.is_wrapped_icrc) {
-				estimated_approval_erc20_fee = BigNumber(from_token.fee!).multipliedBy(2).toString();
-			}
-			let { max_transaction_fee } = await estimate_withdrawal_gas(
-				agent,
-				bridge_metadata.operator,
-				bridge_metadata.minter_address,
-				bridge_metadata.is_native,
-				from_token.canisterId!,
-				max_fee_per_gas,
-				bridge_metadata.is_wrapped_icrc
-			);
+      const bridge_options = await calculate_bridge_options(
+        from_token.canisterId!,
+        to_token.contractAddress!,
+        to_token.usdPrice,
+        to_token.decimals.toFixed(),
+        agent,
+        bridge_metadata,
+        max_transaction_fee,
+        estimated_approval_fee,
+        estimated_approval_erc20_fee,
+        amount,
+        native_currency,
+        max_fee_per_gas,
+        max_priority_fee_per_gas,
+        // All zero (only for deposit)
+        '0',
+        '0',
+      );
 
-			// apply l1_fee if transaction is for base
-			if (bridge_metadata.chain_id == 8453) {
-				max_transaction_fee = BigNumber(max_transaction_fee).plus(base_l1_fee).toFixed();
-			}
+      if (bridge_options.length == 0) {
+        return {
+          result: [],
+          success: false,
+          message: 'Amount Too Low',
+        };
+      }
 
-			if (bridge_metadata.is_native) {
-				// if the amount of native token to be withdrawn is greater than minimum
-				if (
-					new BigNumber(minimum_native_withdrawal_amount)
-						.plus(estimated_approval_fee)
-						.isGreaterThan(new BigNumber(amount))
-				) {
-					return {
-						message: `Minimum amount: ${new BigNumber(minimum_native_withdrawal_amount)
-							.plus(estimated_approval_fee)
-							.dividedBy(10 ** 18)
-							.toFixed()}`,
-						result: [],
-						success: false,
-					};
-				}
-			}
-
-			const bridge_options = await calculate_bridge_options(
-				from_token.canisterId!,
-				to_token.contractAddress!,
-				to_token.usdPrice,
-				to_token.decimals.toFixed(),
-				agent,
-				bridge_metadata,
-				max_transaction_fee,
-				estimated_approval_fee,
-				estimated_approval_erc20_fee,
-				amount,
-				native_currency,
-				max_fee_per_gas,
-				max_priority_fee_per_gas,
-				// All zero (only for deposit)
-				'0',
-				'0',
-			);
-
-			if (bridge_options.length == 0) {
-				return {
-					result: [],
-					success: false,
-					message: 'Amount Too Low',
-				};
-			}
-
-			return { result: bridge_options, message: '', success: true };
-		} else {
-			return {
-				result: [],
-				message: 'Failed to calculate bridge options, Tx type not supported',
-				success: false,
-			};
-		}
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
+      return { result: bridge_options, message: '', success: true };
+    } else {
+      return {
+        result: [],
+        message: 'Failed to calculate bridge options, Tx type not supported',
+        success: false,
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 // Helpers
@@ -286,467 +283,463 @@ export const get_bridge_options = async (
  * Fetch the minter fee for a transaction.
  */
 const fetch_appic_minter_info = async (
-	agent: HttpAgent,
-	minter_address: Principal,
-	//tx_type: TxType,
+  agent: HttpAgent,
+  minter_address: Principal,
+  //tx_type: TxType,
 ): Promise<MinterInfo> => {
-	try {
-		const appic_minter_actor = Actor.createActor(AppicIdlFactory, {
-			agent,
-			canisterId: minter_address,
-		});
-		const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
-		return minter_info
-
-	} catch (error) {
-		console.error('Error fetching minter fee:', error);
-		throw new Error('Failed to fetch minter fee');
-	}
+  try {
+    const appic_minter_actor = Actor.createActor(AppicIdlFactory, {
+      agent,
+      canisterId: minter_address,
+    });
+    const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
+    return minter_info;
+  } catch (error) {
+    console.error('Error fetching minter fee:', error);
+    throw new Error('Failed to fetch minter fee');
+  }
 };
 
 /**
  * Fetch the minter fee for a transaction.
  */
 const fetch_minimum_native_withdrawal_amount = async (
-	agent: HttpAgent,
-	operator: string,
-	minter_address: Principal,
+  agent: HttpAgent,
+  operator: string,
+  minter_address: Principal,
 ): Promise<string> => {
-	try {
-		if (operator === 'Appic') {
-			const appic_minter_actor = Actor.createActor(AppicIdlFactory, {
-				agent,
-				canisterId: minter_address,
-			});
-			const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
+  try {
+    if (operator === 'Appic') {
+      const appic_minter_actor = Actor.createActor(AppicIdlFactory, {
+        agent,
+        canisterId: minter_address,
+      });
+      const minter_info = (await appic_minter_actor.get_minter_info()) as MinterInfo;
 
-			return minter_info.minimum_withdrawal_amount[0]?.toString() || '0';
-		} else {
-			const dfinity_minter_actor = Actor.createActor(DfinityIdlFactory, {
-				agent,
-				canisterId: minter_address,
-			});
-			const minter_info = (await dfinity_minter_actor.get_minter_info()) as DfinityMinterInfo;
+      return minter_info.minimum_withdrawal_amount[0]?.toString() || '0';
+    } else {
+      const dfinity_minter_actor = Actor.createActor(DfinityIdlFactory, {
+        agent,
+        canisterId: minter_address,
+      });
+      const minter_info = (await dfinity_minter_actor.get_minter_info()) as DfinityMinterInfo;
 
-			return minter_info.minimum_withdrawal_amount[0]?.toString() || '0';
-		}
-	} catch (error) {
-		console.error('Error fetching native minimum withdrawal amount:', error);
-		throw new Error('Failed to fetch minter fee');
-	}
+      return minter_info.minimum_withdrawal_amount[0]?.toString() || '0';
+    }
+  } catch (error) {
+    console.error('Error fetching native minimum withdrawal amount:', error);
+    throw new Error('Failed to fetch minter fee');
+  }
 };
 
 /**
  * Estimate gas for a withdrawal transaction.
  */
 const estimate_withdrawal_gas = async (
-	agent: HttpAgent,
-	operator: string,
-	minter_address: Principal,
-	is_native_token: boolean,
-	token_canister_id: string,
-	max_fee_per_gas: string,
-	is_wrapped_icrc: boolean
+  agent: HttpAgent,
+  operator: string,
+  minter_address: Principal,
+  is_native_token: boolean,
+  token_canister_id: string,
+  max_fee_per_gas: string,
+  is_wrapped_icrc: boolean,
 ): Promise<{ max_transaction_fee: string; max_fee_per_gas: string }> => {
-	const erc20_gas = '75000';
-	const native_gas = '25000';
-	const wrapped_gas = '100000'
+  const erc20_gas = '75000';
+  const native_gas = '25000';
+  const wrapped_gas = '100000';
 
-	let max_transaction_fee = "0";
-	if (is_native_token) { max_transaction_fee = new BigNumber(native_gas).multipliedBy(max_fee_per_gas).toFixed() }
-	else if (is_wrapped_icrc == false) {
-		max_transaction_fee = new BigNumber(erc20_gas).multipliedBy(max_fee_per_gas).toFixed()
-	}
-	else { max_transaction_fee = new BigNumber(wrapped_gas).multipliedBy(max_fee_per_gas).toFixed() }
+  let max_transaction_fee = '0';
+  if (is_native_token) {
+    max_transaction_fee = new BigNumber(native_gas).multipliedBy(max_fee_per_gas).toFixed();
+  } else if (is_wrapped_icrc == false) {
+    max_transaction_fee = new BigNumber(erc20_gas).multipliedBy(max_fee_per_gas).toFixed();
+  } else {
+    max_transaction_fee = new BigNumber(wrapped_gas).multipliedBy(max_fee_per_gas).toFixed();
+  }
 
-	return {
-		max_transaction_fee,
-		max_fee_per_gas,
-	};
-	// try {
-	//   if (operator === 'Appic') {
-	//     // Cast actor to Appic Minter Type
-	//     const actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address }) as {
-	//       eip_1559_transaction_price: (
-	//         arg: [AppicEip1559TransactionPriceArg] | [],
-	//       ) => Promise<AppicEip1559TransactionPrice>;
-	//     };
+  return {
+    max_transaction_fee,
+    max_fee_per_gas,
+  };
+  // try {
+  //   if (operator === 'Appic') {
+  //     // Cast actor to Appic Minter Type
+  //     const actor = Actor.createActor(AppicIdlFactory, { agent, canisterId: minter_address }) as {
+  //       eip_1559_transaction_price: (
+  //         arg: [AppicEip1559TransactionPriceArg] | [],
+  //       ) => Promise<AppicEip1559TransactionPrice>;
+  //     };
 
-	//     const price = is_native_token
-	//       ? await actor.eip_1559_transaction_price([])
-	//       : await actor.eip_1559_transaction_price([
-	//           {
-	//             erc20_ledger_id: Principal.fromText(token_canister_id),
-	//           },
-	//         ]);
+  //     const price = is_native_token
+  //       ? await actor.eip_1559_transaction_price([])
+  //       : await actor.eip_1559_transaction_price([
+  //           {
+  //             erc20_ledger_id: Principal.fromText(token_canister_id),
+  //           },
+  //         ]);
 
-	//     return {
-	//       max_transaction_fee: price.max_transaction_fee.toString(),
-	//       max_fee_per_gas: price.max_fee_per_gas.toString(),
-	//     };
-	//   }
+  //     return {
+  //       max_transaction_fee: price.max_transaction_fee.toString(),
+  //       max_fee_per_gas: price.max_fee_per_gas.toString(),
+  //     };
+  //   }
 
-	//   if (operator === 'Dfinity') {
-	//     // Cast actor to Dfinity Minter Type
-	//     const actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address }) as {
-	//       eip_1559_transaction_price: (
-	//         arg: [] | [DfinityEip1559TransactionPriceArg],
-	//       ) => Promise<DfinityEip1559TransactionPrice>;
-	//     };
+  //   if (operator === 'Dfinity') {
+  //     // Cast actor to Dfinity Minter Type
+  //     const actor = Actor.createActor(DfinityIdlFactory, { agent, canisterId: minter_address }) as {
+  //       eip_1559_transaction_price: (
+  //         arg: [] | [DfinityEip1559TransactionPriceArg],
+  //       ) => Promise<DfinityEip1559TransactionPrice>;
+  //     };
 
-	//     const price = is_native_token
-	//       ? await actor.eip_1559_transaction_price([])
-	//       : await actor.eip_1559_transaction_price([
-	//           {
-	//             ckerc20_ledger_id: Principal.fromText(token_canister_id),
-	//           },
-	//         ]);
+  //     const price = is_native_token
+  //       ? await actor.eip_1559_transaction_price([])
+  //       : await actor.eip_1559_transaction_price([
+  //           {
+  //             ckerc20_ledger_id: Principal.fromText(token_canister_id),
+  //           },
+  //         ]);
 
-	//     return {
-	//       max_transaction_fee: price.max_transaction_fee.toString(),
-	//       max_fee_per_gas: price.max_fee_per_gas.toString(),
-	//     };
-	//   }
+  //     return {
+  //       max_transaction_fee: price.max_transaction_fee.toString(),
+  //       max_fee_per_gas: price.max_fee_per_gas.toString(),
+  //     };
+  //   }
 
-	//   // Fallback for unsupported operators
-	//   return {
-	//     max_transaction_fee: '0',
-	//     max_fee_per_gas: '0',
-	//   };
-	// } catch (error) {
-	//   console.error('Error estimating withdrawal gas:', error);
-	//   throw error;
-	// }
+  //   // Fallback for unsupported operators
+  //   return {
+  //     max_transaction_fee: '0',
+  //     max_fee_per_gas: '0',
+  //   };
+  // } catch (error) {
+  //   console.error('Error estimating withdrawal gas:', error);
+  //   throw error;
+  // }
 };
 
 export const get_gas_price = async (
-	chain: ViemChain,
-	rpc_url: string,
+  chain: ViemChain,
+  rpc_url: string,
 ): Promise<{ max_fee_per_gas: string; max_priority_fee_per_gas: string }> => {
-	try {
-		const client = createPublicClient({
-			transport: http(rpc_url),
-			chain,
-		});
+  try {
+    const client = createPublicClient({
+      transport: http(rpc_url),
+      chain,
+    });
 
-		const fee_history = await client.getFeeHistory({
-			blockCount: 5,
-			rewardPercentiles: [50],
-			blockTag: 'latest',
-		});
+    const fee_history = await client.getFeeHistory({
+      blockCount: 5,
+      rewardPercentiles: [50],
+      blockTag: 'latest',
+    });
 
-		// Check if reward exists and is not empty
-		if (!fee_history.reward || fee_history.reward.length === 0) {
-			throw new Error('No reward data found in fee history.');
-		}
+    // Check if reward exists and is not empty
+    if (!fee_history.reward || fee_history.reward.length === 0) {
+      throw new Error('No reward data found in fee history.');
+    }
 
-		// Latest base fee plus 10%
-		const latestBaseFee = new BigNumber(
-			fee_history.baseFeePerGas[fee_history.baseFeePerGas.length - 1].toString(),
-		);
+    // Latest base fee plus 10%
+    const latestBaseFee = new BigNumber(
+      fee_history.baseFeePerGas[fee_history.baseFeePerGas.length - 1].toString(),
+    );
 
-		// Calculate Average Priority Fee
-		const allPriorityFees: BigNumber[] = fee_history.reward
-			.flat()
-			.map((fee) => new BigNumber(fee.toString()));
+    // Calculate Average Priority Fee
+    const allPriorityFees: BigNumber[] = fee_history.reward
+      .flat()
+      .map((fee) => new BigNumber(fee.toString()));
 
-		const sumPriorityFees = allPriorityFees.reduce((sum, fee) => sum.plus(fee), new BigNumber(0));
-		const averagePriorityFee = sumPriorityFees
-			.dividedBy(allPriorityFees.length)
-			.decimalPlaces(0, BigNumber.ROUND_CEIL);
+    const sumPriorityFees = allPriorityFees.reduce((sum, fee) => sum.plus(fee), new BigNumber(0));
+    const averagePriorityFee = sumPriorityFees
+      .dividedBy(allPriorityFees.length)
+      .decimalPlaces(0, BigNumber.ROUND_CEIL);
 
-		// Optionally round the result to 9 decimals (common for gas prices)
-		// and add 10% buffer
-		const maxFeePerGas = latestBaseFee.plus(averagePriorityFee).multipliedBy(1.1).decimalPlaces(0).toFixed();
+    // Optionally round the result to 9 decimals (common for gas prices)
+    // and add 10% buffer
+    const maxFeePerGas = latestBaseFee
+      .plus(averagePriorityFee)
+      .multipliedBy(1.1)
+      .decimalPlaces(0)
+      .toFixed();
 
-		return {
-			max_fee_per_gas: maxFeePerGas,
-			max_priority_fee_per_gas: averagePriorityFee.decimalPlaces(0).toFixed(),
-		};
-	} catch (error) {
-		console.error('Error fetching gas price:', error);
-		throw new Error('Unable to fetch gas price.');
-	}
+    return {
+      max_fee_per_gas: maxFeePerGas,
+      max_priority_fee_per_gas: averagePriorityFee.decimalPlaces(0).toFixed(),
+    };
+  } catch (error) {
+    console.error('Error fetching gas price:', error);
+    throw new Error('Unable to fetch gas price.');
+  }
 };
 
 /**
  * Estimate gas for a deposit transaction.
  */
 export const estimate_gas_fee = (
-	max_fee_per_gas: string,
-	required_gas: string,
+  max_fee_per_gas: string,
+  required_gas: string,
 ): { required_gas: string; total_gas_fee: string } => {
-	// const client = createPublicClient({ transport: http(rpc_url), chain });
-	// const estimated_gas = await client.estimateGas({
-	//   account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
-	//   to: deposit_helper_contract,
-	//   value: value == '0' ? undefined : BigInt(value),
-	//   type: 'eip1559',
-	//   data: encoded_function_data,
-	// });
+  // const client = createPublicClient({ transport: http(rpc_url), chain });
+  // const estimated_gas = await client.estimateGas({
+  //   account: is_native ? undefined : '0xd5c4eD9f6BA274fEd7e8939CF1dd496b16790e5d',
+  //   to: deposit_helper_contract,
+  //   value: value == '0' ? undefined : BigInt(value),
+  //   type: 'eip1559',
+  //   data: encoded_function_data,
+  // });
 
-	// const estimated_gas_plus_1_percent = new BigNumber(estimated_gas.toString())
-	//   .plus(new BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
-	//   .toFixed(); // plus 1 percent in case gas consumption is higher
-	// console.log(estimated_gas_plus_1_percent);
+  // const estimated_gas_plus_1_percent = new BigNumber(estimated_gas.toString())
+  //   .plus(new BigNumber(estimated_gas.toString()).multipliedBy(1).dividedBy(100).decimalPlaces(0))
+  //   .toFixed(); // plus 1 percent in case gas consumption is higher
+  // console.log(estimated_gas_plus_1_percent);
 
-	return {
-		total_gas_fee: new BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
-		required_gas: required_gas,
-	}
+  return {
+    total_gas_fee: new BigNumber(required_gas).multipliedBy(max_fee_per_gas).toFixed(),
+    required_gas: required_gas,
+  };
 };
 
 /**
  * Estimate gas for a deposit approval in case of erc20 tokens.
  */
-export const estimate_approval_fee=  (
-	max_fee_per_gas: string,
-	is_native: boolean,
-) : { approval_gas: string; total_approval_fee: string } => {
-	if (is_native) {
-		return { approval_gas: '0', total_approval_fee: '0' };
-	}
-	return {
-		total_approval_fee: new BigNumber("65000")
-			.multipliedBy(max_fee_per_gas)
-			.toFixed(),
-		approval_gas: "65000",
-	};
-}
+export const estimate_approval_fee = (
+  max_fee_per_gas: string,
+  is_native: boolean,
+): { approval_gas: string; total_approval_fee: string } => {
+  if (is_native) {
+    return { approval_gas: '0', total_approval_fee: '0' };
+  }
+  return {
+    total_approval_fee: new BigNumber('65000').multipliedBy(max_fee_per_gas).toFixed(),
+    approval_gas: '65000',
+  };
+};
 
 /**
  * Get metadata for the bridge transaction.
  */
 const get_bridge_metadata = (
-	from_token: EvmToken | IcpToken,
-	to_token: EvmToken | IcpToken,
+  from_token: EvmToken | IcpToken,
+  to_token: EvmToken | IcpToken,
 ): BridgeMetadata => {
-	const is_deposit = from_token.chain_type === 'EVM' && to_token.chain_type === 'ICP';
-	const operator = is_deposit ? to_token.operator! : from_token.operator!;
-	const chain_id = is_deposit ? from_token.chainId : to_token.chainId;
-	const chain = chains.find((chain) => chain.chainId === chain_id)!;
-	const [viem_chain, rpc_url] = [chain.viem_config!, chain.rpc_url];
+  const is_deposit = from_token.chain_type === 'EVM' && to_token.chain_type === 'ICP';
+  const operator = is_deposit ? to_token.operator! : from_token.operator!;
+  const chain_id = is_deposit ? from_token.chainId : to_token.chainId;
+  const chain = chains.find((chain) => chain.chainId === chain_id)!;
+  const [viem_chain, rpc_url] = [chain.viem_config!, chain.rpc_url];
 
+  let is_wrapped_icrc = false;
+  if (
+    (is_deposit && (from_token as EvmToken).is_wrapped_icrc) ||
+    (!is_deposit && (to_token as EvmToken).is_wrapped_icrc)
+  ) {
+    is_wrapped_icrc = true;
+  }
 
-	let is_wrapped_icrc = false;
-	if ((is_deposit && (from_token as EvmToken).is_wrapped_icrc) || (!is_deposit && (to_token as EvmToken).is_wrapped_icrc)) {
-		is_wrapped_icrc = true;
-	}
-
-	return {
-		tx_type: is_deposit ? TxType.Deposit : TxType.Withdrawal,
-		minter_address: get_minter_address(operator, chain_id),
-		operator,
-		chain_id,
-		is_native: is_native_token(
-			is_deposit ? from_token.contractAddress! : to_token.contractAddress!,
-		),
-		deposit_helper_contract: get_deposit_helper_contract(operator, chain_id),
-		viem_chain,
-		rpc_url,
-		is_wrapped_icrc,
-	};
+  return {
+    tx_type: is_deposit ? TxType.Deposit : TxType.Withdrawal,
+    minter_address: get_minter_address(operator, chain_id),
+    operator,
+    chain_id,
+    is_native: is_native_token(
+      is_deposit ? from_token.contractAddress! : to_token.contractAddress!,
+    ),
+    deposit_helper_contract: get_deposit_helper_contract(operator, chain_id),
+    viem_chain,
+    rpc_url,
+    is_wrapped_icrc,
+  };
 };
 
 /**
  * Get the minter address for a chain and operator.
  */
 const get_minter_address = (operator: string, chain_id: number): Principal => {
-	const chain = chains.find((chain) => chain.chainId === chain_id);
-	const address =
-		operator === 'Appic' ? chain?.appic_minter_address : chain?.dfinity_ck_minter_address;
-	return Principal.fromText(address!);
+  const chain = chains.find((chain) => chain.chainId === chain_id);
+  const address =
+    operator === 'Appic' ? chain?.appic_minter_address : chain?.dfinity_ck_minter_address;
+  return Principal.fromText(address!);
 };
 
 /**
  * Get the deposit helper contract address.
  */
 const get_deposit_helper_contract = (operator: string, chain_id: number): `0x${string}` => {
-	const chain = chains.find((chain) => chain.chainId === chain_id)!;
-	return operator === 'Appic'
-		? (chain?.appic_deposit_helper_contract_v2 as `0x${string}`)
-		: (chain?.dfinity_ck_deposit_helper_contract as `0x${string}`);
+  const chain = chains.find((chain) => chain.chainId === chain_id)!;
+  return operator === 'Appic'
+    ? (chain?.appic_deposit_helper_contract_v2 as `0x${string}`)
+    : (chain?.dfinity_ck_deposit_helper_contract as `0x${string}`);
 };
-
 
 /**
  * Calculate bridge options.
  */
 const calculate_bridge_options = async (
-	from_token_id: string,
-	to_token_id: string,
-	token_price: string,
-	decimals: string,
-	agent: HttpAgent,
-	bridge_metadata: BridgeMetadata,
-	estimated_network_fee: string,
-	approve_native_fee: string,
-	approve_erc20_fee: string,
-	amount: string,
-	native_currency: EvmToken | IcpToken,
-	max_fee_per_gas: string,
-	max_priority_fee_per_gas: string,
-	// Advanced deposit params
-	approve_erc20_gas: string,
-	deposit_gas: string,
+  from_token_id: string,
+  to_token_id: string,
+  token_price: string,
+  decimals: string,
+  agent: HttpAgent,
+  bridge_metadata: BridgeMetadata,
+  estimated_network_fee: string,
+  approve_native_fee: string,
+  approve_erc20_fee: string,
+  amount: string,
+  native_currency: EvmToken | IcpToken,
+  max_fee_per_gas: string,
+  max_priority_fee_per_gas: string,
+  // Advanced deposit params
+  approve_erc20_gas: string,
+  deposit_gas: string,
 ): Promise<BridgeOption[]> => {
+  let minter_fee = '0';
 
-	let minter_fee = '0';
+  try {
+    if (bridge_metadata.tx_type == TxType.Withdrawal) {
+      const minter_info = await fetch_appic_minter_info(agent, bridge_metadata.minter_address);
 
-	try {
-		if (bridge_metadata.tx_type == TxType.Withdrawal) {
+      if (minter_info.withdrawal_native_fee.length == 1) {
+        minter_fee = minter_info.withdrawal_native_fee[0].toString();
+      }
+    }
 
-			const minter_info = await fetch_appic_minter_info(
-				agent,
-				bridge_metadata.minter_address,
-			);
+    const total_native_fee = new BigNumber(minter_fee)
+      .plus(estimated_network_fee)
+      .plus(approve_native_fee)
+      .decimalPlaces(0)
+      .toFixed();
 
-			if (minter_info.withdrawal_native_fee.length == 1) {
-				minter_fee = minter_info.withdrawal_native_fee[0].toString()
-			}
+    const estimated_return = bridge_metadata.is_native
+      ? new BigNumber(amount).minus(total_native_fee).toFixed()
+      : new BigNumber(amount).minus(approve_erc20_fee).toFixed();
+    const human_readable_estimated_return = new BigNumber(estimated_return)
+      .dividedBy(new BigNumber(10).pow(decimals))
+      .toFixed();
+    const usd_estimated_return = new BigNumber(human_readable_estimated_return)
+      .multipliedBy(token_price)
+      .toFixed();
 
-		}
+    if (new BigNumber(usd_estimated_return).isLessThanOrEqualTo(0)) {
+      return [];
+    }
 
+    console.log(
+      'Check fees and amount backward',
+      amount,
+      new BigNumber(estimated_return).plus(total_native_fee).toFixed(),
+    );
 
-		const total_native_fee = new BigNumber(minter_fee)
-			.plus(estimated_network_fee)
-			.plus(approve_native_fee).decimalPlaces(0)
-			.toFixed();
+    const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 1 min' : '15 - 20 min';
+    const native_fee_token_id =
+      bridge_metadata.tx_type == TxType.Withdrawal
+        ? native_currency.canisterId!
+        : native_currency.contractAddress!;
+    return [
+      {
+        from_token_id,
+        to_token_id,
+        native_fee_token_id,
+        bridge_tx_type: bridge_metadata.tx_type,
+        minter_id: bridge_metadata.minter_address,
+        operator: bridge_metadata.operator,
+        chain_id: bridge_metadata.chain_id,
+        viem_chain: bridge_metadata.viem_chain,
+        amount,
+        estimated_return,
+        human_readable_estimated_return,
+        usd_estimated_return,
+        fees: {
+          max_network_fee: estimated_network_fee,
+          human_readable_max_network_fee: new BigNumber(estimated_network_fee)
+            .dividedBy(new BigNumber(10).pow(native_currency.decimals))
+            .toFixed(),
+          minter_fee: minter_fee,
+          human_readable_minter_fee: new BigNumber(minter_fee)
+            .dividedBy(new BigNumber(10).pow(native_currency.decimals))
+            .toFixed(),
+          approval_fee_in_native_token: approve_native_fee,
+          total_native_fee: total_native_fee,
+          human_readable_total_native_fee: new BigNumber(total_native_fee)
+            .dividedBy(new BigNumber(10).pow(native_currency.decimals))
+            .toFixed(),
+          native_fee_token_symbol: native_currency.symbol,
+          total_fee_usd_price: new BigNumber(total_native_fee)
+            .dividedBy(new BigNumber(10).pow(native_currency.decimals))
+            .multipliedBy(native_currency.usdPrice)
+            .toFixed(),
 
-		const estimated_return = bridge_metadata.is_native
-			? new BigNumber(amount).minus(total_native_fee).toFixed()
-			: new BigNumber(amount).minus(approve_erc20_fee).toFixed();
-		const human_readable_estimated_return = new BigNumber(estimated_return)
-			.dividedBy(new BigNumber(10).pow(decimals))
-			.toFixed();
-		const usd_estimated_return = new BigNumber(human_readable_estimated_return)
-			.multipliedBy(token_price)
-			.toFixed();
+          // Withdrawal params
+          approval_fee_in_erc20_tokens: approve_erc20_fee,
 
-		if (new BigNumber(usd_estimated_return).isLessThanOrEqualTo(0)) {
-			return [];
-		}
+          // Deposit params
+          approve_erc20_gas,
+          deposit_gas,
+          max_fee_per_gas,
+          max_priority_fee_per_gas,
+        },
 
-		console.log(
-			'Check fees and amount backward',
-			amount,
-			new BigNumber(estimated_return).plus(total_native_fee).toFixed(),
-		);
+        via: bridge_metadata.operator,
+        duration,
+        is_best: true,
 
-		const duration = bridge_metadata.operator === 'Appic' ? '30 sec - 1 min' : '15 - 20 min';
-		const native_fee_token_id =
-			bridge_metadata.tx_type == TxType.Withdrawal
-				? native_currency.canisterId!
-				: native_currency.contractAddress!;
-		return [
-			{
-				from_token_id,
-				to_token_id,
-				native_fee_token_id,
-				bridge_tx_type: bridge_metadata.tx_type,
-				minter_id: bridge_metadata.minter_address,
-				operator: bridge_metadata.operator,
-				chain_id: bridge_metadata.chain_id,
-				viem_chain: bridge_metadata.viem_chain,
-				amount,
-				estimated_return,
-				human_readable_estimated_return,
-				usd_estimated_return,
-				fees: {
-					max_network_fee: estimated_network_fee,
-					human_readable_max_network_fee: new BigNumber(estimated_network_fee)
-						.dividedBy(new BigNumber(10).pow(native_currency.decimals))
-						.toFixed(),
-					minter_fee: minter_fee,
-					human_readable_minter_fee: new BigNumber(minter_fee)
-						.dividedBy(new BigNumber(10).pow(native_currency.decimals))
-						.toFixed(),
-					approval_fee_in_native_token: approve_native_fee,
-					total_native_fee: total_native_fee,
-					human_readable_total_native_fee: new BigNumber(total_native_fee)
-						.dividedBy(new BigNumber(10).pow(native_currency.decimals))
-						.toFixed(),
-					native_fee_token_symbol: native_currency.symbol,
-					total_fee_usd_price: new BigNumber(total_native_fee)
-						.dividedBy(new BigNumber(10).pow(native_currency.decimals))
-						.multipliedBy(native_currency.usdPrice)
-						.toFixed(),
-
-					// Withdrawal params
-					approval_fee_in_erc20_tokens: approve_erc20_fee,
-
-					// Deposit params
-					approve_erc20_gas,
-					deposit_gas,
-					max_fee_per_gas,
-					max_priority_fee_per_gas,
-				},
-
-				via: bridge_metadata.operator,
-				duration,
-				is_best: true,
-
-				badge: Badge.BEST,
-				deposit_helper_contract: bridge_metadata.deposit_helper_contract,
-				is_native: bridge_metadata.is_native,
-				rpc_url: bridge_metadata.rpc_url,
-				is_wrapped_icrc: bridge_metadata.is_wrapped_icrc
-
-			},
-
-		];
-	} catch (error) {
-		console.error('Error calculating bridge options:', error);
-		return [];
-	}
+        badge: Badge.BEST,
+        deposit_helper_contract: bridge_metadata.deposit_helper_contract,
+        is_native: bridge_metadata.is_native,
+        rpc_url: bridge_metadata.rpc_url,
+        is_wrapped_icrc: bridge_metadata.is_wrapped_icrc,
+      },
+    ];
+  } catch (error) {
+    console.error('Error calculating bridge options:', error);
+    return [];
+  }
 };
 
 /**
  * Get native currency.
  */
 const get_native_currency = (
-	operator: Operator,
-	chain_id: number,
-	tx_type: TxType,
-	bridge_pairs: (EvmToken | IcpToken)[],
+  operator: Operator,
+  chain_id: number,
+  tx_type: TxType,
+  bridge_pairs: (EvmToken | IcpToken)[],
 ): EvmToken | IcpToken => {
-	const chain = chains.find((chain) => chain.chainId === chain_id);
+  const chain = chains.find((chain) => chain.chainId === chain_id);
 
-	if (!chain) {
-		throw new Error(`Chain with chainId ${chain_id} not found.`);
-	}
+  if (!chain) {
+    throw new Error(`Chain with chainId ${chain_id} not found.`);
+  }
 
-	if (tx_type === TxType.Deposit) {
-		return (
-			bridge_pairs.find(
-				(token) =>
-					token.chainId == chain_id &&
-					token.chain_type === 'EVM' &&
-					token.contractAddress === NATIVE_TOKEN_ADDRESS,
-			) ??
-			(() => {
-				throw new Error('Native currency for deposit transaction not found in bridge pairs.');
-			})()
-		);
-	} else if (tx_type === TxType.Withdrawal) {
-		const native_twin_ledger =
-			operator === 'Appic'
-				? chain.appic_twin_native_ledger_canister_id
-				: chain.dfinity_ck_native_ledger_canister_id;
+  if (tx_type === TxType.Deposit) {
+    return (
+      bridge_pairs.find(
+        (token) =>
+          token.chainId == chain_id &&
+          token.chain_type === 'EVM' &&
+          token.contractAddress === NATIVE_TOKEN_ADDRESS,
+      ) ??
+      (() => {
+        throw new Error('Native currency for deposit transaction not found in bridge pairs.');
+      })()
+    );
+  } else if (tx_type === TxType.Withdrawal) {
+    const native_twin_ledger =
+      operator === 'Appic'
+        ? chain.appic_twin_native_ledger_canister_id
+        : chain.dfinity_ck_native_ledger_canister_id;
 
-		if (!native_twin_ledger) {
-			throw new Error(`Native twin ledger ID not found for operator ${operator}.`);
-		}
+    if (!native_twin_ledger) {
+      throw new Error(`Native twin ledger ID not found for operator ${operator}.`);
+    }
 
-		return (
-			bridge_pairs.find(
-				(token) => token.chain_type === 'ICP' && token.canisterId === native_twin_ledger,
-			) ??
-			(() => {
-				throw new Error('Native currency for withdrawal transaction not found in bridge pairs.');
-			})()
-		);
-	}
+    return (
+      bridge_pairs.find(
+        (token) => token.chain_type === 'ICP' && token.canisterId === native_twin_ledger,
+      ) ??
+      (() => {
+        throw new Error('Native currency for withdrawal transaction not found in bridge pairs.');
+      })()
+    );
+  }
 
-	throw new Error(`Unsupported transaction type: ${tx_type}`);
+  throw new Error(`Unsupported transaction type: ${tx_type}`);
 };

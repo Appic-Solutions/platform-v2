@@ -10,7 +10,7 @@ export interface Chain {
   dfinity_ck_deposit_helper_contract?: string;
   dfinity_ck_native_ledger_canister_id?: string;
   appic_deposit_helper_contract?: string;
-	appic_deposit_helper_contract_v2?:string;
+  appic_deposit_helper_contract_v2?: string;
   appic_twin_native_ledger_canister_id?: string;
   rpc_url: string;
   type: ChainType;
@@ -23,6 +23,6 @@ export interface Chain {
   viem_config?: ViemChain;
   twin_handle?: string;
   twin_token_support: boolean;
-	is_swap_active:boolean;
-	swap_contract_address?:string;
+  is_swap_active: boolean;
+  swap_contract_address?: string;
 }

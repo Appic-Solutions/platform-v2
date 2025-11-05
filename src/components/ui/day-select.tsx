@@ -31,21 +31,13 @@ const DaySelect = () => {
       }}
     >
       <SelectTrigger
-        className={cn(
-          'w-[160px] gap-x-4 rounded-lg border-[1px] border-white py-4 text-sm text-[#0A0A0B]',
-          'bg-white/50 dark:bg-[#F5F5F5]',
-        )}
+        className="w-[160px] gap-x-4 rounded-lg border-[1px] border-white bg-[#F5F5F5] py-4 text-sm text-[#0A0A0B]"
         hideIcon
       >
         <SelectValue />
         <CalendarEditIcon className="h-5 w-5 text-gray-500" />
       </SelectTrigger>
-      <SelectContent
-        className={cn(
-          'w-[120px] gap-x-4 rounded-lg border-[1px] border-white py-2 text-sm text-[#0A0A0B]',
-          'bg-white/50 dark:bg-[#F5F5F5]',
-        )}
-      >
+      <SelectContent className="w-[120px] gap-x-4 rounded-lg border-[1px] border-white bg-[#F5F5F5] py-2 text-sm text-[#0A0A0B]">
         <ScrollArea className="h-[15rem]">
           {Array.from({ length: 28 }).map((_, i) => {
             const dayNumber = i + 1;

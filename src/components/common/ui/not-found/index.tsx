@@ -11,8 +11,7 @@ export default function NotFound({ title, desc, className, ...props }: NotFoundP
   return (
     <section
       className={cn(
-        'flex flex-col items-center justify-center gap-y-5 pt-20',
-        'text-white md:text-black md:dark:text-white',
+        'flex flex-col items-center justify-center gap-y-5 pt-20 text-white',
         className,
       )}
       {...props}

@@ -1,3 +1,1 @@
-export async function swap_on_icp(){
-
-}
+export async function swap_on_icp() {}

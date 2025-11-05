@@ -13,7 +13,7 @@ const GradientBorderCard = ({
   return (
     <div
       className={cn(
-        'group rounded-[20px] bg-box-border-gradient p-[1px] text-black backdrop-blur-[30px] dark:text-white lg:rounded-[30px]',
+        'group rounded-[20px] bg-box-border-gradient p-[1px] text-white backdrop-blur-[30px] lg:rounded-[30px]',
         className,
       )}
       onClick={onClick}

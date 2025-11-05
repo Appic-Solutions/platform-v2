@@ -53,7 +53,7 @@ export const RadialProgress = ({
           strokeWidth={strokeWidth ?? circleStrokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset="0"
-          className={cn('stroke-gray-200 dark:stroke-gray-300', className)}
+          className={cn('stroke-gray-300', className)}
         />
         {/* Progress */}
         <circle

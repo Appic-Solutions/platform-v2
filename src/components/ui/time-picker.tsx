@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { ScrollArea } from './scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { useState } from 'react';
@@ -22,20 +21,10 @@ const TimePicker = () => {
         }
       }}
     >
-      <SelectTrigger
-        className={cn(
-          'w-[160px] gap-x-4 rounded-lg border-[1px] border-white py-4 text-sm text-[#0A0A0B]',
-          'bg-white/50 dark:bg-[#F5F5F5]',
-        )}
-      >
+      <SelectTrigger className="w-[160px] gap-x-4 rounded-lg border-[1px] border-white bg-[#F5F5F5] py-4 text-sm text-[#0A0A0B]">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent
-        className={cn(
-          'z-50 w-[120px] gap-x-4 rounded-lg border-[1px] border-white py-2 text-sm text-[#0A0A0B]',
-          'bg-white/50 dark:bg-[#F5F5F5]',
-        )}
-      >
+      <SelectContent className="z-50 w-[120px] gap-x-4 rounded-lg border-[1px] border-white bg-[#F5F5F5] py-2 text-sm text-[#0A0A0B]">
         <ScrollArea className="h-[15rem]">
           {Array.from({ length: 24 }).map((_, i) => {
             const hour = i.toString().padStart(2, '0');

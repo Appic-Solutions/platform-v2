@@ -69,7 +69,7 @@ export async function get_icp_wallet_tokens_balances(
           new BigNumber(10).pow(token.decimals || 0),
         );
         const usdBalance = balanceBN.multipliedBy(token.usdPrice).toFixed(2);
-				if (BigNumber(usdBalance).lt(BigNumber(0.01))) return null;
+        if (BigNumber(usdBalance).lt(BigNumber(0.01))) return null;
         return {
           ...token,
           balance: balanceBN.toString(),

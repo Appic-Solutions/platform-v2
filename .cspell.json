@@ -2,12 +2,7 @@
   "version": "0.2",
   "language": "en",
   "useGitignore": true,
-  "ignorePaths": [
-    "node_modules",
-    "*.json",
-    "./src/blockchain_api/**",
-    "src/blockchain_api/**"
-  ],
+  "ignorePaths": ["node_modules", "*.json", "./src/blockchain_api/**", "src/blockchain_api/**"],
   "dictionaryDefinitions": [
     {
       "name": "keywords",
@@ -15,10 +10,6 @@
       "path": "./keywords.txt"
     }
   ],
-  "dictionaries": [
-    "keywords"
-  ],
-  "ignoreWords": [
-    "Subcomponents"
-  ]
+  "dictionaries": ["keywords"],
+  "ignoreWords": ["Subcomponents"]
 }

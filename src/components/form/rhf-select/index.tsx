@@ -24,7 +24,7 @@ export default function RHFSelect({
       control={control}
       render={({ field, fieldState: { error } }) => (
         <div className="flex w-full min-w-fit flex-col gap-y-1">
-          {label && <label className="text-white dark:text-white md:text-black">{label}</label>}
+          {label && <label className="text-white">{label}</label>}
           <Select onValueChange={field.onChange} defaultValue={field.value} disabled={disabled}>
             <SelectTrigger className={className}>
               <SelectValue placeholder={placeholder} />
