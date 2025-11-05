@@ -8,10 +8,20 @@ export default function BackButton() {
 
   const handleBack = () => {
     const referrer = document.referrer;
+
+    console.log('🚀 ~ BackButton.tsx:12 ~ handleBack ~ referrer:', referrer);
+
     const currentHost = window.location.hostname;
+
+    console.log('🚀 ~ BackButton.tsx:16 ~ handleBack ~ currentHost:', currentHost);
+
     const referrerHost = referrer ? new URL(referrer).hostname : '';
+
+    console.log('🚀 ~ BackButton.tsx:20 ~ handleBack ~ referrerHost:', referrerHost);
+
     if (window.history.length <= 1 || (referrerHost && referrerHost !== currentHost)) {
-      router.push('/swap');
+      console.log('Run Condition => !!!!!');
+      router.push('/');
     } else {
       router.back();
     }
