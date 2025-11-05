@@ -40,7 +40,7 @@ export const FOOTER_NAV_ITEMS: FooterNavItems[] = [
       { label: 'Swap', href: '/swap' },
       { label: 'Bridge', href: '/bridge' },
       { label: 'Pools', href: '/positions' },
-      { label: 'Twin', href: '/advanced' },
+      { label: 'Explore', href: '/explore' },
     ],
   },
   {

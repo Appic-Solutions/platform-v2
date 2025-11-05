@@ -4,7 +4,6 @@ import { useSharedStore } from '@/store/store';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { transactionNotification } from '@/components/common/ui/toast/notification';
 import { useEffect, useCallback } from 'react';
-import { useSwapActions, useSwapStore } from '@/app/swap/_store';
 import {
   addPendingSwapToSession,
   getPendingSwaps,
@@ -15,6 +14,7 @@ import {
 } from '../helpers/session-storage/swap';
 import { TxStatusType } from '@/components/common/ui/toast/types';
 import { HttpAgent } from '@dfinity/agent';
+import { useSwapActions, useSwapStore } from '@/app/(panel)/swap/_store';
 
 export const usePendingSwapsStatus = () => {
   const { addPendingSwap, removePendingSwap, updateSwapStatus } = useSwapActions();
