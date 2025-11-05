@@ -6,7 +6,6 @@ import { WalletWrapper } from '@/lib/wrappers/wallet/wrapper';
 import { UserWalletProvider } from '@/lib/wrappers/wallet/userWalletProvider';
 import { cn } from '@/lib/utils';
 import NavbarPage from './_layout/navbar';
-import { Toaster } from 'react-hot-toast';
 import { QueryClient } from '@tanstack/query-core';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
@@ -42,8 +41,6 @@ export default function PanelLayout({ children }: Readonly<{ children: React.Rea
           <ShapesPage />
           <main className="mb-28 flex w-full flex-1 xl:mb-0">{children}</main>
           <NavbarPage />
-          <Toaster toasterId="notification" />
-          <Toaster toasterId="transactionNotification" />
         </body>
       </WalletWrapper>
     </PersistQueryClientProvider>
