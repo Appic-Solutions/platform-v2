@@ -1,3 +1,4 @@
+"use client"
 import Image from 'next/image';
 import Wallet from './wallet';
 import { cn } from '@/lib/utils';

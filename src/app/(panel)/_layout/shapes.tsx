@@ -1,6 +1,6 @@
 import { SHAPE_SIZES } from '@/lib/constants/layout';
 
-const ShapesPage = () => {
+export default function ShapesPage() {
   return (
     <div className="absolute inset-0 z-[-1] hidden lg:block">
       {SHAPE_SIZES.map(
@@ -21,6 +21,4 @@ const ShapesPage = () => {
       )}
     </div>
   );
-};
-
-export default ShapesPage;
+}

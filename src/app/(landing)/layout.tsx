@@ -1,14 +1,20 @@
+import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import HeaderSection from './_layout/components/header';
 import FooterSection from './_layout/components/footer';
-import AOSWrapper from '@/lib/wrappers/aos';
+
+export const metadata: Metadata = {
+  title: 'Appic Dao',
+  description: 'Appic cross-chain swap built on ICP',
+  icons: '/favicon.ico',
+};
 
 export default function LandingLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <body className="relative mx-auto max-w-[1920px]">
+    <main className="relative mx-auto max-w-[1920px]">
       <HeaderSection />
-      <AOSWrapper>{children}</AOSWrapper>
+      {children}
       <FooterSection />
-    </body>
+    </main>
   );
 }
