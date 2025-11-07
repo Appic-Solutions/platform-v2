@@ -8,22 +8,28 @@ export default function BackButton() {
 
   const handleBack = () => {
     const referrer = document.referrer;
-
-    console.log('🚀 ~ BackButton.tsx:12 ~ handleBack ~ referrer:', referrer);
-
     const currentHost = window.location.hostname;
+    let referrerHost = '';
 
-    console.log('🚀 ~ BackButton.tsx:16 ~ handleBack ~ currentHost:', currentHost);
+    if (referrer) {
+      try {
+        referrerHost = new URL(referrer).hostname;
+      } catch {}
+    }
 
-    const referrerHost = referrer ? new URL(referrer).hostname : '';
+    const isExternal = !referrer || referrerHost !== currentHost;
+    const canGoBack =
+      window.history.length > 1 || (window.history.state && window.history.state.idx > 0);
 
-    console.log('🚀 ~ BackButton.tsx:20 ~ handleBack ~ referrerHost:', referrerHost);
+    if (isExternal) return router.push('/');
 
-    if (window.history.length <= 1 || (referrerHost && referrerHost !== currentHost)) {
-      console.log('Run Condition => !!!!!');
-      router.push('/');
-    } else {
+    if (canGoBack) {
       router.back();
+      setTimeout(() => {
+        if (window.history.state?.idx === 0) router.push('/');
+      }, 500);
+    } else {
+      router.push('/');
     }
   };
 
