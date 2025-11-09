@@ -2,6 +2,7 @@
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import Wallet from '@/app/(panel)/_layout/wallet';
 import { useEffect, useState } from 'react';
 import { NAVBAR_ITEMS } from '../constants';
 
@@ -86,16 +87,7 @@ export default function HeaderSection() {
         ))}
       </ul>
 
-      <div
-        className={cn(
-          'col-span-2 justify-self-end border-[1.5px] border-white/30 text-white backdrop-blur-[102px] duration-200',
-          'bg-[radial-gradient(75.61%_136.07%_at_48.06%_0%,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]',
-          'flex h-12 w-[160px] select-none items-center justify-center gap-x-1 rounded-full text-sm',
-          // "hover:shadow-[0_0_20px_0_rgba(255,255,255,0.3)]"
-        )}
-      >
-        Docs Coming Soon!
-      </div>
+      <Wallet />
     </header>
   );
 }

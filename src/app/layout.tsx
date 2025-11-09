@@ -1,5 +1,4 @@
 'use client';
-
 import '@/style/globals.css';
 import '@nfid/identitykit/react/styles.css';
 import { ReactNode } from 'react';
@@ -29,16 +28,16 @@ const persister = createAsyncStoragePersister({
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" className="font-rethink-sans relative bg-[#060607] md:h-full">
-      <body>
-        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-          <WalletWrapper>
+      <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+        <WalletWrapper>
+          <body>
             <UserWalletProvider />
             <AOSWrapper>{children}</AOSWrapper>
             <Toaster toasterId="notification" />
             <Toaster toasterId="transactionNotification" />
-          </WalletWrapper>
-        </PersistQueryClientProvider>
-      </body>
+          </body>
+        </WalletWrapper>
+      </PersistQueryClientProvider>
     </html>
   );
 }
