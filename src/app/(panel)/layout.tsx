@@ -21,7 +21,9 @@ export default function PanelLayout({ children }: Readonly<{ children: React.Rea
     >
       <HeaderPage />
       <ShapesPage />
-      <div className="mb-28 flex w-full flex-1 xl:mb-0">{children}</div>
+      <div className="mb-28 flex w-full flex-1 md:items-center md:justify-center xl:mb-0">
+        {children}
+      </div>
       <NavbarPage />
     </main>
   );

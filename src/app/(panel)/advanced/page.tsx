@@ -29,7 +29,7 @@ export default function AdvancedPage() {
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="h-full w-full overflow-y-auto md:flex md:items-center md:justify-center"
+        className="h-full w-full md:flex md:items-center md:justify-center"
       >
         {step === 1 && <Step1 methods={methods} isLoading={isLoading} />}
         {step === 2 && (

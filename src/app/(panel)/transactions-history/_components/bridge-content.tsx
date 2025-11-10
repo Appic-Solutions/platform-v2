@@ -32,7 +32,7 @@ export default function BridgeContent() {
     return (
       <div
         className={cn(
-          'flex h-full items-center justify-center text-xl',
+          'flex h-full items-center justify-center text-xl min-h-52',
           'mx-auto max-w-[490px] px-6 text-center text-white',
         )}
       >
@@ -41,13 +41,13 @@ export default function BridgeContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="my-auto flex items-center justify-center md:absolute md:inset-0">
+      <div className="my-auto flex items-center justify-center min-h-52">
         <Spinner />
       </div>
     );
   } else if (bridgeData?.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
+      <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white min-h-52">
         <Image src="/images/empty.png" alt="" width={100} height={100} />
         Empty Bridge History
       </div>

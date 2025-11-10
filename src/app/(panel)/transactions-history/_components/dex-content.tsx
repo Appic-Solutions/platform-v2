@@ -12,7 +12,7 @@ import { cn, getChainLogo, getChainName, getChainSymbol } from '@/lib/utils';
 import Spinner from '@/components/ui/spinner';
 import SolidCard from '@/components/ui/cards/SolidCard';
 import { Avatar } from '@/components/common/ui/avatar';
-import { BlockchainIcon, CloseIcon } from '@/components/icons';
+import { BlockchainIcon } from '@/components/icons';
 import useLogic from '../_logic';
 
 type DexDataType =
@@ -91,14 +91,14 @@ export default function DexContent() {
   // ---------- Error / Loading States ----------
   if (isError)
     return (
-      <div className="mx-auto flex h-full max-w-[490px] items-center justify-center px-6 text-center text-xl text-white">
+      <div className="mx-auto flex h-full min-h-52 max-w-[490px] items-center justify-center px-6 text-center text-xl text-white">
         Failed To Get Dex History
       </div>
     );
 
   if (isLoading)
     return (
-      <div className="my-auto flex items-center justify-center md:absolute md:inset-0">
+      <div className="flex min-h-52 items-center justify-center">
         <Spinner />
       </div>
     );
@@ -122,7 +122,7 @@ export default function DexContent() {
 
       {/* ---------- Empty ---------- */}
       {!filteredData.length ? (
-        <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
+        <div className="flex min-h-52 flex-col items-center justify-center gap-y-10 text-center text-2xl text-white">
           <Image src="/images/empty.png" alt="Empty" width={100} height={100} />
           Empty Dex History
         </div>

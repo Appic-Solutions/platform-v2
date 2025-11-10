@@ -36,7 +36,7 @@ export default function AdvancedContent() {
     return (
       <div
         className={cn(
-          'flex h-full items-center justify-center text-xl',
+          'flex h-full min-h-52 items-center justify-center text-xl',
           'mx-auto max-w-[490px] px-6 text-center text-white',
         )}
       >
@@ -45,13 +45,13 @@ export default function AdvancedContent() {
     );
   } else if (isLoading) {
     return (
-      <div className="my-auto flex items-center justify-center md:absolute md:inset-0">
+      <div className="my-auto flex min-h-52 items-center justify-center">
         <Spinner />
       </div>
     );
   } else if (data?.result.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-y-10 text-center text-2xl text-white md:absolute md:inset-0">
+      <div className="flex min-h-52 flex-col items-center justify-center gap-y-10 text-center text-2xl text-white">
         <Image src="/images/empty.png" alt="" width={100} height={100} />
         Empty Advanced History
       </div>
