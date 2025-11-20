@@ -52,7 +52,7 @@ export default function Tokenomics() {
                 'xl:max-w-[515px] xl:text-[26px] xl:leading-[31px]',
               )}
             >
-              Appic token can be staked for rewards, used for voting on Governance, applied to cover
+              Swapic token can be staked for rewards, used for voting on Governance, applied to cover
               transaction fees, or to earn liquidity incentives.
             </p>
           </div>
@@ -69,8 +69,8 @@ export default function Tokenomics() {
                 'text-center text-lg text-white md:text-start xl:text-[24px] xl:leading-[29px]',
               )}
             >
-              Early investors have the opportunity to purchase Appic tokens at a discounted rate. To
-              take advantage of this exclusive offer and join the Appic ecosystem, get in touch with
+              Early investors have the opportunity to purchase Swapic tokens at a discounted rate. To
+              take advantage of this exclusive offer and join the Swapic ecosystem, get in touch with
               us using the button below.
             </p>
             <Link
@@ -132,7 +132,7 @@ export default function Tokenomics() {
             )}
           >
             <div className="flex flex-col items-center sm:px-4 xl:px-12">
-              <p className="text-center font-bold">Appic Token Distribution</p>
+              <p className="text-center font-bold">Swapic Token Distribution</p>
               <ChartContainer config={CHART_CONFIG} className="mx-auto aspect-square h-[320px]">
                 <PieChart>
                   <ChartTooltip

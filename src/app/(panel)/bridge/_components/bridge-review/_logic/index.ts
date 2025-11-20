@@ -95,7 +95,7 @@ const BridgeReviewLogic = () => {
         status: 'pending',
       });
 
-      // Step 3: Notify Appic Helper
+      // Step 3: Notify Swapic Helper
       const notifyResult = await notifyAppicHelper.mutateAsync({
         unAuthenticatedAgent: params.unAuthenticatedAgent,
         bridgeOption: params.bridgeOption,
@@ -179,7 +179,7 @@ const BridgeReviewLogic = () => {
       count: 4,
       status: 'pending',
     });
-    // Step 4: Notify Appic Helper
+    // Step 4: Notify Swapic Helper
     const notifyResult = await notifyAppicHelperDeposit.mutateAsync({
       bridgeOption: params.bridgeOption,
       recipientPrincipal: params.recipientPrincipal,

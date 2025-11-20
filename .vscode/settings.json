@@ -1,5 +1,8 @@
 {
   "cSpell.words": [
+    "swapic",
+    "Swapic",
+    "SWAPIC",
     "appic",
     "Appicdao",
     "appkit",
@@ -12,12 +15,12 @@
     "iefix",
     "nfid",
     "nocompatible",
+    "OISY",
     "reown",
     "Solana",
     "vaul",
     "viem",
-    "Wagmi",
-    "OISY"
+    "Wagmi"
   ],
   "prettier.prettierPath": "./node_modules/prettier"
 }

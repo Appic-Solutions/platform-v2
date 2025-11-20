@@ -49,7 +49,7 @@ export async function withdraw_funds_from_appic_dex(
     };
   } catch (error) {
     return {
-      message: `Failed to call appic dex canister: ${error}`,
+      message: `Failed to call Swapic dex canister: ${error}`,
       result: undefined,
       success: false,
     };

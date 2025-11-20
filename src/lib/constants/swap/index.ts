@@ -118,7 +118,7 @@ export const tabs: { value: BalanceType; label: string }[] = [
     value: 'wallet',
   },
   {
-    label: 'Appic dex balance',
+    label: 'Swapic dex balance',
     value: 'dex',
   },
 ];

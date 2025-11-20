@@ -40,11 +40,6 @@ const config: Config = {
         'highlighted-card': 'var(--highlighted-card)',
         'input-fields-hover': 'var(--input-fields-hover)',
       },
-      /* Box Shadow */
-      boxShadow: {
-        'appic-shadow': '4px 4px 0px 0px #00000040',
-      },
-
       /* Screen Sizes */
       screens: {
         xs: '480px',

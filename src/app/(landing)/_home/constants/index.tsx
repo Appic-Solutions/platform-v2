@@ -87,26 +87,26 @@ export const CUSTOMERS_IMAGES: CustomerSlideItem[] = [
 
 export const KEY_FEATURES: CardItem[] = [
   {
-    label: 'Appic Crosschain Swap',
-    desc: 'Appic enables easy token swaps across chains like ICP, EVM, SOLANA, and BTC, using top DEXs liquidity for fast, cheap swaps. e.g., USDT on Base to ckBTC on ICP.',
+    label: 'Swapic Crosschain Swap',
+    desc: 'Swapic enables easy token swaps across chains like ICP, EVM, SOLANA, and BTC, using top DEXs liquidity for fast, cheap swaps. e.g., USDT on Base to ckBTC on ICP.',
     icon: <BlockchainIcon className="h-5 w-5" />,
     screenshotPath: '/images/landing/features/swap.png',
   },
   {
-    label: 'Appic Bridge',
-    desc: 'Appic Bridge connects EVM chains to ICP, locking tokens on one side and minting wrapped versions on the other. ICP-to-EVM bridging is coming soon.',
+    label: 'Swapic Bridge',
+    desc: 'Swapic Bridge connects EVM chains to ICP, locking tokens on one side and minting wrapped versions on the other. ICP-to-EVM bridging is coming soon.',
     icon: <ParkOutlineBridgeIcon className="h-5 w-5" />,
     screenshotPath: '/images/landing/features/bridge.png',
   },
   {
-    label: 'Appic Dex',
-    desc: 'Appic Dex offers fast, low-fee swaps on ICP with concentrated liquidity pools, optimized for traders and providers in one canister.',
+    label: 'Swapic Dex',
+    desc: 'Swapic Dex offers fast, low-fee swaps on ICP with concentrated liquidity pools, optimized for traders and providers in one canister.',
     icon: <ArrowsUpDownIcon className="h-5 w-5" />,
     screenshotPath: '/images/landing/features/dex.png',
   },
   {
-    label: 'Appic Twin Token Creator',
-    desc: `Appic Twin Token Creator lets projects make wrapped "twin" tokens on ICP or EVM, bridging them  instantly. e.g., Gold token to Base.`,
+    label: 'Swapic APIs',
+    desc: `We offer APIs for wallets and dApps to provide cross-chain swapping to their users, enabling seamless integration for external applications.`,
     icon: <LockIcon className="h-5 w-5" />,
     screenshotPath: '/images/landing/features/twin-token.png',
   },
@@ -115,17 +115,17 @@ export const KEY_FEATURES: CardItem[] = [
 export const TOKENOMICS_ITEMS: CardItem[] = [
   {
     label: 'Governance',
-    desc: 'Appic token holders have voting power to shape the platform’s future. They can participate in proposals and influence the roadmap by casting their votes.',
+    desc: 'Swapic token holders have voting power to shape the platform’s future. They can participate in proposals and influence the roadmap by casting their votes.',
     icon: <GovernanceIcon className="h-5 w-5" />,
   },
   {
     label: 'Buy Back (Burn)',
-    desc: 'Appic uses platform fees to buy back and burn Appic tokens. This reduces the total supply over time, aiming to maintain a deflationary token model.',
+    desc: 'Swapic uses platform fees to buy back and burn Swapic tokens. This reduces the total supply over time, aiming to maintain a deflationary token model.',
     icon: <FireIcon className="h-5 w-5" />,
   },
   {
     label: 'Transaction Fee',
-    desc: 'Appic tokens can be used to pay transaction fees at a reduced rate. This offers holders a cost-saving benefit when using the platform.',
+    desc: 'Swapic tokens can be used to pay transaction fees at a reduced rate. This offers holders a cost-saving benefit when using the platform.',
     icon: <DiscountIcon className="h-5 w-5" />,
   },
 ];
@@ -150,7 +150,7 @@ export const CHART_CONFIG: ChartConfig = {
 
 export const ROADMAP_ITEMS: RoadmapItem[] = [
   {
-    label: 'Completed',
+    label: 'Q1 2025',
     position: 'top',
     title: 'Initial EVM-ICP Bridge',
     description: `Launched the EVM-ICP bridge connecting Binance Smart Chain and Base, with a minter canister to lock EVM tokens and mint twin tokens (e.g., icBNB, icUSDT.bsc) on ICP, plus a basic frontend for bridging.`,
@@ -164,7 +164,7 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
   {
     label: 'Q3 2025',
     position: 'top',
-    title: 'Appic Dex Deployment',
+    title: 'Swapic Dex Deployment',
     description: `Build a Rust-based Dex canister with concentrated liquidity pools, enabling fast, efficient swaps on ICP, and integrate it into the frontend for pool management and trading.`,
   },
   {
@@ -179,26 +179,38 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
     title: 'Full System Integration',
     description: `Link the bridge, Dex, and router with the frontend for seamless cross-chain swaps, enhance the Chain Fusion Helper Canister to track all activities (swaps, bridges, deployments), and develop an SDK for dApp integration.`,
   },
+  {
+    label: 'Q1 2026',
+    position: 'bottom',
+    title: 'BTC, Solana, and other blockchains integration',
+    description: `Expand the bridging and integration capabilities to include Bitcoin (BTC), Solana, and additional blockchains for broader cross-chain compatibility and functionality.`,
+  },
+  {
+    label: 'Q2 2026',
+    position: 'top',
+    title: 'SNS decentralization swap',
+    description: ` Implement SNS (Service Nervous System) decentralization features for swaps, enhancing decentralized governance and operations within the ecosystem.`,
+  },
 ];
 
 export const FAQ_ITEMS = [
   {
-    title: 'Appic Swap',
+    title: 'Swapic Swap',
     items: [
       {
-        label: 'What is Appic Swap?',
-        content: `Appic Swap lets you trade tokens between any chain, like ICP and EVM networks, using one`,
+        label: 'What is Swapic Swap?',
+        content: `Swapic Swap lets you trade tokens between any chain, like ICP and EVM networks, using one`,
       },
       {
         label: 'How does it find the best swap rates?',
-        content: `It pulls real-time quotes from DEXs like Uniswap, Panckeswap, Appic Dex and ICPSwap, then picks `,
+        content: `It pulls real-time quotes from DEXs like Uniswap, Panckeswap, Swapic Dex and ICPSwap, then picks `,
       },
       {
         label: 'Can I swap tokens across different EVM chains?',
         content: `Yes, it supports EVM-to-EVM swaps, routing through ICP for better liquidity and lower costs.`,
       },
       {
-        label: 'What makes Appic Swap faster?',
+        label: 'What makes Swapic Swap faster?',
         content: `It combines bridging and swapping into one step, cutting down transaction time and fees.`,
       },
       {
@@ -208,10 +220,10 @@ export const FAQ_ITEMS = [
     ],
   },
   {
-    title: 'Appic Bridge',
+    title: 'Swapic Bridge',
     items: [
       {
-        label: 'What does Appic Bridge do?',
+        label: 'What does Swapic Bridge do?',
         content: `It connects EVM chains to ICP, letting you move tokens back and forth by locking and minting them.`,
       },
       {
@@ -233,10 +245,10 @@ export const FAQ_ITEMS = [
     ],
   },
   {
-    title: 'Appic Dex',
+    title: 'Swapic Dex',
     items: [
       {
-        label: 'What is Appic Dex?',
+        label: 'What is Swapic Dex?',
         content: `It’s a decentralized exchange on ICP with liquidity pools for fast, low-cost token swaps.`,
       },
       {
@@ -258,7 +270,7 @@ export const FAQ_ITEMS = [
     ],
   },
   {
-    title: 'Appic Twin Token Creator ',
+    title: 'Swapic Twin Token Creator ',
     items: [
       {
         label: 'What is the Twin Token Creator?',
@@ -266,7 +278,7 @@ export const FAQ_ITEMS = [
       },
       {
         label: 'How does it work with the bridge?',
-        content: `Twin tokens can be bridged between chains using Appic Bridge, connecting ecosystems`,
+        content: `Twin tokens can be bridged between chains using Swapic Bridge, connecting ecosystems`,
       },
       {
         label: 'Can any project use it?',

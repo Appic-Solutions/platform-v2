@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
 
 const persister = createAsyncStoragePersister({
   storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-  key: 'appic-cache',
+  key: 'Swapic-cache',
   throttleTime: 1000,
 });
 

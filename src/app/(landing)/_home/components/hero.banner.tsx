@@ -29,7 +29,7 @@ export default function HeroBanner() {
           Discover
         </p>
         <p className="bg-[linear-gradient(90deg,#6E6E6E_0%,#FFFFFF_34.45%,#FFFFFF_51.67%,#6E6E6E_86.12%)]">
-          Appic Crosschain Dex
+          Swapic Crosschain Dex
         </p>
         <svg
           viewBox="0 0 345 90"

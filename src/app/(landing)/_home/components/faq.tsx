@@ -43,7 +43,7 @@ export default function Faq() {
               'xl:text-[26px] xl:leading-[31px]',
             )}
           >
-            Get answers to your questions about Appic’s innovative cross-chain solutions.
+            Get answers to your questions about Swapic’s innovative cross-chain solutions.
           </p>
         </div>
 

@@ -79,7 +79,7 @@ export const SwapQuote = ({ isLoading }: { isLoading: boolean }) => {
               </div>
               <div className="flex flex-col items-end gap-y-3">
                 <div className="flex items-center gap-x-1 rounded-xl bg-white px-2 py-1 md:rounded-2xl md:px-4">
-                  <span className={cn('text-xs text-blue-600 lg:text-sm')}>via Appic</span>
+                  <span className={cn('text-xs text-blue-600 lg:text-sm')}>via Swapic</span>
                   <Image src="images/logo/icp-logo.svg" alt="logo" width={15} height={15} />
                 </div>
               </div>

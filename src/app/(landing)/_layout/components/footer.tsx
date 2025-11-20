@@ -13,7 +13,7 @@ export default function FooterSection() {
       )}
     >
       <div className="flex flex-col gap-y-6 xl:max-w-[285px]">
-        <Image src={'/images/landing/logo/logo.png'} alt="" width={52} height={43} />
+        <Image src={'/images/landing/logo/swapic-logo.svg'} alt="" width={52} height={43} />
         <p className="flex max-w-80 items-center gap-x-2 text-sm text-white">
           <Image src="/images/landing/ornaments/icp.svg" alt="" width={200} height={40} />
         </p>

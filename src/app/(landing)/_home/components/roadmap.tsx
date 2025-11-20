@@ -44,7 +44,7 @@ export default function Roadmap() {
           Roadmap
         </p>
         <p className="max-w-[293px] text-sm leading-[26px] text-white md:max-w-[354px] md:text-base xl:max-w-3xl">
-          Appic’s roadmap builds from an EVM-ICP bridge to a full cross-chain swap layer on ICP,
+          Swapic’s roadmap builds from an EVM-ICP bridge to a full cross-chain swap layer on ICP,
           targeting late 2025 completion. It includes ICP-to-EVM bridging, a Dex, and a swap router.
         </p>
       </div>
@@ -109,7 +109,7 @@ export default function Roadmap() {
                 )}
               >
                 <div className="mb-2 flex items-center gap-x-4 text-lg font-bold">
-                  <span className="text-[#3870DA]">{item.label}</span>
+                  <span className="text-[#3870DA]">Completed</span>
                   <h3 className="text-white">{item.title}</h3>
                 </div>
                 <p>{item.description}</p>

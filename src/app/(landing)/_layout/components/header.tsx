@@ -51,7 +51,7 @@ export default function HeaderSection() {
         href={'#HeroBanner'}
         className="relative h-[34px] w-[42px] md:h-[42px] md:w-[52px] lg:col-span-2"
       >
-        <Image src={'/images/landing/logo/logo.png'} alt="Logo" fill />
+        <Image src={'/images/landing/logo/swapic-logo.svg'} alt="Logo" fill />
       </Link>
 
       {/* Navbar */}

@@ -46,8 +46,8 @@ export const FOOTER_NAV_ITEMS: FooterNavItems[] = [
   {
     title: 'Resources',
     items: [
-      { label: 'Appic Docs (coming soon)', href: null },
-      { label: 'Appic SDK (coming soon)', href: null },
+      { label: 'Swapic Docs (coming soon)', href: null },
+      { label: 'Swapic SDK (coming soon)', href: null },
       {
         label: 'Investor Deck',
         href: 'https://www.figma.com/slides/3qkLMZLL3uYDNMFTrp2SPk/Appic-Pitch-Deck?node-id=1-1078&t=PEDS7qjRVZrJFA8r-0',

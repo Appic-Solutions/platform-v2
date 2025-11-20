@@ -151,7 +151,7 @@ export async function swap(
   } catch (error) {
     console.log(error);
     return {
-      message: `Failed to call appic dex canister: ${error}`,
+      message: `Failed to call Swapic dex canister: ${error}`,
       result: undefined,
       success: false,
     };

@@ -14,8 +14,8 @@ if (!projectId) {
 
 // Set up metadata
 const metadata = {
-  name: 'Appicdao',
-  description: 'Appic crosschain swap on icp',
+  name: 'Swapic',
+  description: 'Swapic crosschain swap on icp',
   url: 'http://app.appicdao.com', // origin must match your domain & subdomain
   icons: ['https://assets.reown.com/reown-profile-pic.png'],
   debug: true,

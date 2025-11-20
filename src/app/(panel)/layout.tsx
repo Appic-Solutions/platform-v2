@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import NavbarPage from './_layout/navbar';
 
 export const metadata: Metadata = {
-  title: 'Appic Dao',
-  description: 'Appic cross-chain swap built on ICP',
+  title: 'Swapic Dao',
+  description: 'Swapic cross-chain swap built on ICP',
   icons: '/favicon.ico',
 };
 

@@ -10,6 +10,9 @@ ahiza
 appic
 APPIC
 Appicdao
+swapic
+Swapic
+SWAPIC
 appkit
 blocklisted
 blocklistedlptoken

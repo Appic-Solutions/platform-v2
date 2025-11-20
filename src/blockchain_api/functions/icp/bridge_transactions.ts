@@ -342,7 +342,7 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw native token from Appic minter: ${JSON.stringify(native_withdrawal_result.Err)}`,
+            message: `Failed to withdraw native token from Swapic minter: ${JSON.stringify(native_withdrawal_result.Err)}`,
             success: false,
           };
         }
@@ -351,7 +351,7 @@ export const request_withdraw = async (
 
         return {
           result: '',
-          message: `Failed to withdraw native token from Appic minter: ${error}`,
+          message: `Failed to withdraw native token from Swapic minter: ${error}`,
           success: false,
         };
       }
@@ -379,7 +379,7 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(erc20_withdrawal_result.Err)}`,
+            message: `Failed to withdraw ERC20 token from Swapic minter: ${JSON.stringify(erc20_withdrawal_result.Err)}`,
             success: false,
           };
         }
@@ -387,7 +387,7 @@ export const request_withdraw = async (
         console.log(error);
         return {
           result: '',
-          message: `Failed to withdraw ERC20 token from Appic minter: ${JSON.stringify(error)}`,
+          message: `Failed to withdraw ERC20 token from Swapic minter: ${JSON.stringify(error)}`,
           success: false,
         };
       }
@@ -424,7 +424,7 @@ export const request_withdraw = async (
         } else {
           return {
             result: '',
-            message: `Failed to wrap icrc token from Appic minter: ${JSON.stringify(icrc_wrap_result.Err)}`,
+            message: `Failed to wrap icrc token from Swapic minter: ${JSON.stringify(icrc_wrap_result.Err)}`,
             success: false,
           };
         }
@@ -432,7 +432,7 @@ export const request_withdraw = async (
         console.log(error);
         return {
           result: '',
-          message: `Failed to wrap icrc token from Appic minter: ${JSON.stringify(error)}`,
+          message: `Failed to wrap icrc token from Swapic minter: ${JSON.stringify(error)}`,
           success: false,
         };
       }
@@ -1006,7 +1006,7 @@ export const notify_appic_helper_deposit = async (
     return {
       result: '',
       success: false,
-      message: `Failed to notify appic helper ${error}`,
+      message: `Failed to notify Swapic helper ${error}`,
     };
   }
 };
